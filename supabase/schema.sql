@@ -1,0 +1,13 @@
+-- This is intentionally empty. The real schema (parents, kids, attempts,
+-- coin balance + debt, gifts, progression position on the map) should be
+-- designed from ten-a-day-spec.md, not guessed here ahead of time.
+--
+-- Roughly, based on the spec, you'll likely need tables for:
+--   parents       (phone, pin)
+--   kids          (parent_id, name, current era/table/stage, coin_balance)
+--   attempts      (kid_id, era/table/stage, score, lives_used, passed)
+--   gifts         (parent_id, name, coin_price)
+--   gift_claims   (kid_id, gift_id, claimed_at)   -- optional, for history
+--
+-- Run the finished version of this file in your Supabase project's
+-- SQL Editor once it's written.
