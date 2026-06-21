@@ -3,6 +3,7 @@ import { generateBatch } from '../lib/problems'
 import { themeFor } from '../lib/eraTheme'
 import { stageLabel, nextStep } from '../lib/progression'
 import { applyPayout, STAGE_PAYOUT } from '../lib/economy'
+import FlowerJump from '../components/FlowerJump'
 import {
   updateProgress,
   setCoinBalance,
@@ -230,9 +231,11 @@ export default function Practice({
     const pass = correct >= 8
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-white px-6 gap-6 max-w-sm mx-auto">
-        <span className="text-8xl" role="img" aria-label={pass ? 'star' : 'thumbs up'}>
-          {pass ? '⭐' : '👍'}
-        </span>
+        {pass ? (
+          <FlowerJump size={200} />
+        ) : (
+          <span className="text-8xl" role="img" aria-label="thumbs up">👍</span>
+        )}
         <div className="text-center">
           <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">
             {pass ? 'You passed!' : 'Not quite!'}
