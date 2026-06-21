@@ -15,11 +15,11 @@ const TOTAL       = 10
 const LIVES_START = 4
 const TIMED_MS    = 5000
 
-// Both timed node types share the same 5s-per-question countdown UI.
-const TIMED_NODES = new Set(['speed_round', 'irl_timed'])
-// Both "real-world" node types render as longer sentence text instead of
-// a big plain equation.
-const WORD_PROBLEM_NODES = new Set(['irl', 'irl_timed'])
+// 'speed' is the only node with the 5s-per-question countdown UI.
+const TIMED_NODES = new Set(['speed'])
+// 'practice' and 'real_life' render as longer sentence text instead of a
+// big plain equation — 'unlock'/'learn'/'speed' stay plain-equation style.
+const WORD_PROBLEM_NODES = new Set(['practice', 'real_life'])
 
 function XIcon() {
   return (
@@ -80,19 +80,24 @@ function cardAnimClass(choice, selected, revealed, answer) {
 export default function Practice({
   operation = 'addition',
   table = 1,
-  node = 'equations',
+  node = 'learn',
   kidId,
   coinBalance = 0,
+  reviewPool,
   onExit,
   onBalanceChange,
 }) {
   const theme = themeFor(operation)
   const isTimed = TIMED_NODES.has(node)
   const isWordProblem = WORD_PROBLEM_NODES.has(node)
-  const isGift = node === 'gift'
+  const isReview = node === 'review'
   const payout = payoutForNode(node)
 
-  const batch = useMemo(() => generateBatch(operation, table, node), [operation, table, node])
+  const batch = useMemo(
+    () => generateBatch(operation, table, node, 10, reviewPool),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [operation, table, node]
+  )
 
   const [idx,      setIdx]      = useState(0)
   const [lives,    setLives]    = useState(LIVES_START)
@@ -171,7 +176,7 @@ export default function Practice({
           await logCoinTransaction(kidId, {
             attemptId,
             amount: coinsDelta,
-            reason: isGift ? 'gift_node_pass' : 'node_pass',
+            reason: isReview ? 'review_node_pass' : 'node_pass',
             balanceAfter: newBalance,
           })
           onBalanceChange?.(newBalance)
@@ -248,7 +253,7 @@ export default function Practice({
           )}
           <div className="text-center">
             <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">
-              {pass ? (isGift ? 'Bonus complete!' : 'You passed!') : 'Not quite!'}
+              {pass ? (isReview ? 'Review complete!' : 'You passed!') : 'Not quite!'}
             </h2>
             <p className="font-body text-gray-400">{correct} out of {TOTAL} correct</p>
             {pass && (
