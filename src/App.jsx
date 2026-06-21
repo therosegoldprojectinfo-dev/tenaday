@@ -1,42 +1,92 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Map from './screens/Map'
 import ChapterPath from './screens/ChapterPath'
 import Practice from './screens/Practice'
 import Rewards from './screens/Rewards'
 import Profile from './screens/Profile'
+import Auth from './screens/Auth'
+import KidPicker from './screens/KidPicker'
+import CreateKid from './screens/CreateKid'
 import NavShell from './components/NavShell'
-import { DEMO_KID_ID } from './lib/kidData'
+import { getSession, logOut as authLogOut } from './lib/parentAuth'
 
-// Two layers of navigation:
-//   navTab: 'home' | 'rewards' | 'profile' — which bottom-bar/sidebar
-//     destination is active. Persists independently of the chapter
-//     drill-down below, so switching to Rewards and back to Home returns
-//     to the chapter list, not wherever you were in a chapter.
-//   screen: 'list' | 'path' | 'play' — only meaningful while navTab is
-//     'home'; this is the existing chapter-list -> chapter-path ->
-//     practice drill-down.
+// Top-level app flow, in order:
+//   'auth'        — parent signup/login (shown if no saved session)
+//   'kidPicker'   — Netflix-style "who's playing" grid (shown after login)
+//   'createKid'   — name/age/placement-claim form (shown from kidPicker's "Add kid")
+//   'game'        — the actual app (chapter list / chapter path / practice / nav tabs),
+//                    once a specific kid profile has been selected
+//
+// Session persistence (lib/parentAuth.js, localStorage-backed) means a
+// returning parent skips straight to 'kidPicker' on reload instead of
+// having to log in again every visit — but which KID was last active is
+// intentionally NOT persisted across reloads; landing on the picker each
+// time the app is freshly opened matches the Netflix-style mental model
+// ("who's playing right now") better than silently resuming whoever
+// played last, especially on a shared family device.
 export default function App() {
-  // No parent/login flow yet (next build phase) — every screen operates on
-  // one seeded demo kid. Swap this for the picked profile's id once a kid
-  // profile picker exists; nothing else needs to change.
-  const kidId = DEMO_KID_ID
+  const [authPhase, setAuthPhase] = useState('checking') // 'checking' | 'auth' | 'kidPicker' | 'createKid' | 'game'
+  const [parentId, setParentId] = useState(null)
+  const [kidId, setKidId] = useState(null)
 
+  // Game-level navigation state (only meaningful once authPhase === 'game')
   const [navTab, setNavTab] = useState('home') // 'home' | 'rewards' | 'profile'
-
   const [screen, setScreen] = useState('list')       // 'list' | 'path' | 'play'
-  const [activeChapter, setActiveChapter] = useState(null) // operation string, while in 'path' or 'play'
-  const [activeNode, setActiveNode] = useState(null)        // { operation, table, node, coinBalance }, while in 'play'
-
-  // Bumped to force a fresh kid-data fetch whenever a screen we're
-  // returning to should reflect updated progress/balance.
+  const [activeChapter, setActiveChapter] = useState(null)
+  const [activeNode, setActiveNode] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
+
+  // On first mount, check for a saved session and skip straight to the
+  // kid picker if one exists — avoids forcing a returning parent to log
+  // in again every single time they open the app.
+  useEffect(() => {
+    const saved = getSession()
+    if (saved) {
+      setParentId(saved)
+      setAuthPhase('kidPicker')
+    } else {
+      setAuthPhase('auth')
+    }
+  }, [])
+
+  function handleAuthenticated(newParentId) {
+    setParentId(newParentId)
+    setAuthPhase('kidPicker')
+  }
+
+  function handleSelectKid(selectedKidId) {
+    setKidId(selectedKidId)
+    setAuthPhase('game')
+    setNavTab('home')
+    setScreen('list')
+  }
+
+  function handleKidCreated(newKidId) {
+    setKidId(newKidId)
+    setAuthPhase('game')
+    setNavTab('home')
+    setScreen('list')
+  }
+
+  function handleLogOut() {
+    authLogOut()
+    setParentId(null)
+    setKidId(null)
+    setAuthPhase('auth')
+  }
+
+  function handleSwitchProfile() {
+    setKidId(null)
+    setAuthPhase('kidPicker')
+    // Bumping refreshKey forces KidPicker to remount and re-fetch the
+    // kid list, so any changes (coin balance, progress) made during this
+    // session show up immediately rather than a stale snapshot from
+    // whenever the picker last loaded.
+    setRefreshKey(k => k + 1)
+  }
 
   function handleNavigate(tab) {
     setNavTab(tab)
-    // Switching to Rewards/Profile and back to Home always lands back on
-    // the chapter list, not mid-chapter — matches how a persistent nav
-    // bar is expected to behave (it's a top-level destination switch, not
-    // a "resume where I left off" action).
     if (tab === 'home') {
       setScreen('list')
       setActiveChapter(null)
@@ -66,8 +116,45 @@ export default function App() {
     setRefreshKey(k => k + 1)
   }
 
-  // Practice renders standalone, with NO nav shell — full-focus mode,
-  // per current scope (confirmed: nav only appears on Home + Chapter Path).
+  // ── Pre-game phases ──────────────────────────────────────────────────
+
+  if (authPhase === 'checking') {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="font-body text-gray-400">Loading…</p>
+      </div>
+    )
+  }
+
+  if (authPhase === 'auth') {
+    return <Auth onAuthenticated={handleAuthenticated} />
+  }
+
+  if (authPhase === 'kidPicker') {
+    return (
+      <KidPicker
+        key={refreshKey}
+        parentId={parentId}
+        onSelectKid={handleSelectKid}
+        onCreateKid={() => setAuthPhase('createKid')}
+        onLogOut={handleLogOut}
+      />
+    )
+  }
+
+  if (authPhase === 'createKid') {
+    return (
+      <CreateKid
+        parentId={parentId}
+        onCreated={handleKidCreated}
+        onBack={() => setAuthPhase('kidPicker')}
+      />
+    )
+  }
+
+  // ── Game phase ───────────────────────────────────────────────────────
+
+  // Practice renders standalone, with NO nav shell — full-focus mode.
   if (navTab === 'home' && screen === 'play' && activeNode) {
     return (
       <Practice
@@ -78,6 +165,7 @@ export default function App() {
         kidId={kidId}
         coinBalance={activeNode.coinBalance}
         reviewPool={activeNode.reviewPool}
+        placementClaim={activeNode.placementClaim}
         onExit={handleExitPractice}
       />
     )
@@ -87,7 +175,7 @@ export default function App() {
   if (navTab === 'rewards') {
     content = <Rewards />
   } else if (navTab === 'profile') {
-    content = <Profile />
+    content = <Profile kidId={kidId} onSwitchProfile={handleSwitchProfile} />
   } else if (screen === 'path' && activeChapter) {
     content = (
       <ChapterPath
