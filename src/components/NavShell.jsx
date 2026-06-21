@@ -18,19 +18,23 @@ function HouseIcon({ active }) {
   )
 }
 
-// Vault — same Lucide-style stroke-only treatment as House, no fill color.
-// A hand-drawn equivalent of Lucide's "vault" icon (door + handle + bolt
-// circles), kept stroke-only/currentColor so it inherits the same
-// active/inactive color logic as House rather than carrying its own fixed
-// palette.
+// Medal/badge — same Lucide-style stroke-only treatment as House: no
+// fill color, inherits color from the active/inactive state. Replaces an
+// earlier vault icon that used zero-length "dot" sub-paths (M x y v0.01)
+// to draw bolt details — that technique rendered as a broken/empty shape
+// rather than dots, so this version uses only real strokes and a solid
+// fill star, nothing that depends on a renderer interpreting a
+// degenerate path correctly.
 function RewardsIcon({ active }) {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="3" width="18" height="18" rx="2" />
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 10v0.01M14.5 12h0.01M12 14v0.01M9.5 12h0.01" />
-      {active && <path d="M7 7h0.01M17 7h0.01M7 17h0.01M17 17h0.01" />}
+      <circle cx="12" cy="9" r="6" />
+      <path
+        d="M9.5 14.2L7.5 21l4.5-2.5 4.5 2.5-2-6.8"
+        fill={active ? 'currentColor' : 'none'}
+      />
+      <path d="M12 6.5l1 2 2.2 0.3-1.6 1.5 0.4 2.2-2-1.1-2 1.1 0.4-2.2-1.6-1.5 2.2-0.3z" fill="currentColor" stroke="none" />
     </svg>
   )
 }
@@ -42,7 +46,7 @@ function ProfileIcon() {
       alt=""
       draggable={false}
       onContextMenu={(e) => e.preventDefault()}
-      className="w-9 h-9 object-contain select-none pointer-events-none"
+      className="w-11 h-11 object-contain select-none pointer-events-none"
     />
   )
 }
@@ -70,8 +74,8 @@ function NavButton({ item, isActive, onPress, orientation }) {
         aria-current={isActive ? 'page' : undefined}
       >
         <span
-          className="w-11 h-11 rounded-2xl flex items-center justify-center transition-colors"
-          style={{
+          className={isProfile ? 'w-12 h-12 flex items-center justify-center' : 'w-11 h-11 rounded-2xl flex items-center justify-center transition-colors'}
+          style={isProfile ? undefined : {
             backgroundColor: isActive ? ACTIVE_BG : 'transparent',
             color: isActive ? ACTIVE_FG : '#9CA3AF',
           }}
@@ -94,7 +98,7 @@ function NavButton({ item, isActive, onPress, orientation }) {
       }}
       aria-current={isActive ? 'page' : undefined}
     >
-      <span className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+      <span className={isProfile ? 'w-10 h-10 flex items-center justify-center flex-shrink-0' : 'w-9 h-9 flex items-center justify-center flex-shrink-0'}>
         {isProfile ? <Icon /> : <Icon active={isActive} />}
       </span>
       <span className="font-body font-bold text-sm">{label}</span>
