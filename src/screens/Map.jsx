@@ -236,25 +236,27 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
 
       {/* Top stats bar */}
       <div className="sticky top-0 bg-white z-20 border-b border-gray-100">
-        <div className="flex items-center justify-between px-5 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
-          <div className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100">
-            <HeartStatIcon />
-            <span className="font-body font-bold text-base text-red-500 leading-none tabular-nums">4</span>
-          </div>
-          <div
-            className={`flex items-center gap-1.5 rounded-full px-3 py-2 border ${
-              inDebt ? 'border-red-200' : 'border-amber-200'
-            }`}
-            style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}
-          >
-            <CoinStatIcon />
-            <span
-              className={`font-body font-bold text-base leading-none tabular-nums ${
-                inDebt ? 'text-red-500' : 'text-amber-700'
+        <div className="flex items-center justify-end px-5 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100">
+              <HeartStatIcon />
+              <span className="font-body font-bold text-base text-red-500 leading-none tabular-nums">4</span>
+            </div>
+            <div
+              className={`flex items-center gap-1.5 rounded-full px-3 py-2 border ${
+                inDebt ? 'border-red-200' : 'border-amber-200'
               }`}
+              style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}
             >
-              {kid.coin_balance}
-            </span>
+              <CoinStatIcon />
+              <span
+                className={`font-body font-bold text-base leading-none tabular-nums ${
+                  inDebt ? 'text-red-500' : 'text-amber-700'
+                }`}
+              >
+                {kid.coin_balance}
+              </span>
+            </div>
           </div>
         </div>
       </div>
