@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { themeFor } from '../lib/eraTheme'
 import {
   NODES,
@@ -11,53 +11,23 @@ import {
 import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
 import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 
-// ── Zigzag offsets ───────────────────────────────────────────────────────
-// Ported from a real Duolingo-clone reference: a fixed lookup table of
-// horizontal offsets per node index, alternating direction per unit. This
-// replaces a hand-computed sine wave with the same proven pattern Duolingo
-// itself uses — simpler, and because nodes stack via flexbox (not manual
-// pixel math), spacing is never wrong regardless of content above it.
-const LEFT_OFFSETS  = [0, 64, 96, 56, -16, -64, 0]   // px, negative = shift right
-const RIGHT_OFFSETS = [0, -64, -96, -56, 16, 64, 0]
+const DUO_GREEN = '#58cc02'
+const DUO_GREEN_DARK = '#46a302'
 
-function offsetForNode(unitIndex, nodeIdx) {
-  const table = unitIndex % 2 === 0 ? LEFT_OFFSETS : RIGHT_OFFSETS
-  return table[nodeIdx % table.length]
-}
+// ── Icons ────────────────────────────────────────────────────────────────
 
-const NODE_SIZE = 88
-const RING_SIZE = 104 // SVG progress ring, larger than the node so it reads as a halo
-const RING_STROKE = 5
-
-function puckShadow(darkHex) {
-  return [
-    `0 6px 0 0 ${darkHex}`,
-    '0 12px 22px rgba(0,0,0,0.20)',
-    'inset 0 3px 0 rgba(255,255,255,0.30)',
-    'inset 0 -2px 0 rgba(0,0,0,0.12)',
-  ].join(', ')
-}
-
-function StarIcon({ size = 34 }) {
+function CheckIcon({ size = 22 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="white" aria-hidden="true">
-      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
-    </svg>
-  )
-}
-
-function CheckIcon({ size = 30 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M5 13l4 4L19 7" />
     </svg>
   )
 }
 
-function LockIcon({ size = 28 }) {
+function LockIcon({ size = 20 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="5" y="11" width="14" height="9" rx="2" />
       <path d="M8 11V7a4 4 0 0 1 8 0v4" />
@@ -65,16 +35,10 @@ function LockIcon({ size = 28 }) {
   )
 }
 
-function TrophyIcon({ size = 34 }) {
+function StarIcon({ size = 20 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M7 4h10v4a5 5 0 0 1-10 0V4Z" fill="white" />
-      <path
-        d="M7 5H4a2 2 0 0 0-2 2c0 2.2 1.8 4 4 4M17 5h3a2 2 0 0 1 2 2c0 2.2-1.8 4-4 4"
-        stroke="white" strokeWidth="2" strokeLinecap="round"
-      />
-      <rect x="10" y="13" width="4" height="4" fill="white" />
-      <rect x="7" y="17" width="10" height="3" rx="1.5" fill="white" />
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
     </svg>
   )
 }
@@ -109,120 +73,165 @@ function CoinStatIcon() {
   )
 }
 
-// ── Node button ──────────────────────────────────────────────────────────
-// Fixed Duolingo green for every unlocked node (per project-wide rule: only
-// green is used for action/interactive elements, regardless of era) — grey
-// for locked. The era's own color no longer tints nodes; it only tints the
-// unit banner, so the chapter still has visual identity without breaking
-// the "green is the only action color" rule.
-const DUO_GREEN = '#58cc02'
-const DUO_GREEN_DARK = '#46a302'
+// Per-node-type icons for the list rows — distinct glyphs so the 5 rows
+// are visually scannable, not 5 identical circles with different labels.
+function NodeTypeIcon({ node, size = 22 }) {
+  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', 'aria-hidden': true }
+  if (node === 'equations') {
+    return (
+      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round">
+        <path d="M5 8h6M5 16h6M14 7l6 10M20 7l-6 10" />
+      </svg>
+    )
+  }
+  if (node === 'speed_round') {
+    return (
+      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2.5a9.5 9.5 0 1 0 6.7 16.2M12 7v5l3.5 2" />
+        <path d="M18 4l1.5-1.5M20 6l1.5-1.5" />
+      </svg>
+    )
+  }
+  if (node === 'irl') {
+    return (
+      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 20V10l8-6 8 6v10" />
+        <path d="M9 20v-6h6v6" />
+      </svg>
+    )
+  }
+  if (node === 'irl_timed') {
+    return (
+      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 20V10l8-6 8 6v10" />
+        <path d="M9 20v-6h6v6" />
+        <circle cx="18" cy="6" r="4" fill="white" stroke="currentColor" strokeWidth="2" />
+        <path d="M18 4.5V6l1 1" />
+      </svg>
+    )
+  }
+  // gift / bonus round
+  return (
+    <svg {...common} fill="currentColor" stroke="none">
+      <path d="M7 4h10v4a5 5 0 0 1-10 0V4Z" />
+      <path d="M5 5H4a2 2 0 0 0-2 2c0 2.2 1.8 4 4 4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <path d="M19 5h1a2 2 0 0 1 2 2c0 2.2-1.8 4-4 4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+      <rect x="10" y="13" width="4" height="4" />
+      <rect x="7" y="17" width="10" height="3" rx="1.5" />
+    </svg>
+  )
+}
 
-function PathNode({ table, node, status, isCurrent, offsetPx, popoverOpen, onTogglePopover }) {
-  const locked = status === 'locked'
-  const completed = status === 'completed'
-  const isTrophyNode = node === 'gift'
+// ── Horizontal unit selector ────────────────────────────────────────────
+// A scrollable strip of connected circles, one per unit (matches the
+// reference: "+1, +2, +3, +4..." checkpoint timeline). All 12 are always
+// visible/scrollable; only unlocked ones are tappable.
+function UnitSelector({ tables, currentPos, operation, theme, selectedTable, onSelect }) {
+  const selectedRef = useRef(null)
 
-  let icon
-  if (completed) icon = <CheckIcon />
-  else if (locked) icon = <LockIcon />
-  else if (isTrophyNode) icon = <TrophyIcon />
-  else icon = <StarIcon />
-
-  const nodeSize = isTrophyNode ? NODE_SIZE + 10 : NODE_SIZE
+  useEffect(() => {
+    selectedRef.current?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+  }, [selectedTable])
 
   return (
-    <div
-      className="relative flex items-center justify-center"
-      style={{ width: RING_SIZE, height: RING_SIZE, marginLeft: offsetPx }}
-    >
-      {/* SVG progress ring — current node only. A full ring (progress=1)
-          reads as a clear halo without needing a flat grey div behind it. */}
-      {isCurrent && (
-        <svg
-          className="absolute"
-          width={RING_SIZE}
-          height={RING_SIZE}
-          style={{ transform: 'rotate(-90deg)' }}
-        >
-          <circle
-            cx={RING_SIZE / 2}
-            cy={RING_SIZE / 2}
-            r={(RING_SIZE - RING_STROKE) / 2}
-            stroke="#E5E7EB"
-            strokeWidth={RING_STROKE}
-            fill="none"
-          />
-        </svg>
-      )}
+    <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-4">
+      {tables.map((table, i) => {
+        const uStatus = unitStatus(currentPos, operation, table)
+        const locked = uStatus === 'locked'
+        const completed = uStatus === 'completed'
+        const isSelected = table === selectedTable
 
-      <button
-        type="button"
-        disabled={locked}
-        onClick={(e) => { e.stopPropagation(); onTogglePopover() }}
-        className="relative rounded-full flex items-center justify-center
-                   transition-transform duration-75 active:translate-y-1 disabled:active:translate-y-0"
-        style={{
-          width: nodeSize,
-          height: nodeSize,
-          backgroundColor: locked ? '#D1D5DB' : DUO_GREEN,
-          boxShadow: locked ? puckShadow('#9CA3AF') : puckShadow(DUO_GREEN_DARK),
-        }}
-        aria-label={
-          completed
-            ? `Table ${table}, ${nodeLabel(node)}, completed — tap to replay`
-            : locked
-              ? `Table ${table}, ${nodeLabel(node)}, locked`
-              : `Table ${table}, ${nodeLabel(node)}`
-        }
-        aria-expanded={popoverOpen}
-      >
-        {icon}
-      </button>
+        let icon = <span className="font-body font-bold text-sm">{table}</span>
+        if (completed) icon = <CheckIcon size={18} />
+        else if (locked) icon = <LockIcon size={16} />
+        else if (uStatus === 'active') icon = <StarIcon size={16} />
+
+        return (
+          <div key={table} className="flex items-center flex-shrink-0">
+            {i > 0 && (
+              <div
+                className="h-0.5 w-6"
+                style={{ backgroundColor: completed || uStatus === 'active' ? theme.colors.primary : '#E5E7EB' }}
+              />
+            )}
+            <button
+              ref={isSelected ? selectedRef : null}
+              type="button"
+              disabled={locked}
+              onClick={() => onSelect(table)}
+              className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-transform"
+              style={{
+                backgroundColor: locked ? '#E5E7EB' : theme.colors.primary,
+                color: locked ? '#9CA3AF' : '#FFFFFF',
+                outline: isSelected ? `3px solid ${theme.colors.dark}` : 'none',
+                outlineOffset: '2px',
+                transform: isSelected ? 'scale(1.08)' : 'scale(1)',
+              }}
+              aria-label={`Unit ${table}${locked ? ', locked' : ''}`}
+              aria-pressed={isSelected}
+            >
+              {icon}
+            </button>
+          </div>
+        )
+      })}
     </div>
   )
 }
 
-// ── Unit banner ──────────────────────────────────────────────────────────
-// True "sandwich" divider per design reference: sits between the previous
-// unit's last node and this unit's first node, with normal flex spacing on
-// both sides — never anchored/overlapping either neighbor, because flexbox
-// stacking (not manual y-position math) guarantees the gap.
-function UnitBanner({ table, status, theme }) {
-  if (status === 'locked') {
-    // Locked future units get a plain text divider, not a heavy colored
-    // banner — matches the lighter-weight treatment Duolingo itself uses
-    // for sections you haven't reached yet.
-    return (
-      <div className="flex items-center gap-3 w-full px-6 py-2">
-        <div className="flex-1 h-px bg-gray-200" />
-        <p className="font-body font-bold text-sm text-gray-300 text-center whitespace-nowrap">
-          Unit {table}
-        </p>
-        <div className="flex-1 h-px bg-gray-200" />
-      </div>
-    )
-  }
+// ── Node list row ────────────────────────────────────────────────────────
+// Horizontal card: icon, title + progress indicator, status circle —
+// matches the reference's task-list visual language directly.
+function NodeRow({ node, status, isCurrent, onPress }) {
+  const locked = status === 'locked'
+  const completed = status === 'completed'
+  const isGift = node === 'gift'
+
+  const subtitle = locked
+    ? 'Locked'
+    : completed
+      ? 'Completed — tap to replay'
+      : isCurrent
+        ? 'Up next'
+        : 'Ready to play'
 
   return (
-    <div className="w-full px-4">
+    <button
+      type="button"
+      disabled={locked}
+      onClick={onPress}
+      className="w-full flex items-center gap-3 bg-white rounded-2xl border border-gray-100 px-4 py-3.5
+                 transition-transform active:scale-[0.98] disabled:active:scale-100"
+    >
       <div
-        className="rounded-2xl px-4 py-3 flex items-center justify-between max-w-sm mx-auto"
+        className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
         style={{
-          backgroundColor: theme.colors.primary,
-          boxShadow: `0 3px 0 0 ${theme.colors.dark}`,
+          backgroundColor: locked ? '#F3F4F6' : isGift ? '#FFF7E0' : '#EAF8DC',
+          color: locked ? '#9CA3AF' : isGift ? '#CC9900' : DUO_GREEN_DARK,
         }}
       >
-        <div>
-          <p className="font-body font-bold text-xs text-white/75 tracking-widest uppercase leading-none mb-1">
-            {theme.operationLabel}
-          </p>
-          <p className="font-display font-bold text-lg text-white leading-tight">
-            Unit {table}
-          </p>
-        </div>
+        <NodeTypeIcon node={node} />
       </div>
-    </div>
+
+      <div className="flex-1 text-left min-w-0">
+        <p className={`font-display font-bold text-base leading-tight ${locked ? 'text-gray-400' : 'text-gray-900'}`}>
+          {nodeLabel(node)}
+        </p>
+        <p className={`font-body text-xs mt-0.5 ${locked ? 'text-gray-300' : completed ? 'text-gray-400' : 'text-green-600'}`}>
+          {subtitle}
+        </p>
+      </div>
+
+      <div
+        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+        style={{
+          backgroundColor: locked ? '#F3F4F6' : completed ? DUO_GREEN : '#F3F4F6',
+          color: locked ? '#D1D5DB' : completed ? '#FFFFFF' : '#D1D5DB',
+        }}
+      >
+        {locked ? <LockIcon size={16} /> : <CheckIcon size={16} />}
+      </div>
+    </button>
   )
 }
 
@@ -230,33 +239,29 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   const [kid, setKid] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [selectedTable, setSelectedTable] = useState(null)
   // The single node whose confirmation bottom-sheet is open, or null.
-  // Shape: { table, node, status }
   const [openNode, setOpenNode] = useState(null)
 
   useEffect(() => {
     let cancelled = false
     fetchKid(kidId)
-      .then(data => { if (!cancelled) setKid(data) })
+      .then(data => {
+        if (cancelled) return
+        setKid(data)
+        // Default the selected unit to the kid's current table in this
+        // chapter, or table 1 if they haven't reached this chapter yet.
+        setSelectedTable(data.current_operation === operation ? data.current_table : 1)
+      })
       .catch(err => {
         console.error('Failed to load kid progress:', err)
         if (!cancelled) setError(err)
       })
       .finally(() => !cancelled && setLoading(false))
     return () => { cancelled = true }
-  }, [kidId])
+  }, [kidId, operation])
 
-  // Close the open bottom sheet on scroll — keeps it from feeling stuck to
-  // a node that's scrolled out of view. (No outside-click listener needed
-  // since the bottom sheet has its own dimmed backdrop that handles that.)
-  useEffect(() => {
-    if (!openNode) return
-    const close = () => setOpenNode(null)
-    window.addEventListener('scroll', close, { passive: true })
-    return () => window.removeEventListener('scroll', close)
-  }, [openNode])
-
-  if (loading) {
+  if (loading || selectedTable === null) {
     return (
       <div className="bg-white min-h-screen flex items-center justify-center">
         <p className="font-body text-gray-400">Loading…</p>
@@ -281,6 +286,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
     node: kid.current_node,
   }
   const tables = tablesForOperation()
+  const selectedUnitStatus = unitStatus(currentPos, operation, selectedTable)
+
+  function handleSelectUnit(table) {
+    setOpenNode(null)
+    setSelectedTable(table)
+  }
 
   function handleTogglePopover(table, node, status, isCurrent) {
     if (status === 'locked') return
@@ -297,8 +308,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
     setOpenNode(null)
 
     // Charge entry fee up front (spec §7), clamped at the debt floor —
-    // now happens on the SECOND tap (popover confirm), not the first tap
-    // that just opens the popover, so browsing the path never costs coins.
+    // charged on the bottom sheet's confirm tap, not the row tap that
+    // just opens it, so browsing the unit's nodes never costs coins.
     const newBalance = applyEntryFee(kid.coin_balance)
     try {
       await setCoinBalance(kidId, newBalance)
@@ -354,6 +365,17 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
             </div>
           </div>
         </div>
+
+        {/* Horizontal scrollable unit selector — connected checkpoint
+            timeline, all 12 units visible, only unlocked ones tappable. */}
+        <UnitSelector
+          tables={tables}
+          currentPos={currentPos}
+          operation={operation}
+          theme={theme}
+          selectedTable={selectedTable}
+          onSelect={handleSelectUnit}
+        />
       </div>
 
       {atDebtFloor && (
@@ -364,74 +386,65 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
         </div>
       )}
 
-      {/* Node path — each unit is its own flex column block: banner, then
-          its 5 nodes stacked with consistent gap. Units stack vertically
-          with their own margin, so a banner can never be overlapped by a
-          node — flexbox guarantees the gap regardless of content size. */}
-      <div className="flex flex-col items-center w-full">
-        {tables.map(table => {
-          const uStatus = unitStatus(currentPos, operation, table)
-
-          return (
-            <div key={table} className="flex flex-col items-center w-full">
-              <div className="my-6 w-full flex justify-center">
-                <UnitBanner table={table} status={uStatus} theme={theme} />
-              </div>
-
-              <div className="flex flex-col items-center gap-5 py-2">
-                {NODES.map((node, nodeIdx) => {
-                  const targetPos = { operation, table, node }
-
-                  const unlocked =
-                    uStatus === 'completed' ||
-                    (uStatus === 'active' && isUnlocked(currentPos, targetPos))
-
-                  const completed =
-                    uStatus === 'completed' ||
-                    (uStatus === 'active' && isCompleted(currentPos, targetPos))
-
-                  const isCurrent =
-                    uStatus === 'active' &&
-                    currentPos.table === table &&
-                    currentPos.node === node
-
-                  const status = completed ? 'completed' : unlocked ? 'active' : 'locked'
-                  const isThisOpen = openNode?.table === table && openNode?.node === node
-
-                  return (
-                    <PathNode
-                      key={node}
-                      table={table}
-                      node={node}
-                      status={status}
-                      isCurrent={isCurrent}
-                      offsetPx={offsetForNode(table, nodeIdx)}
-                      popoverOpen={isThisOpen}
-                      onTogglePopover={() => handleTogglePopover(table, node, status, isCurrent)}
-                    />
-                  )
-                })}
-              </div>
-            </div>
-          )
-        })}
-
-        <div className="h-16" />
+      {/* Selected unit header */}
+      <div className="px-4 pt-5 pb-2 max-w-sm mx-auto">
+        <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.primary }}>
+          {theme.operationLabel}
+        </p>
+        <p className="font-display font-bold text-2xl text-gray-900">
+          Unit {selectedTable}
+        </p>
       </div>
 
-      {/* Node confirmation bottom sheet — deliberately NOT anchored to the
-          tapped node's own (possibly off-center, zigzagged) position. A
-          fixed bottom sheet sidesteps all viewport-overflow risk entirely
-          and is a perfectly natural mobile pattern in its own right. */}
+      {/* The 5 exercises for the selected unit, as list rows */}
+      <div className="max-w-sm mx-auto px-4 pb-10 flex flex-col gap-2.5">
+        {selectedUnitStatus === 'locked' ? (
+          <div className="rounded-2xl bg-gray-50 border border-gray-100 px-4 py-6 text-center">
+            <LockIcon size={26} />
+            <p className="font-body text-sm text-gray-400 mt-2">
+              Complete the previous unit to unlock this one.
+            </p>
+          </div>
+        ) : (
+          NODES.map(node => {
+            const targetPos = { operation, table: selectedTable, node }
+
+            const unlocked =
+              selectedUnitStatus === 'completed' ||
+              (selectedUnitStatus === 'active' && isUnlocked(currentPos, targetPos))
+
+            const completed =
+              selectedUnitStatus === 'completed' ||
+              (selectedUnitStatus === 'active' && isCompleted(currentPos, targetPos))
+
+            const isCurrent =
+              selectedUnitStatus === 'active' &&
+              currentPos.table === selectedTable &&
+              currentPos.node === node
+
+            const status = completed ? 'completed' : unlocked ? 'active' : 'locked'
+
+            return (
+              <NodeRow
+                key={node}
+                node={node}
+                status={status}
+                isCurrent={isCurrent}
+                onPress={() => handleTogglePopover(selectedTable, node, status, isCurrent)}
+              />
+            )
+          })
+        )}
+      </div>
+
+      {/* Node confirmation bottom sheet */}
       {openNode && (
         <>
           <div
             className="fixed inset-0 bg-black/30 z-40"
             onClick={() => setOpenNode(null)}
           />
-          <div
-            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl px-5 pt-5 pb-8 max-w-sm mx-auto anim-sheet-in"
-          >
+          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl px-5 pt-5 pb-8 max-w-sm mx-auto anim-sheet-in">
             <div className="w-10 h-1.5 rounded-full bg-gray-200 mx-auto mb-4" />
             <p className="font-display font-bold text-xl text-gray-900 mb-1">
               {nodeLabel(openNode.node)}
