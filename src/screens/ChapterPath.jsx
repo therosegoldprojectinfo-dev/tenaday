@@ -5,9 +5,13 @@ import {
   tablesForOperation,
   isUnlocked,
   isCompleted,
-  unitStatus,
+  tableStatus,
   nodeLabel,
+  nodePurpose,
+  chainPosition,
+  reviewPoolFor,
 } from '../lib/progression'
+import { isPlayableToday, nextUnlockMessage } from '../lib/dayGate'
 import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
 import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 
@@ -31,6 +35,18 @@ function LockIcon({ size = 20 }) {
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="5" y="11" width="14" height="9" rx="2" />
       <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </svg>
+  )
+}
+
+// Distinct from a permanent lock — this is "come back tomorrow," a
+// temporary/calendar state, not a progression block.
+function ClockLockIcon({ size = 20 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
+      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3.5 2" />
     </svg>
   )
 }
@@ -65,18 +81,43 @@ function CoinStatIcon() {
   )
 }
 
-// Per-node-type icons for the list rows — distinct glyphs so the 5 rows
-// are visually scannable, not 5 identical circles with different labels.
+// Per-node-type icons for the list rows — distinct glyphs so the 6 rows
+// are visually scannable. Each maps to its node's pedagogical purpose
+// rather than being arbitrary: unlock=key, learn=seedling, practice=
+// repeat-arrows, real_life=house, speed=stopwatch, review=brain/refresh.
 function NodeTypeIcon({ node, size = 22 }) {
   const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', 'aria-hidden': true }
-  if (node === 'equations') {
+  if (node === 'unlock') {
     return (
-      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round">
-        <path d="M5 8h6M5 16h6M14 7l6 10M20 7l-6 10" />
+      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="8" cy="15" r="4" />
+        <path d="M11 12l8-8M16 7l2 2M19 4l2 2" />
       </svg>
     )
   }
-  if (node === 'speed_round') {
+  if (node === 'learn') {
+    return (
+      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 21V10M12 10C12 6 9 5 6 5c0 4 1 6 6 5ZM12 10c0-4 3-5 6-5 0 4-1 6-6 5Z" />
+      </svg>
+    )
+  }
+  if (node === 'practice') {
+    return (
+      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17 2l4 4-4 4M21 6H8a4 4 0 0 0-4 4v1M7 22l-4-4 4-4M3 18h13a4 4 0 0 0 4-4v-1" />
+      </svg>
+    )
+  }
+  if (node === 'real_life') {
+    return (
+      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 20V10l8-6 8 6v10" />
+        <path d="M9 20v-6h6v6" />
+      </svg>
+    )
+  }
+  if (node === 'speed') {
     return (
       <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 2.5a9.5 9.5 0 1 0 6.7 16.2M12 7v5l3.5 2" />
@@ -84,45 +125,23 @@ function NodeTypeIcon({ node, size = 22 }) {
       </svg>
     )
   }
-  if (node === 'irl') {
-    return (
-      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 20V10l8-6 8 6v10" />
-        <path d="M9 20v-6h6v6" />
-      </svg>
-    )
-  }
-  if (node === 'irl_timed') {
-    return (
-      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 20V10l8-6 8 6v10" />
-        <path d="M9 20v-6h6v6" />
-        <circle cx="18" cy="6" r="4" fill="white" stroke="currentColor" strokeWidth="2" />
-        <path d="M18 4.5V6l1 1" />
-      </svg>
-    )
-  }
-  // gift / bonus round
+  // review
   return (
-    <svg {...common} fill="currentColor" stroke="none">
-      <path d="M7 4h10v4a5 5 0 0 1-10 0V4Z" />
-      <path d="M5 5H4a2 2 0 0 0-2 2c0 2.2 1.8 4 4 4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
-      <path d="M19 5h1a2 2 0 0 1 2 2c0 2.2-1.8 4-4 4" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
-      <rect x="10" y="13" width="4" height="4" />
-      <rect x="7" y="17" width="10" height="3" rx="1.5" />
+    <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 12a9 9 0 1 1 3 6.7" />
+      <path d="M3 16v-4h4" />
     </svg>
   )
 }
 
-// ── Horizontal unit selector ────────────────────────────────────────────
-// A scrollable strip of connected circles, one per unit (matches the
-// reference: "+1, +2, +3, +4..." checkpoint timeline). All 12 are always
-// visible/scrollable; only unlocked ones are tappable. Always Duolingo
-// green for unlocked/active/completed circles — no era tinting here,
-// consistent with the rest of the app's "green is the only action color"
-// rule. The era color still shows up just below, in the ADDITION/Unit X
-// label text.
-function UnitSelector({ tables, currentPos, operation, selectedTable, onSelect }) {
+// ── Horizontal table selector ───────────────────────────────────────────
+// A scrollable strip of connected circles, one per table. All 12 are
+// always visible/scrollable; only unlocked ones are tappable. Always
+// Duolingo green for unlocked/active/completed circles — no era tinting
+// here, consistent with the rest of the app's "green is the only action
+// color" rule. The era color still shows up just below, in the
+// ADDITION/Table X label text.
+function TableSelector({ tables, currentPos, operation, selectedTable, onSelect }) {
   const selectedRef = useRef(null)
 
   useEffect(() => {
@@ -133,16 +152,11 @@ function UnitSelector({ tables, currentPos, operation, selectedTable, onSelect }
     <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-4 justify-start md:justify-center">
       <div className="flex items-center">
         {tables.map((table, i) => {
-          const uStatus = unitStatus(currentPos, operation, table)
-          const locked = uStatus === 'locked'
-          const completed = uStatus === 'completed'
+          const tStatus = tableStatus(currentPos, operation, table)
+          const locked = tStatus === 'locked'
+          const completed = tStatus === 'completed'
           const isSelected = table === selectedTable
 
-          // The unit's own number is always the default content — only
-          // completed (checkmark) and locked (padlock) override it. The
-          // kid's current/active unit still just shows its number, same
-          // as any other unlocked unit; the outline ring is what marks it
-          // as "current," not a different icon.
           let icon = <span className="font-body font-bold text-sm">{table}</span>
           if (completed) icon = <CheckIcon size={18} />
           else if (locked) icon = <LockIcon size={16} />
@@ -152,7 +166,7 @@ function UnitSelector({ tables, currentPos, operation, selectedTable, onSelect }
               {i > 0 && (
                 <div
                   className="h-0.5 w-6"
-                  style={{ backgroundColor: completed || uStatus === 'active' ? DUO_GREEN : '#E5E7EB' }}
+                  style={{ backgroundColor: completed || tStatus === 'active' ? DUO_GREEN : '#E5E7EB' }}
                 />
               )}
               <button
@@ -168,7 +182,7 @@ function UnitSelector({ tables, currentPos, operation, selectedTable, onSelect }
                   outlineOffset: '2px',
                   transform: isSelected ? 'scale(1.08)' : 'scale(1)',
                 }}
-                aria-label={`Unit ${table}${locked ? ', locked' : ''}`}
+                aria-label={`Table ${table}${locked ? ', locked' : ''}`}
                 aria-pressed={isSelected}
               >
                 {icon}
@@ -182,25 +196,30 @@ function UnitSelector({ tables, currentPos, operation, selectedTable, onSelect }
 }
 
 // ── Node list row ────────────────────────────────────────────────────────
-// Horizontal card: icon, title + progress indicator, status circle —
-// matches the reference's task-list visual language directly.
+// 'dayLocked' is a distinct visual state from a normal progression lock —
+// uses a clock icon and different copy, since it's temporary ("come back
+// tomorrow"), not a permanent block.
 function NodeRow({ node, status, isCurrent, onPress }) {
   const locked = status === 'locked'
+  const dayLocked = status === 'day_locked'
   const completed = status === 'completed'
-  const isGift = node === 'gift'
+  const isReview = node === 'review'
+  const disabled = locked || dayLocked
 
   const subtitle = locked
     ? 'Locked'
-    : completed
-      ? 'Completed — tap to replay'
-      : isCurrent
-        ? 'Up next'
-        : 'Ready to play'
+    : dayLocked
+      ? nextUnlockMessage()
+      : completed
+        ? 'Completed — tap to replay'
+        : isCurrent
+          ? nodePurpose(node)
+          : 'Ready to play'
 
   return (
     <button
       type="button"
-      disabled={locked}
+      disabled={disabled}
       onClick={onPress}
       className="w-full flex items-center gap-3 bg-white rounded-2xl border border-gray-100 px-4 py-3.5
                  transition-transform active:scale-[0.98] disabled:active:scale-100"
@@ -208,18 +227,20 @@ function NodeRow({ node, status, isCurrent, onPress }) {
       <div
         className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
         style={{
-          backgroundColor: locked ? '#F3F4F6' : isGift ? '#FFF7E0' : '#EAF8DC',
-          color: locked ? '#9CA3AF' : isGift ? '#CC9900' : DUO_GREEN_DARK,
+          backgroundColor: disabled ? '#F3F4F6' : isReview ? '#FFF7E0' : '#EAF8DC',
+          color: disabled ? '#9CA3AF' : isReview ? '#CC9900' : DUO_GREEN_DARK,
         }}
       >
         <NodeTypeIcon node={node} />
       </div>
 
       <div className="flex-1 text-left min-w-0">
-        <p className={`font-display font-bold text-base leading-tight ${locked ? 'text-gray-400' : 'text-gray-900'}`}>
+        <p className={`font-display font-bold text-base leading-tight ${disabled ? 'text-gray-400' : 'text-gray-900'}`}>
           {nodeLabel(node)}
         </p>
-        <p className={`font-body text-xs mt-0.5 ${locked ? 'text-gray-300' : completed ? 'text-gray-400' : 'text-green-600'}`}>
+        <p className={`font-body text-xs mt-0.5 leading-snug ${
+          dayLocked ? 'text-amber-600' : disabled ? 'text-gray-300' : completed ? 'text-gray-400' : 'text-green-600'
+        }`}>
           {subtitle}
         </p>
       </div>
@@ -227,11 +248,11 @@ function NodeRow({ node, status, isCurrent, onPress }) {
       <div
         className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
         style={{
-          backgroundColor: locked ? '#F3F4F6' : completed ? DUO_GREEN : '#F3F4F6',
-          color: locked ? '#D1D5DB' : completed ? '#FFFFFF' : '#D1D5DB',
+          backgroundColor: dayLocked ? '#FEF3C7' : disabled ? '#F3F4F6' : completed ? DUO_GREEN : '#F3F4F6',
+          color: dayLocked ? '#D97706' : disabled ? '#D1D5DB' : completed ? '#FFFFFF' : '#D1D5DB',
         }}
       >
-        {locked ? <LockIcon size={16} /> : <CheckIcon size={16} />}
+        {dayLocked ? <ClockLockIcon size={16} /> : locked ? <LockIcon size={16} /> : <CheckIcon size={16} />}
       </div>
     </button>
   )
@@ -242,7 +263,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedTable, setSelectedTable] = useState(null)
-  // The single node whose confirmation bottom-sheet is open, or null.
   const [openNode, setOpenNode] = useState(null)
 
   useEffect(() => {
@@ -251,8 +271,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
       .then(data => {
         if (cancelled) return
         setKid(data)
-        // Default the selected unit to the kid's current table in this
-        // chapter, or table 1 if they haven't reached this chapter yet.
         setSelectedTable(data.current_operation === operation ? data.current_table : 1)
       })
       .catch(err => {
@@ -288,15 +306,15 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
     node: kid.current_node,
   }
   const tables = tablesForOperation()
-  const selectedUnitStatus = unitStatus(currentPos, operation, selectedTable)
+  const selectedStatus = tableStatus(currentPos, operation, selectedTable)
 
-  function handleSelectUnit(table) {
+  function handleSelectTable(table) {
     setOpenNode(null)
     setSelectedTable(table)
   }
 
   function handleTogglePopover(table, node, status, isCurrent) {
-    if (status === 'locked') return
+    if (status === 'locked' || status === 'day_locked') return
     setOpenNode(prev =>
       prev && prev.table === table && prev.node === node
         ? null
@@ -309,9 +327,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
     const { table, node } = openNode
     setOpenNode(null)
 
-    // Charge entry fee up front (spec §7), clamped at the debt floor —
-    // charged on the bottom sheet's confirm tap, not the row tap that
-    // just opens it, so browsing the unit's nodes never costs coins.
     const newBalance = applyEntryFee(kid.coin_balance)
     try {
       await setCoinBalance(kidId, newBalance)
@@ -325,7 +340,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
       console.error('Failed to charge entry fee (continuing anyway):', err)
     }
 
-    onStartNode({ operation, table, node, coinBalance: newBalance })
+    const reviewPool = node === 'review' ? reviewPoolFor(operation, table) : undefined
+
+    onStartNode({ operation, table, node, coinBalance: newBalance, reviewPool })
   }
 
   const inDebt = kid.coin_balance < 0
@@ -334,7 +351,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Top stats bar + back button */}
       <div className="sticky top-0 bg-white z-30 border-b border-gray-100">
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <button
@@ -368,14 +384,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
           </div>
         </div>
 
-        {/* Horizontal scrollable unit selector — connected checkpoint
-            timeline, all 12 units visible, only unlocked ones tappable. */}
-        <UnitSelector
+        <TableSelector
           tables={tables}
           currentPos={currentPos}
           operation={operation}
           selectedTable={selectedTable}
-          onSelect={handleSelectUnit}
+          onSelect={handleSelectTable}
         />
       </div>
 
@@ -387,45 +401,54 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
         </div>
       )}
 
-      {/* Selected unit header */}
       <div className="px-4 pt-5 pb-2 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
         <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.primary }}>
           {theme.operationLabel}
         </p>
         <p className="font-display font-bold text-2xl text-gray-900">
-          Unit {selectedTable}
+          Table {selectedTable}
         </p>
       </div>
 
-      {/* The 5 exercises for the selected unit, as list rows — single
-          column on phone, 2 columns on tablet/desktop since these are
-          short list-style rows that read fine side by side. */}
       <div className="max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto px-4 pb-10 grid grid-cols-1 md:grid-cols-2 gap-2.5">
-        {selectedUnitStatus === 'locked' ? (
+        {selectedStatus === 'locked' ? (
           <div className="md:col-span-2 rounded-2xl bg-gray-50 border border-gray-100 px-4 py-6 text-center">
             <LockIcon size={26} />
             <p className="font-body text-sm text-gray-400 mt-2">
-              Complete the previous unit to unlock this one.
+              Complete the previous table to unlock this one.
             </p>
           </div>
         ) : (
           NODES.map(node => {
             const targetPos = { operation, table: selectedTable, node }
 
-            const unlocked =
-              selectedUnitStatus === 'completed' ||
-              (selectedUnitStatus === 'active' && isUnlocked(currentPos, targetPos))
+            const unlockedInChain =
+              selectedStatus === 'completed' ||
+              (selectedStatus === 'active' && isUnlocked(currentPos, targetPos))
 
             const completed =
-              selectedUnitStatus === 'completed' ||
-              (selectedUnitStatus === 'active' && isCompleted(currentPos, targetPos))
+              selectedStatus === 'completed' ||
+              (selectedStatus === 'active' && isCompleted(currentPos, targetPos))
 
             const isCurrent =
-              selectedUnitStatus === 'active' &&
+              selectedStatus === 'active' &&
               currentPos.table === selectedTable &&
               currentPos.node === node
 
-            const status = completed ? 'completed' : unlocked ? 'active' : 'locked'
+            let dayLocked = false
+            if (selectedStatus === 'active' && unlockedInChain && !completed) {
+              const pos = chainPosition(currentPos, targetPos)
+              const playable = isPlayableToday(pos, kid.last_advance_date, new Date())
+              dayLocked = !playable
+            }
+
+            const status = completed
+              ? 'completed'
+              : dayLocked
+                ? 'day_locked'
+                : unlockedInChain
+                  ? 'active'
+                  : 'locked'
 
             return (
               <NodeRow
@@ -440,10 +463,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
         )}
       </div>
 
-      {/* Node confirmation: bottom sheet on phone (standard mobile pattern),
-          centered modal on tablet/desktop — a full-width sheet sliding up
-          across a wide monitor would look broken, so it switches treatment
-          at the md breakpoint rather than just stretching. */}
       {openNode && (
         <>
           <div
@@ -464,7 +483,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
               {openNode.status === 'completed'
                 ? 'Tap to replay this node'
                 : openNode.isCurrent
-                  ? 'Ready when you are'
+                  ? nodePurpose(openNode.node)
                   : 'Tap to play'}
             </p>
             <button
@@ -473,8 +492,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
             >
               {openNode.status === 'completed'
                 ? 'PRACTICE'
-                : openNode.node === 'gift'
-                  ? 'BONUS ROUND'
+                : openNode.node === 'review'
+                  ? 'START REVIEW'
                   : 'START'}
             </button>
           </div>
