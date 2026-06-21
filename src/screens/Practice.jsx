@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { generateBatch } from '../lib/problems'
 import { themeFor } from '../lib/eraTheme'
-import { nodeLabel, nextStep } from '../lib/progression'
-import { applyPayout, payoutForNode } from '../lib/economy'
+import { nodeLabel, nextStep, OPERATIONS } from '../lib/progression'
+import { applyPayout, payoutForNode, passThresholdFor } from '../lib/economy'
 import FlowerJump from '../components/FlowerJump'
 import {
   updateProgress,
@@ -84,6 +84,7 @@ export default function Practice({
   kidId,
   coinBalance = 0,
   reviewPool,
+  placementClaim = null,
   onExit,
   onBalanceChange,
 }) {
@@ -92,6 +93,7 @@ export default function Practice({
   const isWordProblem = WORD_PROBLEM_NODES.has(node)
   const isReview = node === 'review'
   const payout = payoutForNode(node)
+  const passThreshold = passThresholdFor(operation, placementClaim, OPERATIONS)
 
   const batch = useMemo(
     () => generateBatch(operation, table, node, 10, reviewPool),
@@ -202,7 +204,7 @@ export default function Practice({
     }
     if (idx === TOTAL - 1) {
       const correct = TOTAL - wrong
-      const pass = correct >= 8
+      const pass = correct >= passThreshold
       setOver('finished')
       finalizeAttempt(pass ? 'passed' : 'retry')
       return
@@ -242,7 +244,7 @@ export default function Practice({
 
   if (over === 'finished') {
     const correct = TOTAL - wrong
-    const pass = correct >= 8
+    const pass = correct >= passThreshold
     return (
       <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
         <div className="h-screen md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-6 gap-6">
