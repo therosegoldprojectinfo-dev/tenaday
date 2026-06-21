@@ -4,40 +4,37 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Shared UI chrome (top bar, buttons, text) - not era-specific
-        ink: '#2B2118',
-        cream: '#FBF3E7',
+        ink:   '#3C3C3C',
+        muted: '#AFAFAF',
 
-        // One color group per era. Placeholder values for now -
-        // Claude Design / Claude Code should replace these once the
-        // real palette is locked, but the structure (era.primary,
-        // era.accent, era.bg) should stay so every screen can just
-        // reference "stoneage.primary" etc. instead of hardcoding hex.
         stoneage: {
-          primary: '#8C6A4F',
-          accent: '#D98E4A',
-          bg: '#F2E8DC',
+          primary: '#FF9600', // vivid amber — pucks, buttons, accents
+          dark:    '#CC7700', // darker amber — 3D button shadow
+          accent:  '#FFB700', // warm gold — highlights
+          bg:      '#FFFFFF',
         },
         medieval: {
-          primary: '#5B4B8A',
-          accent: '#C9A227',
-          bg: '#EFEAF7',
+          primary: '#9B59B6',
+          dark:    '#7D3C98',
+          accent:  '#F1C40F',
+          bg:      '#FFFFFF',
         },
         industrial: {
-          primary: '#4A5A66',
-          accent: '#D9762D',
-          bg: '#E8ECEF',
+          primary: '#E74C3C',
+          dark:    '#C0392B',
+          accent:  '#F39C12',
+          bg:      '#FFFFFF',
         },
         futuristic: {
-          primary: '#1F6F8B',
-          accent: '#4FE0C9',
-          bg: '#0E1A24',
+          primary: '#00B4D8',
+          dark:    '#0088A8',
+          accent:  '#7B2FBE',
+          bg:      '#FFFFFF',
         },
       },
       fontFamily: {
-        // Placeholder fonts - swap once Claude Design locks typography
         display: ['"Baloo 2"', 'sans-serif'],
-        body: ['Inter', 'sans-serif'],
+        body:    ['Inter', 'sans-serif'],
       },
     },
   },
