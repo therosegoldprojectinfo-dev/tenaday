@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { OPERATIONS, eraStatus, eraProgress, stageLabel } from '../lib/progression'
-import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
-import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
+import { OPERATIONS, eraStatus, eraProgress } from '../lib/progression'
+import { fetchKid, DEMO_KID_ID } from '../lib/kidData'
+import { DEBT_FLOOR } from '../lib/economy'
 
 // ── Card visual spec ─────────────────────────────────────────────────────
 // Per the Duolingo chapter-card reference: every card shares the SAME
@@ -177,7 +177,7 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
   )
 }
 
-export default function Map({ onStartStage, kidId = DEMO_KID_ID }) {
+export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
   const [kid, setKid] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -215,36 +215,17 @@ export default function Map({ onStartStage, kidId = DEMO_KID_ID }) {
   const currentPos = {
     operation: kid.current_operation,
     table: kid.current_table,
-    stage: kid.current_stage,
+    node: kid.current_node,
   }
 
-  async function handleCardPress(operation) {
+  function handleCardPress(operation) {
     const status = eraStatus(currentPos, operation)
     if (status === 'locked') return
-
-    // Resume exactly where the kid's cursor is if this is their current
-    // era; otherwise (already completed era, replaying) start fresh at
-    // table 1 / equation.
-    const target =
-      status === 'active'
-        ? { operation, table: currentPos.table, stage: currentPos.stage }
-        : { operation, table: 1, stage: 'equation' }
-
-    // Charge entry fee up front (spec §7), clamped at the debt floor.
-    const newBalance = applyEntryFee(kid.coin_balance)
-    try {
-      await setCoinBalance(kidId, newBalance)
-      await logCoinTransaction(kidId, {
-        amount: newBalance - kid.coin_balance,
-        reason: 'entry_fee',
-        balanceAfter: newBalance,
-      })
-      setKid(k => ({ ...k, coin_balance: newBalance }))
-    } catch (err) {
-      console.error('Failed to charge entry fee (continuing anyway):', err)
-    }
-
-    onStartStage({ ...target, coinBalance: newBalance })
+    // Card tap now opens the in-chapter unit/node path screen — it no
+    // longer charges the entry fee or jumps straight into Practice. The
+    // entry fee is charged per-node, inside that new screen, right before
+    // a specific node is actually started.
+    onOpenChapter(operation)
   }
 
   const inDebt = kid.coin_balance < 0
@@ -292,9 +273,7 @@ export default function Map({ onStartStage, kidId = DEMO_KID_ID }) {
           const status = eraStatus(currentPos, operation)
           const progress = eraProgress(currentPos, operation)
           const resumeLabel =
-            status === 'active'
-              ? `Table ${currentPos.table} · ${stageLabel(currentPos.stage)}`
-              : null
+            status === 'active' ? `Unit ${currentPos.table}` : null
 
           return (
             <ChapterCard
