@@ -118,7 +118,7 @@ function CoinStatIcon() {
 const DUO_GREEN = '#58cc02'
 const DUO_GREEN_DARK = '#46a302'
 
-function PathNode({ table, node, status, isCurrent, offsetPx, onPress }) {
+function PathNode({ table, node, status, isCurrent, offsetPx, popoverOpen, onTogglePopover }) {
   const locked = status === 'locked'
   const completed = status === 'completed'
   const isTrophyNode = node === 'gift'
@@ -159,7 +159,7 @@ function PathNode({ table, node, status, isCurrent, offsetPx, onPress }) {
       <button
         type="button"
         disabled={locked}
-        onClick={onPress}
+        onClick={(e) => { e.stopPropagation(); onTogglePopover() }}
         className="relative rounded-full flex items-center justify-center
                    transition-transform duration-75 active:translate-y-1 disabled:active:translate-y-0"
         style={{
@@ -173,8 +173,9 @@ function PathNode({ table, node, status, isCurrent, offsetPx, onPress }) {
             ? `Table ${table}, ${nodeLabel(node)}, completed — tap to replay`
             : locked
               ? `Table ${table}, ${nodeLabel(node)}, locked`
-              : `Start table ${table}, ${nodeLabel(node)}`
+              : `Table ${table}, ${nodeLabel(node)}`
         }
+        aria-expanded={popoverOpen}
       >
         {icon}
       </button>
@@ -229,6 +230,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   const [kid, setKid] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  // The single node whose confirmation bottom-sheet is open, or null.
+  // Shape: { table, node, status }
+  const [openNode, setOpenNode] = useState(null)
 
   useEffect(() => {
     let cancelled = false
@@ -241,6 +245,16 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
       .finally(() => !cancelled && setLoading(false))
     return () => { cancelled = true }
   }, [kidId])
+
+  // Close the open bottom sheet on scroll — keeps it from feeling stuck to
+  // a node that's scrolled out of view. (No outside-click listener needed
+  // since the bottom sheet has its own dimmed backdrop that handles that.)
+  useEffect(() => {
+    if (!openNode) return
+    const close = () => setOpenNode(null)
+    window.addEventListener('scroll', close, { passive: true })
+    return () => window.removeEventListener('scroll', close)
+  }, [openNode])
 
   if (loading) {
     return (
@@ -268,17 +282,23 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   }
   const tables = tablesForOperation()
 
-  async function handleNodePress(table, node) {
-    const uStatus = unitStatus(currentPos, operation, table)
-    const targetPos = { operation, table, node }
+  function handleTogglePopover(table, node, status, isCurrent) {
+    if (status === 'locked') return
+    setOpenNode(prev =>
+      prev && prev.table === table && prev.node === node
+        ? null
+        : { table, node, status, isCurrent }
+    )
+  }
 
-    const playable =
-      uStatus === 'completed' ||
-      (uStatus === 'active' && isUnlocked(currentPos, targetPos))
+  async function handleConfirmStart() {
+    if (!openNode) return
+    const { table, node } = openNode
+    setOpenNode(null)
 
-    if (!playable) return
-
-    // Charge entry fee up front (spec §7), clamped at the debt floor.
+    // Charge entry fee up front (spec §7), clamped at the debt floor —
+    // now happens on the SECOND tap (popover confirm), not the first tap
+    // that just opens the popover, so browsing the path never costs coins.
     const newBalance = applyEntryFee(kid.coin_balance)
     try {
       await setCoinBalance(kidId, newBalance)
@@ -376,6 +396,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
                     currentPos.node === node
 
                   const status = completed ? 'completed' : unlocked ? 'active' : 'locked'
+                  const isThisOpen = openNode?.table === table && openNode?.node === node
 
                   return (
                     <PathNode
@@ -385,7 +406,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
                       status={status}
                       isCurrent={isCurrent}
                       offsetPx={offsetForNode(table, nodeIdx)}
-                      onPress={() => handleNodePress(table, node)}
+                      popoverOpen={isThisOpen}
+                      onTogglePopover={() => handleTogglePopover(table, node, status, isCurrent)}
                     />
                   )
                 })}
@@ -396,6 +418,44 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
 
         <div className="h-16" />
       </div>
+
+      {/* Node confirmation bottom sheet — deliberately NOT anchored to the
+          tapped node's own (possibly off-center, zigzagged) position. A
+          fixed bottom sheet sidesteps all viewport-overflow risk entirely
+          and is a perfectly natural mobile pattern in its own right. */}
+      {openNode && (
+        <>
+          <div
+            className="fixed inset-0 bg-black/30 z-40"
+            onClick={() => setOpenNode(null)}
+          />
+          <div
+            className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl px-5 pt-5 pb-8 max-w-sm mx-auto anim-sheet-in"
+          >
+            <div className="w-10 h-1.5 rounded-full bg-gray-200 mx-auto mb-4" />
+            <p className="font-display font-bold text-xl text-gray-900 mb-1">
+              {nodeLabel(openNode.node)}
+            </p>
+            <p className="font-body text-sm text-gray-400 mb-5">
+              {openNode.status === 'completed'
+                ? 'Tap to replay this node'
+                : openNode.isCurrent
+                  ? 'Ready when you are'
+                  : 'Tap to play'}
+            </p>
+            <button
+              onClick={handleConfirmStart}
+              className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
+            >
+              {openNode.status === 'completed'
+                ? 'PRACTICE'
+                : openNode.node === 'gift'
+                  ? 'BONUS ROUND'
+                  : 'START'}
+            </button>
+          </div>
+        </>
+      )}
     </div>
   )
 }
