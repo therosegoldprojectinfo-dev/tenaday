@@ -6,6 +6,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Every <img> in the app is decorative chrome, not a photo someone dropped
+   in — never selectable, never draggable, no long-press "save image" feel.
+   Keeps illustrations (mascots, future era art) feeling baked into the UI
+   rather than like a pasted-on picture. */
+img {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
 body {
   overscroll-behavior: none;
 }
