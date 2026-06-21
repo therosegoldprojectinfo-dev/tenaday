@@ -10,24 +10,24 @@ import {
 } from '../lib/progression'
 import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
 import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
-import FlowerJump from '../components/FlowerJump'
 
-// ── Layout constants ─────────────────────────────────────────────────────
-// Bigger nodes, more breathing room than the old single-stage map per
-// design feedback: "the circle is large... distance between the nodes...
-// generous gap."
-const NODE_SIZE   = 92
-const RING_PAD    = 14   // gap between node edge and the surrounding halo ring
-const V_STEP      = 124  // vertical distance between node centers
-const UNIT_GAP    = 64   // extra vertical space reserved for each unit's banner
-const TOP_PAD     = 28
-const START_PILL_CLEARANCE = 150 // extra space reserved above the current node so the START pill (which floats ~142px above the node center) never overlaps the unit banner
+// ── Zigzag offsets ───────────────────────────────────────────────────────
+// Ported from a real Duolingo-clone reference: a fixed lookup table of
+// horizontal offsets per node index, alternating direction per unit. This
+// replaces a hand-computed sine wave with the same proven pattern Duolingo
+// itself uses — simpler, and because nodes stack via flexbox (not manual
+// pixel math), spacing is never wrong regardless of content above it.
+const LEFT_OFFSETS  = [0, 64, 96, 56, -16, -64, 0]   // px, negative = shift right
+const RIGHT_OFFSETS = [0, -64, -96, -56, 16, 64, 0]
 
-const CENTER_X  = 50
-const WAVE_AMPL = 26
-function xForIndex(i) {
-  return CENTER_X + WAVE_AMPL * Math.sin(i * 0.9)
+function offsetForNode(unitIndex, nodeIdx) {
+  const table = unitIndex % 2 === 0 ? LEFT_OFFSETS : RIGHT_OFFSETS
+  return table[nodeIdx % table.length]
 }
+
+const NODE_SIZE = 88
+const RING_SIZE = 104 // SVG progress ring, larger than the node so it reads as a halo
+const RING_STROKE = 5
 
 function puckShadow(darkHex) {
   return [
@@ -38,7 +38,7 @@ function puckShadow(darkHex) {
   ].join(', ')
 }
 
-function StarIcon({ size = 36 }) {
+function StarIcon({ size = 34 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="white" aria-hidden="true">
       <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
@@ -46,7 +46,7 @@ function StarIcon({ size = 36 }) {
   )
 }
 
-function CheckIcon({ size = 32 }) {
+function CheckIcon({ size = 30 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -55,7 +55,7 @@ function CheckIcon({ size = 32 }) {
   )
 }
 
-function LockIcon({ size = 30 }) {
+function LockIcon({ size = 28 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -65,7 +65,7 @@ function LockIcon({ size = 30 }) {
   )
 }
 
-function TrophyIcon({ size = 36 }) {
+function TrophyIcon({ size = 34 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M7 4h10v4a5 5 0 0 1-10 0V4Z" fill="white" />
@@ -106,6 +106,122 @@ function CoinStatIcon() {
         fill="#CC7700"
       />
     </svg>
+  )
+}
+
+// ── Node button ──────────────────────────────────────────────────────────
+// Fixed Duolingo green for every unlocked node (per project-wide rule: only
+// green is used for action/interactive elements, regardless of era) — grey
+// for locked. The era's own color no longer tints nodes; it only tints the
+// unit banner, so the chapter still has visual identity without breaking
+// the "green is the only action color" rule.
+const DUO_GREEN = '#58cc02'
+const DUO_GREEN_DARK = '#46a302'
+
+function PathNode({ table, node, status, isCurrent, offsetPx, onPress }) {
+  const locked = status === 'locked'
+  const completed = status === 'completed'
+  const isTrophyNode = node === 'gift'
+
+  let icon
+  if (completed) icon = <CheckIcon />
+  else if (locked) icon = <LockIcon />
+  else if (isTrophyNode) icon = <TrophyIcon />
+  else icon = <StarIcon />
+
+  const nodeSize = isTrophyNode ? NODE_SIZE + 10 : NODE_SIZE
+
+  return (
+    <div
+      className="relative flex items-center justify-center"
+      style={{ width: RING_SIZE, height: RING_SIZE, marginLeft: offsetPx }}
+    >
+      {/* SVG progress ring — current node only. A full ring (progress=1)
+          reads as a clear halo without needing a flat grey div behind it. */}
+      {isCurrent && (
+        <svg
+          className="absolute"
+          width={RING_SIZE}
+          height={RING_SIZE}
+          style={{ transform: 'rotate(-90deg)' }}
+        >
+          <circle
+            cx={RING_SIZE / 2}
+            cy={RING_SIZE / 2}
+            r={(RING_SIZE - RING_STROKE) / 2}
+            stroke="#E5E7EB"
+            strokeWidth={RING_STROKE}
+            fill="none"
+          />
+        </svg>
+      )}
+
+      <button
+        type="button"
+        disabled={locked}
+        onClick={onPress}
+        className="relative rounded-full flex items-center justify-center
+                   transition-transform duration-75 active:translate-y-1 disabled:active:translate-y-0"
+        style={{
+          width: nodeSize,
+          height: nodeSize,
+          backgroundColor: locked ? '#D1D5DB' : DUO_GREEN,
+          boxShadow: locked ? puckShadow('#9CA3AF') : puckShadow(DUO_GREEN_DARK),
+        }}
+        aria-label={
+          completed
+            ? `Table ${table}, ${nodeLabel(node)}, completed — tap to replay`
+            : locked
+              ? `Table ${table}, ${nodeLabel(node)}, locked`
+              : `Start table ${table}, ${nodeLabel(node)}`
+        }
+      >
+        {icon}
+      </button>
+    </div>
+  )
+}
+
+// ── Unit banner ──────────────────────────────────────────────────────────
+// True "sandwich" divider per design reference: sits between the previous
+// unit's last node and this unit's first node, with normal flex spacing on
+// both sides — never anchored/overlapping either neighbor, because flexbox
+// stacking (not manual y-position math) guarantees the gap.
+function UnitBanner({ table, status, theme }) {
+  if (status === 'locked') {
+    // Locked future units get a plain text divider, not a heavy colored
+    // banner — matches the lighter-weight treatment Duolingo itself uses
+    // for sections you haven't reached yet.
+    return (
+      <div className="flex items-center gap-3 w-full px-6 py-2">
+        <div className="flex-1 h-px bg-gray-200" />
+        <p className="font-body font-bold text-sm text-gray-300 text-center whitespace-nowrap">
+          Unit {table}
+        </p>
+        <div className="flex-1 h-px bg-gray-200" />
+      </div>
+    )
+  }
+
+  return (
+    <div className="w-full px-4">
+      <div
+        className="rounded-2xl px-4 py-3 flex items-center justify-between max-w-sm mx-auto"
+        style={{
+          backgroundColor: theme.colors.primary,
+          boxShadow: `0 3px 0 0 ${theme.colors.dark}`,
+        }}
+      >
+        <div>
+          <p className="font-body font-bold text-xs text-white/75 tracking-widest uppercase leading-none mb-1">
+            {theme.operationLabel}
+          </p>
+          <p className="font-display font-bold text-lg text-white leading-tight">
+            Unit {table}
+          </p>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -152,50 +268,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   }
   const tables = tablesForOperation()
 
-  // Build a flat list of every node across all 12 units, in path order,
-  // each tagged with which unit it belongs to and whether it's the first
-  // node of a new unit (so we know where to drop a banner).
-  const flatNodes = []
-  tables.forEach(table => {
-    NODES.forEach((node, nodeIdx) => {
-      flatNodes.push({ table, node, nodeIdx, isFirstOfUnit: nodeIdx === 0 })
-    })
-  })
-
-  // Vertical position bookkeeping: every unit's banner reserves UNIT_GAP of
-  // height before its first node — including unit 1, which previously had
-  // no reserved space and caused the banner to overlap the node + START
-  // pill. The START pill itself floats above the kid's current node and
-  // also needs its own reserved clearance so it never collides with the
-  // banner above it. bannerY is computed independently of any START-pill
-  // clearance added to a node's own y, so the banner never shifts based on
-  // whether the unit's first node happens to be the current node.
-  let y = TOP_PAD + UNIT_GAP
-  const positioned = flatNodes.map((n, i) => {
-    if (n.isFirstOfUnit && i !== 0) y += UNIT_GAP
-    const bannerY = y - UNIT_GAP // fixed offset above this node, pre-clearance
-    const isCurrentNodeForSpacing =
-      currentPos.operation === operation &&
-      currentPos.table === n.table &&
-      currentPos.node === n.node
-    // Reserve extra clearance above any node that will render the START
-    // pill, so the pill (and its little tail) never overlaps the banner
-    // or the previous node.
-    if (isCurrentNodeForSpacing) y += START_PILL_CLEARANCE
-    const pos = { ...n, y, bannerY, x: xForIndex(i) }
-    y += V_STEP
-    return pos
-  })
-  const totalHeight = y + TOP_PAD
-
   async function handleNodePress(table, node) {
     const uStatus = unitStatus(currentPos, operation, table)
     const targetPos = { operation, table, node }
 
-    // Playable if: this unit is already fully completed (replay mode —
-    // every node in it stays open), or this unit is the kid's active unit
-    // AND the specific node is unlocked within the linear chain. Anything
-    // else (locked chapter, locked future unit) is not playable.
     const playable =
       uStatus === 'completed' ||
       (uStatus === 'active' && isUnlocked(currentPos, targetPos))
@@ -268,166 +344,57 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
         </div>
       )}
 
-      {/* Scrolling node path */}
-      <div className="relative mx-auto max-w-sm" style={{ height: totalHeight }}>
-
-        {positioned.map(({ table, node, nodeIdx, isFirstOfUnit, y, bannerY, x }) => {
+      {/* Node path — each unit is its own flex column block: banner, then
+          its 5 nodes stacked with consistent gap. Units stack vertically
+          with their own margin, so a banner can never be overlapped by a
+          node — flexbox guarantees the gap regardless of content size. */}
+      <div className="flex flex-col items-center w-full">
+        {tables.map(table => {
           const uStatus = unitStatus(currentPos, operation, table)
-          const targetPos = { operation, table, node }
-
-          // A node is playable if its unit is active and the node itself is
-          // unlocked within the linear chain, OR the whole unit/chapter is
-          // already completed (replay mode — everything stays playable).
-          const unlocked =
-            uStatus === 'completed' ||
-            (uStatus === 'active' && isUnlocked(currentPos, targetPos))
-
-          const completed =
-            uStatus === 'completed' ||
-            (uStatus === 'active' && isCompleted(currentPos, targetPos))
-
-          const isCurrentNode =
-            uStatus === 'active' &&
-            currentPos.table === table &&
-            currentPos.node === node
-
-          const isTrophyNode = node === 'gift'
-
-          let icon
-          if (completed) icon = <CheckIcon />
-          else if (!unlocked) icon = <LockIcon />
-          else if (isTrophyNode) icon = <TrophyIcon />
-          else icon = <StarIcon />
 
           return (
-            <div key={`${table}-${node}`}>
-              {isFirstOfUnit && (
-                <div
-                  className="absolute left-1/2 -translate-x-1/2 w-full px-4"
-                  style={{ top: bannerY, maxWidth: 384 }}
-                >
-                  <div
-                    className="rounded-2xl px-4 py-3 flex items-center justify-between"
-                    style={{
-                      backgroundColor: uStatus === 'locked' ? '#D1D5DB' : theme.colors.primary,
-                      boxShadow: `0 3px 0 0 ${uStatus === 'locked' ? '#9CA3AF' : theme.colors.dark}`,
-                    }}
-                  >
-                    <div>
-                      <p className="font-body font-bold text-xs text-white/75 tracking-widest uppercase leading-none mb-1">
-                        {theme.operationLabel}
-                      </p>
-                      <p className="font-display font-bold text-lg text-white leading-tight">
-                        Unit {table}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
+            <div key={table} className="flex flex-col items-center w-full">
+              <div className="my-6 w-full flex justify-center">
+                <UnitBanner table={table} status={uStatus} theme={theme} />
+              </div>
 
-              <div
-                className="absolute"
-                style={{
-                  left: `${x}%`,
-                  top: y,
-                  width: 0,
-                  height: 0,
-                  zIndex: isCurrentNode ? 15 : 10,
-                }}
-              >
-                {/* Soft grey halo ring around the kid's current node — bigger
-                    diameter than the puck, clearly a halo not a tight outline. */}
-                {isCurrentNode && (
-                  <div
-                    className="absolute rounded-full"
-                    style={{
-                      width: NODE_SIZE + RING_PAD * 2,
-                      height: NODE_SIZE + RING_PAD * 2,
-                      left: -(NODE_SIZE / 2 + RING_PAD),
-                      top: -(NODE_SIZE / 2 + RING_PAD),
-                      backgroundColor: '#E5E7EB',
-                    }}
-                  />
-                )}
+              <div className="flex flex-col items-center gap-5 py-2">
+                {NODES.map((node, nodeIdx) => {
+                  const targetPos = { operation, table, node }
 
-                <button
-                  type="button"
-                  disabled={!unlocked}
-                  onClick={() => handleNodePress(table, node)}
-                  className="absolute rounded-full flex items-center justify-center
-                             transition-transform duration-75 active:translate-y-1 disabled:active:translate-y-0"
-                  style={{
-                    width: NODE_SIZE,
-                    height: NODE_SIZE,
-                    left: -NODE_SIZE / 2,
-                    top: -NODE_SIZE / 2,
-                    backgroundColor: unlocked ? theme.colors.primary : '#D1D5DB',
-                    boxShadow: unlocked ? puckShadow(theme.colors.dark) : puckShadow('#9CA3AF'),
-                  }}
-                  aria-label={
-                    completed
-                      ? `Table ${table}, ${nodeLabel(node)}, completed — tap to replay`
-                      : unlocked
-                        ? `Start table ${table}, ${nodeLabel(node)}`
-                        : `Table ${table}, ${nodeLabel(node)}, locked`
-                  }
-                >
-                  {icon}
-                </button>
+                  const unlocked =
+                    uStatus === 'completed' ||
+                    (uStatus === 'active' && isUnlocked(currentPos, targetPos))
 
-                {/* START pill with speech-bubble tail, floats above the
-                    current node pointing down to it. */}
-                {isCurrentNode && (
-                  <div
-                    className="absolute flex flex-col items-center"
-                    style={{
-                      top: -(NODE_SIZE / 2 + RING_PAD + 44),
-                      left: '50%',
-                      transform: 'translateX(-50%)',
-                    }}
-                  >
-                    <div
-                      className="font-body font-bold text-sm tracking-wide px-4 py-1.5 rounded-2xl"
-                      style={{ color: theme.colors.primary, border: `2px solid ${theme.colors.primary}`, backgroundColor: '#FFFFFF' }}
-                    >
-                      START
-                    </div>
-                    <div
-                      className="w-3 h-3 rotate-45 -mt-1.5"
-                      style={{
-                        backgroundColor: '#FFFFFF',
-                        borderRight: `2px solid ${theme.colors.primary}`,
-                        borderBottom: `2px solid ${theme.colors.primary}`,
-                      }}
+                  const completed =
+                    uStatus === 'completed' ||
+                    (uStatus === 'active' && isCompleted(currentPos, targetPos))
+
+                  const isCurrent =
+                    uStatus === 'active' &&
+                    currentPos.table === table &&
+                    currentPos.node === node
+
+                  const status = completed ? 'completed' : unlocked ? 'active' : 'locked'
+
+                  return (
+                    <PathNode
+                      key={node}
+                      table={table}
+                      node={node}
+                      status={status}
+                      isCurrent={isCurrent}
+                      offsetPx={offsetForNode(table, nodeIdx)}
+                      onPress={() => handleNodePress(table, node)}
                     />
-                  </div>
-                )}
+                  )
+                })}
               </div>
             </div>
           )
         })}
 
-        {/* Ambient mascot — one per unit, sitting in the open space the
-            zigzag path leaves on alternating sides. Loops continuously as
-            idle "alive" decoration, doesn't block or compete with nodes. */}
-        {positioned
-          .filter(p => p.nodeIdx === 2) // middle node (irl) of each unit — roughly centered in that unit's vertical span
-          .map(p => (
-            <div
-              key={`mascot-${p.table}`}
-              className="absolute"
-              style={{
-                top: p.y - 70,
-                // Mirror to whichever side has more open space: opposite
-                // the node's own x position.
-                left: p.x > 50 ? '8%' : '62%',
-                zIndex: 1,
-              }}
-            >
-              <FlowerJump loop size={140} />
-            </div>
-          ))}
-
+        <div className="h-16" />
       </div>
     </div>
   )
