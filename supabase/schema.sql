@@ -1,18 +1,24 @@
 -- ============================================================================
--- Ten a Day — Supabase schema (v2: 5-node units)
+-- Ten a Day — Supabase schema (v3: Numio Daily Loop)
 -- ============================================================================
--- Supersedes the original 3-stage ladder (equation/word_problem/speed_round)
--- with the 5-node-per-unit model:
---   Chapter (operation) -> Unit (table 1-12) -> Node (5 per unit):
---     equations -> speed_round -> irl -> irl_timed -> gift
+-- Supersedes the 5-node-per-unit model with the 6-node daily loop per
+-- table (spec §6.5):
+--   Chapter (operation) -> Table (1-12) -> Node (6 per table):
+--     unlock -> learn -> practice -> real_life -> speed -> review
 --
--- SAFE TO RE-RUN: this file drops and recreates the stage/node enum and the
--- columns that depend on it, so it works whether you're running it fresh
--- or migrating a database that already has the old 3-stage schema. Existing
--- kid/attempt rows referencing old stage values ('word_problem', etc.) will
--- be reset, since there's no automatic mapping from 3 old stages to 5 new
--- nodes — fine for a dev/demo database, NOT something to run against real
--- user data without writing an explicit data migration first.
+-- Two new behaviors this version adds support for:
+--   1. Calendar-day gating: the NEXT node in the chain only unlocks on a
+--      new real day, even if today's already-unlocked nodes are replayed.
+--      Tracked via kids.last_advance_date.
+--   2. One-time interactive chapter concept intro (e.g. "what is addition?")
+--      shown once per chapter, before that chapter's table 1. Tracked via
+--      kids.seen_chapter_intros (array of operation_type).
+--
+-- SAFE TO RE-RUN: drops and recreates the node enum and its dependent
+-- columns, so it works whether fresh or migrating from the old 5-node
+-- schema. Existing kid/attempt rows referencing old node values
+-- ('equations', 'gift', etc.) will be reset — fine for dev/demo data, NOT
+-- something to run against real user data without an explicit migration.
 --
 -- Run this whole file once in your Supabase project's SQL Editor.
 -- ============================================================================
@@ -27,14 +33,14 @@ do $$ begin
 exception when duplicate_object then null;
 end $$;
 
--- Drop the old 3-value stage enum's dependent columns before recreating it,
+-- Drop the old 5-value node enum's dependent columns before recreating it,
 -- since Postgres won't let you change an enum's values in place.
-alter table if exists kids     drop column if exists current_stage;
-alter table if exists attempts drop column if exists stage;
+alter table if exists kids     drop column if exists current_node;
+alter table if exists attempts drop column if exists node;
 
-drop type if exists stage_type;
+drop type if exists node_type;
 
-create type node_type as enum ('equations', 'speed_round', 'irl', 'irl_timed', 'gift');
+create type node_type as enum ('unlock', 'learn', 'practice', 'real_life', 'speed', 'review');
 
 -- ── parents ──────────────────────────────────────────────────────────────
 -- Phone + 4-digit PIN, no email (per spec §3). PIN is stored as a bcrypt-style
@@ -50,31 +56,47 @@ create table if not exists parents (
 
 -- ── kids ─────────────────────────────────────────────────────────────────
 -- One row per kid profile. current_operation/current_table/current_node
--- together encode "where am I in the chapter/unit/node ladder" — this
+-- together encode "where am I in the chapter/table/node ladder" — this
 -- triple IS the progression cursor.
+--
+-- last_advance_date: the calendar date (in the kid's local sense — stored
+-- as a plain date, app layer handles timezone) the cursor last moved
+-- forward by passing a node. The day-gating rule: the NEXT node beyond the
+-- current one only unlocks once this date is in the past relative to
+-- "today" — see lib/dayGate.js. Replaying already-unlocked nodes never
+-- touches this column.
+--
+-- seen_chapter_intros: which operations' one-time concept intro (spec:
+-- "what is addition?" etc.) this kid has already been shown. Checked
+-- before rendering a chapter's table-1 content for the first time.
 --
 -- coin_balance can go negative (debt), floor enforced by application logic
 -- per spec §7 (debt capped at -2x entry fee). Not enforced at the DB level
 -- since entry_fee is tunable; the app computes the floor before writing.
 
 create table if not exists kids (
-  id                 uuid primary key default gen_random_uuid(),
-  parent_id          uuid references parents(id) on delete cascade,
-  name               text not null,
+  id                   uuid primary key default gen_random_uuid(),
+  parent_id            uuid references parents(id) on delete cascade,
+  name                 text not null,
 
-  current_operation  operation_type not null default 'addition',
-  current_table      int  not null default 1 check (current_table between 1 and 12),
-  current_node       node_type not null default 'equations',
+  current_operation    operation_type not null default 'addition',
+  current_table        int  not null default 1 check (current_table between 1 and 12),
+  current_node         node_type not null default 'unlock',
 
-  coin_balance       int  not null default 50,
+  last_advance_date    date,  -- null until the kid passes their very first node
+  seen_chapter_intros  operation_type[] not null default '{}',
 
-  created_at         timestamptz not null default now(),
-  updated_at         timestamptz not null default now()
+  coin_balance         int  not null default 50,
+
+  created_at           timestamptz not null default now(),
+  updated_at           timestamptz not null default now()
 );
 
--- If `kids` already existed from the old schema (without current_node),
--- this adds it back after the drop/recreate above.
-alter table kids add column if not exists current_node node_type not null default 'equations';
+-- If `kids` already existed from an earlier schema version, these add the
+-- new columns back after the drop/recreate above.
+alter table kids add column if not exists current_node node_type not null default 'unlock';
+alter table kids add column if not exists last_advance_date date;
+alter table kids add column if not exists seen_chapter_intros operation_type[] not null default '{}';
 
 -- ── attempts ─────────────────────────────────────────────────────────────
 -- One row per playthrough of a node (a batch of up to 10 questions).
@@ -178,10 +200,13 @@ drop policy if exists "dev_open_gift_claims" on gift_claims;
 create policy "dev_open_gift_claims" on gift_claims for all using (true) with check (true);
 
 -- ── Seed: one demo kid so the app has something to load before the parent
--- flow exists. Safe to delete once real signup is built.
+-- flow exists. Safe to delete once real signup is built. Starts at the
+-- very first node of the very first table — the Unlock node is skipped
+-- in the APP LOGIC (not the schema) for this exact starting position,
+-- since there is no "yesterday" to test on table 1 of Addition.
 
-insert into kids (id, parent_id, name, current_operation, current_table, current_node, coin_balance)
-values ('00000000-0000-0000-0000-000000000001', null, 'Demo Kid', 'addition', 1, 'equations', 50)
+insert into kids (id, parent_id, name, current_operation, current_table, current_node, last_advance_date, seen_chapter_intros, coin_balance)
+values ('00000000-0000-0000-0000-000000000001', null, 'Demo Kid', 'addition', 1, 'learn', null, '{}', 50)
 on conflict (id) do update set
   current_operation = excluded.current_operation,
   current_table = excluded.current_table,
