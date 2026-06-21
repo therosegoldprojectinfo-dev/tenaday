@@ -8,14 +8,20 @@ import {
   stageLabel,
 } from '../lib/progression'
 import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
-import { applyEntryFee, ENTRY_FEE, DEBT_FLOOR } from '../lib/economy'
+import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 
-const NODE_SIZE = 64
-const V_STEP    = 130
-const TOP_PAD   = 72
+const NODE_SIZE = 84
+const V_STEP    = 104
+const TOP_PAD   = 60
 
-const LEFT_X  = 22
-const RIGHT_X = 78
+// Organic wavy path instead of a strict left/right zigzag — x position
+// follows a sine curve so the path drifts and curves the way Duolingo's
+// does, rather than snapping between two fixed columns.
+const CENTER_X  = 50   // %
+const WAVE_AMPL = 28   // % — how far the path swings from center
+function xForIndex(i) {
+  return CENTER_X + WAVE_AMPL * Math.sin(i * 0.9)
+}
 
 function puckShadow(darkHex) {
   return [
@@ -28,7 +34,7 @@ function puckShadow(darkHex) {
 
 function StarIcon() {
   return (
-    <svg width="26" height="26" viewBox="0 0 24 24" fill="white" aria-hidden="true">
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="white" aria-hidden="true">
       <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
     </svg>
   )
@@ -36,7 +42,7 @@ function StarIcon() {
 
 function CheckIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M5 13l4 4L19 7" />
     </svg>
@@ -45,7 +51,7 @@ function CheckIcon() {
 
 function LockIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4"
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="5" y="11" width="14" height="9" rx="2" />
       <path d="M8 11V7a4 4 0 0 1 8 0v4" />
@@ -74,30 +80,9 @@ function CoinStatIcon() {
   )
 }
 
-// Flat single-color silhouette landmarks, one per era — placed every 3
-// tables so a 12-table walk has visual variety (spec §9).
-function Landmark({ era, style }) {
-  const motif = {
-    addition: (
-      <path d="M24 3 C20 11 11 17 11 27 C11 38 17 47 24 47 C31 47 37 38 37 27 C37 17 28 11 24 3Z" fill="#FFB700" />
-    ),
-    subtraction: (
-      <path d="M6 47V24l18-16 18 16v23H6Z M16 47V32h16v15" fill="#F1C40F" />
-    ),
-    multiplication: (
-      <rect x="6" y="18" width="36" height="29" rx="2" fill="#F39C12" />
-    ),
-    division: (
-      <circle cx="24" cy="28" r="18" fill="#7B2FBE" />
-    ),
-  }
-  return (
-    <svg width="48" height="58" viewBox="0 0 48 58" fill="none"
-      className="absolute pointer-events-none" style={style} aria-hidden="true">
-      {motif[era] ?? motif.addition}
-    </svg>
-  )
-}
+// Landmark teardrop icon removed per design feedback — was reading as
+// clutter, not as a landmark. Era visual variety will come from a real
+// illustration pass later, not a floating shape next to nodes.
 
 export default function Map({ onStartStage, kidId = DEMO_KID_ID }) {
   const [kid, setKid] = useState(null)
@@ -284,21 +269,8 @@ export default function Map({ onStartStage, kidId = DEMO_KID_ID }) {
       {/* Scrollable map — nodes positioned absolutely within this fixed-height container */}
       <div className="relative mx-auto max-w-sm" style={{ height: H, backgroundColor: '#FFFFFF' }}>
 
-        {tables.filter(t => t % 3 === 2).map(t => (
-          <Landmark
-            key={`landmark-${t}`}
-            era={activeEra}
-            style={{
-              top: TOP_PAD + (t - 1) * V_STEP - 20,
-              [t % 6 === 2 ? 'right' : 'left']: '4%',
-              zIndex: 5,
-            }}
-          />
-        ))}
-
         {tables.map((table, i) => {
-          const isRight = i % 2 === 1
-          const x = isRight ? RIGHT_X : LEFT_X
+          const x = xForIndex(i)
           const y = TOP_PAD + i * V_STEP
 
           const targetPos = { operation: activeEra, table, stage: 'equation' }
@@ -310,33 +282,74 @@ export default function Map({ onStartStage, kidId = DEMO_KID_ID }) {
           if (completed) icon = <CheckIcon />
           else if (!unlocked) icon = <LockIcon />
 
+          const RING_PAD = 12 // gap between node edge and the surrounding ring
+
           return (
-            <button
+            <div
               key={table}
-              type="button"
-              disabled={!unlocked}
-              onClick={() => handleNodePress(table)}
-              className="absolute w-16 h-16 rounded-full flex items-center justify-center
-                         transition-transform duration-75 active:translate-y-1 disabled:active:translate-y-0"
+              className="absolute"
               style={{
-                left: `calc(${x}% - ${NODE_SIZE / 2}px)`,
-                top: y - NODE_SIZE / 2,
-                backgroundColor: unlocked ? theme.colors.primary : '#D1D5DB',
-                boxShadow: unlocked ? puckShadow(theme.colors.dark) : puckShadow('#9CA3AF'),
-                zIndex: 10,
-                outline: isCurrentTable ? `3px solid ${theme.colors.accent}` : 'none',
-                outlineOffset: '3px',
+                left: `${x}%`,
+                top: y,
+                width: 0,
+                height: 0,
+                zIndex: isCurrentTable ? 15 : 10,
               }}
-              aria-label={
-                completed
-                  ? `Table ${table}, completed — tap to replay`
-                  : unlocked
-                    ? `Start table ${table}`
-                    : `Table ${table}, locked`
-              }
             >
-              {icon}
-            </button>
+              {/* Concentric "current node" ring — true circle centered on the
+                  node, drawn behind it, never offset from the puck itself. */}
+              {isCurrentTable && (
+                <div
+                  className="absolute rounded-full"
+                  style={{
+                    width: NODE_SIZE + RING_PAD * 2,
+                    height: NODE_SIZE + RING_PAD * 2,
+                    left: -(NODE_SIZE / 2 + RING_PAD),
+                    top: -(NODE_SIZE / 2 + RING_PAD),
+                    border: `3px solid ${theme.colors.primary}`,
+                  }}
+                />
+              )}
+
+              <button
+                type="button"
+                disabled={!unlocked}
+                onClick={() => handleNodePress(table)}
+                className="absolute rounded-full flex items-center justify-center
+                           transition-transform duration-75 active:translate-y-1 disabled:active:translate-y-0"
+                style={{
+                  width: NODE_SIZE,
+                  height: NODE_SIZE,
+                  left: -NODE_SIZE / 2,
+                  top: -NODE_SIZE / 2,
+                  backgroundColor: unlocked ? theme.colors.primary : '#D1D5DB',
+                  boxShadow: unlocked ? puckShadow(theme.colors.dark) : puckShadow('#9CA3AF'),
+                }}
+                aria-label={
+                  completed
+                    ? `Table ${table}, completed — tap to replay`
+                    : unlocked
+                      ? `Start table ${table}`
+                      : `Table ${table}, locked`
+                }
+              >
+                {icon}
+              </button>
+
+              {isCurrentTable && (
+                <div
+                  className="absolute font-body font-bold text-xs tracking-widest uppercase whitespace-nowrap px-3 py-1 rounded-full text-white"
+                  style={{
+                    top: -(NODE_SIZE / 2 + RING_PAD + 34),
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    backgroundColor: theme.colors.primary,
+                  }}
+                >
+                  Start
+                </div>
+              )}
+            </div>
           )
         })}
 
