@@ -1,8 +1,18 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { generateBatch } from '../lib/problems'
+import { themeFor } from '../lib/eraTheme'
+import { stageLabel, nextStep } from '../lib/progression'
+import { applyPayout, STAGE_PAYOUT } from '../lib/economy'
+import {
+  updateProgress,
+  setCoinBalance,
+  logCoinTransaction,
+  logAttempt,
+} from '../lib/kidData'
 
-const TOTAL       = 10
-const LIVES_START = 4
+const TOTAL          = 10
+const LIVES_START    = 4
+const SPEED_ROUND_MS = 5000
 
 function XIcon() {
   return (
@@ -23,15 +33,28 @@ function HeartIcon({ className = '' }) {
   )
 }
 
+function CoinIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <circle cx="10" cy="10" r="10" fill="#FFB700" />
+      <circle cx="10" cy="10" r="7" fill="#FFD700" />
+      <path
+        d="M10 5.5l1.1 3.4h3.6l-2.9 2.1 1.1 3.4L10 12.4 6.9 14.4l1.1-3.4-2.9-2.1h3.6z"
+        fill="#CC7700"
+      />
+    </svg>
+  )
+}
+
 function cardClass(choice, selected, revealed, answer) {
   const base = [
     'rounded-2xl border-2 font-display font-bold text-3xl card-answer',
-    'flex items-center justify-center h-32 w-full select-none',
+    'flex items-center justify-center h-32 w-full select-none px-3 text-center',
   ].join(' ')
 
   if (!revealed) {
     return selected === choice
-      ? `${base} border-stoneage-primary bg-stoneage-primary/10 text-stoneage-primary`
+      ? `${base} border-green-500 bg-green-50 text-green-600`
       : `${base} border-gray-200 bg-white text-gray-800`
   }
 
@@ -47,52 +70,134 @@ function cardAnimClass(choice, selected, revealed, answer) {
   return ''
 }
 
-export default function Practice({ operation = 'addition', table = 1, onExit }) {
-  const batch = useMemo(() => generateBatch(operation, table), [operation, table])
+export default function Practice({
+  operation = 'addition',
+  table = 1,
+  stage = 'equation',
+  kidId,
+  coinBalance = 0,
+  onExit,
+  onBalanceChange,
+}) {
+  const theme = themeFor(operation)
+  const isSpeedRound = stage === 'speed_round'
+  const isWordProblem = stage === 'word_problem'
 
-  const [idx,     setIdx]     = useState(0)
-  const [lives,   setLives]   = useState(LIVES_START)
+  const batch = useMemo(() => generateBatch(operation, table, stage), [operation, table, stage])
+
+  const [idx,      setIdx]      = useState(0)
+  const [lives,    setLives]    = useState(LIVES_START)
   const [selected, setSelected] = useState(null)
   const [revealed, setRevealed] = useState(false)
-  const [wrong,   setWrong]   = useState(0)
-  const [over,    setOver]    = useState(null)
+  const [wrong,    setWrong]    = useState(0)
+  const [over,     setOver]     = useState(null) // null | 'died' | 'finished'
+  const [saving,   setSaving]   = useState(false)
 
   // Incrementing this key remounts the HeartIcon, restarting the CSS animation
   const [heartKey, setHeartKey] = useState(0)
 
-  const q         = batch[idx]
+  // Speed round: per-question 5s timer. timerKey remounts the bar so the
+  // CSS animation restarts on every new question.
+  const [timerKey, setTimerKey] = useState(0)
+  const timeoutRef = useRef(null)
+
+  const q = batch[idx]
   const isCorrect = selected === q?.answer
 
   // Emil: animate transform not width — scaleX from origin-left
   const progressScale = (idx + (revealed ? 1 : 0)) / TOTAL
 
-  function handleCheck() {
-    if (selected === null || revealed) return
-    const wasWrong = selected !== q.answer
+  function handleWrongChoice() {
+    setWrong(w => w + 1)
+    setLives(l => l - 1)
+    setHeartKey(k => k + 1)
+  }
+
+  function handleCheck(forcedChoice) {
+    if (revealed) return
+    const choice = forcedChoice !== undefined ? forcedChoice : selected
+    if (choice === null || choice === undefined) return
+
     setRevealed(true)
-    if (wasWrong) {
-      setWrong(w => w + 1)
-      setLives(l => l - 1)
-      setHeartKey(k => k + 1)
+    if (choice !== q.answer) handleWrongChoice()
+  }
+
+  // Speed round: auto-expire the question if no answer was chosen in time —
+  // counts as a wrong answer, same as picking the wrong card.
+  useEffect(() => {
+    if (!isSpeedRound || over || revealed) return
+    timeoutRef.current = setTimeout(() => {
+      handleCheck(null) // null never matches q.answer -> counts as wrong
+    }, SPEED_ROUND_MS)
+    return () => clearTimeout(timeoutRef.current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, isSpeedRound, over, revealed])
+
+  async function finalizeAttempt(result) {
+    setSaving(true)
+    const correct = TOTAL - wrong
+    let coinsDelta = 0
+    let newBalance = coinBalance
+
+    if (result === 'passed') {
+      newBalance = applyPayout(coinBalance)
+      coinsDelta = STAGE_PAYOUT
+    }
+    // 'died' and 'retry' carry no further coin change here — the entry fee
+    // was already charged when the attempt started (handled in Map.jsx).
+
+    try {
+      if (kidId) {
+        const attemptId = await logAttempt(kidId, {
+          operation, table, stage,
+          questionsSeen: idx + 1,
+          correctCount: correct,
+          wrongCount: wrong,
+          livesUsed: LIVES_START - lives,
+          result,
+          coinsDelta,
+        })
+
+        if (coinsDelta !== 0) {
+          await setCoinBalance(kidId, newBalance)
+          await logCoinTransaction(kidId, {
+            attemptId,
+            amount: coinsDelta,
+            reason: 'stage_pass',
+            balanceAfter: newBalance,
+          })
+          onBalanceChange?.(newBalance)
+        }
+
+        if (result === 'passed') {
+          const next = nextStep(operation, table, stage)
+          if (next) await updateProgress(kidId, next)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to save attempt (gameplay continues regardless):', err)
+    } finally {
+      setSaving(false)
     }
   }
 
   function handleContinue() {
     if (lives === 0) {
-      console.log('died')
       setOver('died')
+      finalizeAttempt('died')
       return
     }
     if (idx === TOTAL - 1) {
       const correct = TOTAL - wrong
-      const pass    = correct >= 8
-      console.log(`Finished: ${correct}/${TOTAL} — ${pass ? 'PASS' : 'did not pass'}`)
+      const pass = correct >= 8
       setOver('finished')
+      finalizeAttempt(pass ? 'passed' : 'retry')
       return
     }
-    setIdx(i  => i + 1)
+    setIdx(i => i + 1)
     setSelected(null)
     setRevealed(false)
+    setTimerKey(k => k + 1)
   }
 
   // ── Game over screens ──────────────────────────────────────────
@@ -103,16 +208,16 @@ export default function Practice({ operation = 'addition', table = 1, onExit }) 
         <span className="text-8xl" role="img" aria-label="skull">💀</span>
         <div className="text-center">
           <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">Out of lives!</h2>
-          <p className="font-body text-gray-400 text-sm">You ran out before finishing.</p>
+          <p className="font-body text-gray-400 text-sm">You ran out before finishing. Try again any time.</p>
         </div>
         {onExit && (
           <div className="w-full mt-2">
             <button
               onClick={onExit}
-              className="btn-era w-full py-4 rounded-2xl bg-stoneage-primary font-body font-bold text-xl text-ink tracking-widest"
-              style={{ '--btn-shadow': '#CC7700' }}
+              disabled={saving}
+              className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
             >
-              EXIT
+              {saving ? 'SAVING…' : 'EXIT'}
             </button>
           </div>
         )}
@@ -122,7 +227,7 @@ export default function Practice({ operation = 'addition', table = 1, onExit }) 
 
   if (over === 'finished') {
     const correct = TOTAL - wrong
-    const pass    = correct >= 8
+    const pass = correct >= 8
     return (
       <div className="h-screen flex flex-col items-center justify-center bg-white px-6 gap-6 max-w-sm mx-auto">
         <span className="text-8xl" role="img" aria-label={pass ? 'star' : 'thumbs up'}>
@@ -133,15 +238,20 @@ export default function Practice({ operation = 'addition', table = 1, onExit }) 
             {pass ? 'You passed!' : 'Not quite!'}
           </h2>
           <p className="font-body text-gray-400">{correct} out of {TOTAL} correct</p>
+          {pass && (
+            <div className="flex items-center justify-center gap-1.5 mt-3 font-body font-bold text-base text-amber-600">
+              <CoinIcon /> +{STAGE_PAYOUT}
+            </div>
+          )}
         </div>
         {onExit && (
           <div className="w-full mt-2">
             <button
               onClick={onExit}
-              className="btn-era w-full py-4 rounded-2xl bg-stoneage-primary font-body font-bold text-xl text-ink tracking-widest"
-              style={{ '--btn-shadow': '#CC7700' }}
+              disabled={saving}
+              className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
             >
-              EXIT
+              {saving ? 'SAVING…' : 'CONTINUE'}
             </button>
           </div>
         )}
@@ -173,8 +283,9 @@ export default function Practice({ operation = 'addition', table = 1, onExit }) 
           aria-valuemax={TOTAL}
         >
           <div
-            className="h-full bg-stoneage-primary rounded-full origin-left"
+            className="h-full rounded-full origin-left"
             style={{
+              backgroundColor: '#58cc02',
               transform: `scaleX(${progressScale})`,
               transition: 'transform 350ms cubic-bezier(0.4, 0, 0.2, 1)',
             }}
@@ -190,9 +301,33 @@ export default function Practice({ operation = 'addition', table = 1, onExit }) 
         </div>
       </div>
 
+      {/* Stage label + speed-round timer */}
+      <div className="flex-shrink-0 px-5 flex items-center justify-between">
+        <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.dark }}>
+          {theme.era} · {stageLabel(stage)}
+        </p>
+        {isSpeedRound && (
+          <p className="font-body font-bold text-xs text-gray-400">5s</p>
+        )}
+      </div>
+
+      {isSpeedRound && (
+        <div className="flex-shrink-0 mx-5 mt-1 h-1.5 rounded-full bg-gray-100 overflow-hidden">
+          <div
+            key={timerKey}
+            className="h-full bg-red-400 rounded-full anim-speed-countdown"
+            style={{ animationDuration: `${SPEED_ROUND_MS}ms` }}
+          />
+        </div>
+      )}
+
       {/* Question */}
-      <div className="flex-shrink-0 px-6 pt-6 pb-2">
-        <p className="text-4xl font-display font-extrabold text-gray-900 text-center leading-tight">
+      <div className={`flex-shrink-0 px-6 pt-5 pb-2 ${isWordProblem ? '' : 'flex items-center justify-center'}`}>
+        <p className={
+          isWordProblem
+            ? 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto'
+            : 'text-4xl font-display font-extrabold text-gray-900 text-center leading-tight'
+        }>
           {q.text}
         </p>
       </div>
@@ -207,7 +342,7 @@ export default function Practice({ operation = 'addition', table = 1, onExit }) 
               onClick={() => !revealed && setSelected(choice)}
               aria-pressed={selected === choice}
               className={`${cardClass(choice, selected, revealed, q.answer)} ${cardAnimClass(choice, selected, revealed, q.answer)}`}
-              style={!revealed && selected === choice ? { '--card-shadow': '#CC7700' } : {}}
+              style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}
             >
               {choice}
             </button>
@@ -220,14 +355,8 @@ export default function Practice({ operation = 'addition', table = 1, onExit }) 
         {!revealed ? (
           <button
             disabled={selected === null}
-            onClick={handleCheck}
-            className={[
-              'w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest',
-              selected !== null
-                ? 'btn-era bg-stoneage-primary text-ink'
-                : 'bg-gray-100 text-gray-300 cursor-not-allowed',
-            ].join(' ')}
-            style={selected !== null ? { '--btn-shadow': '#CC7700' } : {}}
+            onClick={() => handleCheck()}
+            className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
           >
             CHECK
           </button>
@@ -249,11 +378,9 @@ export default function Practice({ operation = 'addition', table = 1, onExit }) 
             </div>
             <button
               onClick={handleContinue}
-              className={[
-                'btn-era w-full py-4 font-body font-bold text-xl text-white tracking-widest',
-                isCorrect ? 'bg-green-500' : 'bg-red-400',
-              ].join(' ')}
-              style={{ '--btn-shadow': isCorrect ? '#15803d' : '#b91c1c' }}
+              className={`w-full py-4 font-body font-bold text-xl tracking-widest ${
+                isCorrect ? 'btn-duo' : 'btn-duo-red'
+              }`}
             >
               CONTINUE
             </button>
