@@ -3,9 +3,11 @@ import { useState } from 'react'
 // ── Icons ────────────────────────────────────────────────────────────────
 // Per project rule: Lucide-style icons get strokeWidth={2.5} for a
 // chunkier, more Duolingo-like look matching Baloo 2's heavy roundness.
-// House and Rewards are both plain currentColor stroke icons, identical
-// treatment — only Profile breaks that pattern, since it's a colored
-// mascot image, not a line icon.
+// All three nav icons (House, Rewards, Profile) are plain currentColor
+// stroke icons with identical sizing/treatment, hand-drawn to match
+// Lucide's actual shapes rather than imported, since the one icon this
+// app needed from Lucide's separate @lucide/lab package (chest) isn't
+// worth a second dependency for a single glyph.
 
 function HouseIcon({ active }) {
   return (
@@ -39,15 +41,18 @@ function RewardsIcon({ active }) {
   )
 }
 
-function ProfileIcon() {
+// Profile — circle-user (Lucide's standard profile icon shape: a person
+// silhouette inside a circle), same stroke-only treatment as House and
+// Rewards. Replaces the earlier flower mascot image — all three nav icons
+// are now the same family, just swapped per request.
+function ProfileIcon({ active }) {
   return (
-    <img
-      src="/nav-icons/profile-flower.png"
-      alt=""
-      draggable={false}
-      onContextMenu={(e) => e.preventDefault()}
-      className="w-11 h-11 object-contain select-none pointer-events-none"
-    />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="10" r="3" fill={active ? 'currentColor' : 'none'} />
+      <path d="M6.2 18.5a6.5 6.5 0 0 1 11.6 0" />
+    </svg>
   )
 }
 
@@ -62,7 +67,6 @@ const ACTIVE_FG = '#1CB0F6'
 
 function NavButton({ item, isActive, onPress, orientation }) {
   const { Icon, label } = item
-  const isProfile = item.id === 'profile'
 
   if (orientation === 'bottom') {
     return (
@@ -74,13 +78,13 @@ function NavButton({ item, isActive, onPress, orientation }) {
         aria-current={isActive ? 'page' : undefined}
       >
         <span
-          className={isProfile ? 'w-12 h-12 flex items-center justify-center' : 'w-11 h-11 rounded-2xl flex items-center justify-center transition-colors'}
-          style={isProfile ? undefined : {
+          className="w-11 h-11 rounded-2xl flex items-center justify-center transition-colors"
+          style={{
             backgroundColor: isActive ? ACTIVE_BG : 'transparent',
             color: isActive ? ACTIVE_FG : '#9CA3AF',
           }}
         >
-          {isProfile ? <Icon /> : <Icon active={isActive} />}
+          <Icon active={isActive} />
         </span>
       </button>
     )
@@ -98,8 +102,8 @@ function NavButton({ item, isActive, onPress, orientation }) {
       }}
       aria-current={isActive ? 'page' : undefined}
     >
-      <span className={isProfile ? 'w-10 h-10 flex items-center justify-center flex-shrink-0' : 'w-9 h-9 flex items-center justify-center flex-shrink-0'}>
-        {isProfile ? <Icon /> : <Icon active={isActive} />}
+      <span className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+        <Icon active={isActive} />
       </span>
       <span className="font-body font-bold text-sm">{label}</span>
     </button>
