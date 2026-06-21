@@ -53,6 +53,7 @@ export default function App() {
         node={activeNode.node}
         kidId={kidId}
         coinBalance={activeNode.coinBalance}
+        reviewPool={activeNode.reviewPool}
         onExit={handleExitPractice}
       />
     )
