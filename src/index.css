@@ -206,6 +206,28 @@ body {
   animation: sheet-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+/* Desktop/tablet: same element switches to a centered modal, scale+fade
+   instead of slide-up (a sheet sliding up from the bottom of a huge
+   monitor looks broken). Wrapped in an explicit min-width media query —
+   not just a later CSS rule — so this deterministically overrides
+   .anim-sheet-in at the breakpoint regardless of class/source order,
+   rather than relying on which rule happens to be declared last. The
+   keyframe owns its FULL transform (translate -50%/-50% centering +
+   scale) rather than splitting it with Tailwind's md:-translate-x-1/2
+   utilities, since a CSS animation overrides utility-class transforms at
+   runtime — splitting it across both silently breaks centering the
+   moment the animation plays (this exact bug hit the node popover in an
+   earlier version). */
+@keyframes modal-in {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@media (min-width: 768px) {
+  .anim-sheet-in {
+    animation: modal-in 200ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}
+
 /* ── Reduced motion: crossfade instead of movement ───────────── */
 @media (prefers-reduced-motion: reduce) {
   .anim-correct,
@@ -219,7 +241,13 @@ body {
 
   .anim-sheet-in {
     animation: none !important;
-    transform: translateY(0) !important; /* sheet still appears, just without the slide-up motion */
+    transform: translateY(0) !important; /* mobile: sheet still appears at rest, just without the slide-up motion */
+  }
+
+  @media (min-width: 768px) {
+    .anim-sheet-in {
+      transform: translate(-50%, -50%) !important; /* desktop: stays correctly centered without the scale+fade entrance */
+    }
   }
 
   /* Static fallback: show only the stand pose, hide crouch/jump layers */
