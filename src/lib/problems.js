@@ -1,8 +1,13 @@
 // ── Problem generation ───────────────────────────────────────────────────
-// Implements spec §4 (hard rules) and §5 (stage definitions: plain equation,
-// situation/word problem, speed round). Speed round uses the exact same
-// difficulty/generation as the table — only the UI (5s per-question
-// countdown) differs, which lives in Practice.jsx, not here.
+// Implements spec §4 (hard rules: no negative subtraction, no division
+// remainders) across the 5-node-per-unit model:
+//   equations   — plain equation text, random order
+//   speed_round — same plain-equation content; the 5s/question countdown
+//                 is a Practice.jsx UI concern, not a content difference
+//   irl         — word/situation problem phrasing
+//   irl_timed   — same word-problem phrasing as irl; countdown UI only
+//   gift        — recap/bonus round mixing plain-equation AND word-problem
+//                 phrasing at random, same difficulty (this table only)
 
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -40,8 +45,8 @@ function buildDistractors(answer, count = 3) {
 }
 
 // ── Core (operation, table) -> {a, b, answer} ──────────────────────────
-// Pure numeric core, shared by all 3 stages so the *difficulty* is always
-// identical within a table — only the presentation differs (spec §5).
+// Pure numeric core, shared by every node type so the *difficulty* is
+// always identical within a table — only the presentation differs.
 
 function coreValues(operation, table) {
   if (operation === 'addition') {
@@ -73,7 +78,7 @@ function equationText(operation, a, b) {
 }
 
 // ── Word problem phrasing ───────────────────────────────────────────────
-// Small rotating cast of names/objects so stage 2 doesn't feel repetitive.
+// Small rotating cast of names/objects so irl nodes don't feel repetitive.
 // Kept simple/short on purpose — spec calls for near-zero reading load.
 
 const NAMES = ['Tom', 'Mia', 'Sam', 'Lina', 'Eli', 'Noa', 'Zoe', 'Kai']
@@ -98,21 +103,34 @@ function wordProblemText(operation, a, b) {
   return equationText(operation, a, b)
 }
 
-function makeProblem(operation, table, stage) {
+// Node types that render as plain equations vs. word-problem phrasing.
+const EQUATION_STYLE_NODES = new Set(['equations', 'speed_round'])
+const WORD_PROBLEM_STYLE_NODES = new Set(['irl', 'irl_timed'])
+
+function makeProblem(operation, table, node) {
   const { a, b, answer } = coreValues(operation, table)
-  const text =
-    stage === 'word_problem'
-      ? wordProblemText(operation, a, b)
-      : equationText(operation, a, b) // 'equation' and 'speed_round' share plain-equation text
+
+  let text
+  if (node === 'gift') {
+    // Recap/bonus round: randomly mix both presentation styles, same
+    // difficulty — reinforces everything learned in this unit.
+    text = Math.random() < 0.5 ? equationText(operation, a, b) : wordProblemText(operation, a, b)
+  } else if (WORD_PROBLEM_STYLE_NODES.has(node)) {
+    text = wordProblemText(operation, a, b)
+  } else {
+    // 'equations', 'speed_round', or any unrecognized node falls back to
+    // plain equation text rather than throwing.
+    text = equationText(operation, a, b)
+  }
 
   return { text, answer }
 }
 
-/** Generates a 10-question batch for the given operation/table/stage.
- *  `stage` is one of 'equation' | 'word_problem' | 'speed_round'. */
-export function generateBatch(operation = 'addition', table = 1, stage = 'equation', count = 10) {
+/** Generates a 10-question batch for the given operation/table/node.
+ *  `node` is one of 'equations' | 'speed_round' | 'irl' | 'irl_timed' | 'gift'. */
+export function generateBatch(operation = 'addition', table = 1, node = 'equations', count = 10) {
   return Array.from({ length: count }, () => {
-    const { text, answer } = makeProblem(operation, table, stage)
+    const { text, answer } = makeProblem(operation, table, node)
     return { text, answer, choices: shuffle([...buildDistractors(answer), answer]) }
   })
 }
