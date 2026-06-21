@@ -188,15 +188,30 @@ create trigger kids_set_updated_at
   for each row execute function set_updated_at();
 
 -- ── Row Level Security ──────────────────────────────────────────────────
--- Permissive policies for now since there's no parent auth wired up yet in
--- this build phase (kid/game screens only, per current scope). Lock these
--- down to auth.uid()-scoped policies once PIN login lands.
+-- Permissive policies for now — phone+PIN auth is enforced at the APP
+-- layer (lib/parentAuth.js verifies the PIN before ever returning a
+-- parent id to the client), not via Postgres RLS tied to auth.uid(),
+-- since this app isn't using Supabase Auth proper for phone+PIN (see
+-- lib/pinAuth.js's docs on that tradeoff). Lock these down to real
+-- auth.uid()-scoped policies if/when this migrates to Supabase Auth.
+--
+-- IMPORTANT: every table the app writes to needs BOTH "enable row level
+-- security" AND a matching open policy below — RLS enabled with no
+-- policy silently blocks ALL access (a 401), and Supabase projects often
+-- auto-enable RLS on new tables by default even before this script
+-- explicitly does so. `parents` was missing from this block for a while
+-- during development, which caused exactly that 401 on signup — if you
+-- add new tables later, add them here too.
 
+alter table parents enable row level security;
 alter table kids enable row level security;
 alter table attempts enable row level security;
 alter table coin_transactions enable row level security;
 alter table gifts enable row level security;
 alter table gift_claims enable row level security;
+
+drop policy if exists "dev_open_parents" on parents;
+create policy "dev_open_parents" on parents for all using (true) with check (true);
 
 drop policy if exists "dev_open_kids" on kids;
 create policy "dev_open_kids" on kids for all using (true) with check (true);
