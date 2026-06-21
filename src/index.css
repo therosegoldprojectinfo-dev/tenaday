@@ -10,6 +10,16 @@ body {
   overscroll-behavior: none;
 }
 
+/* Hide scrollbar on the horizontally-scrolling era tabs row, while keeping
+   it scrollable via touch/trackpad */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* ── Keyframe animations ──────────────────────────────────────── */
 
 /* Correct answer: spring bounce (overshoot → settle) */
@@ -41,21 +51,58 @@ body {
   100% { transform: scale(1); }
 }
 
+/* Speed round: per-question 5s countdown bar, drains left to right */
+@keyframes speed-countdown {
+  from { transform: scaleX(1); }
+  to   { transform: scaleX(0); }
+}
+.anim-speed-countdown {
+  animation: speed-countdown linear forwards;
+  transform-origin: left;
+}
+
 .anim-correct     { animation: correct-bounce 380ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 .anim-wrong-shake { animation: wrong-shake    360ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
 .anim-heart-pulse { animation: heart-pulse    340ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
-/* ── Duolingo-style 3D press button ──────────────────────────── */
-/* Bottom shadow collapses and button translates down on press,
-   simulating the button physically depressing. */
-.btn-era {
-  box-shadow: 0 4px 0 0 var(--btn-shadow, #CC7700);
+/* ── Duolingo green 3D press button ──────────────────────────── */
+/* Fixed green action color, used for every primary button (Check,
+   Continue, Exit, era banner CTA, etc.) across all 4 eras — buttons do
+   NOT take era tinting. Bottom shadow collapses and the button translates
+   down on press, simulating a physical button depressing.
+   Source: Uiverse.io by suda-code, adapted to project's radius/sizing. */
+.btn-duo {
+  background: #58cc02;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 0 0 #58a700;
   transition: transform 80ms cubic-bezier(0.23, 1, 0.32, 1),
               box-shadow 80ms cubic-bezier(0.23, 1, 0.32, 1);
 }
-.btn-era:not(:disabled):active {
-  transform: translateY(3px);
-  box-shadow: 0 1px 0 0 var(--btn-shadow, #CC7700);
+.btn-duo:not(:disabled):active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+.btn-duo:disabled {
+  background: #e5e7eb;
+  color: #9ca3af;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Red variant — same mechanic, used only for the "wrong answer" Continue
+   button state so the feedback color (red) still reads correctly. */
+.btn-duo-red {
+  background: #ff4b4b;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 0 0 #d93333;
+  transition: transform 80ms cubic-bezier(0.23, 1, 0.32, 1),
+              box-shadow 80ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn-duo-red:not(:disabled):active {
+  transform: translateY(4px);
+  box-shadow: none;
 }
 
 /* ── Answer card: card-puck variant ─────────────────────────── */
@@ -75,12 +122,15 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .anim-correct,
   .anim-wrong-shake,
-  .anim-heart-pulse {
+  .anim-heart-pulse,
+  .anim-speed-countdown {
     animation: none;
   }
 
-  .btn-era,
-  .btn-era:not(:disabled):active,
+  .btn-duo,
+  .btn-duo:not(:disabled):active,
+  .btn-duo-red,
+  .btn-duo-red:not(:disabled):active,
   .card-answer,
   .card-answer:not(:disabled):active {
     transform: none;
