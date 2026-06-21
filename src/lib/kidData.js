@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient'
+import { todayString } from './dayGate'
 
 // ── Demo kid ─────────────────────────────────────────────────────────────
 // No parent/login flow yet (that's next build phase per current scope), so
@@ -8,11 +9,12 @@ import { supabase } from './supabaseClient'
 // kidId as a parameter.
 export const DEMO_KID_ID = '00000000-0000-0000-0000-000000000001'
 
-/** Loads a kid's current progress + coin balance. */
+/** Loads a kid's current progress + coin balance + daily-loop gating
+ *  fields (last_advance_date, seen_chapter_intros). */
 export async function fetchKid(kidId) {
   const { data, error } = await supabase
     .from('kids')
-    .select('id, name, current_operation, current_table, current_node, coin_balance')
+    .select('id, name, current_operation, current_table, current_node, last_advance_date, seen_chapter_intros, coin_balance')
     .eq('id', kidId)
     .single()
 
@@ -20,7 +22,11 @@ export async function fetchKid(kidId) {
   return data
 }
 
-/** Updates the kid's progression cursor (called after a node PASS). */
+/** Updates the kid's progression cursor (called after a node PASS) and
+ *  stamps last_advance_date to today — this is what the day-gate in
+ *  lib/dayGate.js checks against to decide if the NEXT node can unlock
+ *  yet. Every actual advance (not replay) goes through this function, so
+ *  the stamp only moves forward when real progress happens. */
 export async function updateProgress(kidId, { operation, table, node }) {
   const { error } = await supabase
     .from('kids')
@@ -28,7 +34,21 @@ export async function updateProgress(kidId, { operation, table, node }) {
       current_operation: operation,
       current_table: table,
       current_node: node,
+      last_advance_date: todayString(),
     })
+    .eq('id', kidId)
+
+  if (error) throw error
+}
+
+/** Marks a chapter's one-time interactive concept intro as seen, so it
+ *  doesn't show again for this kid. Appends rather than overwrites, since
+ *  seen_chapter_intros accumulates across all 4 chapters over time. */
+export async function markChapterIntroSeen(kidId, operation, currentSeenList = []) {
+  if (currentSeenList.includes(operation)) return // already recorded, avoid a redundant write
+  const { error } = await supabase
+    .from('kids')
+    .update({ seen_chapter_intros: [...currentSeenList, operation] })
     .eq('id', kidId)
 
   if (error) throw error
