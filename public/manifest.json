@@ -4,9 +4,8 @@
   "description": "Two minutes of math, every day.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FBF3E7",
-  "theme_color": "#1F6F66",
-  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#58cc02",
   "icons": [
     {
       "src": "/icon-192.png",
