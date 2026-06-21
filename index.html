@@ -9,9 +9,13 @@
     <meta name="theme-color" content="#58cc02" />
 
     <!-- PWA: lets a kid/parent add this to their home screen and open it
-         full-screen, no browser address bar, like a real app -->
+         full-screen, no browser address bar, like a real app. Both tags
+         needed — apple-mobile-web-app-capable is iOS Safari-specific and
+         still required there; mobile-web-app-capable is the modern
+         standard tag other browsers (and newer iOS) now expect. -->
     <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
