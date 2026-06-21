@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { generateBatch } from '../lib/problems'
 import { themeFor } from '../lib/eraTheme'
-import { stageLabel, nextStep } from '../lib/progression'
-import { applyPayout, STAGE_PAYOUT } from '../lib/economy'
+import { nodeLabel, nextStep } from '../lib/progression'
+import { applyPayout, payoutForNode } from '../lib/economy'
 import FlowerJump from '../components/FlowerJump'
 import {
   updateProgress,
@@ -11,9 +11,15 @@ import {
   logAttempt,
 } from '../lib/kidData'
 
-const TOTAL          = 10
-const LIVES_START    = 4
-const SPEED_ROUND_MS = 5000
+const TOTAL       = 10
+const LIVES_START = 4
+const TIMED_MS    = 5000
+
+// Both timed node types share the same 5s-per-question countdown UI.
+const TIMED_NODES = new Set(['speed_round', 'irl_timed'])
+// Both "real-world" node types render as longer sentence text instead of
+// a big plain equation.
+const WORD_PROBLEM_NODES = new Set(['irl', 'irl_timed'])
 
 function XIcon() {
   return (
@@ -74,17 +80,19 @@ function cardAnimClass(choice, selected, revealed, answer) {
 export default function Practice({
   operation = 'addition',
   table = 1,
-  stage = 'equation',
+  node = 'equations',
   kidId,
   coinBalance = 0,
   onExit,
   onBalanceChange,
 }) {
   const theme = themeFor(operation)
-  const isSpeedRound = stage === 'speed_round'
-  const isWordProblem = stage === 'word_problem'
+  const isTimed = TIMED_NODES.has(node)
+  const isWordProblem = WORD_PROBLEM_NODES.has(node)
+  const isGift = node === 'gift'
+  const payout = payoutForNode(node)
 
-  const batch = useMemo(() => generateBatch(operation, table, stage), [operation, table, stage])
+  const batch = useMemo(() => generateBatch(operation, table, node), [operation, table, node])
 
   const [idx,      setIdx]      = useState(0)
   const [lives,    setLives]    = useState(LIVES_START)
@@ -97,7 +105,7 @@ export default function Practice({
   // Incrementing this key remounts the HeartIcon, restarting the CSS animation
   const [heartKey, setHeartKey] = useState(0)
 
-  // Speed round: per-question 5s timer. timerKey remounts the bar so the
+  // Timed nodes: per-question 5s timer. timerKey remounts the bar so the
   // CSS animation restarts on every new question.
   const [timerKey, setTimerKey] = useState(0)
   const timeoutRef = useRef(null)
@@ -105,7 +113,6 @@ export default function Practice({
   const q = batch[idx]
   const isCorrect = selected === q?.answer
 
-  // Emil: animate transform not width — scaleX from origin-left
   const progressScale = (idx + (revealed ? 1 : 0)) / TOTAL
 
   function handleWrongChoice() {
@@ -123,16 +130,16 @@ export default function Practice({
     if (choice !== q.answer) handleWrongChoice()
   }
 
-  // Speed round: auto-expire the question if no answer was chosen in time —
+  // Timed nodes: auto-expire the question if no answer was chosen in time —
   // counts as a wrong answer, same as picking the wrong card.
   useEffect(() => {
-    if (!isSpeedRound || over || revealed) return
+    if (!isTimed || over || revealed) return
     timeoutRef.current = setTimeout(() => {
       handleCheck(null) // null never matches q.answer -> counts as wrong
-    }, SPEED_ROUND_MS)
+    }, TIMED_MS)
     return () => clearTimeout(timeoutRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx, isSpeedRound, over, revealed])
+  }, [idx, isTimed, over, revealed])
 
   async function finalizeAttempt(result) {
     setSaving(true)
@@ -141,8 +148,8 @@ export default function Practice({
     let newBalance = coinBalance
 
     if (result === 'passed') {
-      newBalance = applyPayout(coinBalance)
-      coinsDelta = STAGE_PAYOUT
+      newBalance = applyPayout(coinBalance, node)
+      coinsDelta = payout
     }
     // 'died' and 'retry' carry no further coin change here — the entry fee
     // was already charged when the attempt started (handled in Map.jsx).
@@ -150,7 +157,7 @@ export default function Practice({
     try {
       if (kidId) {
         const attemptId = await logAttempt(kidId, {
-          operation, table, stage,
+          operation, table, node,
           questionsSeen: idx + 1,
           correctCount: correct,
           wrongCount: wrong,
@@ -164,14 +171,14 @@ export default function Practice({
           await logCoinTransaction(kidId, {
             attemptId,
             amount: coinsDelta,
-            reason: 'stage_pass',
+            reason: isGift ? 'gift_node_pass' : 'node_pass',
             balanceAfter: newBalance,
           })
           onBalanceChange?.(newBalance)
         }
 
         if (result === 'passed') {
-          const next = nextStep(operation, table, stage)
+          const next = nextStep(operation, table, node)
           if (next) await updateProgress(kidId, next)
         }
       }
@@ -238,12 +245,12 @@ export default function Practice({
         )}
         <div className="text-center">
           <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">
-            {pass ? 'You passed!' : 'Not quite!'}
+            {pass ? (isGift ? 'Bonus complete!' : 'You passed!') : 'Not quite!'}
           </h2>
           <p className="font-body text-gray-400">{correct} out of {TOTAL} correct</p>
           {pass && (
             <div className="flex items-center justify-center gap-1.5 mt-3 font-body font-bold text-base text-amber-600">
-              <CoinIcon /> +{STAGE_PAYOUT}
+              <CoinIcon /> +{payout}
             </div>
           )}
         </div>
@@ -304,22 +311,22 @@ export default function Practice({
         </div>
       </div>
 
-      {/* Stage label + speed-round timer */}
+      {/* Node label + timed countdown indicator */}
       <div className="flex-shrink-0 px-5 flex items-center justify-between">
         <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.dark }}>
-          {theme.era} · {stageLabel(stage)}
+          {theme.era} · Table {table} · {nodeLabel(node)}
         </p>
-        {isSpeedRound && (
+        {isTimed && (
           <p className="font-body font-bold text-xs text-gray-400">5s</p>
         )}
       </div>
 
-      {isSpeedRound && (
+      {isTimed && (
         <div className="flex-shrink-0 mx-5 mt-1 h-1.5 rounded-full bg-gray-100 overflow-hidden">
           <div
             key={timerKey}
             className="h-full bg-red-400 rounded-full anim-speed-countdown"
-            style={{ animationDuration: `${SPEED_ROUND_MS}ms` }}
+            style={{ animationDuration: `${TIMED_MS}ms` }}
           />
         </div>
       )}
