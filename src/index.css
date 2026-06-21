@@ -129,13 +129,92 @@ body {
   box-shadow: 0 1px 0 0 var(--card-shadow, #D1D5DB);
 }
 
+/* ── Flower Jump animation ────────────────────────────────────── */
+/* Ported from a hand-tuned 3.0s keyframe timeline (stand → crouch
+   anticipation → jump + poof → land → settle). Percentages below are the
+   original second-marks divided by 3.0s. Three pose layers cross-fade
+   while the body wrapper lifts/squashes for weight and energy. */
+
+@keyframes flower-jump-stand-op {
+  0%      { opacity: 1; }
+  26.7%   { opacity: 1; }
+  31.7%   { opacity: 0; }
+  78.3%   { opacity: 0; }
+  83.3%   { opacity: 1; }
+  100%    { opacity: 1; }
+}
+
+@keyframes flower-jump-crouch-op {
+  0%, 26.7%   { opacity: 0; }
+  31.7%       { opacity: 1; }
+  41.7%       { opacity: 1; }
+  45%         { opacity: 0; }
+  65%         { opacity: 0; }
+  70%         { opacity: 1; }
+  78.3%       { opacity: 1; }
+  83.3%       { opacity: 0; }
+  100%        { opacity: 0; }
+}
+
+@keyframes flower-jump-jump-op {
+  0%, 41.7%   { opacity: 0; }
+  45%         { opacity: 1; }
+  65%         { opacity: 1; }
+  70%         { opacity: 0; }
+  100%        { opacity: 0; }
+}
+
+@keyframes flower-jump-body {
+  0%      { transform: translateY(0)    scale(1, 1); }
+  26.7%   { transform: translateY(0)    scale(1, 1); }
+  41.7%   { transform: translateY(7px)  scale(1.04, 0.93); }   /* crouch squash */
+  45%     { transform: translateY(2px)  scale(0.98, 1.05); }   /* launch stretch */
+  55%     { transform: translateY(-32px) scale(0.97, 1.0); }   /* peak of jump */
+  65%     { transform: translateY(2px)  scale(0.98, 1.0); }
+  70%     { transform: translateY(8px)  scale(1.04, 0.92); }   /* landing squash */
+  78.3%   { transform: translateY(0)    scale(1, 1); }
+  100%    { transform: translateY(0)    scale(1, 1); }
+}
+
+@keyframes flower-jump-shadow {
+  0%, 26.7%  { transform: scale(1, 1);     opacity: 0.35; }
+  41.7%      { transform: scale(1.04, 1.04); opacity: 0.32; }
+  55%        { transform: scale(0.55, 0.55); opacity: 0.12; }  /* shrinks at jump peak */
+  70%        { transform: scale(1.04, 1.04); opacity: 0.32; }
+  78.3%, 100% { transform: scale(1, 1);     opacity: 0.35; }
+}
+
+.anim-flower-stand.flower-jump-loop     { animation: flower-jump-stand-op 3s ease-in-out infinite; }
+.anim-flower-stand.flower-jump-once     { animation: flower-jump-stand-op 3s ease-in-out 1; }
+.anim-flower-crouch.flower-jump-loop    { animation: flower-jump-crouch-op 3s ease-in-out infinite; }
+.anim-flower-crouch.flower-jump-once    { animation: flower-jump-crouch-op 3s ease-in-out 1; }
+.anim-flower-jumppose.flower-jump-loop  { animation: flower-jump-jump-op 3s ease-in-out infinite; }
+.anim-flower-jumppose.flower-jump-once  { animation: flower-jump-jump-op 3s ease-in-out 1; }
+.anim-flower-body.flower-jump-loop      { animation: flower-jump-body 3s ease-in-out infinite; }
+.anim-flower-body.flower-jump-once      { animation: flower-jump-body 3s ease-in-out 1; }
+.anim-flower-shadow.flower-jump-loop    { animation: flower-jump-shadow 3s ease-in-out infinite; }
+.anim-flower-shadow.flower-jump-once    { animation: flower-jump-shadow 3s ease-in-out 1; }
+
 /* ── Reduced motion: crossfade instead of movement ───────────── */
 @media (prefers-reduced-motion: reduce) {
   .anim-correct,
   .anim-wrong-shake,
   .anim-heart-pulse,
-  .anim-speed-countdown {
-    animation: none;
+  .anim-speed-countdown,
+  .anim-flower-body,
+  .anim-flower-shadow {
+    animation: none !important;
+  }
+
+  /* Static fallback: show only the stand pose, hide crouch/jump layers */
+  .anim-flower-stand {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+  .anim-flower-crouch,
+  .anim-flower-jumppose {
+    animation: none !important;
+    opacity: 0 !important;
   }
 
   .btn-duo,
