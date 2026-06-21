@@ -35,14 +35,6 @@ function LockIcon({ size = 20 }) {
   )
 }
 
-function StarIcon({ size = 20 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
-    </svg>
-  )
-}
-
 function BackIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.5"
@@ -125,8 +117,12 @@ function NodeTypeIcon({ node, size = 22 }) {
 // ── Horizontal unit selector ────────────────────────────────────────────
 // A scrollable strip of connected circles, one per unit (matches the
 // reference: "+1, +2, +3, +4..." checkpoint timeline). All 12 are always
-// visible/scrollable; only unlocked ones are tappable.
-function UnitSelector({ tables, currentPos, operation, theme, selectedTable, onSelect }) {
+// visible/scrollable; only unlocked ones are tappable. Always Duolingo
+// green for unlocked/active/completed circles — no era tinting here,
+// consistent with the rest of the app's "green is the only action color"
+// rule. The era color still shows up just below, in the ADDITION/Unit X
+// label text.
+function UnitSelector({ tables, currentPos, operation, selectedTable, onSelect }) {
   const selectedRef = useRef(null)
 
   useEffect(() => {
@@ -134,47 +130,53 @@ function UnitSelector({ tables, currentPos, operation, theme, selectedTable, onS
   }, [selectedTable])
 
   return (
-    <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-4">
-      {tables.map((table, i) => {
-        const uStatus = unitStatus(currentPos, operation, table)
-        const locked = uStatus === 'locked'
-        const completed = uStatus === 'completed'
-        const isSelected = table === selectedTable
+    <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-4 justify-start md:justify-center">
+      <div className="flex items-center">
+        {tables.map((table, i) => {
+          const uStatus = unitStatus(currentPos, operation, table)
+          const locked = uStatus === 'locked'
+          const completed = uStatus === 'completed'
+          const isSelected = table === selectedTable
 
-        let icon = <span className="font-body font-bold text-sm">{table}</span>
-        if (completed) icon = <CheckIcon size={18} />
-        else if (locked) icon = <LockIcon size={16} />
-        else if (uStatus === 'active') icon = <StarIcon size={16} />
+          // The unit's own number is always the default content — only
+          // completed (checkmark) and locked (padlock) override it. The
+          // kid's current/active unit still just shows its number, same
+          // as any other unlocked unit; the outline ring is what marks it
+          // as "current," not a different icon.
+          let icon = <span className="font-body font-bold text-sm">{table}</span>
+          if (completed) icon = <CheckIcon size={18} />
+          else if (locked) icon = <LockIcon size={16} />
 
-        return (
-          <div key={table} className="flex items-center flex-shrink-0">
-            {i > 0 && (
-              <div
-                className="h-0.5 w-6"
-                style={{ backgroundColor: completed || uStatus === 'active' ? theme.colors.primary : '#E5E7EB' }}
-              />
-            )}
-            <button
-              ref={isSelected ? selectedRef : null}
-              type="button"
-              disabled={locked}
-              onClick={() => onSelect(table)}
-              className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-transform"
-              style={{
-                backgroundColor: locked ? '#E5E7EB' : theme.colors.primary,
-                color: locked ? '#9CA3AF' : '#FFFFFF',
-                outline: isSelected ? `3px solid ${theme.colors.dark}` : 'none',
-                outlineOffset: '2px',
-                transform: isSelected ? 'scale(1.08)' : 'scale(1)',
-              }}
-              aria-label={`Unit ${table}${locked ? ', locked' : ''}`}
-              aria-pressed={isSelected}
-            >
-              {icon}
-            </button>
-          </div>
-        )
-      })}
+          return (
+            <div key={table} className="flex items-center flex-shrink-0">
+              {i > 0 && (
+                <div
+                  className="h-0.5 w-6"
+                  style={{ backgroundColor: completed || uStatus === 'active' ? DUO_GREEN : '#E5E7EB' }}
+                />
+              )}
+              <button
+                ref={isSelected ? selectedRef : null}
+                type="button"
+                disabled={locked}
+                onClick={() => onSelect(table)}
+                className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-transform"
+                style={{
+                  backgroundColor: locked ? '#E5E7EB' : DUO_GREEN,
+                  color: locked ? '#9CA3AF' : '#FFFFFF',
+                  outline: isSelected ? `3px solid ${DUO_GREEN_DARK}` : 'none',
+                  outlineOffset: '2px',
+                  transform: isSelected ? 'scale(1.08)' : 'scale(1)',
+                }}
+                aria-label={`Unit ${table}${locked ? ', locked' : ''}`}
+                aria-pressed={isSelected}
+              >
+                {icon}
+              </button>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -372,7 +374,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
           tables={tables}
           currentPos={currentPos}
           operation={operation}
-          theme={theme}
           selectedTable={selectedTable}
           onSelect={handleSelectUnit}
         />
