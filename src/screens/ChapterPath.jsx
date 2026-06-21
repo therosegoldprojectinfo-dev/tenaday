@@ -334,7 +334,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
 
       {/* Top stats bar + back button */}
       <div className="sticky top-0 bg-white z-30 border-b border-gray-100">
-        <div className="flex items-center justify-between px-3 py-3 max-w-sm mx-auto">
+        <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <button
             onClick={onBack}
             className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500
@@ -379,7 +379,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
       </div>
 
       {atDebtFloor && (
-        <div className="mx-4 mt-3 rounded-xl bg-red-50 border border-red-100 px-3 py-2 max-w-sm md:mx-auto">
+        <div className="mx-4 mt-3 rounded-xl bg-red-50 border border-red-100 px-3 py-2 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
           <p className="font-body text-xs text-red-500 font-semibold">
             Coins are low — retries are free until you earn some back. Keep playing!
           </p>
@@ -387,7 +387,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
       )}
 
       {/* Selected unit header */}
-      <div className="px-4 pt-5 pb-2 max-w-sm mx-auto">
+      <div className="px-4 pt-5 pb-2 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
         <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.primary }}>
           {theme.operationLabel}
         </p>
@@ -396,10 +396,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
         </p>
       </div>
 
-      {/* The 5 exercises for the selected unit, as list rows */}
-      <div className="max-w-sm mx-auto px-4 pb-10 flex flex-col gap-2.5">
+      {/* The 5 exercises for the selected unit, as list rows — single
+          column on phone, 2 columns on tablet/desktop since these are
+          short list-style rows that read fine side by side. */}
+      <div className="max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto px-4 pb-10 grid grid-cols-1 md:grid-cols-2 gap-2.5">
         {selectedUnitStatus === 'locked' ? (
-          <div className="rounded-2xl bg-gray-50 border border-gray-100 px-4 py-6 text-center">
+          <div className="md:col-span-2 rounded-2xl bg-gray-50 border border-gray-100 px-4 py-6 text-center">
             <LockIcon size={26} />
             <p className="font-body text-sm text-gray-400 mt-2">
               Complete the previous unit to unlock this one.
@@ -437,15 +439,23 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
         )}
       </div>
 
-      {/* Node confirmation bottom sheet */}
+      {/* Node confirmation: bottom sheet on phone (standard mobile pattern),
+          centered modal on tablet/desktop — a full-width sheet sliding up
+          across a wide monitor would look broken, so it switches treatment
+          at the md breakpoint rather than just stretching. */}
       {openNode && (
         <>
           <div
             className="fixed inset-0 bg-black/30 z-40"
             onClick={() => setOpenNode(null)}
           />
-          <div className="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-3xl px-5 pt-5 pb-8 max-w-sm mx-auto anim-sheet-in">
-            <div className="w-10 h-1.5 rounded-full bg-gray-200 mx-auto mb-4" />
+          <div
+            className="fixed z-50 bg-white anim-sheet-in
+                       bottom-0 left-0 right-0 rounded-t-3xl px-5 pt-5 pb-8 max-w-sm mx-auto
+                       md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto
+                       md:rounded-3xl md:max-w-md md:w-full md:px-6 md:pt-6 md:pb-7"
+          >
+            <div className="w-10 h-1.5 rounded-full bg-gray-200 mx-auto mb-4 md:hidden" />
             <p className="font-display font-bold text-xl text-gray-900 mb-1">
               {nodeLabel(openNode.node)}
             </p>
