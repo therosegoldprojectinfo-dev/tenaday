@@ -10,6 +10,7 @@ import {
 } from '../lib/progression'
 import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
 import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
+import FlowerJump from '../components/FlowerJump'
 
 // ── Layout constants ─────────────────────────────────────────────────────
 // Bigger nodes, more breathing room than the old single-stage map per
@@ -18,8 +19,9 @@ import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 const NODE_SIZE   = 92
 const RING_PAD    = 14   // gap between node edge and the surrounding halo ring
 const V_STEP      = 124  // vertical distance between node centers
-const UNIT_GAP    = 56   // extra vertical space before a new unit's banner
+const UNIT_GAP    = 64   // extra vertical space reserved for each unit's banner
 const TOP_PAD     = 28
+const START_PILL_CLEARANCE = 150 // extra space reserved above the current node so the START pill (which floats ~142px above the node center) never overlaps the unit banner
 
 const CENTER_X  = 50
 const WAVE_AMPL = 26
@@ -160,12 +162,27 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
     })
   })
 
-  // Vertical position bookkeeping: each unit banner adds extra height
-  // (UNIT_GAP) before its first node.
-  let y = TOP_PAD
+  // Vertical position bookkeeping: every unit's banner reserves UNIT_GAP of
+  // height before its first node — including unit 1, which previously had
+  // no reserved space and caused the banner to overlap the node + START
+  // pill. The START pill itself floats above the kid's current node and
+  // also needs its own reserved clearance so it never collides with the
+  // banner above it. bannerY is computed independently of any START-pill
+  // clearance added to a node's own y, so the banner never shifts based on
+  // whether the unit's first node happens to be the current node.
+  let y = TOP_PAD + UNIT_GAP
   const positioned = flatNodes.map((n, i) => {
-    if (n.isFirstOfUnit && n.table !== 1) y += UNIT_GAP
-    const pos = { ...n, y, x: xForIndex(i) }
+    if (n.isFirstOfUnit && i !== 0) y += UNIT_GAP
+    const bannerY = y - UNIT_GAP // fixed offset above this node, pre-clearance
+    const isCurrentNodeForSpacing =
+      currentPos.operation === operation &&
+      currentPos.table === n.table &&
+      currentPos.node === n.node
+    // Reserve extra clearance above any node that will render the START
+    // pill, so the pill (and its little tail) never overlaps the banner
+    // or the previous node.
+    if (isCurrentNodeForSpacing) y += START_PILL_CLEARANCE
+    const pos = { ...n, y, bannerY, x: xForIndex(i) }
     y += V_STEP
     return pos
   })
@@ -254,7 +271,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
       {/* Scrolling node path */}
       <div className="relative mx-auto max-w-sm" style={{ height: totalHeight }}>
 
-        {positioned.map(({ table, node, nodeIdx, isFirstOfUnit, y, x }) => {
+        {positioned.map(({ table, node, nodeIdx, isFirstOfUnit, y, bannerY, x }) => {
           const uStatus = unitStatus(currentPos, operation, table)
           const targetPos = { operation, table, node }
 
@@ -287,7 +304,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
               {isFirstOfUnit && (
                 <div
                   className="absolute left-1/2 -translate-x-1/2 w-full px-4"
-                  style={{ top: y - UNIT_GAP - 6, maxWidth: 384 }}
+                  style={{ top: bannerY, maxWidth: 384 }}
                 >
                   <div
                     className="rounded-2xl px-4 py-3 flex items-center justify-between"
@@ -389,6 +406,27 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
             </div>
           )
         })}
+
+        {/* Ambient mascot — one per unit, sitting in the open space the
+            zigzag path leaves on alternating sides. Loops continuously as
+            idle "alive" decoration, doesn't block or compete with nodes. */}
+        {positioned
+          .filter(p => p.nodeIdx === 2) // middle node (irl) of each unit — roughly centered in that unit's vertical span
+          .map(p => (
+            <div
+              key={`mascot-${p.table}`}
+              className="absolute"
+              style={{
+                top: p.y - 70,
+                // Mirror to whichever side has more open space: opposite
+                // the node's own x position.
+                left: p.x > 50 ? '8%' : '62%',
+                zIndex: 1,
+              }}
+            >
+              <FlowerJump loop size={140} />
+            </div>
+          ))}
 
       </div>
     </div>
