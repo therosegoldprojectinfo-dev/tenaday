@@ -236,7 +236,7 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
 
       {/* Top stats bar */}
       <div className="sticky top-0 bg-white z-20 border-b border-gray-100">
-        <div className="flex items-center justify-between px-5 py-3 max-w-sm mx-auto">
+        <div className="flex items-center justify-between px-5 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <div className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100">
             <HeartStatIcon />
             <span className="font-body font-bold text-base text-red-500 leading-none tabular-nums">4</span>
@@ -260,15 +260,16 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
       </div>
 
       {atDebtFloor && (
-        <div className="mx-4 mt-3 rounded-xl bg-red-50 border border-red-100 px-3 py-2 max-w-sm md:mx-auto">
+        <div className="mx-4 mt-3 rounded-xl bg-red-50 border border-red-100 px-3 py-2 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
           <p className="font-body text-xs text-red-500 font-semibold">
             Coins are low — retries are free until you earn some back. Keep playing!
           </p>
         </div>
       )}
 
-      {/* Chapter card list */}
-      <div className="max-w-sm mx-auto px-4 py-4 flex flex-col gap-4">
+      {/* Chapter card list — single column on phone, 2 columns on tablet,
+          3 on desktop, per standard responsive card-grid practice. */}
+      <div className="max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto px-4 py-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {OPERATIONS.map(operation => {
           const status = eraStatus(currentPos, operation)
           const progress = eraProgress(currentPos, operation)
