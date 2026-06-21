@@ -10,11 +10,12 @@ import { todayString } from './dayGate'
 export const DEMO_KID_ID = '00000000-0000-0000-0000-000000000001'
 
 /** Loads a kid's current progress + coin balance + daily-loop gating
- *  fields (last_advance_date, seen_chapter_intros). */
+ *  fields (last_advance_date, seen_chapter_intros) + placement_claim
+ *  (affects pass threshold — see lib/economy.js's passThresholdFor). */
 export async function fetchKid(kidId) {
   const { data, error } = await supabase
     .from('kids')
-    .select('id, name, current_operation, current_table, current_node, last_advance_date, seen_chapter_intros, coin_balance')
+    .select('id, name, age, placement_claim, current_operation, current_table, current_node, last_advance_date, seen_chapter_intros, coin_balance')
     .eq('id', kidId)
     .single()
 
@@ -107,4 +108,33 @@ export async function logAttempt(kidId, {
     return null
   }
   return data.id
+}
+
+/** Aggregates a kid's real gameplay history for the Profile page —
+ *  deliberately only counts data that genuinely exists (spec explicitly
+ *  puts leaderboards/streaks/social features out of scope for now), so
+ *  this returns honest numbers rather than fabricated placeholders for
+ *  things like "current league" that have no underlying system yet. */
+export async function fetchKidStats(kidId) {
+  const { data, error } = await supabase
+    .from('attempts')
+    .select('result, correct_count, questions_seen, created_at')
+    .eq('kid_id', kidId)
+
+  if (error) throw error
+
+  const nodesPassed = data.filter(a => a.result === 'passed').length
+  const totalCorrect = data.reduce((sum, a) => sum + a.correct_count, 0)
+  const totalQuestions = data.reduce((sum, a) => sum + a.questions_seen, 0)
+  const totalAttempts = data.length
+
+  // Distinct calendar days the kid has played at all (any attempt,
+  // passed or not) — a simple, honest "days active" count. Not the same
+  // thing as a maintained day-streak (which would need to track
+  // consecutive days and reset on a missed day), but truthful as-is.
+  const distinctDays = new Set(
+    data.map(a => new Date(a.created_at).toISOString().slice(0, 10))
+  ).size
+
+  return { nodesPassed, totalCorrect, totalQuestions, totalAttempts, distinctDays }
 }
