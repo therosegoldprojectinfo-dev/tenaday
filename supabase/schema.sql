@@ -78,6 +78,18 @@ create table if not exists kids (
   id                   uuid primary key default gen_random_uuid(),
   parent_id            uuid references parents(id) on delete cascade,
   name                 text not null,
+  age                  int  check (age is null or (age between 3 and 17)),
+
+  -- Parent's claim at profile creation: "my kid is already good at X".
+  -- Does NOT change where the kid starts playing — every kid always
+  -- begins at Addition table 1 and plays the full ladder, no skipping
+  -- ("to make sure the foundation is actually there" — confirmed product
+  -- decision). Instead, this raises the PASS THRESHOLD to 90% (9/10)
+  -- instead of the normal 80% (8/10) for the claimed chapter AND every
+  -- chapter before it in the ladder — see lib/economy.js's
+  -- passThresholdFor(). Null means no claim was made; every chapter uses
+  -- the normal 80% threshold.
+  placement_claim      operation_type,
 
   current_operation    operation_type not null default 'addition',
   current_table        int  not null default 1 check (current_table between 1 and 12),
@@ -97,6 +109,8 @@ create table if not exists kids (
 alter table kids add column if not exists current_node node_type not null default 'learn';
 alter table kids add column if not exists last_advance_date date;
 alter table kids add column if not exists seen_chapter_intros operation_type[] not null default '{}';
+alter table kids add column if not exists age int check (age is null or (age between 3 and 17));
+alter table kids add column if not exists placement_claim operation_type;
 
 -- ── attempts ─────────────────────────────────────────────────────────────
 -- One row per playthrough of a node (a batch of up to 10 questions).
