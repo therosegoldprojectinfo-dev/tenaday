@@ -11,6 +11,15 @@ export const DEBT_CAP_MULT    = 2    // debt floor = -(ENTRY_FEE * DEBT_CAP_MULT
 
 export const DEBT_FLOOR = -(ENTRY_FEE * DEBT_CAP_MULT)
 
+// Pass thresholds, out of 10 questions per attempt (spec §6: "8, 9, or
+// 10 correct -> PASS"). NORMAL is the default everywhere. CLAIMED applies
+// only to chapters covered by a kid's placement_claim (see schema.sql) —
+// raised to 90% so a parent's "my kid is already good at X" claim is
+// self-verifying: genuinely solid material stays easy to clear, an
+// optimistic claim gets caught by the higher bar.
+export const NORMAL_PASS_THRESHOLD  = 8
+export const CLAIMED_PASS_THRESHOLD = 9
+
 /** Applies the entry fee to a balance, clamped at the debt floor.
  *  A kid is NEVER blocked from playing for lack of coins (spec §7) — if
  *  they're already at the floor, the fee is effectively free. */
@@ -38,4 +47,28 @@ export function applyPayout(balance, node = 'learn') {
 
 export function isInDebt(balance) {
   return balance < 0
+}
+
+/** The pass threshold (out of 10) for a given operation/chapter, given a
+ *  kid's placement_claim (or null/undefined if no claim was made).
+ *
+ *  Raised to CLAIMED_PASS_THRESHOLD for the claimed chapter AND every
+ *  chapter before it in the ladder (e.g. claiming "good at multiplication"
+ *  raises the bar for addition, subtraction, AND multiplication — division,
+ *  which comes after, stays at the normal threshold). Chapters after the
+ *  claim were never claimed to be already-known, so they keep the normal
+ *  bar.
+ *
+ *  Takes OPERATIONS (the ladder order) as a parameter rather than
+ *  importing it directly from lib/progression.js, so this module has no
+ *  circular/cross-module import dependency — callers already have
+ *  OPERATIONS in scope wherever they'd call this. */
+export function passThresholdFor(operation, placementClaim, operationsOrder) {
+  if (!placementClaim) return NORMAL_PASS_THRESHOLD
+
+  const claimIdx = operationsOrder.indexOf(placementClaim)
+  const opIdx = operationsOrder.indexOf(operation)
+  if (claimIdx === -1 || opIdx === -1) return NORMAL_PASS_THRESHOLD
+
+  return opIdx <= claimIdx ? CLAIMED_PASS_THRESHOLD : NORMAL_PASS_THRESHOLD
 }
