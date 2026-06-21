@@ -1,42 +1,74 @@
 import { useState } from 'react'
 import Map from './screens/Map'
+import ChapterPath from './screens/ChapterPath'
 import Practice from './screens/Practice'
 import { DEMO_KID_ID } from './lib/kidData'
 
+// Three-level navigation:
+//   'list'  — chapter card list (was the whole app before; now the top level)
+//   'path'  — in-chapter unit/node path for ONE operation
+//   'play'  — Practice screen for ONE specific node
 export default function App() {
   // No parent/login flow yet (next build phase) — every screen operates on
   // one seeded demo kid. Swap this for the picked profile's id once a kid
   // profile picker exists; nothing else needs to change.
   const kidId = DEMO_KID_ID
 
-  // null = on the map. Otherwise: { operation, table, stage, coinBalance }
-  const [activeStage, setActiveStage] = useState(null)
-  // Bumped to force Map to re-fetch fresh kid data when returning from a
-  // finished attempt (so the journey map reflects the new position/balance).
-  const [mapRefreshKey, setMapRefreshKey] = useState(0)
+  const [screen, setScreen] = useState('list')       // 'list' | 'path' | 'play'
+  const [activeChapter, setActiveChapter] = useState(null) // operation string, while in 'path' or 'play'
+  const [activeNode, setActiveNode] = useState(null)        // { operation, table, node, coinBalance }, while in 'play'
 
-  function handleStartStage(stageConfig) {
-    setActiveStage(stageConfig)
+  // Bumped to force a fresh kid-data fetch whenever a screen we're
+  // returning to should reflect updated progress/balance.
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  function handleOpenChapter(operation) {
+    setActiveChapter(operation)
+    setScreen('path')
+  }
+
+  function handleStartNode(nodeConfig) {
+    setActiveNode(nodeConfig)
+    setScreen('play')
   }
 
   function handleExitPractice() {
-    setActiveStage(null)
-    setMapRefreshKey(k => k + 1)
+    setActiveNode(null)
+    setScreen('path')
+    setRefreshKey(k => k + 1)
   }
 
-  if (activeStage) {
+  function handleBackToList() {
+    setActiveChapter(null)
+    setScreen('list')
+    setRefreshKey(k => k + 1)
+  }
+
+  if (screen === 'play' && activeNode) {
     return (
       <Practice
-        key={`${activeStage.operation}-${activeStage.table}-${activeStage.stage}`}
-        operation={activeStage.operation}
-        table={activeStage.table}
-        stage={activeStage.stage}
+        key={`${activeNode.operation}-${activeNode.table}-${activeNode.node}`}
+        operation={activeNode.operation}
+        table={activeNode.table}
+        node={activeNode.node}
         kidId={kidId}
-        coinBalance={activeStage.coinBalance}
+        coinBalance={activeNode.coinBalance}
         onExit={handleExitPractice}
       />
     )
   }
 
-  return <Map key={mapRefreshKey} onStartStage={handleStartStage} kidId={kidId} />
+  if (screen === 'path' && activeChapter) {
+    return (
+      <ChapterPath
+        key={`${activeChapter}-${refreshKey}`}
+        operation={activeChapter}
+        kidId={kidId}
+        onStartNode={handleStartNode}
+        onBack={handleBackToList}
+      />
+    )
+  }
+
+  return <Map key={refreshKey} onOpenChapter={handleOpenChapter} kidId={kidId} />
 }
