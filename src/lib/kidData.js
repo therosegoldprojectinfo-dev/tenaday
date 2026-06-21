@@ -12,7 +12,7 @@ export const DEMO_KID_ID = '00000000-0000-0000-0000-000000000001'
 export async function fetchKid(kidId) {
   const { data, error } = await supabase
     .from('kids')
-    .select('id, name, current_operation, current_table, current_stage, coin_balance')
+    .select('id, name, current_operation, current_table, current_node, coin_balance')
     .eq('id', kidId)
     .single()
 
@@ -20,14 +20,14 @@ export async function fetchKid(kidId) {
   return data
 }
 
-/** Updates the kid's progression cursor (called after a stage PASS). */
-export async function updateProgress(kidId, { operation, table, stage }) {
+/** Updates the kid's progression cursor (called after a node PASS). */
+export async function updateProgress(kidId, { operation, table, node }) {
   const { error } = await supabase
     .from('kids')
     .update({
       current_operation: operation,
       current_table: table,
-      current_stage: stage,
+      current_node: node,
     })
     .eq('id', kidId)
 
@@ -61,7 +61,7 @@ export async function logCoinTransaction(kidId, { attemptId = null, amount, reas
 /** Records one finished attempt (passed / retry / died) and returns its id
  *  so it can be linked from coin_transactions. */
 export async function logAttempt(kidId, {
-  operation, table, stage,
+  operation, table, node,
   questionsSeen, correctCount, wrongCount, livesUsed,
   result, coinsDelta,
 }) {
@@ -71,7 +71,7 @@ export async function logAttempt(kidId, {
       kid_id: kidId,
       operation,
       table_number: table,
-      stage,
+      node,
       questions_seen: questionsSeen,
       correct_count: correctCount,
       wrong_count: wrongCount,
