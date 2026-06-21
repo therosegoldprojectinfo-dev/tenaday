@@ -195,6 +195,17 @@ body {
 .anim-flower-shadow.flower-jump-loop    { animation: flower-jump-shadow 3s ease-in-out infinite; }
 .anim-flower-shadow.flower-jump-once    { animation: flower-jump-shadow 3s ease-in-out 1; }
 
+/* Node confirmation bottom sheet — slides up from the bottom, standard
+   mobile sheet pattern. Deliberately not anchored to any node's position
+   (see ChapterPath.jsx), so this has zero viewport-overflow risk. */
+@keyframes sheet-in {
+  0%   { transform: translateY(100%); }
+  100% { transform: translateY(0); }
+}
+.anim-sheet-in {
+  animation: sheet-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 /* ── Reduced motion: crossfade instead of movement ───────────── */
 @media (prefers-reduced-motion: reduce) {
   .anim-correct,
@@ -204,6 +215,11 @@ body {
   .anim-flower-body,
   .anim-flower-shadow {
     animation: none !important;
+  }
+
+  .anim-sheet-in {
+    animation: none !important;
+    transform: translateY(0) !important; /* sheet still appears, just without the slide-up motion */
   }
 
   /* Static fallback: show only the stand pose, hide crouch/jump layers */
