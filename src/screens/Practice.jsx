@@ -212,23 +212,25 @@ export default function Practice({
 
   if (over === 'died') {
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-white px-6 gap-6 max-w-sm mx-auto">
-        <span className="text-8xl" role="img" aria-label="skull">💀</span>
-        <div className="text-center">
-          <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">Out of lives!</h2>
-          <p className="font-body text-gray-400 text-sm">You ran out before finishing. Try again any time.</p>
-        </div>
-        {onExit && (
-          <div className="w-full mt-2">
-            <button
-              onClick={onExit}
-              disabled={saving}
-              className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
-            >
-              {saving ? 'SAVING…' : 'EXIT'}
-            </button>
+      <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
+        <div className="h-screen md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-6 gap-6">
+          <span className="text-8xl" role="img" aria-label="skull">💀</span>
+          <div className="text-center">
+            <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">Out of lives!</h2>
+            <p className="font-body text-gray-400 text-sm">You ran out before finishing. Try again any time.</p>
           </div>
-        )}
+          {onExit && (
+            <div className="w-full mt-2">
+              <button
+                onClick={onExit}
+                disabled={saving}
+                className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
+              >
+                {saving ? 'SAVING…' : 'EXIT'}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     )
   }
@@ -237,34 +239,36 @@ export default function Practice({
     const correct = TOTAL - wrong
     const pass = correct >= 8
     return (
-      <div className="h-screen flex flex-col items-center justify-center bg-white px-6 gap-6 max-w-sm mx-auto">
-        {pass ? (
-          <FlowerJump size={200} />
-        ) : (
-          <span className="text-8xl" role="img" aria-label="thumbs up">👍</span>
-        )}
-        <div className="text-center">
-          <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">
-            {pass ? (isGift ? 'Bonus complete!' : 'You passed!') : 'Not quite!'}
-          </h2>
-          <p className="font-body text-gray-400">{correct} out of {TOTAL} correct</p>
-          {pass && (
-            <div className="flex items-center justify-center gap-1.5 mt-3 font-body font-bold text-base text-amber-600">
-              <CoinIcon /> +{payout}
+      <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
+        <div className="h-screen md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-6 gap-6">
+          {pass ? (
+            <FlowerJump size={200} />
+          ) : (
+            <span className="text-8xl" role="img" aria-label="thumbs up">👍</span>
+          )}
+          <div className="text-center">
+            <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">
+              {pass ? (isGift ? 'Bonus complete!' : 'You passed!') : 'Not quite!'}
+            </h2>
+            <p className="font-body text-gray-400">{correct} out of {TOTAL} correct</p>
+            {pass && (
+              <div className="flex items-center justify-center gap-1.5 mt-3 font-body font-bold text-base text-amber-600">
+                <CoinIcon /> +{payout}
+              </div>
+            )}
+          </div>
+          {onExit && (
+            <div className="w-full mt-2">
+              <button
+                onClick={onExit}
+                disabled={saving}
+                className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
+              >
+                {saving ? 'SAVING…' : 'CONTINUE'}
+              </button>
             </div>
           )}
         </div>
-        {onExit && (
-          <div className="w-full mt-2">
-            <button
-              onClick={onExit}
-              disabled={saving}
-              className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
-            >
-              {saving ? 'SAVING…' : 'CONTINUE'}
-            </button>
-          </div>
-        )}
       </div>
     )
   }
@@ -272,7 +276,8 @@ export default function Practice({
   // ── Main practice screen ───────────────────────────────────────
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col bg-white max-w-sm mx-auto">
+    <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
+      <div className="h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md">
 
       {/* Top bar */}
       <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-5 pb-3">
@@ -398,6 +403,7 @@ export default function Practice({
         )}
       </div>
 
+      </div>
     </div>
   )
 }
