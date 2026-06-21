@@ -7,6 +7,16 @@ export default {
         ink:   '#3C3C3C',
         muted: '#AFAFAF',
 
+        // Fixed Duolingo green — the ONLY action/button color, shared by
+        // all 4 eras. Era palettes below are for backgrounds/map nodes
+        // only; buttons never use era colors.
+        duo: {
+          DEFAULT: '#58cc02',
+          dark:    '#58a700',
+          red:     '#ff4b4b',
+          reddark: '#d93333',
+        },
+
         stoneage: {
           primary: '#FF9600', // vivid amber — pucks, buttons, accents
           dark:    '#CC7700', // darker amber — 3D button shadow
