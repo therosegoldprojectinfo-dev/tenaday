@@ -1,9 +1,18 @@
 -- ============================================================================
--- Ten a Day — Supabase schema
+-- Ten a Day — Supabase schema (v2: 5-node units)
 -- ============================================================================
--- Built from ten-a-day-spec.md. Parent/auth tables are included for the
--- *next* build phase (PIN login, gifts) but this round only reads/writes
--- the `kids` + `attempts` + `coin_transactions` tables from the game client.
+-- Supersedes the original 3-stage ladder (equation/word_problem/speed_round)
+-- with the 5-node-per-unit model:
+--   Chapter (operation) -> Unit (table 1-12) -> Node (5 per unit):
+--     equations -> speed_round -> irl -> irl_timed -> gift
+--
+-- SAFE TO RE-RUN: this file drops and recreates the stage/node enum and the
+-- columns that depend on it, so it works whether you're running it fresh
+-- or migrating a database that already has the old 3-stage schema. Existing
+-- kid/attempt rows referencing old stage values ('word_problem', etc.) will
+-- be reset, since there's no automatic mapping from 3 old stages to 5 new
+-- nodes — fine for a dev/demo database, NOT something to run against real
+-- user data without writing an explicit data migration first.
 --
 -- Run this whole file once in your Supabase project's SQL Editor.
 -- ============================================================================
@@ -13,8 +22,19 @@ create extension if not exists "pgcrypto"; -- gen_random_uuid()
 
 -- ── Enums ────────────────────────────────────────────────────────────────
 
-create type operation_type as enum ('addition', 'subtraction', 'multiplication', 'division');
-create type stage_type     as enum ('equation', 'word_problem', 'speed_round');
+do $$ begin
+  create type operation_type as enum ('addition', 'subtraction', 'multiplication', 'division');
+exception when duplicate_object then null;
+end $$;
+
+-- Drop the old 3-value stage enum's dependent columns before recreating it,
+-- since Postgres won't let you change an enum's values in place.
+alter table if exists kids     drop column if exists current_stage;
+alter table if exists attempts drop column if exists stage;
+
+drop type if exists stage_type;
+
+create type node_type as enum ('equations', 'speed_round', 'irl', 'irl_timed', 'gift');
 
 -- ── parents ──────────────────────────────────────────────────────────────
 -- Phone + 4-digit PIN, no email (per spec §3). PIN is stored as a bcrypt-style
@@ -29,9 +49,9 @@ create table if not exists parents (
 );
 
 -- ── kids ─────────────────────────────────────────────────────────────────
--- One row per kid profile. current_operation/current_table/current_stage
--- together encode "where am I on the journey map" — this triple IS the
--- progression cursor described in spec §5.
+-- One row per kid profile. current_operation/current_table/current_node
+-- together encode "where am I in the chapter/unit/node ladder" — this
+-- triple IS the progression cursor.
 --
 -- coin_balance can go negative (debt), floor enforced by application logic
 -- per spec §7 (debt capped at -2x entry fee). Not enforced at the DB level
@@ -44,7 +64,7 @@ create table if not exists kids (
 
   current_operation  operation_type not null default 'addition',
   current_table      int  not null default 1 check (current_table between 1 and 12),
-  current_stage      stage_type not null default 'equation',
+  current_node       node_type not null default 'equations',
 
   coin_balance       int  not null default 50,
 
@@ -52,8 +72,12 @@ create table if not exists kids (
   updated_at         timestamptz not null default now()
 );
 
+-- If `kids` already existed from the old schema (without current_node),
+-- this adds it back after the drop/recreate above.
+alter table kids add column if not exists current_node node_type not null default 'equations';
+
 -- ── attempts ─────────────────────────────────────────────────────────────
--- One row per playthrough of a stage (a batch of up to 10 questions).
+-- One row per playthrough of a node (a batch of up to 10 questions).
 -- Written once the attempt ends, either by dying or finishing the batch.
 
 create table if not exists attempts (
@@ -62,7 +86,7 @@ create table if not exists attempts (
 
   operation       operation_type not null,
   table_number    int  not null check (table_number between 1 and 12),
-  stage           stage_type not null,
+  node            node_type not null,
 
   questions_seen  int  not null default 0,
   correct_count   int  not null default 0,
@@ -75,27 +99,27 @@ create table if not exists attempts (
   created_at      timestamptz not null default now()
 );
 
+alter table attempts add column if not exists node node_type;
+
 create index if not exists attempts_kid_id_idx on attempts (kid_id, created_at desc);
 
 -- ── coin_transactions ───────────────────────────────────────────────────
 -- Ledger of every coin movement, so the parent dashboard (next phase) can
--- show a real history instead of just the current balance. Optional for
--- gameplay to function, but cheap to keep and very useful for debugging
--- "why is my balance wrong" during build/testing.
+-- show a real history instead of just the current balance.
 
 create table if not exists coin_transactions (
   id          uuid primary key default gen_random_uuid(),
   kid_id      uuid not null references kids(id) on delete cascade,
   attempt_id  uuid references attempts(id) on delete set null,
   amount      int  not null,            -- positive = earned, negative = spent
-  reason      text not null,            -- 'entry_fee' | 'stage_pass' | 'gift_purchase'
+  reason      text not null,            -- 'entry_fee' | 'node_pass' | 'gift_purchase'
   balance_after int not null,
   created_at  timestamptz not null default now()
 );
 
 create index if not exists coin_transactions_kid_id_idx on coin_transactions (kid_id, created_at desc);
 
--- ── gifts (next build phase, included now so schema doesn't need a second migration) ──
+-- ── gifts (parent-defined real-world rewards, next build phase) ──────────
 
 create table if not exists gifts (
   id          uuid primary key default gen_random_uuid(),
@@ -156,6 +180,9 @@ create policy "dev_open_gift_claims" on gift_claims for all using (true) with ch
 -- ── Seed: one demo kid so the app has something to load before the parent
 -- flow exists. Safe to delete once real signup is built.
 
-insert into kids (id, parent_id, name, current_operation, current_table, current_stage, coin_balance)
-values ('00000000-0000-0000-0000-000000000001', null, 'Demo Kid', 'addition', 1, 'equation', 50)
-on conflict (id) do nothing;
+insert into kids (id, parent_id, name, current_operation, current_table, current_node, coin_balance)
+values ('00000000-0000-0000-0000-000000000001', null, 'Demo Kid', 'addition', 1, 'equations', 50)
+on conflict (id) do update set
+  current_operation = excluded.current_operation,
+  current_table = excluded.current_table,
+  current_node = excluded.current_node;
