@@ -81,3 +81,36 @@ export function overallProgress(operation, table, stage) {
   if (i === -1) return 0
   return i / total
 }
+
+/** Progress (0–1) within a single era/operation only — used for each
+ *  chapter card's own progress bar. A kid not yet in this operation gets 0;
+ *  a kid past this operation entirely gets 1 (fully complete). */
+export function eraProgress(currentPos, operation) {
+  const opIdx = OPERATIONS.indexOf(operation)
+  const curOpIdx = OPERATIONS.indexOf(currentPos.operation)
+  const stepsPerEra = TABLE_COUNT * STAGES.length
+
+  if (curOpIdx > opIdx) return 1 // already moved past this era entirely
+  if (curOpIdx < opIdx) return 0 // haven't reached this era yet
+
+  // currently inside this exact era — count completed steps within it
+  const stageIdx = STAGES.indexOf(currentPos.stage)
+  const stepsDone = (currentPos.table - 1) * STAGES.length + stageIdx
+  return stepsDone / stepsPerEra
+}
+
+/** 'locked' | 'active' | 'completed' for a whole era, used to decide which
+ *  chapter card state to render. An era is 'active' if it's the kid's
+ *  current operation (even if 0% in) or already partially/fully done but
+ *  not yet superseded — i.e. exactly the operations at or before current. */
+export function eraStatus(currentPos, operation) {
+  const opIdx = OPERATIONS.indexOf(operation)
+  const curOpIdx = OPERATIONS.indexOf(currentPos.operation)
+  if (opIdx > curOpIdx) return 'locked'
+  if (opIdx < curOpIdx) return 'completed'
+  // opIdx === curOpIdx: the kid's current era. 'completed' only once they've
+  // finished the very last step (table 12, speed_round) and the cursor has
+  // moved on — which the curOpIdx > opIdx branch above already covers — so
+  // landing here always means in-progress/active, including freshly started.
+  return 'active'
+}
