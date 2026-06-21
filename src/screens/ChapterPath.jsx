@@ -342,7 +342,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
 
     const reviewPool = node === 'review' ? reviewPoolFor(operation, table) : undefined
 
-    onStartNode({ operation, table, node, coinBalance: newBalance, reviewPool })
+    onStartNode({ operation, table, node, coinBalance: newBalance, reviewPool, placementClaim: kid.placement_claim })
   }
 
   const inDebt = kid.coin_balance < 0
