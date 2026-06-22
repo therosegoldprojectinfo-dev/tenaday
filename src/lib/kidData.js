@@ -138,3 +138,80 @@ export async function fetchKidStats(kidId) {
 
   return { nodesPassed, totalCorrect, totalQuestions, totalAttempts, distinctDays }
 }
+
+// ── Rewards (spec §8) ───────────────────────────────────────────────────
+
+/** Fetches every gift available to a kid — global rewards (parent_id is
+ *  null, the seeded starter list) plus any the kid's own parent has
+ *  created (parent_id matches). Ordered cheapest-first so a kid scanning
+ *  the list sees achievable goals before aspirational ones. */
+export async function fetchAvailableGifts(parentId) {
+  const { data, error } = await supabase
+    .from('gifts')
+    .select('id, name, coin_price, icon, parent_id')
+    .or(parentId ? `parent_id.is.null,parent_id.eq.${parentId}` : 'parent_id.is.null')
+    .order('coin_price', { ascending: true })
+
+  if (error) throw error
+  return data
+}
+
+/** Fetches the set of gift ids a kid has already claimed — used to mark
+ *  already-bought items distinctly rather than letting a kid buy the same
+ *  reward an unlimited number of times in one sitting by mistake. (Spec
+ *  doesn't explicitly forbid re-buying the same reward — e.g. "20 minutes
+ *  of TV" is reasonably repeatable — so this is informational/history,
+ *  not a hard block; see Rewards.jsx for how it's actually used.) */
+export async function fetchClaimedGiftIds(kidId) {
+  const { data, error } = await supabase
+    .from('gift_claims')
+    .select('gift_id')
+    .eq('kid_id', kidId)
+
+  if (error) throw error
+  return data.map(c => c.gift_id)
+}
+
+/** Purchases a gift for a kid: deducts the price from their coin balance,
+ *  records the claim, and logs the coin transaction — all three in
+ *  sequence. Re-validates affordability against the FRESH balance passed
+ *  in (the caller should fetch a current kid row immediately before
+ *  calling this, not trust stale client state), since coins could have
+ *  changed between when the Rewards screen loaded and when the kid taps
+ *  Buy. Per spec §7, while in debt a kid's rewards stay LOCKED until the
+ *  balance is back to >= 0 — that gate is enforced by the caller (the
+ *  Rewards screen disables every buy button while in debt), not here;
+ *  this function only re-checks raw affordability (balance >= price). */
+export async function purchaseGift(kidId, gift, currentBalance) {
+  if (currentBalance < gift.coin_price) {
+    throw new Error('Not enough coins for this reward.')
+  }
+
+  const newBalance = currentBalance - gift.coin_price
+
+  const { error: balanceError } = await supabase
+    .from('kids')
+    .update({ coin_balance: newBalance })
+    .eq('id', kidId)
+  if (balanceError) throw balanceError
+
+  const { error: claimError } = await supabase
+    .from('gift_claims')
+    .insert({ kid_id: kidId, gift_id: gift.id })
+  if (claimError) {
+    // Coin balance already moved — log but don't throw, since the
+    // purchase itself (the part that matters to the kid) succeeded; a
+    // missing claims-history row is a minor bookkeeping gap, not a
+    // reason to show the kid an error after their coins were already
+    // correctly deducted.
+    console.error('gift_claims insert failed (non-blocking):', claimError)
+  }
+
+  await logCoinTransaction(kidId, {
+    amount: -gift.coin_price,
+    reason: 'gift_purchase',
+    balanceAfter: newBalance,
+  })
+
+  return newBalance
+}
