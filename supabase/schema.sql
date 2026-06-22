@@ -93,7 +93,7 @@ create table if not exists kids (
 
   current_operation    operation_type not null default 'addition',
   current_table        int  not null default 1 check (current_table between 1 and 12),
-  current_batch        int  not null default 1 check (current_batch between 1 and 4),
+  current_batch        int  not null default 1 check (current_batch between 1 and 6),
   current_node         node_type not null default 'learn',
 
   last_advance_date    date,  -- null until the kid passes their very first node
@@ -108,7 +108,7 @@ create table if not exists kids (
 -- If `kids` already existed from an earlier schema version, these add the
 -- new columns back after the drop/recreate above.
 alter table kids add column if not exists current_node node_type not null default 'learn';
-alter table kids add column if not exists current_batch int not null default 1 check (current_batch between 1 and 4);
+alter table kids add column if not exists current_batch int not null default 1 check (current_batch between 1 and 6);
 alter table kids add column if not exists last_advance_date date;
 alter table kids add column if not exists seen_chapter_intros operation_type[] not null default '{}';
 alter table kids add column if not exists age int check (age is null or (age between 3 and 17));
