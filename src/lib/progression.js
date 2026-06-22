@@ -189,7 +189,27 @@ export function batchStatus(currentPos, operation, table, batch) {
   return 'active'
 }
 
-/** All 12 table numbers for a given operation. */
+/** Returns how many batches (0–4) are fully completed for a given table.
+ *  Used to render the circular progress ring on each table circle in the
+ *  TableSelector — each quarter of the ring represents one completed batch. */
+export function batchesCompletedForTable(currentPos, operation, table) {
+  const tStatus = tableStatus(currentPos, operation, table)
+  if (tStatus === 'locked') return 0
+  if (tStatus === 'completed') return BATCH_COUNT // all 4 done
+
+  // tStatus === 'active': count how many batches are fully completed
+  // (the current batch is not yet complete unless cursor is past it)
+  if (currentPos.operation !== operation || currentPos.table !== table) return 0
+
+  // Batches strictly before current batch are completed.
+  // Current batch: completed only if cursor is past its last node (review).
+  const curBatchDone = NODES.indexOf(currentPos.node) >= NODES.length - 1
+    ? currentPos.batch
+    : currentPos.batch - 1
+  return Math.max(0, curBatchDone)
+}
+
+
 export function tablesForOperation() {
   return Array.from({ length: TABLE_COUNT }, (_, i) => i + 1)
 }
