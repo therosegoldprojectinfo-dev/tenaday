@@ -11,7 +11,7 @@ import {
   logAttempt,
 } from '../lib/kidData'
 
-const TOTAL       = 10
+const TOTAL       = 12
 const LIVES_START = 4
 const TIMED_MS    = 5000
 
@@ -80,10 +80,12 @@ function cardAnimClass(choice, selected, revealed, answer) {
 export default function Practice({
   operation = 'addition',
   table = 1,
+  batchNum = 1,
   node = 'learn',
   kidId,
   coinBalance = 0,
   reviewPool,
+  unlockBatch,
   placementClaim = null,
   onExit,
   onBalanceChange,
@@ -95,10 +97,10 @@ export default function Practice({
   const payout = payoutForNode(node)
   const passThreshold = passThresholdFor(operation, placementClaim, OPERATIONS)
 
-  const batch = useMemo(
-    () => generateBatch(operation, table, node, 10, reviewPool),
+  const questions = useMemo(
+    () => generateBatch(operation, table, batchNum, node, { unlockBatch, reviewPool }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [operation, table, node]
+    [operation, table, batchNum, node]
   )
 
   const [idx,      setIdx]      = useState(0)
@@ -117,7 +119,7 @@ export default function Practice({
   const [timerKey, setTimerKey] = useState(0)
   const timeoutRef = useRef(null)
 
-  const q = batch[idx]
+  const q = questions[idx]
   const isCorrect = selected === q?.answer
 
   const progressScale = (idx + (revealed ? 1 : 0)) / TOTAL
@@ -164,7 +166,7 @@ export default function Practice({
     try {
       if (kidId) {
         const attemptId = await logAttempt(kidId, {
-          operation, table, node,
+          operation, table, batch: batchNum, node,
           questionsSeen: idx + 1,
           correctCount: correct,
           wrongCount: wrong,
@@ -185,7 +187,7 @@ export default function Practice({
         }
 
         if (result === 'passed') {
-          const next = nextStep(operation, table, node)
+          const next = nextStep(operation, table, batchNum, node)
           if (next) await updateProgress(kidId, next)
         }
       }
