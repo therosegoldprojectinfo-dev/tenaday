@@ -12,6 +12,7 @@ import {
   reviewPoolFor,
   previousBatch,
   factsForBatch,
+  batchesCompletedForTable,
 } from '../lib/progression'
 import { isPlayableToday, nextUnlockMessage } from '../lib/dayGate'
 import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
@@ -136,13 +137,56 @@ function NodeTypeIcon({ node, size = 22 }) {
   )
 }
 
-// ── Horizontal table selector ───────────────────────────────────────────
-// A scrollable strip of connected circles, one per table. All 12 are
-// always visible/scrollable; only unlocked ones are tappable. Always
-// Duolingo green for unlocked/active/completed circles — no era tinting
-// here, consistent with the rest of the app's "green is the only action
-// color" rule. The era color still shows up just below, in the
-// ADDITION/Table X label text.
+// ── Circular progress ring ───────────────────────────────────────────────
+// Drawn as an SVG arc around each table circle. 4 batches = 4 quarters.
+// Uses stroke-dasharray trick: circumference of the arc is 2πr, and we
+// fill `completedBatches/4` of it. The ring starts at the top (-90° = 12
+// o'clock position, matching the reference image's clockwise fill).
+function BatchRing({ completedBatches, size = 48, isSelected }) {
+  const r     = (size - 4) / 2        // radius, leaving 2px stroke inset
+  const circ  = 2 * Math.PI * r       // full circumference
+  const fill  = (completedBatches / 4) * circ
+  const gap   = circ - fill
+
+  if (completedBatches === 0) return null // no ring to draw when nothing done
+
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
+      aria-hidden="true"
+    >
+      {/* Track (the grey remainder) */}
+      <circle
+        cx={size / 2} cy={size / 2} r={r}
+        fill="none"
+        stroke={isSelected ? 'rgba(255,255,255,0.3)' : '#E5E7EB'}
+        strokeWidth="3"
+      />
+      {/* Fill (the green completed portion) */}
+      <circle
+        cx={size / 2} cy={size / 2} r={r}
+        fill="none"
+        stroke={completedBatches === 4 ? DUO_GREEN : 'white'}
+        strokeWidth="3.5"
+        strokeLinecap="round"
+        strokeDasharray={`${fill} ${gap}`}
+        strokeDashoffset={circ / 4}  // rotate to 12 o'clock (- quarter turn)
+        style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
+      />
+    </svg>
+  )
+}
+
+// ── Horizontal table selector ─────────────────────────────────────────────
+// Each circle shows the table number + a circular progress ring (0-4
+// quarter-arcs) showing how many of that table's 4 daily batches are done.
+// A table is ONLY tappable once the PREVIOUS table's ring is full (all 4
+// batches complete) — not just when "any progress exists" in the current
+// table. This enforces the spec's rule: master all 4 days of a table before
+// moving on.
 function TableSelector({ tables, currentPos, operation, selectedTable, onSelect }) {
   const selectedRef = useRef(null)
 
@@ -154,10 +198,22 @@ function TableSelector({ tables, currentPos, operation, selectedTable, onSelect 
     <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-4 justify-start md:justify-center">
       <div className="flex items-center">
         {tables.map((table, i) => {
-          const tStatus = tableStatus(currentPos, operation, table)
-          const locked = tStatus === 'locked'
-          const completed = tStatus === 'completed'
-          const isSelected = table === selectedTable
+          const tStatus    = tableStatus(currentPos, operation, table)
+          const completed  = tStatus === 'completed'
+          const batches    = batchesCompletedForTable(currentPos, operation, table)
+
+          // A table is locked if:
+          //   - it's genuinely locked in the progression chain, OR
+          //   - it's table N+1 and table N doesn't have all 4 batches done yet
+          //     (prevents jumping ahead within the same chapter)
+          const prevTable   = i > 0 ? tables[i - 1] : null
+          const prevBatches = prevTable ? batchesCompletedForTable(currentPos, operation, prevTable) : 4
+          const locked      = tStatus === 'locked' || (tStatus !== 'completed' && prevBatches < 4 && table !== tables[0])
+
+          // For the very first table of the chapter, always allow access
+          // (it's where the kid starts). For subsequent tables, require the
+          // previous one to be fully mastered (all 4 batches).
+          const isSelected  = table === selectedTable
 
           let icon = <span className="font-body font-bold text-sm">{table}</span>
           if (completed) icon = <CheckIcon size={18} />
@@ -167,28 +223,38 @@ function TableSelector({ tables, currentPos, operation, selectedTable, onSelect 
             <div key={table} className="flex items-center flex-shrink-0">
               {i > 0 && (
                 <div
-                  className="h-0.5 w-6"
-                  style={{ backgroundColor: completed || tStatus === 'active' ? DUO_GREEN : '#E5E7EB' }}
+                  className="h-0.5 w-5"
+                  style={{
+                    backgroundColor: completed ? DUO_GREEN : tStatus === 'active' ? DUO_GREEN : '#E5E7EB'
+                  }}
                 />
               )}
-              <button
-                ref={isSelected ? selectedRef : null}
-                type="button"
-                disabled={locked}
-                onClick={() => onSelect(table)}
-                className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center transition-transform"
-                style={{
-                  backgroundColor: locked ? '#E5E7EB' : DUO_GREEN,
-                  color: locked ? '#9CA3AF' : '#FFFFFF',
-                  outline: isSelected ? `3px solid ${DUO_GREEN_DARK}` : 'none',
-                  outlineOffset: '2px',
-                  transform: isSelected ? 'scale(1.08)' : 'scale(1)',
-                }}
-                aria-label={`Table ${table}${locked ? ', locked' : ''}`}
-                aria-pressed={isSelected}
-              >
-                {icon}
-              </button>
+              {/* Wrapper keeps the ring and circle perfectly overlaid */}
+              <div style={{ position: 'relative', width: 44, height: 44 }}>
+                <BatchRing
+                  completedBatches={batches}
+                  size={44}
+                  isSelected={isSelected}
+                />
+                <button
+                  ref={isSelected ? selectedRef : null}
+                  type="button"
+                  disabled={locked}
+                  onClick={() => !locked && onSelect(table)}
+                  className="w-full h-full rounded-full flex items-center justify-center transition-transform"
+                  style={{
+                    backgroundColor: locked ? '#E5E7EB' : DUO_GREEN,
+                    color: locked ? '#9CA3AF' : '#FFFFFF',
+                    outline: isSelected ? `3px solid ${DUO_GREEN_DARK}` : 'none',
+                    outlineOffset: '2px',
+                    transform: isSelected ? 'scale(1.08)' : 'scale(1)',
+                  }}
+                  aria-label={`Table ${table}${locked ? ', locked' : ''} — ${batches} of 4 days complete`}
+                  aria-pressed={isSelected}
+                >
+                  {icon}
+                </button>
+              </div>
             </div>
           )
         })}
