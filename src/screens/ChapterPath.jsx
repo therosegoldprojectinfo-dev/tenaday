@@ -10,6 +10,8 @@ import {
   nodePurpose,
   chainPosition,
   reviewPoolFor,
+  previousBatch,
+  factsForBatch,
 } from '../lib/progression'
 import { isPlayableToday, nextUnlockMessage } from '../lib/dayGate'
 import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
@@ -303,28 +305,33 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   const currentPos = {
     operation: kid.current_operation,
     table: kid.current_table,
+    batch: kid.current_batch,
     node: kid.current_node,
   }
   const tables = tablesForOperation()
   const selectedStatus = tableStatus(currentPos, operation, selectedTable)
+
+  // Within the selected table, default to the kid's current batch if
+  // they're on this table, otherwise batch 1.
+  const selectedBatch = selectedStatus === 'active' ? currentPos.batch : 1
 
   function handleSelectTable(table) {
     setOpenNode(null)
     setSelectedTable(table)
   }
 
-  function handleTogglePopover(table, node, status, isCurrent) {
+  function handleTogglePopover(table, batch, node, status, isCurrent) {
     if (status === 'locked' || status === 'day_locked') return
     setOpenNode(prev =>
-      prev && prev.table === table && prev.node === node
+      prev && prev.table === table && prev.batch === batch && prev.node === node
         ? null
-        : { table, node, status, isCurrent }
+        : { table, batch, node, status, isCurrent }
     )
   }
 
   async function handleConfirmStart() {
     if (!openNode) return
-    const { table, node } = openNode
+    const { table, batch, node } = openNode
     setOpenNode(null)
 
     const newBalance = applyEntryFee(kid.coin_balance)
@@ -340,9 +347,25 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
       console.error('Failed to charge entry fee (continuing anyway):', err)
     }
 
-    const reviewPool = node === 'review' ? reviewPoolFor(operation, table) : undefined
+    // Resolve the previous batch for the Unlock node — the caller
+    // (Practice.jsx) needs to know which facts to test, not just that
+    // the node is 'unlock'. previousBatch() is a pure progression
+    // function, no DB needed.
+    const unlockBatch = node === 'unlock'
+      ? previousBatch(operation, table, batch)
+      : undefined
 
-    onStartNode({ operation, table, node, coinBalance: newBalance, reviewPool, placementClaim: kid.placement_claim })
+    const reviewPool = node === 'review'
+      ? reviewPoolFor(operation, table, batch)
+      : undefined
+
+    onStartNode({
+      operation, table, batchNum: batch, node,
+      coinBalance: newBalance,
+      reviewPool,
+      unlockBatch,
+      placementClaim: kid.placement_claim,
+    })
   }
 
   const inDebt = kid.coin_balance < 0
@@ -406,7 +429,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
           {theme.operationLabel}
         </p>
         <p className="font-display font-bold text-2xl text-gray-900">
-          Table {selectedTable}
+          Table {selectedTable} · Day {selectedBatch} of 4
+        </p>
+        <p className="font-body text-xs text-gray-400 mt-0.5">
+          Today's facts: {factsForBatch(selectedBatch).map(f => `${selectedTable} ${theme.symbol} ${f}`).join(', ')}
         </p>
       </div>
 
@@ -420,7 +446,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
           </div>
         ) : (
           NODES.map(node => {
-            const targetPos = { operation, table: selectedTable, node }
+            const targetPos = {
+              operation,
+              table: selectedTable,
+              batch: selectedBatch,
+              node,
+            }
 
             const unlockedInChain =
               selectedStatus === 'completed' ||
@@ -433,6 +464,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
             const isCurrent =
               selectedStatus === 'active' &&
               currentPos.table === selectedTable &&
+              currentPos.batch === selectedBatch &&
               currentPos.node === node
 
             let dayLocked = false
@@ -456,7 +488,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
                 node={node}
                 status={status}
                 isCurrent={isCurrent}
-                onPress={() => handleTogglePopover(selectedTable, node, status, isCurrent)}
+                onPress={() => handleTogglePopover(selectedTable, selectedBatch, node, status, isCurrent)}
               />
             )
           })
