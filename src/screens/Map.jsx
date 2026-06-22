@@ -215,6 +215,7 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
   const currentPos = {
     operation: kid.current_operation,
     table: kid.current_table,
+    batch: kid.current_batch || 1,
     node: kid.current_node,
   }
 
