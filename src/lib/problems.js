@@ -33,9 +33,10 @@ function shuffle(arr) {
  *  - No two consecutive indices are the same
  *  This is the ordering backbone used by all 6 nodes. */
 function makeFactSequence() {
-  // Start with [0,0,0,0, 1,1,1,1, 2,2,2,2] and shuffle until no
-  // consecutive duplicates — this almost always resolves in 1-2 tries.
-  const pool = [0,0,0,0, 1,1,1,1, 2,2,2,2]
+  // 2 facts × 6 repetitions each = 12 questions total.
+  // With only 2 facts, alternating [0,1,0,1...] is always valid and
+  // the shuffle + no-consecutive check still produces random variety.
+  const pool = [0,0,0,0,0,0, 1,1,1,1,1,1]
   let attempts = 0
   while (attempts < 200) {
     shuffle(pool)
@@ -46,9 +47,7 @@ function makeFactSequence() {
     if (valid) return pool
     attempts++
   }
-  // Fallback: build a valid sequence deterministically to guarantee
-  // no infinite loop even in the (vanishingly rare) worst case.
-  return [0,1,2,0,1,2,0,1,2,0,1,2]
+  return [0,1,0,1,0,1,0,1,0,1,0,1]
 }
 
 // ── Core math: (operation, table, secondOperand) → answer ────────────────
@@ -366,7 +365,7 @@ function realLifeQuestion(operation, table, second) {
  *  { operation, table, batch } objects, typically built by
  *  lib/progression.js's reviewPoolFor(). */
 export function generateBatch(operation, table, batch, node, { unlockBatch, reviewPool } = {}) {
-  const sequence = makeFactSequence() // [0,1,2,0,2,1,...] — 12 items, each 4x, no consecutive
+  const sequence = makeFactSequence() // [0,1,0,1,...] — 12 items, each 6x, no consecutive
 
   if (node === 'review') {
     return generateReview(operation, table, batch, reviewPool || [], sequence)
@@ -401,22 +400,20 @@ function generateReview(operation, table, batch, reviewPool, sequence) {
     ? reviewPool
     : [{ operation, table, batch }]
 
-  // Pick 3 "review facts" drawn from the pool: distribute the 3 fact slots
-  // across different past batches where possible for maximum variety.
+  // Pick 2 "review facts" — one per fact slot in the sequence (0 and 1).
+  // Each comes from a randomly chosen past batch for maximum variety.
   const pickedBatches = [
-    allBatches[randInt(0, allBatches.length - 1)],
     allBatches[randInt(0, allBatches.length - 1)],
     allBatches[randInt(0, allBatches.length - 1)],
   ]
 
   const reviewFacts = pickedBatches.map(b => {
     const facts = factsForBatch(b.batch)
-    return { operation: b.operation, table: b.table, second: facts[randInt(0, 2)] }
+    return { operation: b.operation, table: b.table, second: facts[randInt(0, facts.length - 1)] }
   })
 
   // Alternate question format: even index = plain equation, odd = real-life
-  // word problem. Gives exactly 6 of each across 12 questions, so review
-  // genuinely feels like a MIX and not just more equations.
+  // word problem. Gives exactly 6 of each across 12 questions.
   return sequence.map((factIdx, i) => {
     const { operation: op, table: t, second } = reviewFacts[factIdx]
     if (i % 2 === 0) {
