@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from 'react'
 import { themeFor } from '../lib/eraTheme'
 import {
   NODES,
+  TABLE_COUNT,
+  BATCH_COUNT,
   tablesForOperation,
   isUnlocked,
   isCompleted,
@@ -12,7 +14,6 @@ import {
   reviewPoolFor,
   previousBatch,
   factsForBatch,
-  batchesCompletedForTable,
 } from '../lib/progression'
 import { isPlayableToday, nextUnlockMessage } from '../lib/dayGate'
 import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
@@ -137,127 +138,75 @@ function NodeTypeIcon({ node, size = 22 }) {
   )
 }
 
-// ── Circular progress ring ───────────────────────────────────────────────
-// Drawn as an SVG arc around each table circle. 4 batches = 4 quarters.
-// Uses stroke-dasharray trick: circumference of the arc is 2πr, and we
-// fill `completedBatches/4` of it. The ring starts at the top (-90° = 12
-// o'clock position, matching the reference image's clockwise fill).
-function BatchRing({ completedBatches, size = 48, isSelected }) {
-  const r     = (size - 4) / 2        // radius, leaving 2px stroke inset
-  const circ  = 2 * Math.PI * r       // full circumference
-  const fill  = (completedBatches / 4) * circ
-  const gap   = circ - fill
-
-  if (completedBatches === 0) return null // no ring to draw when nothing done
-
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}
-      aria-hidden="true"
-    >
-      {/* Track (the grey remainder) */}
-      <circle
-        cx={size / 2} cy={size / 2} r={r}
-        fill="none"
-        stroke={isSelected ? 'rgba(255,255,255,0.3)' : '#E5E7EB'}
-        strokeWidth="3"
-      />
-      {/* Fill (the green completed portion) */}
-      <circle
-        cx={size / 2} cy={size / 2} r={r}
-        fill="none"
-        stroke={completedBatches === 4 ? DUO_GREEN : 'white'}
-        strokeWidth="3.5"
-        strokeLinecap="round"
-        strokeDasharray={`${fill} ${gap}`}
-        strokeDashoffset={circ / 4}  // rotate to 12 o'clock (- quarter turn)
-        style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
-      />
-    </svg>
-  )
-}
-
-// ── Horizontal table selector ─────────────────────────────────────────────
-// Each circle shows the table number + a circular progress ring (0-4
-// quarter-arcs) showing how many of that table's 4 daily batches are done.
-// A table is ONLY tappable once the PREVIOUS table's ring is full (all 4
-// batches complete) — not just when "any progress exists" in the current
-// table. This enforces the spec's rule: master all 4 days of a table before
-// moving on.
-function TableSelector({ tables, currentPos, operation, selectedTable, onSelect }) {
+// ── Day strip ────────────────────────────────────────────────────────────
+// 72 circles total per chapter (12 tables × 6 batches). Shows a sliding
+// window of ~10 circles centered on the kid's current position — enough
+// context to see what's done and what's coming without scrolling through
+// 72 at once. Each circle shows the day number. Color state:
+//   green filled  = completed (playable as replay)
+//   green outline = today's active day session (current cursor)
+//   grey locked   = not yet reached OR day-gated (next calendar day)
+function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
   const selectedRef = useRef(null)
 
   useEffect(() => {
     selectedRef.current?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
-  }, [selectedTable])
+  }, [selectedDay])
+
+  // Window: show 5 circles before current, current, 4 after — always 10
+  // visible, clamped to the 1-totalDays range.
+  const BEFORE = 5
+  const AFTER  = 4
+  const windowStart = Math.max(1, Math.min(currentDay - BEFORE, totalDays - BEFORE - AFTER))
+  const windowEnd   = Math.min(totalDays, windowStart + BEFORE + AFTER)
+  const visibleDays = Array.from({ length: windowEnd - windowStart + 1 }, (_, i) => windowStart + i)
 
   return (
-    <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-4 justify-start md:justify-center">
-      <div className="flex items-center">
-        {tables.map((table, i) => {
-          const tStatus    = tableStatus(currentPos, operation, table)
-          const completed  = tStatus === 'completed'
-          const batches    = batchesCompletedForTable(currentPos, operation, table)
+    <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-3 justify-start md:justify-center">
+      <div className="flex items-center gap-1.5">
+        {/* Ellipsis indicator if more days exist before the window */}
+        {windowStart > 1 && (
+          <span className="font-body text-xs text-gray-400 px-1">···</span>
+        )}
 
-          // A table is locked if:
-          //   - it's genuinely locked in the progression chain, OR
-          //   - it's table N+1 and table N doesn't have all 4 batches done yet
-          //     (prevents jumping ahead within the same chapter)
-          const prevTable   = i > 0 ? tables[i - 1] : null
-          const prevBatches = prevTable ? batchesCompletedForTable(currentPos, operation, prevTable) : 4
-          const locked      = tStatus === 'locked' || (tStatus !== 'completed' && prevBatches < 4 && table !== tables[0])
-
-          // For the very first table of the chapter, always allow access
-          // (it's where the kid starts). For subsequent tables, require the
-          // previous one to be fully mastered (all 4 batches).
-          const isSelected  = table === selectedTable
-
-          let icon = <span className="font-body font-bold text-sm">{table}</span>
-          if (completed) icon = <CheckIcon size={18} />
-          else if (locked) icon = <LockIcon size={16} />
+        {visibleDays.map((day) => {
+          const isDone     = day < currentDay
+          const isCurrent  = day === currentDay
+          const isLocked   = day > currentDay
+          const isSelected = day === selectedDay
 
           return (
-            <div key={table} className="flex items-center flex-shrink-0">
-              {i > 0 && (
-                <div
-                  className="h-0.5 w-5"
-                  style={{
-                    backgroundColor: completed ? DUO_GREEN : tStatus === 'active' ? DUO_GREEN : '#E5E7EB'
-                  }}
-                />
-              )}
-              {/* Wrapper keeps the ring and circle perfectly overlaid */}
-              <div style={{ position: 'relative', width: 44, height: 44 }}>
-                <BatchRing
-                  completedBatches={batches}
-                  size={44}
-                  isSelected={isSelected}
-                />
-                <button
-                  ref={isSelected ? selectedRef : null}
-                  type="button"
-                  disabled={locked}
-                  onClick={() => !locked && onSelect(table)}
-                  className="w-full h-full rounded-full flex items-center justify-center transition-transform"
-                  style={{
-                    backgroundColor: locked ? '#E5E7EB' : DUO_GREEN,
-                    color: locked ? '#9CA3AF' : '#FFFFFF',
-                    outline: isSelected ? `3px solid ${DUO_GREEN_DARK}` : 'none',
-                    outlineOffset: '2px',
-                    transform: isSelected ? 'scale(1.08)' : 'scale(1)',
-                  }}
-                  aria-label={`Table ${table}${locked ? ', locked' : ''} — ${batches} of 4 days complete`}
-                  aria-pressed={isSelected}
-                >
-                  {icon}
-                </button>
-              </div>
-            </div>
+            <button
+              key={day}
+              ref={isSelected ? selectedRef : null}
+              type="button"
+              disabled={isLocked}
+              onClick={() => !isLocked && onSelect(day)}
+              className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-body font-bold text-xs transition-transform"
+              style={{
+                backgroundColor: isDone ? DUO_GREEN : isLocked ? '#F3F4F6' : DUO_GREEN,
+                color: isLocked ? '#D1D5DB' : '#FFFFFF',
+                outline: isSelected ? `3px solid ${DUO_GREEN_DARK}` : 'none',
+                outlineOffset: '2px',
+                transform: isSelected ? 'scale(1.12)' : 'scale(1)',
+                opacity: isLocked ? 0.5 : 1,
+              }}
+              aria-label={`Day ${day}${isLocked ? ', locked' : isDone ? ', completed' : ', today'}`}
+              aria-pressed={isSelected}
+            >
+              {isDone
+                ? <CheckIcon size={14} />
+                : isLocked
+                  ? <LockIcon size={13} />
+                  : day}
+            </button>
           )
         })}
+
+        {/* Ellipsis indicator if more days exist after the window */}
+        {windowEnd < totalDays && (
+          <span className="font-body text-xs text-gray-400 px-1">···</span>
+        )}
       </div>
     </div>
   )
@@ -330,8 +279,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   const [kid, setKid] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [selectedTable, setSelectedTable] = useState(null)
+  const [selectedDay, setSelectedDay] = useState(null)
   const [openNode, setOpenNode] = useState(null)
+
+  const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT // 72
 
   useEffect(() => {
     let cancelled = false
@@ -339,7 +290,14 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
       .then(data => {
         if (cancelled) return
         setKid(data)
-        setSelectedTable(data.current_operation === operation ? data.current_table : 1)
+        // Default selected day to the kid's current day within this chapter,
+        // or day 1 if they haven't reached this chapter yet.
+        if (data.current_operation === operation) {
+          const day = (data.current_table - 1) * BATCH_COUNT + (data.current_batch || 1)
+          setSelectedDay(day)
+        } else {
+          setSelectedDay(1)
+        }
       })
       .catch(err => {
         console.error('Failed to load kid progress:', err)
@@ -349,7 +307,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
     return () => { cancelled = true }
   }, [kidId, operation])
 
-  if (loading || selectedTable === null) {
+  if (loading || selectedDay === null) {
     return (
       <div className="bg-white min-h-screen flex items-center justify-center">
         <p className="font-body text-gray-400">Loading…</p>
@@ -371,19 +329,24 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   const currentPos = {
     operation: kid.current_operation,
     table: kid.current_table,
-    batch: kid.current_batch,
+    batch: kid.current_batch || 1,
     node: kid.current_node,
   }
-  const tables = tablesForOperation()
+
+  // Derive table/batch from the selected day number (1-72)
+  const selectedTable = Math.ceil(selectedDay / BATCH_COUNT)
+  const selectedBatch = ((selectedDay - 1) % BATCH_COUNT) + 1
+
+  // The kid's current day number within this chapter
+  const currentDay = currentPos.operation === operation
+    ? (currentPos.table - 1) * BATCH_COUNT + currentPos.batch
+    : 0 // not yet in this chapter
+
   const selectedStatus = tableStatus(currentPos, operation, selectedTable)
 
-  // Within the selected table, default to the kid's current batch if
-  // they're on this table, otherwise batch 1.
-  const selectedBatch = selectedStatus === 'active' ? currentPos.batch : 1
-
-  function handleSelectTable(table) {
+  function handleSelectDay(day) {
     setOpenNode(null)
-    setSelectedTable(table)
+    setSelectedDay(day)
   }
 
   function handleTogglePopover(table, batch, node, status, isCurrent) {
@@ -413,10 +376,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
       console.error('Failed to charge entry fee (continuing anyway):', err)
     }
 
-    // Resolve the previous batch for the Unlock node — the caller
-    // (Practice.jsx) needs to know which facts to test, not just that
-    // the node is 'unlock'. previousBatch() is a pure progression
-    // function, no DB needed.
     const unlockBatch = node === 'unlock'
       ? previousBatch(operation, table, batch)
       : undefined
@@ -473,12 +432,11 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
           </div>
         </div>
 
-        <TableSelector
-          tables={tables}
-          currentPos={currentPos}
-          operation={operation}
-          selectedTable={selectedTable}
-          onSelect={handleSelectTable}
+        <DayStrip
+          totalDays={TOTAL_DAYS}
+          currentDay={currentDay || 1}
+          selectedDay={selectedDay}
+          onSelect={handleSelectDay}
         />
       </div>
 
@@ -492,10 +450,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
 
       <div className="px-4 pt-5 pb-2 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
         <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.primary }}>
-          {theme.operationLabel}
+          {theme.operationLabel} · Table {selectedTable}
         </p>
         <p className="font-display font-bold text-2xl text-gray-900">
-          Table {selectedTable} · Day {selectedBatch} of 4
+          Day {selectedDay} of {TOTAL_DAYS}
         </p>
         <p className="font-body text-xs text-gray-400 mt-0.5">
           Today's facts: {factsForBatch(selectedBatch).map(f => `${selectedTable} ${theme.symbol} ${f}`).join(', ')}
@@ -507,7 +465,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
           <div className="md:col-span-2 rounded-2xl bg-gray-50 border border-gray-100 px-4 py-6 text-center">
             <LockIcon size={26} />
             <p className="font-body text-sm text-gray-400 mt-2">
-              Complete the previous table to unlock this one.
+              Complete the previous day to unlock this one.
             </p>
           </div>
         ) : (
