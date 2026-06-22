@@ -173,7 +173,7 @@ export default function App() {
 
   let content
   if (navTab === 'rewards') {
-    content = <Rewards />
+    content = <Rewards kidId={kidId} parentId={parentId} />
   } else if (navTab === 'profile') {
     content = <Profile kidId={kidId} onSwitchProfile={handleSwitchProfile} />
   } else if (screen === 'path' && activeChapter) {
