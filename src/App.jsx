@@ -158,13 +158,15 @@ export default function App() {
   if (navTab === 'home' && screen === 'play' && activeNode) {
     return (
       <Practice
-        key={`${activeNode.operation}-${activeNode.table}-${activeNode.node}`}
+        key={`${activeNode.operation}-${activeNode.table}-${activeNode.batchNum}-${activeNode.node}`}
         operation={activeNode.operation}
         table={activeNode.table}
+        batchNum={activeNode.batchNum}
         node={activeNode.node}
         kidId={kidId}
         coinBalance={activeNode.coinBalance}
         reviewPool={activeNode.reviewPool}
+        unlockBatch={activeNode.unlockBatch}
         placementClaim={activeNode.placementClaim}
         onExit={handleExitPractice}
       />
