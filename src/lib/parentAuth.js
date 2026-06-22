@@ -162,6 +162,7 @@ export async function createKid(parentId, { name, age, placementClaim }) {
       placement_claim: placementClaim || null,
       current_operation: 'addition',
       current_table: 1,
+      current_batch: 1,
       current_node: 'learn',
       coin_balance: 50,
     })
