@@ -11,9 +11,13 @@
 // stuff") rather than punishing someone who plays at 11pm and again at
 // 7am the same way a strict 24-hour cooldown would.
 
-/** Returns today's date as YYYY-MM-DD in the LOCAL timezone of whoever's
- *  device is running this — intentionally not UTC, since "today" should
- *  match the calendar day the kid is actually experiencing. */
+/** Returns today's date as YYYY-MM-DD using the LOCAL timezone of the
+ *  kid's device — intentionally NOT UTC. "Today" should match the
+ *  calendar day the kid is actually experiencing, so a kid in Morocco
+ *  and a kid in Canada get different "todays" at the same moment, which
+ *  is correct. The device clock can technically be manipulated, but this
+ *  is a kids' math app, not a banking system — the right tradeoff is
+ *  "feels natural" over "tamper-proof." */
 export function todayString(now = new Date()) {
   const y = now.getFullYear()
   const m = String(now.getMonth() + 1).padStart(2, '0')
@@ -39,28 +43,15 @@ export function nextUnlockMessage() {
 }
 
 /** Combines the linear progression chain with calendar-day gating.
+ *  The day-gate now fires at BATCH boundaries — a kid can complete all 6
+ *  nodes of today's batch in one sitting, but the next BATCH (even within
+ *  the same table) requires a new calendar day.
  *
- *  The day-gate applies ONLY when the target node would cross into a NEW
- *  TABLE relative to the kid's current cursor — a kid can freely finish
- *  every remaining node of TODAY's table in one sitting (no per-node day
- *  lock within a table), but starting a new table requires a new
- *  calendar day. Five buckets, by comparing a target node's chain
- *  position to the kid's cursor position:
- *    - 'before'           (already completed) -> always playable, replay
- *    - 'current'          (their literal cursor spot) -> always playable
- *    - 'next_same_table'  (next node, same table as current) -> always
- *                          playable once reached via the normal chain,
- *                          no day check
- *    - 'next_new_table'   (next node, but it's the first node of a new
- *                          table) -> playable only if canAdvanceToday()
- *    - 'locked'           (further ahead than one step) -> never playable,
- *                          ordinary lock, not a day-gate question
- *
- *  `chainPosition` should be lib/progression.js's chainPosition(...)
- *  result for this target — passed in as a plain string so this module
- *  has zero dependency on progression.js's internals. */
+ *  'before' | 'current' | 'next_same_batch' → always playable
+ *  'next_new_batch' → playable only if canAdvanceToday()
+ *  'locked' → normal progression lock, not a day-gate question */
 export function isPlayableToday(chainPosition, lastAdvanceDate, now) {
-  if (chainPosition === 'before' || chainPosition === 'current' || chainPosition === 'next_same_table') return true
-  if (chainPosition === 'next_new_table') return canAdvanceToday(lastAdvanceDate, now)
+  if (chainPosition === 'before' || chainPosition === 'current' || chainPosition === 'next_same_batch') return true
+  if (chainPosition === 'next_new_batch') return canAdvanceToday(lastAdvanceDate, now)
   return false // 'locked'
 }
