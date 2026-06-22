@@ -1,97 +1,200 @@
 // ── Progression ladder ───────────────────────────────────────────────────
-// The Numio Daily Loop (spec §6.5): one long, strictly linear staircase,
-// now with 6 nodes per TABLE instead of 5 nodes per unit:
+// The Numio Daily Loop with the batch system:
 //
 //   Chapter (Operation: Addition → Subtraction → Multiplication → Division)
 //     └─ Table (1–12)
-//          └─ Node (6 per table):
-//               1. unlock     — tests PREVIOUS table's material (hard gate;
-//                                must pass to reach 'learn'). SKIPPED
-//                                entirely on the very first table of the
-//                                very first chapter — there's no "yesterday"
-//                                to test yet. See firstEverNode().
-//               2. learn      — 1–3 new facts for this table
-//               3. practice   — same facts, different format
-//               4. real_life  — applied/word problems
-//               5. speed      — fast mixed recall, timed
-//               6. review     — spaced mix of past tables/days/formats
+//          └─ Batch (1–4): 3 specific facts per batch
+//               └─ Node (6 per batch):
+//                    unlock → learn → practice → real_life → speed → review
 //
-// Within a table, nodes unlock linearly, but any already-unlocked node
-// stays replayable out of order. On top of that linear chain, the NEXT
-// node also requires a new calendar day (see lib/dayGate.js) — that
-// day-gating is layered on by the screens that call isUnlocked, not baked
-// into this file's pure step-sequencing math.
+// Batch facts: table N, batch B → second operands (3B-2), (3B-1), 3B
+//   e.g. addition table 1, batch 2: facts 1+4, 1+5, 1+6
+//
+// Day-gate fires at the BATCH boundary — a kid completes all 6 nodes of
+// today's batch in one sitting, then waits for the next calendar day to
+// unlock the next batch. Replaying already-completed nodes is always free.
+//
+// Total ladder: 4 ops × 12 tables × 4 batches × 6 nodes = 1,152 nodes
 
 export const OPERATIONS = ['addition', 'subtraction', 'multiplication', 'division']
-
-export const NODES = ['unlock', 'learn', 'practice', 'real_life', 'speed', 'review']
-
+export const NODES      = ['unlock', 'learn', 'practice', 'real_life', 'speed', 'review']
 export const TABLE_COUNT = 12
+export const BATCH_COUNT = 4
+export const FACTS_PER_BATCH = 3 // always 3; 3 × 4 batches = 12 facts per table
 
-/** The very first node a kid ever sees in the whole app — Unlock is
- *  skipped here since there's no prior table to test (confirmed product
- *  decision, not a default/guess). Every screen that needs to know "is
- *  this the special no-unlock-yet position" should compare against this
- *  rather than hardcoding the literal values inline. */
-export function firstEverNode() {
-  return { operation: OPERATIONS[0], table: 1, node: 'learn' }
+// ── Fact resolution ──────────────────────────────────────────────────────
+
+/** Returns the 3 second-operand values for a given table+batch.
+ *  These are the specific facts a kid works on during one day-session.
+ *  e.g. table 5, batch 2 → [4, 5, 6] meaning 5+4, 5+5, 5+6 for addition. */
+export function factsForBatch(batch) {
+  const start = (batch - 1) * FACTS_PER_BATCH + 1
+  return [start, start + 1, start + 2]
 }
 
-function stepIndex(operation, table, node) {
+/** Returns the previous batch's (operation, table, batch) — used by the
+ *  Unlock node to know which facts to test. Returns null only for the
+ *  very first batch ever (addition, table 1, batch 1), which skips Unlock
+ *  entirely since there's no "yesterday." */
+export function previousBatch(operation, table, batch) {
+  if (batch > 1) return { operation, table, batch: batch - 1 }
+  if (table > 1) return { operation, table: table - 1, batch: BATCH_COUNT }
   const opIdx = OPERATIONS.indexOf(operation)
-  const nodeIdx = NODES.indexOf(node)
-  if (opIdx === -1 || nodeIdx === -1 || table < 1 || table > TABLE_COUNT) return -1
-  return opIdx * (TABLE_COUNT * NODES.length) + (table - 1) * NODES.length + nodeIdx
+  if (opIdx <= 0) return null // addition/table1/batch1 — no previous batch
+  return { operation: OPERATIONS[opIdx - 1], table: TABLE_COUNT, batch: BATCH_COUNT }
+}
+
+/** True if this position is the very first node a kid ever sees — the
+ *  special case where Unlock is skipped (no prior batch to test).
+ *  hasEverAdvanced: true once any node has been passed (last_advance_date
+ *  is set), which means this is a replay of the first batch, not the
+ *  first-ever session. */
+export function shouldSkipUnlock(operation, table, batch, hasEverAdvanced) {
+  if (hasEverAdvanced) return false
+  return operation === OPERATIONS[0] && table === 1 && batch === 1
+}
+
+// ── Step indexing ────────────────────────────────────────────────────────
+// The whole ladder is one flat sequence. A "step" is one (op, table, batch,
+// node) position. We convert to/from integer indices to make ordering,
+// comparison, and "next step" trivial.
+
+function stepIndex(operation, table, batch, node) {
+  const opIdx    = OPERATIONS.indexOf(operation)
+  const nodeIdx  = NODES.indexOf(node)
+  if (opIdx === -1 || nodeIdx === -1) return -1
+  if (table < 1 || table > TABLE_COUNT) return -1
+  if (batch < 1 || batch > BATCH_COUNT) return -1
+  return (
+    opIdx    * (TABLE_COUNT * BATCH_COUNT * NODES.length) +
+    (table - 1) * (BATCH_COUNT * NODES.length) +
+    (batch - 1) * NODES.length +
+    nodeIdx
+  )
 }
 
 function stepFromIndex(i) {
-  const totalNodesPerOp = TABLE_COUNT * NODES.length
-  const opIdx = Math.floor(i / totalNodesPerOp)
-  if (opIdx >= OPERATIONS.length) return null // finished the whole ladder
-  const rem = i % totalNodesPerOp
-  const table = Math.floor(rem / NODES.length) + 1
-  const node = NODES[rem % NODES.length]
-  return { operation: OPERATIONS[opIdx], table, node }
+  const nodesPerBatch = NODES.length
+  const nodesPerTable = BATCH_COUNT * nodesPerBatch
+  const nodesPerOp    = TABLE_COUNT * nodesPerTable
+
+  const opIdx    = Math.floor(i / nodesPerOp)
+  if (opIdx >= OPERATIONS.length) return null // finished entire ladder
+  const rem1   = i % nodesPerOp
+  const table  = Math.floor(rem1 / nodesPerTable) + 1
+  const rem2   = rem1 % nodesPerTable
+  const batch  = Math.floor(rem2 / nodesPerBatch) + 1
+  const node   = NODES[rem2 % nodesPerBatch]
+  return { operation: OPERATIONS[opIdx], table, batch, node }
 }
 
-/** Returns { operation, table, node } for the step after the given one,
- *  or null if that was the very last node in the whole ladder.
- *  Does NOT skip 'unlock' nodes — that skip only applies to the single
- *  very-first-ever position (handled at the kid-seed/init level, see
- *  firstEverNode), not to every table's unlock node in general. */
-export function nextStep(operation, table, node) {
-  const i = stepIndex(operation, table, node)
+/** Returns the next (operation, table, batch, node) position, or null if
+ *  this was the very last node in the whole ladder. */
+export function nextStep(operation, table, batch, node) {
+  const i = stepIndex(operation, table, batch, node)
   if (i === -1) return null
   return stepFromIndex(i + 1)
 }
 
-/** True if (operation, table, node) comes at or before the kid's current
- *  position — i.e. it's already unlocked/playable, not locked-ahead.
- *  This is the LINEAR-CHAIN check only; calendar-day gating for the very
- *  next node is a separate, additional check layered on by the calling
- *  screen (see lib/dayGate.js's canAdvanceToday). */
+/** True if target comes at or before current — already unlocked/replayable. */
 export function isUnlocked(currentPos, targetPos) {
-  const cur = stepIndex(currentPos.operation, currentPos.table, currentPos.node)
-  const target = stepIndex(targetPos.operation, targetPos.table, targetPos.node)
+  const cur    = stepIndex(currentPos.operation, currentPos.table, currentPos.batch, currentPos.node)
+  const target = stepIndex(targetPos.operation,  targetPos.table,  targetPos.batch,  targetPos.node)
   if (cur === -1 || target === -1) return false
   return target <= cur
 }
 
-/** True if the target node is strictly before the kid's current position
- *  — already completed (and thus replayable, per spec). */
+/** True if target is strictly before current — already completed. */
 export function isCompleted(currentPos, targetPos) {
-  const cur = stepIndex(currentPos.operation, currentPos.table, currentPos.node)
-  const target = stepIndex(targetPos.operation, targetPos.table, targetPos.node)
+  const cur    = stepIndex(currentPos.operation, currentPos.table, currentPos.batch, currentPos.node)
+  const target = stepIndex(targetPos.operation,  targetPos.table,  targetPos.batch,  targetPos.node)
   if (cur === -1 || target === -1) return false
   return target < cur
 }
 
-/** All 12 table numbers for a given operation, in order. */
+// ── Chain position for day-gating ────────────────────────────────────────
+// The day-gate fires at BATCH boundaries. Within a batch, all 6 nodes are
+// freely completable in one sitting. The next BATCH (even within the same
+// table) requires a new calendar day.
+
+/** Classifies a target node's position relative to the kid's current
+ *  cursor:
+ *  'before'           — already completed, always replayable
+ *  'current'          — the kid's literal cursor position, always playable
+ *  'next_same_batch'  — next node in the same batch, always playable
+ *  'next_new_batch'   — first node of the next batch (day-gate applies)
+ *  'locked'           — more than one step ahead, normal lock */
+export function chainPosition(currentPos, targetPos) {
+  const cur    = stepIndex(currentPos.operation, currentPos.table, currentPos.batch, currentPos.node)
+  const target = stepIndex(targetPos.operation,  targetPos.table,  targetPos.batch,  targetPos.node)
+  if (cur === -1 || target === -1) return 'locked'
+  if (target < cur)  return 'before'
+  if (target === cur) return 'current'
+  if (target > cur + 1) return 'locked'
+
+  // target === cur + 1: immediately next step
+  const sameBatch =
+    targetPos.operation === currentPos.operation &&
+    targetPos.table     === currentPos.table &&
+    targetPos.batch     === currentPos.batch
+  return sameBatch ? 'next_same_batch' : 'next_new_batch'
+}
+
+// ── Era / table / batch status ───────────────────────────────────────────
+
+/** 'locked' | 'active' | 'completed' for a whole chapter. */
+export function eraStatus(currentPos, operation) {
+  const opIdx    = OPERATIONS.indexOf(operation)
+  const curOpIdx = OPERATIONS.indexOf(currentPos.operation)
+  if (opIdx > curOpIdx) return 'locked'
+  if (opIdx < curOpIdx) return 'completed'
+  return 'active'
+}
+
+/** Progress (0–1) within a single chapter — used for the chapter card's
+ *  progress bar. Now counts 48 day-sessions (batches) not 12 tables. */
+export function eraProgress(currentPos, operation) {
+  const opIdx    = OPERATIONS.indexOf(operation)
+  const curOpIdx = OPERATIONS.indexOf(currentPos.operation)
+  const totalBatches = TABLE_COUNT * BATCH_COUNT // 48
+
+  if (curOpIdx > opIdx) return 1
+  if (curOpIdx < opIdx) return 0
+
+  const nodeIdx   = NODES.indexOf(currentPos.node)
+  const batchesDone = (currentPos.table - 1) * BATCH_COUNT + (currentPos.batch - 1)
+  // Partial credit within the current batch, proportional to node progress
+  const nodeProgress = nodeIdx / NODES.length
+  return (batchesDone + nodeProgress) / totalBatches
+}
+
+/** 'locked' | 'active' | 'completed' for a single table. */
+export function tableStatus(currentPos, operation, table) {
+  const eStatus = eraStatus(currentPos, operation)
+  if (eStatus === 'locked') return 'locked'
+  if (eStatus === 'completed') return 'completed'
+  if (table < currentPos.table) return 'completed'
+  if (table > currentPos.table) return 'locked'
+  return 'active'
+}
+
+/** 'locked' | 'active' | 'completed' for a single batch within a table. */
+export function batchStatus(currentPos, operation, table, batch) {
+  const tStatus = tableStatus(currentPos, operation, table)
+  if (tStatus === 'locked') return 'locked'
+  if (tStatus === 'completed') return 'completed'
+  // tStatus === 'active': compare batch within this table
+  if (batch < currentPos.batch) return 'completed'
+  if (batch > currentPos.batch) return 'locked'
+  return 'active'
+}
+
+/** All 12 table numbers for a given operation. */
 export function tablesForOperation() {
   return Array.from({ length: TABLE_COUNT }, (_, i) => i + 1)
 }
 
-/** Human label for a node type, used in headers/banners/node tooltips. */
+/** Human label for a node type. */
 export function nodeLabel(node) {
   if (node === 'unlock')    return 'Unlock'
   if (node === 'learn')     return 'Learn'
@@ -102,138 +205,38 @@ export function nodeLabel(node) {
   return node
 }
 
-/** Short purpose line per node — used as subtext under the node's name in
- *  the path/list UI, keeps the pedagogical intent visible to kids/parents
- *  without requiring them to already know the system. */
+/** Short purpose line per node — shown as subtext in the node list UI. */
 export function nodePurpose(node) {
   if (node === 'unlock')    return 'Remember yesterday?'
   if (node === 'learn')     return 'Something new'
-  if (node === 'practice')  return 'Try it your way'
+  if (node === 'practice')  return 'What happened here?'
   if (node === 'real_life') return 'Use it for real'
   if (node === 'speed')     return 'Answer fast'
   if (node === 'review')    return 'Keep it fresh'
   return ''
 }
 
-/** Whole-ladder progress, 0–1, for an optional overall progress display. */
-export function overallProgress(operation, table, node) {
-  const i = stepIndex(operation, table, node)
-  const total = OPERATIONS.length * TABLE_COUNT * NODES.length
-  if (i === -1) return 0
-  return i / total
-}
-
-/** Progress (0–1) within a single chapter/operation only — used for each
- *  chapter card's own progress bar. A kid not yet in this chapter gets 0;
- *  a kid past this chapter entirely gets 1 (fully complete). */
-export function eraProgress(currentPos, operation) {
-  const opIdx = OPERATIONS.indexOf(operation)
-  const curOpIdx = OPERATIONS.indexOf(currentPos.operation)
-  const stepsPerEra = TABLE_COUNT * NODES.length
-
-  if (curOpIdx > opIdx) return 1 // already moved past this chapter entirely
-  if (curOpIdx < opIdx) return 0 // haven't reached this chapter yet
-
-  const nodeIdx = NODES.indexOf(currentPos.node)
-  const stepsDone = (currentPos.table - 1) * NODES.length + nodeIdx
-  return stepsDone / stepsPerEra
-}
-
-/** 'locked' | 'active' | 'completed' for a whole chapter, used to decide
- *  which chapter card state to render on the card-list screen. */
-export function eraStatus(currentPos, operation) {
-  const opIdx = OPERATIONS.indexOf(operation)
-  const curOpIdx = OPERATIONS.indexOf(currentPos.operation)
-  if (opIdx > curOpIdx) return 'locked'
-  if (opIdx < curOpIdx) return 'completed'
-  return 'active'
-}
-
-/** 'locked' | 'active' | 'completed' for a single table within a chapter
- *  — used by the in-chapter node-path screen to decide whether to render
- *  a table's nodes as playable, the kid's current table, or done. */
-export function tableStatus(currentPos, operation, table) {
-  const eStatus = eraStatus(currentPos, operation)
-  if (eStatus === 'locked') return 'locked'
-  if (eStatus === 'completed') return 'completed' // whole chapter done -> every table in it is done
-
-  if (table < currentPos.table) return 'completed'
-  if (table > currentPos.table) return 'locked'
-  return 'active'
-}
-
-/** Classifies a target node's position relative to the kid's current
- *  cursor, as 'before' | 'current' | 'next_same_table' | 'next_new_table'
- *  | 'locked'. This is the input lib/dayGate.js's isPlayableToday expects.
- *
- *  The distinction between 'next_same_table' and 'next_new_table' is what
- *  the day-gate actually keys off: a kid can freely finish every
- *  remaining node of TODAY's table in one sitting, but cannot cross into
- *  a new table until a new calendar day. So only 'next_new_table' is ever
- *  day-gated; 'next_same_table' is always playable once reached via the
- *  normal linear chain (confirmed product decision — see conversation
- *  history, not the original spec's literal "tomorrow's activities" text
- *  taken as one-node-per-day). */
-export function chainPosition(currentPos, targetPos) {
-  const cur = stepIndex(currentPos.operation, currentPos.table, currentPos.node)
-  const target = stepIndex(targetPos.operation, targetPos.table, targetPos.node)
-  if (cur === -1 || target === -1) return 'locked'
-  if (target < cur) return 'before'
-  if (target === cur) return 'current'
-  if (target > cur + 1) return 'locked'
-
-  const sameTable = targetPos.operation === currentPos.operation && targetPos.table === currentPos.table
-  return sameTable ? 'next_same_table' : 'next_new_table'
-}
-
-/** Returns the (operation, table) that comes immediately before the given
- *  one in the whole ladder — used by the Unlock node, which always tests
- *  the PREVIOUS table's material (spec: "Unlock... checks the previous
- *  table's content, even if the kid played multiple days on that same
- *  table"). Correctly spans chapter boundaries: subtraction's table 1
- *  "previous" is addition's table 12. Returns null only for addition's
- *  table 1, which has no previous table at all (the one case Unlock is
- *  skipped entirely — see shouldSkipUnlock). */
-export function previousTable(operation, table) {
-  if (table > 1) return { operation, table: table - 1 }
-  const opIdx = OPERATIONS.indexOf(operation)
-  if (opIdx <= 0) return null // addition, table 1 -> no previous table exists
-  return { operation: OPERATIONS[opIdx - 1], table: TABLE_COUNT }
-}
-
-/** Builds the list of past (operation, table) pairs available for a
- *  Review node's spaced-repetition mix — every table strictly before the
- *  given position, across all chapters reached so far. Capped at a
- *  reasonable pool size (most-recent-N) rather than every table ever,
- *  since early tables become less relevant to review the further a kid
- *  progresses, and an unbounded pool would dilute review of genuinely
- *  recent material. */
-export function reviewPoolFor(operation, table, maxPoolSize = 8) {
-  const targetIdx = stepIndex(operation, table, 'unlock') // any node in this table works as the boundary
-  if (targetIdx === -1) return []
+/** Builds the review pool for a given position: all facts seen so far,
+ *  capped at the most recent 8 batches (= 24 facts) so early material
+ *  doesn't dominate as the kid progresses deep into the ladder. Each
+ *  pool entry is { operation, table, batch } — problems.js resolves
+ *  the actual fact values from batch number. */
+export function reviewPoolFor(operation, table, batch, maxBatches = 8) {
+  const curIdx = stepIndex(operation, table, batch, 'learn')
+  if (curIdx === -1) return []
 
   const pool = []
   for (const op of OPERATIONS) {
     for (let t = 1; t <= TABLE_COUNT; t++) {
-      const idx = stepIndex(op, t, 'unlock')
-      if (idx < targetIdx) pool.push({ operation: op, table: t })
+      for (let b = 1; b <= BATCH_COUNT; b++) {
+        const idx = stepIndex(op, t, b, 'learn')
+        if (idx < curIdx) pool.push({ operation: op, table: t, batch: b })
+        if (op === operation && t === table && b === batch) break
+      }
       if (op === operation && t === table) break
     }
     if (op === operation) break
   }
 
-  // Most-recent-N: keep the tail end of the chronological list, so a kid
-  // deep into the ladder reviews their recent tables, not table 1 forever.
-  return pool.slice(-maxPoolSize)
-}
-
-/** True if this exact (operation, table, node) position is the one
- *  special case where the Unlock node should be skipped — the very first
- *  node a kid ever sees in the entire app. Every other table's Unlock
- *  node (including table 1 of every OTHER chapter) behaves normally,
- *  since by then the kid genuinely has "yesterday's" material (the
- *  previous chapter's last table) to be tested on. */
-export function shouldSkipUnlock(operation, table, hasEverAdvanced) {
-  if (hasEverAdvanced) return false
-  return operation === OPERATIONS[0] && table === 1
+  return pool.slice(-maxBatches)
 }
