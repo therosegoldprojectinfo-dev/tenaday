@@ -102,7 +102,7 @@ export default function Profile({ kidId, onSwitchProfile }) {
   const theme = themeFor(kid.current_operation)
   const overallPct = Math.round(
     (OPERATIONS.reduce((sum, op) => sum + eraProgress(
-      { operation: kid.current_operation, table: kid.current_table, node: kid.current_node },
+      { operation: kid.current_operation, table: kid.current_table, batch: kid.current_batch || 1, node: kid.current_node },
       op
     ), 0) / OPERATIONS.length) * 100
   )
@@ -139,7 +139,7 @@ export default function Profile({ kidId, onSwitchProfile }) {
             {theme.operationLabel}
           </p>
           <p className="font-display font-bold text-lg text-gray-900 mb-2">
-            Table {kid.current_table} · {overallPct}% through the full journey
+            Table {kid.current_table} · Day {kid.current_batch || 1} of 4 · {overallPct}% complete
           </p>
           <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
             <div
