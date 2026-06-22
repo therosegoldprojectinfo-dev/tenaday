@@ -15,7 +15,7 @@ export const DEMO_KID_ID = '00000000-0000-0000-0000-000000000001'
 export async function fetchKid(kidId) {
   const { data, error } = await supabase
     .from('kids')
-    .select('id, name, age, placement_claim, current_operation, current_table, current_node, last_advance_date, seen_chapter_intros, coin_balance')
+    .select('id, name, age, placement_claim, current_operation, current_table, current_batch, current_node, last_advance_date, seen_chapter_intros, coin_balance')
     .eq('id', kidId)
     .single()
 
@@ -25,15 +25,16 @@ export async function fetchKid(kidId) {
 
 /** Updates the kid's progression cursor (called after a node PASS) and
  *  stamps last_advance_date to today — this is what the day-gate in
- *  lib/dayGate.js checks against to decide if the NEXT node can unlock
+ *  lib/dayGate.js checks against to decide if the NEXT batch can unlock
  *  yet. Every actual advance (not replay) goes through this function, so
  *  the stamp only moves forward when real progress happens. */
-export async function updateProgress(kidId, { operation, table, node }) {
+export async function updateProgress(kidId, { operation, table, batch, node }) {
   const { error } = await supabase
     .from('kids')
     .update({
       current_operation: operation,
       current_table: table,
+      current_batch: batch,
       current_node: node,
       last_advance_date: todayString(),
     })
@@ -82,7 +83,7 @@ export async function logCoinTransaction(kidId, { attemptId = null, amount, reas
 /** Records one finished attempt (passed / retry / died) and returns its id
  *  so it can be linked from coin_transactions. */
 export async function logAttempt(kidId, {
-  operation, table, node,
+  operation, table, batch, node,
   questionsSeen, correctCount, wrongCount, livesUsed,
   result, coinsDelta,
 }) {
