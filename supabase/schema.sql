@@ -155,15 +155,34 @@ create table if not exists coin_transactions (
 
 create index if not exists coin_transactions_kid_id_idx on coin_transactions (kid_id, created_at desc);
 
--- ── gifts (parent-defined real-world rewards, next build phase) ──────────
+-- ── gifts (real-world rewards a parent defines, spec §8) ────────────────
+-- parent_id is NULLABLE: null means a GLOBAL/shared reward, visible to
+-- every kid regardless of parent — this is the seeded starter list below,
+-- used since there's no parent-management UI yet to let each parent build
+-- their own list (confirmed product decision for this build phase, not a
+-- placeholder oversight). Once that UI exists, a parent's own gifts (with
+-- a real parent_id) and the global list can coexist — kid-facing screens
+-- should show both, parent_id IS NULL OR parent_id = <this kid's parent>.
+--
+-- icon is a small fixed vocabulary (not freeform/emoji input) so the
+-- Rewards screen can render a consistent flat-icon-per-card style rather
+-- than arbitrary parent-typed emoji — see lib/kidData.js's REWARD_ICONS
+-- for the matching list on the client side.
 
 create table if not exists gifts (
   id          uuid primary key default gen_random_uuid(),
-  parent_id   uuid not null references parents(id) on delete cascade,
+  parent_id   uuid references parents(id) on delete cascade,
   name        text not null,
   coin_price  int  not null check (coin_price > 0),
+  icon        text not null default 'gift',
   created_at  timestamptz not null default now()
 );
+
+-- If `gifts` already existed from an earlier schema version (parent_id
+-- was NOT NULL before), this relaxes that constraint without dropping
+-- the table or losing any rows a parent may have already created.
+alter table gifts alter column parent_id drop not null;
+alter table gifts add column if not exists icon text not null default 'gift';
 
 create table if not exists gift_claims (
   id          uuid primary key default gen_random_uuid(),
@@ -240,3 +259,29 @@ on conflict (id) do update set
   current_operation = excluded.current_operation,
   current_table = excluded.current_table,
   current_node = excluded.current_node;
+
+-- ── Seed: starter rewards (spec §8), global (parent_id null) ────────────
+-- A small placeholder list so the Rewards screen has real content before
+-- a parent-management UI exists to let each parent build their own list.
+-- Prices are example values, same "tune during build" spirit as the
+-- economy constants in lib/economy.js — easy to adjust once real kids are
+-- actually playing and the numbers can be balanced against real coin
+-- earn rates.
+--
+-- Guarded by "only insert if no global gifts exist yet" rather than an
+-- ON CONFLICT clause, since gifts has no unique constraint for ON
+-- CONFLICT to target (its only unique column is the auto-generated id,
+-- which is different on every insert and so can never conflict) — without
+-- this guard, re-running schema.sql would silently duplicate the seed
+-- rewards on every run.
+
+insert into gifts (name, coin_price, icon)
+select * from (values
+  ('20 minutes of TV',        120, 'tv'),
+  ('Pick tonight''s dinner',  150, 'utensils'),
+  ('Stay up 30 minutes late', 200, 'moon'),
+  ('A trip to the park',      250, 'tree'),
+  ('Choose a movie night',    300, 'film'),
+  ('A small toy',             500, 'gift')
+) as starter_gifts(name, coin_price, icon)
+where not exists (select 1 from gifts where parent_id is null);
