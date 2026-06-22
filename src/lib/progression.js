@@ -3,33 +3,34 @@
 //
 //   Chapter (Operation: Addition → Subtraction → Multiplication → Division)
 //     └─ Table (1–12)
-//          └─ Batch (1–4): 3 specific facts per batch
+//          └─ Batch (1–6): 2 specific facts per batch
 //               └─ Node (6 per batch):
 //                    unlock → learn → practice → real_life → speed → review
 //
-// Batch facts: table N, batch B → second operands (3B-2), (3B-1), 3B
-//   e.g. addition table 1, batch 2: facts 1+4, 1+5, 1+6
+// Batch facts: table N, batch B → second operands (2B-1), 2B
+//   e.g. addition table 1, batch 2: facts 1+3, 1+4
 //
 // Day-gate fires at the BATCH boundary — a kid completes all 6 nodes of
 // today's batch in one sitting, then waits for the next calendar day to
 // unlock the next batch. Replaying already-completed nodes is always free.
 //
-// Total ladder: 4 ops × 12 tables × 4 batches × 6 nodes = 1,152 nodes
+// Total ladder: 4 ops × 12 tables × 6 batches × 6 nodes = 1,728 nodes
+// Per chapter: 12 tables × 6 batches = 72 day-sessions
 
 export const OPERATIONS = ['addition', 'subtraction', 'multiplication', 'division']
 export const NODES      = ['unlock', 'learn', 'practice', 'real_life', 'speed', 'review']
 export const TABLE_COUNT = 12
-export const BATCH_COUNT = 4
-export const FACTS_PER_BATCH = 3 // always 3; 3 × 4 batches = 12 facts per table
+export const BATCH_COUNT = 6
+export const FACTS_PER_BATCH = 2 // always 2; 2 × 6 batches = 12 facts per table
 
 // ── Fact resolution ──────────────────────────────────────────────────────
 
-/** Returns the 3 second-operand values for a given table+batch.
+/** Returns the 2 second-operand values for a given table+batch.
  *  These are the specific facts a kid works on during one day-session.
- *  e.g. table 5, batch 2 → [4, 5, 6] meaning 5+4, 5+5, 5+6 for addition. */
+ *  e.g. table 5, batch 2 → [3, 4] meaning 5+3, 5+4 for addition. */
 export function factsForBatch(batch) {
   const start = (batch - 1) * FACTS_PER_BATCH + 1
-  return [start, start + 1, start + 2]
+  return [start, start + 1]
 }
 
 /** Returns the previous batch's (operation, table, batch) — used by the
