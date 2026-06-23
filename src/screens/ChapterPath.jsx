@@ -163,7 +163,7 @@ function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
 
   return (
     <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-3 justify-start md:justify-center">
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-2.5">
         {/* Ellipsis indicator if more days exist before the window */}
         {windowStart > 1 && (
           <span className="font-body text-xs text-gray-400 px-1">···</span>
