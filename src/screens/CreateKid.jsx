@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import { createKid, AuthError } from '../lib/parentAuth'
-import { OPERATIONS } from '../lib/progression'
-import { themeFor } from '../lib/eraTheme'
 
 function BackIcon() {
   return (
@@ -12,42 +10,52 @@ function BackIcon() {
   )
 }
 
-function CheckIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"
-      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M5 13l4 4L19 7" />
-    </svg>
-  )
-}
+// Kid-friendly level options — each maps to an operation_type claim (or null)
+// but the language is relatable, not technical.
+const LEVEL_OPTIONS = [
+  {
+    claim: null,
+    emoji: '🌱',
+    title: "I'm just starting out",
+    subtitle: "I want to learn everything from the beginning",
+  },
+  {
+    claim: 'addition',
+    emoji: '➕',
+    title: "I'm not a little kid anymore",
+    subtitle: "I already know my addition",
+  },
+  {
+    claim: 'subtraction',
+    emoji: '➖',
+    title: "I know addition and subtraction",
+    subtitle: "I'm getting pretty good at this",
+  },
+  {
+    claim: 'multiplication',
+    emoji: '✖️',
+    title: "I know multiplication too",
+    subtitle: "Addition, subtraction, multiplication — I've got this",
+  },
+  {
+    claim: 'division',
+    emoji: '🧠',
+    title: "I master all forms of math",
+    subtitle: "Addition, subtraction, multiplication AND division",
+  },
+]
 
-export default function CreateKid({ parentId, onCreated, onBack }) {
+// ── Step 1: Name + Age ────────────────────────────────────────────────────
+function StepNameAge({ onNext, onBack }) {
   const [name, setName] = useState('')
-  const [age, setAge] = useState('')
-  // null = no claim made ("starting fresh" / not sure yet) — every chapter
-  // uses the normal 80% pass threshold. Picking a chapter here raises the
-  // bar to 90% for that chapter and everything before it (see
-  // lib/economy.js's passThresholdFor) — it does NOT change where the kid
-  // starts playing; every kid always begins at Addition table 1.
-  const [placementClaim, setPlacementClaim] = useState(null)
-  const [submitting, setSubmitting] = useState(false)
-  const [error, setError] = useState(null)
+  const [age, setAge]   = useState('')
 
-  const canSubmit = name.trim().length > 0 && !submitting
+  const canContinue = name.trim().length > 0
 
-  async function handleSubmit(e) {
+  function handleSubmit(e) {
     e.preventDefault()
-    if (!canSubmit) return
-    setSubmitting(true)
-    setError(null)
-    try {
-      const ageNum = age ? parseInt(age, 10) : null
-      const kidId = await createKid(parentId, { name, age: ageNum, placementClaim })
-      onCreated(kidId)
-    } catch (err) {
-      setError(err instanceof AuthError ? err.message : 'Something went wrong. Please try again.')
-      setSubmitting(false)
-    }
+    if (!canContinue) return
+    onNext({ name: name.trim(), age: age ? parseInt(age, 10) : null })
   }
 
   return (
@@ -68,7 +76,7 @@ export default function CreateKid({ parentId, onCreated, onBack }) {
             Add a kid
           </h1>
           <p className="font-body text-sm text-gray-400 text-center mb-7">
-            A few details to set up their profile.
+            Just a couple of details to get started.
           </p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
@@ -79,6 +87,7 @@ export default function CreateKid({ parentId, onCreated, onBack }) {
               <input
                 type="text"
                 autoComplete="off"
+                autoFocus
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="What's their name?"
@@ -104,59 +113,157 @@ export default function CreateKid({ parentId, onCreated, onBack }) {
               />
             </div>
 
-            <div>
-              <label className="font-body font-bold text-xs text-gray-500 uppercase tracking-wide mb-2 block">
-                Already good at something? <span className="normal-case text-gray-300">(optional)</span>
-              </label>
-              <p className="font-body text-xs text-gray-400 mb-3 leading-snug">
-                Every kid starts from the very beginning either way — this just
-                raises the bar a bit on that material, so we can check the claim
-                holds up.
-              </p>
-              <div className="grid grid-cols-2 gap-2.5">
-                {OPERATIONS.map(op => {
-                  const theme = themeFor(op)
-                  const isSelected = placementClaim === op
-                  return (
-                    <button
-                      key={op}
-                      type="button"
-                      onClick={() => setPlacementClaim(isSelected ? null : op)}
-                      className="flex items-center gap-2 rounded-2xl border-2 px-3 py-3 transition-colors"
-                      style={{
-                        borderColor: isSelected ? theme.colors.primary : '#E5E7EB',
-                        backgroundColor: isSelected ? `${theme.colors.primary}14` : 'transparent',
-                      }}
-                    >
-                      <div
-                        className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: isSelected ? theme.colors.primary : '#E5E7EB' }}
-                      >
-                        {isSelected && <CheckIcon />}
-                      </div>
-                      <span className="font-body font-bold text-sm text-gray-700">{theme.operationLabel}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {error && (
-              <div className="rounded-xl bg-red-50 border border-red-100 px-3 py-2.5">
-                <p className="font-body text-sm text-red-600">{error}</p>
-              </div>
-            )}
-
             <button
               type="submit"
-              disabled={!canSubmit}
+              disabled={!canContinue}
               className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-lg tracking-wide mt-2"
             >
-              {submitting ? 'CREATING…' : 'CREATE PROFILE'}
+              CONTINUE →
             </button>
           </form>
         </div>
       </div>
+    </div>
+  )
+}
+
+// ── Step 2: Level picker ──────────────────────────────────────────────────
+function StepLevel({ name, onNext, onBack }) {
+  const [selected, setSelected] = useState(null) // index into LEVEL_OPTIONS
+
+  function handleChoose(index) {
+    setSelected(index)
+  }
+
+  function handleContinue() {
+    if (selected === null) return
+    onNext(LEVEL_OPTIONS[selected].claim)
+  }
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      <div className="flex items-center px-4 pt-5">
+        <button
+          onClick={onBack}
+          className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors active:bg-gray-100"
+          aria-label="Back"
+        >
+          <BackIcon />
+        </button>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center px-6 py-8">
+        <div className="w-full max-w-sm">
+          <h1 className="font-display font-bold text-2xl text-gray-900 text-center mb-1">
+            What's your level, {name}?
+          </h1>
+          <p className="font-body text-sm text-gray-400 text-center mb-6">
+            Be honest — we'll check! Either way, you always start from the beginning.
+          </p>
+
+          <div className="flex flex-col gap-3">
+            {LEVEL_OPTIONS.map((opt, i) => {
+              const isSelected = selected === i
+              return (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => handleChoose(i)}
+                  className="w-full flex items-center gap-3 rounded-2xl border-2 px-4 py-3.5 text-left transition-colors active:scale-[0.98]"
+                  style={{
+                    borderColor: isSelected ? '#58cc02' : '#E5E7EB',
+                    backgroundColor: isSelected ? '#EAF8DC' : 'transparent',
+                  }}
+                >
+                  <span className="text-2xl flex-shrink-0">{opt.emoji}</span>
+                  <div className="min-w-0">
+                    <p className={`font-body font-bold text-sm leading-tight ${isSelected ? 'text-green-800' : 'text-gray-900'}`}>
+                      {opt.title}
+                    </p>
+                    <p className="font-body text-xs text-gray-400 mt-0.5 leading-snug">{opt.subtitle}</p>
+                  </div>
+                  <div
+                    className="w-5 h-5 rounded-full border-2 flex-shrink-0 ml-auto flex items-center justify-center"
+                    style={{
+                      borderColor: isSelected ? '#58cc02' : '#D1D5DB',
+                      backgroundColor: isSelected ? '#58cc02' : 'transparent',
+                    }}
+                  >
+                    {isSelected && (
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5"
+                        strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+
+          <button
+            onClick={handleContinue}
+            disabled={selected === null}
+            className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-lg tracking-wide mt-6"
+          >
+            CREATE PROFILE
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── Main CreateKid orchestrator ───────────────────────────────────────────
+export default function CreateKid({ parentId, onCreated, onBack }) {
+  const [step, setStep]       = useState(1)        // 1 | 2
+  const [nameAge, setNameAge] = useState(null)      // { name, age }
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError]     = useState(null)
+
+  function handleStep1Done({ name, age }) {
+    setNameAge({ name, age })
+    setStep(2)
+  }
+
+  async function handleStep2Done(placementClaim) {
+    setSubmitting(true)
+    setError(null)
+    try {
+      const kidId = await createKid(parentId, {
+        name: nameAge.name,
+        age:  nameAge.age,
+        placementClaim,
+      })
+      onCreated(kidId)
+    } catch (err) {
+      setError(err instanceof AuthError ? err.message : 'Something went wrong. Please try again.')
+      setSubmitting(false)
+    }
+  }
+
+  if (step === 1) {
+    return <StepNameAge onNext={handleStep1Done} onBack={onBack} />
+  }
+
+  return (
+    <div>
+      {error && (
+        <div className="fixed top-4 left-4 right-4 z-50 rounded-xl bg-red-50 border border-red-100 px-4 py-3">
+          <p className="font-body text-sm text-red-600">{error}</p>
+        </div>
+      )}
+      {submitting ? (
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <p className="font-body text-gray-400">Creating profile…</p>
+        </div>
+      ) : (
+        <StepLevel
+          name={nameAge.name}
+          onNext={handleStep2Done}
+          onBack={() => setStep(1)}
+        />
+      )}
     </div>
   )
 }
