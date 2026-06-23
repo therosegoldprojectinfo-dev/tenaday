@@ -343,58 +343,79 @@ function realLifeQuestion(operation, table, fact) {
   }
 }
 
-// ── Review generator ──────────────────────────────────────────────────────
-
-/** Generates 12 review questions from past batches, capped at the most
- *  recent 8 batches (16 distinct facts). Each "slot" in the sequence picks
- *  independently from the pool for maximum variety. Format alternates:
- *  even index → plain equation, odd index → word problem (both number choices). */
-/** Generates 12 review questions from past batches.
- *  Each question independently samples a random batch from the pool and
- *  picks one of its 2 facts — this ensures genuine variety across the 12
- *  questions rather than hammering the same 2 facts 6 times each.
- *  Format alternates: even index → plain equation, odd → word problem. */
-function generateReview(operation, table, batch, reviewPool, sequence) {
+// ── Review generator ────────────────────────────────────────────────────
+/** Generates 24 review questions from past batches — double the normal
+ *  count since Review covers all 4 formats: plain equations, what_happened
+ *  (equation choices), real_life word problems, and speed-style equations.
+ *  6 of each format = 24 total. Each question independently picks from
+ *  the pool for genuine variety. */
+function generateReview(operation, table, batch, reviewPool) {
   const pool = reviewPool.length > 0 ? reviewPool : [{ operation, table, batch }]
+  const formats = ['equation', 'what_happened', 'real_life', 'speed']
+  const questions = []
 
-  return sequence.map(({ factIdx: _, qIdx }) => {
-    // Pick a completely independent source for every question
-    const src     = pool[randInt(0, pool.length - 1)]
-    const [f1, f2] = factsForBatch(src.batch)
-    // factIdx (0 or 1) selects which of the 2 facts to use, but since we
-    // already randomised the source batch, also randomise the fact pick so
-    // every question is independently drawn from the whole history pool.
-    const fact = Math.random() < 0.5 ? f1 : f2
+  // 6 questions per format, each independently drawn from the pool
+  for (const fmt of formats) {
+    for (let i = 0; i < 6; i++) {
+      const src = pool[randInt(0, pool.length - 1)]
+      const [f1, f2] = factsForBatch(src.batch)
+      const fact = Math.random() < 0.5 ? f1 : f2
+      if (fmt === 'equation' || fmt === 'speed') {
+        questions.push(plainEquationQuestion(src.operation, src.table, fact))
+      } else if (fmt === 'what_happened') {
+        questions.push(practiceQuestion(src.operation, src.table, fact))
+      } else {
+        questions.push(realLifeQuestion(src.operation, src.table, fact))
+      }
+    }
+  }
 
-    return qIdx % 2 === 0
-      ? plainEquationQuestion(src.operation, src.table, fact)
-      : realLifeQuestion(src.operation, src.table, fact)
-  })
+  // Shuffle so formats are interleaved, not grouped
+  return shuffle(questions)
 }
 
 // ── Main export ───────────────────────────────────────────────────────────
 
-/** Generates exactly 12 questions for a daily-loop node.
+/** Generates questions for a daily-loop node.
  *
- *  - 2 facts per batch, each appearing exactly 6 times = 12 questions
- *  - No two consecutive questions test the same fact
- *  - Randomized order on every call
+ *  SPECIAL CASES:
+ *  - 'learn' returns { isLesson: true, facts: [{equation, result}] } — no
+ *    questions, just the 2 facts to display as a pure lesson screen.
+ *  - 'review' returns 24 questions (all 4 formats, 6 each, shuffled).
+ *  - All other nodes return 12 questions (2 facts × 6 each, no consecutive).
  *
- *  @param {string}   operation    - 'addition' | 'subtraction' | 'multiplication' | 'division'
- *  @param {number}   table        - 1–12
- *  @param {number}   batch        - 1–6
- *  @param {string}   node         - 'unlock' | 'learn' | 'practice' | 'real_life' | 'speed' | 'review'
- *  @param {object}   [opts]
- *  @param {object}   [opts.unlockBatch]  - { operation, table, batch } for the previous batch; required for 'unlock'
- *  @param {object[]} [opts.reviewPool]   - array of { operation, table, batch }; required for 'review'
+ *  Node → format mapping:
+ *  unlock       → plain equations, NUMBER choices, tests YESTERDAY's facts
+ *  learn        → pure lesson (no questions) — just shows today's 2 facts
+ *  what_happened→ word problems, EQUATION choices ("which equation fits?")
+ *  practice     → word problems, NUMBER choices
+ *  real_life    → applied word problems, NUMBER choices
+ *  speed        → plain equations, NUMBER choices, timed
+ *  review       → all 4 formats mixed, 24 questions total
  */
 export function generateBatch(operation, table, batch, node, { unlockBatch, reviewPool } = {}) {
-  const rawSeq = makeFactSequence() // [0,1,0,1,...] 12 items, 6 of each, no consecutive dupes
-  const sequence = rawSeq.map((factIdx, qIdx) => ({ factIdx, qIdx }))
-
-  if (node === 'review') {
-    return generateReview(operation, table, batch, reviewPool || [], sequence)
+  // Learn is a pure lesson — return the 2 facts directly, no questions
+  if (node === 'learn') {
+    const [f1, f2] = factsForBatch(batch)
+    const { a: a1, b: b1, answer: ans1 } = factValues(operation, table, f1)
+    const { a: a2, b: b2, answer: ans2 } = factValues(operation, table, f2)
+    return {
+      isLesson: true,
+      facts: [
+        { equation: `${a1} ${SYMBOL[operation]} ${b1}`, result: ans1 },
+        { equation: `${a2} ${SYMBOL[operation]} ${b2}`, result: ans2 },
+      ],
+    }
   }
+
+  // Review = 24 questions across all formats
+  if (node === 'review') {
+    return generateReview(operation, table, batch, reviewPool || [])
+  }
+
+  // All other nodes: 12 questions, 2 facts × 6 each, no consecutive
+  const rawSeq  = makeFactSequence()
+  const sequence = rawSeq.map((factIdx, qIdx) => ({ factIdx, qIdx }))
 
   // Unlock tests the PREVIOUS batch's facts; all other nodes test today's
   const src = (node === 'unlock' && unlockBatch) ? unlockBatch : { operation, table, batch }
@@ -403,8 +424,9 @@ export function generateBatch(operation, table, batch, node, { unlockBatch, revi
 
   return sequence.map(({ factIdx }) => {
     const fact = facts[factIdx]
-    if (node === 'practice')  return practiceQuestion(src.operation, src.table, fact)
-    if (node === 'real_life') return realLifeQuestion(src.operation, src.table, fact)
-    return plainEquationQuestion(src.operation, src.table, fact) // unlock, learn, speed
+    if (node === 'what_happened') return practiceQuestion(src.operation, src.table, fact)
+    if (node === 'practice')      return realLifeQuestion(src.operation, src.table, fact)
+    if (node === 'real_life')     return realLifeQuestion(src.operation, src.table, fact)
+    return plainEquationQuestion(src.operation, src.table, fact) // unlock, speed
   })
 }
