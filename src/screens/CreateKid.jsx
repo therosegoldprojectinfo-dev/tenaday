@@ -235,7 +235,7 @@ export default function CreateKid({ parentId, onCreated, onBack }) {
         age:  nameAge.age,
         placementClaim,
       })
-      onCreated(kidId)
+      onCreated(kidId, placementClaim)
     } catch (err) {
       setError(err instanceof AuthError ? err.message : 'Something went wrong. Please try again.')
       setSubmitting(false)
