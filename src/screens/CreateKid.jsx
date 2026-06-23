@@ -223,48 +223,65 @@ const CLAIM_LABELS = {
 }
 
 function StepTestWarning({ name, claim, onConfirm, onBack }) {
+  const questionCount = { addition: 20, subtraction: 20, multiplication: 20, division: 20 }[claim] || 20
+  const claimEmoji = { addition: '➕', subtraction: '➖', multiplication: '✖️', division: '➗' }[claim] || '🧮'
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       <div className="flex items-center px-4 pt-5">
-        <button
-          onClick={onBack}
+        <button onClick={onBack}
           className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors active:bg-gray-100"
-          aria-label="Back"
-        >
+          aria-label="Back">
           <BackIcon />
         </button>
       </div>
 
       <div className="flex-1 flex items-center justify-center px-6 py-8">
         <div className="w-full max-w-sm flex flex-col items-center text-center gap-6">
-          <span className="text-8xl select-none">📝</span>
+
+          <div className="flex flex-col items-center gap-2">
+            <span className="text-8xl select-none" style={{ animation: 'correct-bounce 0.6s cubic-bezier(0.34,1.56,0.64,1) both' }}>
+              🕵️
+            </span>
+            <span className="text-4xl">{claimEmoji}</span>
+          </div>
 
           <div>
-            <h1 className="font-display font-bold text-2xl text-gray-900 mb-3">
-              Time to prove it, {name}!
+            <h1 className="font-display font-bold text-3xl text-gray-900 mb-2">
+              Prove it, {name}! 😤
             </h1>
-            <p className="font-body text-base text-gray-500 leading-relaxed">
-              You said you already know{' '}
+            <p className="font-body text-lg text-gray-500 leading-relaxed">
+              You said you're already good at{' '}
               <span className="font-bold text-gray-800">{CLAIM_LABELS[claim]}</span>.
-              {' '}We're going to give you a quick test to check — about{' '}
-              {claim === 'addition' ? '36' : claim === 'subtraction' ? '54' : claim === 'multiplication' ? '72' : '90'}{' '}
-              questions covering all the tables.
+              {' '}Let's find out if that's true! 👀
             </p>
           </div>
 
-          <div className="w-full rounded-2xl bg-amber-50 border border-amber-100 px-5 py-4 text-left">
-            <p className="font-body font-bold text-sm text-amber-800 mb-1">💡 How it works</p>
-            <p className="font-body text-sm text-amber-700 leading-snug">
-              Score 80% or higher and you'll skip straight to that chapter.
-              If not, no worries — you'll start from the beginning like everyone else.
-            </p>
+          <div className="w-full rounded-3xl px-5 py-5 flex flex-col gap-3"
+            style={{ background: 'linear-gradient(135deg, #EAF8DC 0%, #DDF0FB 100%)' }}>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">📝</span>
+              <p className="font-body font-bold text-base text-gray-800 text-left">
+                {questionCount} questions — mix of everything!
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">🏆</span>
+              <p className="font-body font-bold text-base text-gray-800 text-left">
+                Get 16+ right and you skip ahead!
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-3xl">😊</span>
+              <p className="font-body font-bold text-base text-gray-800 text-left">
+                Don't worry if you don't pass — no big deal!
+              </p>
+            </div>
           </div>
 
-          <button
-            onClick={onConfirm}
-            className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
-          >
-            OK, LET'S GO! →
+          <button onClick={onConfirm}
+            className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
+            I'M READY! 💪
           </button>
         </div>
       </div>
