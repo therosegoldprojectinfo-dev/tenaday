@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Map from './screens/Map'
 import ChapterPath from './screens/ChapterPath'
 import Practice from './screens/Practice'
+import ChapterIntro from './screens/ChapterIntro'
 import Rewards from './screens/Rewards'
 import Profile from './screens/Profile'
 import Auth from './screens/Auth'
@@ -154,8 +155,27 @@ export default function App() {
 
   // ── Game phase ───────────────────────────────────────────────────────
 
-  // Practice renders standalone, with NO nav shell — full-focus mode.
   if (navTab === 'home' && screen === 'play' && activeNode) {
+    // Day 1 of any chapter (batch 1, unlock node) → show chapter intro
+    // instead of the unlock exercise (nothing to test yet on day 1).
+    // isFirstEver = true only for the very first session (addition/table1/batch1)
+    const isChapterDay1 = activeNode.node === 'unlock' && activeNode.batchNum === 1 && activeNode.table === 1
+    if (isChapterDay1) {
+      const isFirstEver = activeNode.operation === 'addition'
+      return (
+        <ChapterIntro
+          key={`intro-${activeNode.operation}`}
+          operation={activeNode.operation}
+          table={activeNode.table}
+          batchNum={activeNode.batchNum}
+          node={activeNode.node}
+          kidId={kidId}
+          isFirstEver={isFirstEver}
+          onDone={handleExitPractice}
+        />
+      )
+    }
+
     return (
       <Practice
         key={`${activeNode.operation}-${activeNode.table}-${activeNode.batchNum}-${activeNode.node}`}
