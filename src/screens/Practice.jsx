@@ -94,7 +94,91 @@ function useCoinTick(target, active) {
 
 // ── End screens ───────────────────────────────────────────────────────────
 
-/** Animated countdown: 5→4→3→2→1, gets bigger and redder */
+/** 🔥 Fire particles that rise from the bottom when streak hits milestones */
+function FireParticles({ streakKey, streak }) {
+  if (streak < 3) return null
+  const count = Math.min(streak, 12)
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden" key={streakKey}>
+      {Array.from({ length: count }).map((_, i) => {
+        const left = 10 + Math.random() * 80
+        const delay = Math.random() * 0.4
+        const duration = 1.2 + Math.random() * 0.6
+        const size = streak >= 7 ? 28 + Math.random() * 16 : 20 + Math.random() * 12
+        return (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              bottom: -40,
+              left: `${left}%`,
+              fontSize: size,
+              animation: `fire-rise ${duration}s ${delay}s ease-out both`,
+            }}
+          >
+            {streak >= 7 ? '🔥' : '🔥'}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/** 🎉 Confetti that bursts up from the bottom on session complete */
+function ConfettiBlast({ active }) {
+  if (!active) return null
+  const colors = ['#58cc02','#1CB0F6','#FF9600','#FF4B4B','#CE82FF','#FFD900','#FF6B6B','#4ECDC4']
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {Array.from({ length: 40 }).map((_, i) => {
+        const left = Math.random() * 100
+        const delay = Math.random() * 0.5
+        const duration = 1.0 + Math.random() * 0.8
+        const size = 8 + Math.random() * 10
+        const color = colors[i % colors.length]
+        const isCircle = i % 3 === 0
+        return (
+          <div
+            key={i}
+            style={{
+              position: 'absolute',
+              bottom: -20,
+              left: `${left}%`,
+              width: size,
+              height: size,
+              borderRadius: isCircle ? '50%' : 2,
+              backgroundColor: color,
+              animation: `confetti-rise ${duration}s ${delay}s cubic-bezier(0.2,0.8,0.3,1) both`,
+              transform: `rotate(${Math.random() * 360}deg)`,
+            }}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+/** 🔥 Streak badge shown in the header */
+function StreakBadge({ streak }) {
+  if (streak < 2) return null
+  const hot = streak >= 7
+  const warm = streak >= 4
+  return (
+    <div
+      key={streak}
+      className="flex items-center gap-1 px-2.5 py-1 rounded-full anim-correct"
+      style={{
+        backgroundColor: hot ? '#FF4500' : warm ? '#FF9600' : '#FFB700',
+        boxShadow: hot ? '0 0 12px rgba(255,69,0,0.6)' : 'none',
+      }}
+    >
+      <span style={{ fontSize: hot ? 16 : 14 }}>🔥</span>
+      <span className="font-display font-extrabold text-white" style={{ fontSize: hot ? 15 : 13 }}>
+        {streak}
+      </span>
+    </div>
+  )
+}
 function SpeedCountdown({ durationMs }) {
   const total = Math.ceil(durationMs / 1000)
   const [count, setCount] = useState(total)
@@ -290,10 +374,12 @@ export default function Practice({
   const [selected, setSelected] = useState(null)
   const [revealed, setRevealed] = useState(false)
   const [wrong,    setWrong]    = useState(0)
-  const [over,     setOver]     = useState(null) // null | 'died' | 'finished'
+  const [over,     setOver]     = useState(null)
   const [saving,   setSaving]   = useState(false)
   const [heartKey, setHeartKey] = useState(0)
   const [timerKey, setTimerKey] = useState(1)
+  const [streak,   setStreak]   = useState(0)
+  const [fireKey,  setFireKey]  = useState(0) // bumped to trigger fire burst
   const timeoutRef = useRef(null)
 
   const q         = questions[idx]
@@ -310,20 +396,23 @@ export default function Practice({
     if (choice === null || choice === undefined) return
 
     setRevealed(true)
-    if (choice !== q.answer) {
+    if (choice === q.answer) {
+      const newStreak = streak + 1
+      setStreak(newStreak)
+      // Fire burst at streak milestones 3, 5, 7, 10+
+      if (newStreak >= 3) setFireKey(k => k + 1)
+    } else {
+      setStreak(0)
       setWrong(w => w + 1)
       setLives(l => l - 1)
       setHeartKey(k => k + 1)
     }
   }
 
-  // Speed node: when the 5s timer expires, count as wrong and auto-reveal
-  // — uses a dedicated handler so the null-guard in handleCheck doesn't
-  // silently swallow the timeout (that was the original bug: handleCheck(null)
-  // hit `if (choice === null) return` and did nothing).
   function handleTimerExpire() {
     if (revealed || over) return
     setRevealed(true)
+    setStreak(0)
     setWrong(w => w + 1)
     setLives(l => l - 1)
     setHeartKey(k => k + 1)
@@ -424,15 +513,18 @@ export default function Practice({
     const correct = SESSION_TOTAL - wrong
     const passed  = correct >= passThreshold
     return (
-      <FinishedScreen
-        passed={passed}
-        correct={correct}
-        total={SESSION_TOTAL}
-        payout={payout}
-        isReview={isReview}
-        saving={saving}
-        onExit={onExit}
-      />
+      <>
+        <ConfettiBlast active={passed} />
+        <FinishedScreen
+          passed={passed}
+          correct={correct}
+          total={SESSION_TOTAL}
+          payout={payout}
+          isReview={isReview}
+          saving={saving}
+          onExit={onExit}
+        />
+      </>
     )
   }
 
@@ -440,6 +532,9 @@ export default function Practice({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
+      {/* Fire particles — rise from bottom when streak ≥ 3 */}
+      <FireParticles streakKey={fireKey} streak={streak} />
+
       <div className="h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md">
 
         {/* ── Top bar ─────────────────────────────────────────────── */}
@@ -453,7 +548,11 @@ export default function Practice({
           </button>
 
           <div
-            className="flex-1 h-5 rounded-full bg-gray-100 overflow-hidden"
+            className="flex-1 h-5 rounded-full overflow-hidden"
+            style={{
+              backgroundColor: streak >= 3 ? '#FFE0B2' : '#F3F4F6',
+              transition: 'background-color 0.4s',
+            }}
             role="progressbar"
             aria-valuenow={idx}
             aria-valuemax={SESSION_TOTAL}
@@ -461,25 +560,29 @@ export default function Practice({
             <div
               className="h-full rounded-full origin-left"
               style={{
-                backgroundColor: '#58cc02',
+                backgroundColor: streak >= 7 ? '#FF4500' : streak >= 4 ? '#FF9600' : '#58cc02',
                 transform: `scaleX(${progressScale})`,
-                transition: 'transform 350ms cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'transform 350ms cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s',
+                boxShadow: streak >= 4 ? `0 0 8px ${streak >= 7 ? '#FF4500' : '#FF9600'}` : 'none',
               }}
             />
           </div>
 
-          {/* Lives row — hearts light up and pulse when one is lost */}
-          <div className="flex items-center gap-1 px-2 py-2">
-            {Array.from({ length: LIVES_START }).map((_, i) => {
-              const filled = i < lives
-              return (
-                <HeartIcon
-                  key={i}
-                  filled={filled}
-                  className={filled && i === lives - 1 && heartKey > 0 ? 'anim-heart-pulse' : ''}
-                />
-              )
-            })}
+          {/* Streak badge replaces hearts when streak ≥ 2, hearts stay */}
+          <div className="flex items-center gap-1.5">
+            <StreakBadge streak={streak} />
+            <div className="flex items-center gap-0.5">
+              {Array.from({ length: LIVES_START }).map((_, i) => {
+                const filled = i < lives
+                return (
+                  <HeartIcon
+                    key={i}
+                    filled={filled}
+                    className={filled && i === lives - 1 && heartKey > 0 ? 'anim-heart-pulse' : ''}
+                  />
+                )
+              })}
+            </div>
           </div>
         </div>
 
