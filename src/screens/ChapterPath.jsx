@@ -15,7 +15,7 @@ import {
   previousBatch,
   factsForBatch,
 } from '../lib/progression'
-import { isPlayableToday, canAdvanceToday, nextUnlockMessage } from '../lib/dayGate'
+import { isPlayableToday, nextUnlockMessage } from '../lib/dayGate'
 import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
 import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 
@@ -103,6 +103,16 @@ function NodeTypeIcon({ node, size = 22 }) {
     return (
       <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 21V10M12 10C12 6 9 5 6 5c0 4 1 6 6 5ZM12 10c0-4 3-5 6-5 0 4-1 6-6 5Z" />
+      </svg>
+    )
+  }
+  if (node === 'what_happened') {
+    // Question mark bubble — "which equation describes this?"
+    return (
+      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M9 9a3 3 0 1 1 4 2.8c-.6.2-1 .8-1 1.4V14" />
+        <circle cx="12" cy="17" r="0.8" fill="currentColor" stroke="none" />
+        <circle cx="12" cy="12" r="9" />
       </svg>
     )
   }
@@ -494,16 +504,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
             let dayLocked = false
             if (selectedStatus === 'active' && unlockedInChain && !completed) {
               const pos = chainPosition(currentPos, targetPos)
-              // After completing a batch, updateProgress moves the cursor to the
-              // next batch's first node. chainPosition returns 'current' for that
-              // node — normally always playable — but if last_advance_date is today
-              // the kid just finished the previous batch today and must wait until
-              // the next calendar day to start this new batch.
-              const isNewBatchStart =
-                pos === 'current' &&
-                currentPos.node === 'unlock' &&
-                !canAdvanceToday(kid.last_advance_date)
-              const playable = isNewBatchStart ? false : isPlayableToday(pos, kid.last_advance_date, new Date())
+              const playable = isPlayableToday(pos, kid.last_advance_date, new Date())
               dayLocked = !playable
             }
 
