@@ -18,7 +18,7 @@
 // Per chapter: 12 tables × 6 batches = 72 day-sessions
 
 export const OPERATIONS = ['addition', 'subtraction', 'multiplication', 'division']
-export const NODES      = ['unlock', 'learn', 'practice', 'real_life', 'speed', 'review']
+export const NODES = ['unlock', 'learn', 'what_happened', 'practice', 'real_life', 'speed', 'review']
 export const TABLE_COUNT = 12
 export const BATCH_COUNT = 6
 export const FACTS_PER_BATCH = 2 // always 2; 2 × 6 batches = 12 facts per table
@@ -217,23 +217,25 @@ export function tablesForOperation() {
 
 /** Human label for a node type. */
 export function nodeLabel(node) {
-  if (node === 'unlock')    return 'Unlock'
-  if (node === 'learn')     return 'Learn'
-  if (node === 'practice')  return 'Practice'
-  if (node === 'real_life') return 'Real Life'
-  if (node === 'speed')     return 'Speed'
-  if (node === 'review')    return 'Review'
+  if (node === 'unlock')       return 'Unlock'
+  if (node === 'learn')        return 'Learn'
+  if (node === 'what_happened') return 'What Happened?'
+  if (node === 'practice')     return 'Practice'
+  if (node === 'real_life')    return 'Real Life'
+  if (node === 'speed')        return 'Speed'
+  if (node === 'review')       return 'Review'
   return node
 }
 
-/** Short purpose line per node — shown as subtext in the node list UI. */
+/** Short purpose line per node. */
 export function nodePurpose(node) {
-  if (node === 'unlock')    return 'Remember yesterday?'
-  if (node === 'learn')     return 'Something new'
-  if (node === 'practice')  return 'What happened here?'
-  if (node === 'real_life') return 'Use it for real'
-  if (node === 'speed')     return 'Answer fast'
-  if (node === 'review')    return 'Keep it fresh'
+  if (node === 'unlock')       return 'Remember yesterday?'
+  if (node === 'learn')        return 'Today\'s new facts'
+  if (node === 'what_happened') return 'Which equation fits?'
+  if (node === 'practice')     return 'Find the answer'
+  if (node === 'real_life')    return 'Use it for real'
+  if (node === 'speed')        return 'Answer fast'
+  if (node === 'review')       return 'Remember everything'
   return ''
 }
 
