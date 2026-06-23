@@ -412,32 +412,47 @@ function generateReview(operation, table, batch, reviewPool) {
 //   'subtraction'    → 54  (36 sub + 18 add)
 //   'multiplication' → 72  (36 mul + 18 sub + 18 add)
 //   'division'       → 90  (36 div + 18 mul + 18 sub + 18 add)
+/** Generates exactly 20 diagnostic questions for a placement claim.
+ *  Always 20 — no more, no less. Covers all operations up to and including
+ *  the claimed one, mixed together and shuffled. Each question tagged
+ *  isPrimary: true so Diagnostic.jsx can track score on the claimed op.
+ *
+ *  Distribution: 20 questions split evenly across operations involved,
+ *  all 3 question types (plain equation, what_happened, real_life), random
+ *  tables and facts. */
 export function generateDiagnostic(claimedOperation) {
   const OPS_ORDER = ['addition', 'subtraction', 'multiplication', 'division']
   const claimedIdx = OPS_ORDER.indexOf(claimedOperation)
   if (claimedIdx === -1) return []
 
+  // All operations to cover (e.g. subtraction claim → [addition, subtraction])
+  const ops = OPS_ORDER.slice(0, claimedIdx + 1)
+
+  // 20 questions distributed as evenly as possible across ops
+  const perOp = Math.floor(20 / ops.length)
+  const remainder = 20 - perOp * ops.length
+  const counts = ops.map((_, i) => perOp + (i === ops.length - 1 ? remainder : 0))
+  // Give any remainder to the primary (claimed) operation so primary gets
+  // slightly more weight — that's the one we're actually evaluating
+
   const allQuestions = []
+  const TYPES = ['plain', 'what_happened', 'real_life']
 
-  // Preceding operations: 18 questions each (6 random tables × 3 types)
-  for (let opIdx = 0; opIdx < claimedIdx; opIdx++) {
-    const op = OPS_ORDER[opIdx]
-    const tables = shuffle(Array.from({ length: 12 }, (_, i) => i + 1)).slice(0, 6)
-    for (const table of tables) {
-      const fact = randInt(1, 12)
-      allQuestions.push(plainEquationQuestion(op, table, fact))
-      allQuestions.push(practiceQuestion(op, table, fact))
-      allQuestions.push(realLifeQuestion(op, table, fact))
+  ops.forEach((op, opIdx) => {
+    const isPrimary = op === claimedOperation
+    const n = counts[opIdx]
+    // Pick n random (table, fact) pairs, cycling through question types
+    for (let i = 0; i < n; i++) {
+      const table = randInt(1, 12)
+      const fact  = randInt(1, 12)
+      const type  = TYPES[i % TYPES.length]
+      let q
+      if (type === 'plain')         q = plainEquationQuestion(op, table, fact)
+      else if (type === 'what_happened') q = practiceQuestion(op, table, fact)
+      else                          q = realLifeQuestion(op, table, fact)
+      allQuestions.push({ ...q, isPrimary })
     }
-  }
-
-  // Primary operation: all 12 tables × 3 types = 36 questions
-  for (let table = 1; table <= 12; table++) {
-    const fact = randInt(1, 12)
-    allQuestions.push({ ...plainEquationQuestion(claimedOperation, table, fact), isPrimary: true })
-    allQuestions.push({ ...practiceQuestion(claimedOperation, table, fact),      isPrimary: true })
-    allQuestions.push({ ...realLifeQuestion(claimedOperation, table, fact),      isPrimary: true })
-  }
+  })
 
   return shuffle(allQuestions)
 }
