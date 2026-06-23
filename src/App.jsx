@@ -3,6 +3,7 @@ import Map from './screens/Map'
 import ChapterPath from './screens/ChapterPath'
 import Practice from './screens/Practice'
 import ChapterIntro from './screens/ChapterIntro'
+import Diagnostic from './screens/Diagnostic'
 import Rewards from './screens/Rewards'
 import Profile from './screens/Profile'
 import Auth from './screens/Auth'
@@ -26,9 +27,10 @@ import { getSession, logOut as authLogOut } from './lib/parentAuth'
 // ("who's playing right now") better than silently resuming whoever
 // played last, especially on a shared family device.
 export default function App() {
-  const [authPhase, setAuthPhase] = useState('checking') // 'checking' | 'auth' | 'kidPicker' | 'createKid' | 'game'
+  const [authPhase, setAuthPhase] = useState('checking') // 'checking' | 'auth' | 'kidPicker' | 'createKid' | 'diagnostic' | 'game'
   const [parentId, setParentId] = useState(null)
   const [kidId, setKidId] = useState(null)
+  const [pendingClaim, setPendingClaim] = useState(null) // placement claim for the diagnostic phase
 
   // Game-level navigation state (only meaningful once authPhase === 'game')
   const [navTab, setNavTab] = useState('home') // 'home' | 'rewards' | 'profile'
@@ -62,8 +64,29 @@ export default function App() {
     setScreen('list')
   }
 
-  function handleKidCreated(newKidId) {
+  function handleKidCreated(newKidId, placementClaim) {
     setKidId(newKidId)
+    if (placementClaim) {
+      setPendingClaim(placementClaim)
+      setAuthPhase('diagnostic')
+    } else {
+      setAuthPhase('game')
+      setNavTab('home')
+      setScreen('list')
+    }
+  }
+
+  function handleDiagnosticPass() {
+    // Cursor already set to claimed chapter by Diagnostic.jsx; go straight to game.
+    setPendingClaim(null)
+    setAuthPhase('game')
+    setNavTab('home')
+    setScreen('list')
+  }
+
+  function handleDiagnosticFail() {
+    // Cursor stays at addition/table1/batch1/learn (the default from createKid).
+    setPendingClaim(null)
     setAuthPhase('game')
     setNavTab('home')
     setScreen('list')
@@ -149,6 +172,17 @@ export default function App() {
         parentId={parentId}
         onCreated={handleKidCreated}
         onBack={() => setAuthPhase('kidPicker')}
+      />
+    )
+  }
+
+  if (authPhase === 'diagnostic') {
+    return (
+      <Diagnostic
+        kidId={kidId}
+        claimedOperation={pendingClaim}
+        onPass={handleDiagnosticPass}
+        onFail={handleDiagnosticFail}
       />
     )
   }
