@@ -557,10 +557,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
               className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
             >
               {openNode.status === 'completed'
-                ? 'PRACTICE'
-                : openNode.node === 'review'
-                  ? 'START REVIEW'
-                  : 'START'}
+                ? `REPLAY ${nodeLabel(openNode.node).toUpperCase()}`
+                : openNode.node === 'learn'
+                  ? 'START LESSON'
+                  : openNode.node === 'review'
+                    ? 'START REVIEW'
+                    : `START ${nodeLabel(openNode.node).toUpperCase()}`}
             </button>
           </div>
         </>
