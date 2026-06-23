@@ -393,6 +393,55 @@ function generateReview(operation, table, batch, reviewPool) {
  *  speed        → plain equations, NUMBER choices, timed
  *  review       → all 4 formats mixed, 24 questions total
  */
+// ── Diagnostic generator ──────────────────────────────────────────────────
+// Generates a placement-test question set for a kid who claims to already
+// know a given operation.
+//
+// Primary operation (claimed): all 12 tables × 3 types = 36 questions.
+//   Questions tagged isPrimary: true — Diagnostic.jsx uses this to score
+//   only the claimed section (threshold: 80% of 36 = 29 correct).
+//
+// Preceding operations: 6 randomly sampled tables × 3 types = 18 each.
+//   These are informational — they don't gate the pass/fail decision.
+//
+// All questions shuffled together so the kid can't tell where one section
+// ends and another begins.
+//
+// Scope by claim:
+//   'addition'       → 36  (addition only)
+//   'subtraction'    → 54  (36 sub + 18 add)
+//   'multiplication' → 72  (36 mul + 18 sub + 18 add)
+//   'division'       → 90  (36 div + 18 mul + 18 sub + 18 add)
+export function generateDiagnostic(claimedOperation) {
+  const OPS_ORDER = ['addition', 'subtraction', 'multiplication', 'division']
+  const claimedIdx = OPS_ORDER.indexOf(claimedOperation)
+  if (claimedIdx === -1) return []
+
+  const allQuestions = []
+
+  // Preceding operations: 18 questions each (6 random tables × 3 types)
+  for (let opIdx = 0; opIdx < claimedIdx; opIdx++) {
+    const op = OPS_ORDER[opIdx]
+    const tables = shuffle(Array.from({ length: 12 }, (_, i) => i + 1)).slice(0, 6)
+    for (const table of tables) {
+      const fact = randInt(1, 12)
+      allQuestions.push(plainEquationQuestion(op, table, fact))
+      allQuestions.push(practiceQuestion(op, table, fact))
+      allQuestions.push(realLifeQuestion(op, table, fact))
+    }
+  }
+
+  // Primary operation: all 12 tables × 3 types = 36 questions
+  for (let table = 1; table <= 12; table++) {
+    const fact = randInt(1, 12)
+    allQuestions.push({ ...plainEquationQuestion(claimedOperation, table, fact), isPrimary: true })
+    allQuestions.push({ ...practiceQuestion(claimedOperation, table, fact),      isPrimary: true })
+    allQuestions.push({ ...realLifeQuestion(claimedOperation, table, fact),      isPrimary: true })
+  }
+
+  return shuffle(allQuestions)
+}
+
 export function generateBatch(operation, table, batch, node, { unlockBatch, reviewPool } = {}) {
   // Learn is a pure lesson — return the 2 facts directly, no questions
   if (node === 'learn') {
@@ -413,12 +462,25 @@ export function generateBatch(operation, table, batch, node, { unlockBatch, revi
     return generateReview(operation, table, batch, reviewPool || [])
   }
 
+  // Unlock node: mix all 3 question types (4 plain + 4 what_happened + 4 real_life)
+  // so it's a genuine memory check, not just equation drills.
+  if (node === 'unlock') {
+    const src = unlockBatch || { operation, table, batch }
+    const [f0, f1] = factsForBatch(src.batch)
+    // Each fact appears twice per type = 6 appearances total across 12 questions
+    const pair = [f0, f1, f0, f1]
+    return shuffle([
+      ...pair.map(f => plainEquationQuestion(src.operation, src.table, f)),
+      ...pair.map(f => practiceQuestion(src.operation, src.table, f)),
+      ...pair.map(f => realLifeQuestion(src.operation, src.table, f)),
+    ])
+  }
+
   // All other nodes: 12 questions, 2 facts × 6 each, no consecutive
   const rawSeq  = makeFactSequence()
   const sequence = rawSeq.map((factIdx, qIdx) => ({ factIdx, qIdx }))
 
-  // Unlock tests the PREVIOUS batch's facts; all other nodes test today's
-  const src = (node === 'unlock' && unlockBatch) ? unlockBatch : { operation, table, batch }
+  const src = { operation, table, batch }
   const [fact0, fact1] = factsForBatch(src.batch)
   const facts = [fact0, fact1]
 
@@ -427,6 +489,6 @@ export function generateBatch(operation, table, batch, node, { unlockBatch, revi
     if (node === 'what_happened') return practiceQuestion(src.operation, src.table, fact)
     if (node === 'practice')      return realLifeQuestion(src.operation, src.table, fact)
     if (node === 'real_life')     return realLifeQuestion(src.operation, src.table, fact)
-    return plainEquationQuestion(src.operation, src.table, fact) // unlock, speed
+    return plainEquationQuestion(src.operation, src.table, fact) // speed
   })
 }
