@@ -120,29 +120,28 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
           </p>
         </div>
 
-        {/* Second bubble for visual richness */}
-        <div
-          className="absolute top-6 right-32 bg-white rounded-2xl px-4 py-2.5 shadow-sm"
-          style={{ borderBottomRightRadius: 4 }}
-        >
-          <p
-            className="font-display font-extrabold text-xl tracking-wide"
-            style={{ color: locked ? '#C4C9D1' : '#3C3C3C' }}
+        {/* Second bubble — only when not locked */}
+        {!locked && (
+          <div
+            className="absolute top-5 right-5 bg-white rounded-2xl px-4 py-2.5 shadow-sm"
+            style={{ borderBottomRightRadius: 4 }}
           >
-            {BUBBLE_SYMBOL[operation]}
-          </p>
-        </div>
+            <p className="font-display font-extrabold text-xl tracking-wide" style={{ color: '#3C3C3C' }}>
+              {BUBBLE_SYMBOL[operation]}
+            </p>
+          </div>
+        )}
 
-        {/* Mascot — bigger, more presence */}
+        {/* Mascot — anchored bottom-right, bleeds off edge */}
         <img
           src={MASCOTS[operation]}
           alt=""
           draggable={false}
           onContextMenu={(e) => e.preventDefault()}
-          className="absolute bottom-0 right-2 object-contain object-bottom select-none pointer-events-none"
+          className="absolute bottom-0 right-0 select-none pointer-events-none"
           style={{
-            height: 180,
-            width: 180,
+            height: 200,
+            width: 'auto',
             filter: locked ? 'grayscale(1) opacity(0.45)' : 'none',
             userSelect: 'none',
             WebkitUserDrag: 'none',
