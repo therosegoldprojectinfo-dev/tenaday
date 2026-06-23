@@ -214,19 +214,88 @@ function StepLevel({ name, onNext, onBack }) {
   )
 }
 
+// ── Step 3: Test warning (only shown when kid claimed a level) ────────────
+const CLAIM_LABELS = {
+  addition: 'Addition',
+  subtraction: 'Subtraction',
+  multiplication: 'Multiplication',
+  division: 'Division',
+}
+
+function StepTestWarning({ name, claim, onConfirm, onBack }) {
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      <div className="flex items-center px-4 pt-5">
+        <button
+          onClick={onBack}
+          className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors active:bg-gray-100"
+          aria-label="Back"
+        >
+          <BackIcon />
+        </button>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center px-6 py-8">
+        <div className="w-full max-w-sm flex flex-col items-center text-center gap-6">
+          <span className="text-8xl select-none">📝</span>
+
+          <div>
+            <h1 className="font-display font-bold text-2xl text-gray-900 mb-3">
+              Time to prove it, {name}!
+            </h1>
+            <p className="font-body text-base text-gray-500 leading-relaxed">
+              You said you already know{' '}
+              <span className="font-bold text-gray-800">{CLAIM_LABELS[claim]}</span>.
+              {' '}We're going to give you a quick test to check — about{' '}
+              {claim === 'addition' ? '36' : claim === 'subtraction' ? '54' : claim === 'multiplication' ? '72' : '90'}{' '}
+              questions covering all the tables.
+            </p>
+          </div>
+
+          <div className="w-full rounded-2xl bg-amber-50 border border-amber-100 px-5 py-4 text-left">
+            <p className="font-body font-bold text-sm text-amber-800 mb-1">💡 How it works</p>
+            <p className="font-body text-sm text-amber-700 leading-snug">
+              Score 80% or higher and you'll skip straight to that chapter.
+              If not, no worries — you'll start from the beginning like everyone else.
+            </p>
+          </div>
+
+          <button
+            onClick={onConfirm}
+            className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
+          >
+            OK, LET'S GO! →
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Main CreateKid orchestrator ───────────────────────────────────────────
 export default function CreateKid({ parentId, onCreated, onBack }) {
-  const [step, setStep]       = useState(1)        // 1 | 2
-  const [nameAge, setNameAge] = useState(null)      // { name, age }
+  const [step, setStep]             = useState(1)   // 1 | 2 | 3
+  const [nameAge, setNameAge]       = useState(null)
+  const [pendingClaim, setPendingClaim] = useState(null)
   const [submitting, setSubmitting] = useState(false)
-  const [error, setError]     = useState(null)
+  const [error, setError]           = useState(null)
 
   function handleStep1Done({ name, age }) {
     setNameAge({ name, age })
     setStep(2)
   }
 
-  async function handleStep2Done(placementClaim) {
+  function handleStep2Done(placementClaim) {
+    setPendingClaim(placementClaim)
+    if (placementClaim) {
+      // Show the test warning before creating the profile
+      setStep(3)
+    } else {
+      doCreateKid(null)
+    }
+  }
+
+  async function doCreateKid(placementClaim) {
     setSubmitting(true)
     setError(null)
     try {
@@ -244,6 +313,17 @@ export default function CreateKid({ parentId, onCreated, onBack }) {
 
   if (step === 1) {
     return <StepNameAge onNext={handleStep1Done} onBack={onBack} />
+  }
+
+  if (step === 3 && pendingClaim) {
+    return (
+      <StepTestWarning
+        name={nameAge.name}
+        claim={pendingClaim}
+        onConfirm={() => doCreateKid(pendingClaim)}
+        onBack={() => setStep(2)}
+      />
+    )
   }
 
   return (
