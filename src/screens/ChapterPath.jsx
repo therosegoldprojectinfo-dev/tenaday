@@ -15,7 +15,7 @@ import {
   previousBatch,
   factsForBatch,
 } from '../lib/progression'
-import { isPlayableToday, nextUnlockMessage } from '../lib/dayGate'
+import { isPlayableToday, canAdvanceToday, nextUnlockMessage } from '../lib/dayGate'
 import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
 import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 
@@ -494,7 +494,16 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
             let dayLocked = false
             if (selectedStatus === 'active' && unlockedInChain && !completed) {
               const pos = chainPosition(currentPos, targetPos)
-              const playable = isPlayableToday(pos, kid.last_advance_date, new Date())
+              // After completing a batch, updateProgress moves the cursor to the
+              // next batch's first node. chainPosition returns 'current' for that
+              // node — normally always playable — but if last_advance_date is today
+              // the kid just finished the previous batch today and must wait until
+              // the next calendar day to start this new batch.
+              const isNewBatchStart =
+                pos === 'current' &&
+                currentPos.node === 'unlock' &&
+                !canAdvanceToday(kid.last_advance_date)
+              const playable = isNewBatchStart ? false : isPlayableToday(pos, kid.last_advance_date, new Date())
               dayLocked = !playable
             }
 
