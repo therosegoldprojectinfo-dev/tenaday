@@ -107,18 +107,6 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
         className="relative overflow-hidden"
         style={{ backgroundColor: locked ? LOCK_GREY : CARD_BLUE, height: 220 }}
       >
-        {/* Speech bubble — bigger, more personality */}
-        <div
-          className="absolute top-5 left-5 bg-white rounded-2xl px-5 py-3 shadow-sm"
-          style={{ borderBottomLeftRadius: 4 }}
-        >
-          <p
-            className="font-display font-extrabold text-2xl tracking-wide"
-            style={{ color: locked ? '#C4C9D1' : '#3C3C3C' }}
-          >
-            {BUBBLE_SYMBOL[operation]}
-          </p>
-        </div>
 
         {/* Mascot — anchored bottom-right, bleeds off edge */}
         <img
