@@ -11,12 +11,12 @@ import {
   logAttempt,
 } from '../lib/kidData'
 
-const TOTAL       = 12
+const TOTAL       = 12  // default; review overrides to 24
 const LIVES_START = 4
 const TIMED_MS    = 5000
 
 const TIMED_NODES        = new Set(['speed'])
-const WORD_PROBLEM_NODES = new Set(['practice', 'real_life'])
+const WORD_PROBLEM_NODES = new Set(['what_happened', 'practice', 'real_life'])
 
 // ── Icons ─────────────────────────────────────────────────────────────────
 
@@ -142,7 +142,7 @@ function FinishedScreen({ passed, correct, payout, isReview, saving, onExit }) {
               : 'Not quite!'}
           </h2>
           <p className="font-body text-gray-400">
-            {correct} out of {TOTAL} correct
+            {correct} out of {SESSION_TOTAL} correct
           </p>
           {!passed && (
             <p className="font-body text-gray-400 text-sm mt-1">
@@ -171,6 +171,63 @@ function FinishedScreen({ passed, correct, payout, isReview, saving, onExit }) {
   )
 }
 
+// ── Lesson screen (Learn node) ───────────────────────────────────────────
+// Pure display — shows today's 2 facts clearly, no questions, no lives.
+// Kid taps "Got it →" and we advance the cursor to the next node.
+function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, onExit }) {
+  const [saving, setSaving] = useState(false)
+
+  async function handleGotIt() {
+    setSaving(true)
+    try {
+      const next = nextStep(operation, table, batchNum, node)
+      if (next && kidId) await updateProgress(kidId, next)
+    } catch (err) {
+      console.error('Failed to advance after lesson:', err)
+    } finally {
+      setSaving(false)
+      onExit?.()
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
+      <div className="h-screen md:h-auto md:min-h-[500px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col bg-white px-6 py-10">
+        <div className="flex-1 flex flex-col items-center justify-center gap-8">
+          <div className="text-center">
+            <p className="font-body font-bold text-xs tracking-widest uppercase mb-1" style={{ color: theme.colors.primary }}>
+              {theme.era} · Table {table}
+            </p>
+            <h1 className="font-display font-bold text-2xl text-gray-900">Today's new facts</h1>
+            <p className="font-body text-sm text-gray-400 mt-1">Memorize these — they'll come up a lot!</p>
+          </div>
+
+          <div className="w-full flex flex-col gap-4">
+            {facts.map((f, i) => (
+              <div
+                key={i}
+                className="w-full rounded-2xl border-2 px-6 py-5 flex items-center justify-between"
+                style={{ borderColor: theme.colors.primary, backgroundColor: `${theme.colors.primary}0D` }}
+              >
+                <span className="font-display font-extrabold text-4xl text-gray-900">{f.equation}</span>
+                <span className="font-display font-extrabold text-4xl" style={{ color: theme.colors.primary }}>= {f.result}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <button
+          onClick={handleGotIt}
+          disabled={saving}
+          className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest mt-6"
+        >
+          {saving ? 'SAVING…' : 'GOT IT →'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ── Main component ────────────────────────────────────────────────────────
 
 export default function Practice({
@@ -191,13 +248,19 @@ export default function Practice({
   const isWordProblem = WORD_PROBLEM_NODES.has(node)
   const isReview      = node === 'review'
   const payout        = payoutForNode(node)
-  const passThreshold = passThresholdFor(operation, placementClaim, OPERATIONS)
 
-  const questions = useMemo(
+  const generated = useMemo(
     () => generateBatch(operation, table, batchNum, node, { unlockBatch, reviewPool }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [operation, table, batchNum, node]
   )
+
+  // Learn is a pure lesson — no game state needed
+  const isLesson  = generated?.isLesson === true
+  const questions = isLesson ? [] : generated
+  // Review has 24 questions; all others have 12
+  const SESSION_TOTAL = isReview ? 24 : TOTAL
+  const passThreshold = passThresholdFor(operation, placementClaim, OPERATIONS, SESSION_TOTAL)
 
   const [idx,      setIdx]      = useState(0)
   const [lives,    setLives]    = useState(LIVES_START)
@@ -214,7 +277,7 @@ export default function Practice({
   const isCorrect = selected === q?.answer
   const isEquationChoice = q?.choiceType === 'equation'
 
-  const progressScale = (idx + (revealed ? 1 : 0)) / TOTAL
+  const progressScale = (idx + (revealed ? 1 : 0)) / SESSION_TOTAL
 
   // ── Answer handling ─────────────────────────────────────────────────────
 
@@ -256,8 +319,8 @@ export default function Practice({
       finalizeAttempt('died')
       return
     }
-    if (idx === TOTAL - 1) {
-      const correct = TOTAL - wrong
+    if (idx === SESSION_TOTAL - 1) {
+      const correct = SESSION_TOTAL - wrong
       setOver('finished')
       finalizeAttempt(correct >= passThreshold ? 'passed' : 'retry')
       return
@@ -272,7 +335,7 @@ export default function Practice({
 
   async function finalizeAttempt(result) {
     setSaving(true)
-    const correct    = TOTAL - wrong
+    const correct    = SESSION_TOTAL - wrong
     const coinsDelta = result === 'passed' ? payout : 0
     const newBalance = result === 'passed' ? applyPayout(coinBalance, node) : coinBalance
 
@@ -313,12 +376,29 @@ export default function Practice({
 
   // ── End screens ─────────────────────────────────────────────────────────
 
+  // Learn is a pure lesson screen — show today's 2 facts clearly,
+  // no questions, no lives, no coins. Kid taps "Got it" and advances.
+  if (isLesson) {
+    return (
+      <LessonScreen
+        facts={generated.facts}
+        theme={theme}
+        operation={operation}
+        table={table}
+        batchNum={batchNum}
+        node={node}
+        kidId={kidId}
+        onExit={onExit}
+      />
+    )
+  }
+
   if (over === 'died') {
     return <DiedScreen saving={saving} onExit={onExit} />
   }
 
   if (over === 'finished') {
-    const correct = TOTAL - wrong
+    const correct = SESSION_TOTAL - wrong
     const passed  = correct >= passThreshold
     return (
       <FinishedScreen
@@ -352,7 +432,7 @@ export default function Practice({
             className="flex-1 h-5 rounded-full bg-gray-100 overflow-hidden"
             role="progressbar"
             aria-valuenow={idx}
-            aria-valuemax={TOTAL}
+            aria-valuemax={SESSION_TOTAL}
           >
             <div
               className="h-full rounded-full origin-left"
