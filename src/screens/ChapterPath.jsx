@@ -226,12 +226,23 @@ function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
 // 'dayLocked' is a distinct visual state from a normal progression lock —
 // uses a clock icon and different copy, since it's temporary ("come back
 // tomorrow"), not a permanent block.
+// Per-node accent colors — makes each card feel distinct and fun
+const NODE_COLORS = {
+  unlock:       { bg: '#EDE9FE', icon: '#7C3AED', border: '#C4B5FD' },
+  learn:        { bg: '#DCFCE7', icon: '#16A34A', border: '#86EFAC' },
+  what_happened:{ bg: '#FEF3C7', icon: '#D97706', border: '#FCD34D' },
+  practice:     { bg: '#DBEAFE', icon: '#2563EB', border: '#93C5FD' },
+  real_life:    { bg: '#FCE7F3', icon: '#BE185D', border: '#F9A8D4' },
+  speed:        { bg: '#FFF7ED', icon: '#EA580C', border: '#FDBA74' },
+  review:       { bg: '#F0FDF4', icon: '#15803D', border: '#4ADE80' },
+}
+
 function NodeRow({ node, status, isCurrent, onPress }) {
-  const locked = status === 'locked'
+  const locked    = status === 'locked'
   const dayLocked = status === 'day_locked'
   const completed = status === 'completed'
-  const isReview = node === 'review'
-  const disabled = locked || dayLocked
+  const disabled  = locked || dayLocked
+  const colors    = NODE_COLORS[node] || NODE_COLORS.learn
 
   const subtitle = locked
     ? 'Locked'
@@ -241,45 +252,64 @@ function NodeRow({ node, status, isCurrent, onPress }) {
         ? 'Completed — tap to replay'
         : isCurrent
           ? nodePurpose(node)
-          : 'Ready to play'
+          : 'Ready to play!'
 
   return (
     <button
       type="button"
       disabled={disabled}
       onClick={onPress}
-      className="w-full flex items-center gap-3 bg-white rounded-2xl border border-gray-100 px-4 py-3.5
-                 transition-transform active:scale-[0.98] disabled:active:scale-100"
+      className="w-full flex items-center gap-4 rounded-3xl border-2 px-4 py-4
+                 transition-transform active:scale-[0.97] disabled:active:scale-100"
+      style={{
+        backgroundColor: disabled ? '#F9FAFB' : colors.bg,
+        borderColor: disabled ? '#E5E7EB' : completed ? DUO_GREEN : colors.border,
+        boxShadow: disabled ? 'none' : isCurrent ? `0 4px 12px ${colors.border}80` : 'none',
+      }}
     >
+      {/* Big icon badge */}
       <div
-        className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+        className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
         style={{
-          backgroundColor: disabled ? '#F3F4F6' : isReview ? '#FFF7E0' : '#EAF8DC',
-          color: disabled ? '#9CA3AF' : isReview ? '#CC9900' : DUO_GREEN_DARK,
+          backgroundColor: disabled ? '#E5E7EB' : completed ? `${DUO_GREEN}22` : `${colors.icon}22`,
+          color: disabled ? '#9CA3AF' : completed ? DUO_GREEN : colors.icon,
         }}
       >
-        <NodeTypeIcon node={node} />
+        <NodeTypeIcon node={node} size={28} />
       </div>
 
       <div className="flex-1 text-left min-w-0">
-        <p className={`font-display font-bold text-base leading-tight ${disabled ? 'text-gray-400' : 'text-gray-900'}`}>
+        <p className={`font-display font-bold text-lg leading-tight ${disabled ? 'text-gray-300' : 'text-gray-900'}`}>
           {nodeLabel(node)}
         </p>
-        <p className={`font-body text-xs mt-0.5 leading-snug ${
-          dayLocked ? 'text-amber-600' : disabled ? 'text-gray-300' : completed ? 'text-gray-400' : 'text-green-600'
-        }`}>
+        <p className={`font-body text-sm mt-0.5 leading-snug font-semibold ${
+          dayLocked   ? 'text-amber-500'
+          : locked    ? 'text-gray-300'
+          : completed ? 'text-gray-400'
+          : isCurrent ? `text-[${colors.icon}]`
+          : 'text-green-500'
+        }`}
+        style={{ color: !dayLocked && !locked && !completed && isCurrent ? colors.icon : undefined }}
+        >
           {subtitle}
         </p>
       </div>
 
+      {/* Status badge */}
       <div
-        className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+        className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
         style={{
-          backgroundColor: dayLocked ? '#FEF3C7' : disabled ? '#F3F4F6' : completed ? DUO_GREEN : '#F3F4F6',
-          color: dayLocked ? '#D97706' : disabled ? '#D1D5DB' : completed ? '#FFFFFF' : '#D1D5DB',
+          backgroundColor: dayLocked ? '#FEF3C7' : locked ? '#F3F4F6' : completed ? DUO_GREEN : `${colors.icon}22`,
+          color: dayLocked ? '#D97706' : locked ? '#D1D5DB' : completed ? '#FFFFFF' : colors.icon,
         }}
       >
-        {dayLocked ? <ClockLockIcon size={16} /> : locked ? <LockIcon size={16} /> : <CheckIcon size={16} />}
+        {dayLocked
+          ? <ClockLockIcon size={18} />
+          : locked
+            ? <LockIcon size={18} />
+            : completed
+              ? <CheckIcon size={18} />
+              : <span style={{ fontSize: 18 }}>→</span>}
       </div>
     </button>
   )
@@ -470,7 +500,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
         </p>
       </div>
 
-      <div className="max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto px-4 pb-10 grid grid-cols-1 md:grid-cols-2 gap-2.5">
+      <div className="max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto px-4 pb-10 flex flex-col gap-3">
         {selectedStatus === 'locked' ? (
           <div className="md:col-span-2 rounded-2xl bg-gray-50 border border-gray-100 px-4 py-6 text-center">
             <LockIcon size={26} />
