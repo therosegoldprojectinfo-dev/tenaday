@@ -94,28 +94,44 @@ function useCoinTick(target, active) {
 
 // ── End screens ───────────────────────────────────────────────────────────
 
+/** Animated countdown: 5→4→3→2→1, gets bigger and redder */
+function SpeedCountdown({ durationMs }) {
+  const total = Math.ceil(durationMs / 1000)
+  const [count, setCount] = useState(total)
+  useEffect(() => {
+    if (count <= 0) return
+    const t = setTimeout(() => setCount(c => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [count])
+  const color = count <= 2 ? '#EF4444' : count === 3 ? '#F97316' : '#9CA3AF'
+  const size  = count <= 2 ? 'text-2xl' : count === 3 ? 'text-xl' : 'text-base'
+  return (
+    <span key={count} className={`font-display font-extrabold ${size} anim-correct`} style={{ color }}>
+      {count}s
+    </span>
+  )
+}
+
 function DiedScreen({ saving, onExit }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
       <div className="h-screen md:h-auto md:min-h-[560px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
-        <div className="flex gap-3" aria-label="No lives left">
+        <span className="text-8xl select-none">💔</span>
+        <div className="flex gap-2" aria-label="No lives left">
           {Array.from({ length: LIVES_START }).map((_, i) => (
-            <HeartIcon key={i} filled={false} />
+            <HeartIcon key={i} filled={false} style={{ opacity: 0.3 }} />
           ))}
         </div>
         <div className="text-center">
-          <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">Out of lives</h2>
+          <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">Out of lives!</h2>
           <p className="font-body text-gray-400 text-sm leading-relaxed">
-            That was a tough one. You can try again any time — no worries.
+            That was a tough one. You can try again — it's free!
           </p>
         </div>
         {onExit && (
-          <button
-            onClick={onExit}
-            disabled={saving}
-            className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
-          >
-            {saving ? 'SAVING…' : 'GOT IT'}
+          <button onClick={onExit} disabled={saving}
+            className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
+            {saving ? 'SAVING…' : 'TRY AGAIN'}
           </button>
         )}
       </div>
@@ -127,43 +143,50 @@ function FinishedScreen({ passed, correct, total, payout, isReview, saving, onEx
   const coinDisplayed = useCoinTick(payout, passed)
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
-      <div className="h-screen md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
+    <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50 relative overflow-hidden">
+      <div className="h-screen md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6 relative z-10">
         {passed ? (
-          <FlowerJump size={200} />
+          <div className="flex flex-col items-center gap-2">
+            <FlowerJump size={220} />
+            <div className="flex gap-2 mt-1">
+              {['⭐','⭐','⭐'].map((s, i) => (
+                <span key={i} className="text-4xl" style={{
+                  display: 'inline-block',
+                  animation: `correct-bounce 0.5s ${0.1 + i * 0.13}s cubic-bezier(0.34,1.56,0.64,1) both`
+                }}>{s}</span>
+              ))}
+            </div>
+          </div>
         ) : (
-          <span className="text-7xl select-none" role="img" aria-label="thumbs up">👍</span>
+          <span className="text-8xl select-none">💪</span>
         )}
 
         <div className="text-center">
           <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">
             {passed
-              ? (isReview ? 'Review complete!' : 'You passed!')
-              : 'Not quite!'}
+              ? (isReview ? '🎉 Review complete!' : '🎉 You passed!')
+              : 'Almost there!'}
           </h2>
           <p className="font-body text-gray-400">
             {correct} out of {total} correct
           </p>
           {!passed && (
             <p className="font-body text-gray-400 text-sm mt-1">
-              Retry is free — give it another go!
+              Retry is free — you've got this!
             </p>
           )}
           {passed && (
-            <div className="flex items-center justify-center gap-2 mt-4 font-body font-bold text-2xl text-amber-500">
-              <CoinIcon size={26} />
+            <div className="flex items-center justify-center gap-2 mt-4 font-display font-extrabold text-3xl text-amber-500">
+              <CoinIcon size={30} />
               <span className="tabular-nums">+{coinDisplayed}</span>
             </div>
           )}
         </div>
 
         {onExit && (
-          <button
-            onClick={onExit}
-            disabled={saving}
-            className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
-          >
-            {saving ? 'SAVING…' : 'CONTINUE'}
+          <button onClick={onExit} disabled={saving}
+            className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
+            {saving ? 'SAVING…' : passed ? 'CONTINUE →' : 'TRY AGAIN'}
           </button>
         )}
       </div>
@@ -460,13 +483,13 @@ export default function Practice({
           </div>
         </div>
 
-        {/* ── Node label + speed indicator ────────────────────────── */}
+        {/* ── Node label + speed countdown ────────────────────────── */}
         <div className="flex-shrink-0 px-5 flex items-center justify-between">
           <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.dark }}>
             {theme.era} · Table {table} · {nodeLabel(node)}
           </p>
           {isTimed && (
-            <p className="font-body font-bold text-xs text-gray-400">5s</p>
+            <SpeedCountdown key={timerKey} durationMs={TIMED_MS} />
           )}
         </div>
 
