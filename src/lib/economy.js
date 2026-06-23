@@ -11,7 +11,7 @@ export const DEBT_CAP_MULT    = 2    // debt floor = -(ENTRY_FEE * DEBT_CAP_MULT
 
 export const DEBT_FLOOR = -(ENTRY_FEE * DEBT_CAP_MULT)
 
-// Pass thresholds, out of 12 questions per attempt (spec §6: "8, 9, or
+// Pass thresholds, out of 10 questions per attempt (spec §6: "8, 9, or
 // 10 correct -> PASS"). NORMAL is the default everywhere. CLAIMED applies
 // only to chapters covered by a kid's placement_claim (see schema.sql) —
 // raised to 90% so a parent's "my kid is already good at X" claim is
@@ -49,26 +49,19 @@ export function isInDebt(balance) {
   return balance < 0
 }
 
-/** The pass threshold (out of 10) for a given operation/chapter, given a
- *  kid's placement_claim (or null/undefined if no claim was made).
- *
- *  Raised to CLAIMED_PASS_THRESHOLD for the claimed chapter AND every
- *  chapter before it in the ladder (e.g. claiming "good at multiplication"
- *  raises the bar for addition, subtraction, AND multiplication — division,
- *  which comes after, stays at the normal threshold). Chapters after the
- *  claim were never claimed to be already-known, so they keep the normal
- *  bar.
- *
- *  Takes OPERATIONS (the ladder order) as a parameter rather than
- *  importing it directly from lib/progression.js, so this module has no
- *  circular/cross-module import dependency — callers already have
- *  OPERATIONS in scope wherever they'd call this. */
-export function passThresholdFor(operation, placementClaim, operationsOrder) {
-  if (!placementClaim) return NORMAL_PASS_THRESHOLD
+/** The pass threshold for a given operation/chapter, scaled to the
+ *  session's total question count (12 for most nodes, 24 for review).
+ *  Normal = 67% (8/12 → 16/24), Claimed = 75% (9/12 → 18/24). */
+export function passThresholdFor(operation, placementClaim, operationsOrder, sessionTotal = 12) {
+  const normalPct  = NORMAL_PASS_THRESHOLD  / 12
+  const claimedPct = CLAIMED_PASS_THRESHOLD / 12
+
+  if (!placementClaim) return Math.round(normalPct * sessionTotal)
 
   const claimIdx = operationsOrder.indexOf(placementClaim)
-  const opIdx = operationsOrder.indexOf(operation)
-  if (claimIdx === -1 || opIdx === -1) return NORMAL_PASS_THRESHOLD
+  const opIdx    = operationsOrder.indexOf(operation)
+  if (claimIdx === -1 || opIdx === -1) return Math.round(normalPct * sessionTotal)
 
-  return opIdx <= claimIdx ? CLAIMED_PASS_THRESHOLD : NORMAL_PASS_THRESHOLD
+  const pct = opIdx <= claimIdx ? claimedPct : normalPct
+  return Math.round(pct * sessionTotal)
 }
