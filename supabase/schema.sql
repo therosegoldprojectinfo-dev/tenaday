@@ -4,7 +4,7 @@
 -- Supersedes the 5-node-per-unit model with the 6-node daily loop per
 -- table (spec §6.5):
 --   Chapter (operation) -> Table (1-12) -> Node (6 per table):
---     unlock -> learn -> practice -> real_life -> speed -> review
+--     unlock -> learn -> what_happened -> practice -> real_life -> speed -> review
 --
 -- Two new behaviors this version adds support for:
 --   1. Calendar-day gating: the NEXT node in the chain only unlocks on a
@@ -40,7 +40,7 @@ alter table if exists attempts drop column if exists node;
 
 drop type if exists node_type;
 
-create type node_type as enum ('unlock', 'learn', 'practice', 'real_life', 'speed', 'review');
+create type node_type as enum ('unlock', 'learn', 'what_happened', 'practice', 'real_life', 'speed', 'review');
 
 -- ── parents ──────────────────────────────────────────────────────────────
 -- Phone + 4-digit PIN, no email (per spec §3). PIN is stored as a bcrypt-style
