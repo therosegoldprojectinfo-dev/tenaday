@@ -237,7 +237,7 @@ const NODE_COLORS = {
   review:       { bg: '#F0FDF4', icon: '#15803D', border: '#4ADE80' },
 }
 
-function NodeRow({ node, status, isCurrent, onPress }) {
+function NodeRow({ node, status, isCurrent, isWelcome, onPress }) {
   const locked    = status === 'locked'
   const dayLocked = status === 'day_locked'
   const completed = status === 'completed'
@@ -250,9 +250,13 @@ function NodeRow({ node, status, isCurrent, onPress }) {
       ? nextUnlockMessage()
       : completed
         ? 'Completed — tap to replay'
-        : isCurrent
-          ? nodePurpose(node)
-          : 'Ready to play!'
+        : isWelcome
+          ? "Let's get started! 🎉"
+          : isCurrent
+            ? nodePurpose(node)
+            : 'Ready to play!'
+
+  const displayLabel = isWelcome ? 'Welcome!' : nodeLabel(node)
 
   return (
     <button
@@ -280,7 +284,7 @@ function NodeRow({ node, status, isCurrent, onPress }) {
 
       <div className="flex-1 text-left min-w-0">
         <p className={`font-display font-bold text-lg leading-tight ${disabled ? 'text-gray-300' : 'text-gray-900'}`}>
-          {nodeLabel(node)}
+          {displayLabel}
         </p>
         <p className={`font-body text-sm mt-0.5 leading-snug font-semibold ${
           dayLocked   ? 'text-amber-500'
@@ -531,6 +535,14 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
               currentPos.batch === selectedBatch &&
               currentPos.node === node
 
+            // Day 1 of any chapter (batch 1, unlock node, table 1) →
+            // this is the Welcome/Intro screen, not a regular unlock exercise.
+            // Show it as a special state so the label reflects that.
+            const isWelcome = node === 'unlock' &&
+              selectedBatch === 1 &&
+              selectedTable === 1 &&
+              (isCurrent || unlockedInChain)
+
             let dayLocked = false
             if (selectedStatus === 'active' && unlockedInChain && !completed) {
               const pos = chainPosition(currentPos, targetPos)
@@ -552,6 +564,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
                 node={node}
                 status={status}
                 isCurrent={isCurrent}
+                isWelcome={isWelcome}
                 onPress={() => handleTogglePopover(selectedTable, selectedBatch, node, status, isCurrent)}
               />
             )
