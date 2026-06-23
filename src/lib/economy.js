@@ -11,7 +11,7 @@ export const DEBT_CAP_MULT    = 2    // debt floor = -(ENTRY_FEE * DEBT_CAP_MULT
 
 export const DEBT_FLOOR = -(ENTRY_FEE * DEBT_CAP_MULT)
 
-// Pass thresholds, out of 10 questions per attempt (spec §6: "8, 9, or
+// Pass thresholds, out of 12 questions per attempt (spec §6: "8, 9, or
 // 10 correct -> PASS"). NORMAL is the default everywhere. CLAIMED applies
 // only to chapters covered by a kid's placement_claim (see schema.sql) —
 // raised to 90% so a parent's "my kid is already good at X" claim is
