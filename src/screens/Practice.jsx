@@ -123,7 +123,7 @@ function DiedScreen({ saving, onExit }) {
   )
 }
 
-function FinishedScreen({ passed, correct, payout, isReview, saving, onExit }) {
+function FinishedScreen({ passed, correct, total, payout, isReview, saving, onExit }) {
   const coinDisplayed = useCoinTick(payout, passed)
 
   return (
@@ -142,7 +142,7 @@ function FinishedScreen({ passed, correct, payout, isReview, saving, onExit }) {
               : 'Not quite!'}
           </h2>
           <p className="font-body text-gray-400">
-            {correct} out of {SESSION_TOTAL} correct
+            {correct} out of {total} correct
           </p>
           {!passed && (
             <p className="font-body text-gray-400 text-sm mt-1">
@@ -404,6 +404,7 @@ export default function Practice({
       <FinishedScreen
         passed={passed}
         correct={correct}
+        total={SESSION_TOTAL}
         payout={payout}
         isReview={isReview}
         saving={saving}
