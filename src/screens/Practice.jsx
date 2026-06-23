@@ -207,7 +207,7 @@ export default function Practice({
   const [over,     setOver]     = useState(null) // null | 'died' | 'finished'
   const [saving,   setSaving]   = useState(false)
   const [heartKey, setHeartKey] = useState(0)
-  const [timerKey, setTimerKey] = useState(0)
+  const [timerKey, setTimerKey] = useState(1)
   const timeoutRef = useRef(null)
 
   const q         = questions[idx]
@@ -231,12 +231,21 @@ export default function Practice({
     }
   }
 
-  // Speed node: auto-expire → count as wrong
+  // Speed node: when the 5s timer expires, count as wrong and auto-reveal
+  // — uses a dedicated handler so the null-guard in handleCheck doesn't
+  // silently swallow the timeout (that was the original bug: handleCheck(null)
+  // hit `if (choice === null) return` and did nothing).
+  function handleTimerExpire() {
+    if (revealed || over) return
+    setRevealed(true)
+    setWrong(w => w + 1)
+    setLives(l => l - 1)
+    setHeartKey(k => k + 1)
+  }
+
   useEffect(() => {
     if (!isTimed || over || revealed) return
-    timeoutRef.current = setTimeout(() => {
-      handleCheck(null) // null never equals q.answer → wrong
-    }, TIMED_MS)
+    timeoutRef.current = setTimeout(handleTimerExpire, TIMED_MS)
     return () => clearTimeout(timeoutRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, isTimed, over, revealed])
@@ -392,9 +401,13 @@ export default function Practice({
         )}
 
         {/* ── Question text ────────────────────────────────────────── */}
-        <div className={`flex-shrink-0 px-6 pt-6 pb-2 ${isWordProblem ? '' : 'flex items-center justify-center'}`}>
+        {/* isWordProblem covers practice/real_life nodes. For review, we
+            also check the question text itself since review mixes both
+            formats — equation questions end with "= ?" so anything else
+            is a word problem and should use the smaller readable size. */}
+        <div className={`flex-shrink-0 px-6 pt-6 pb-2 ${(isWordProblem || !q.text.endsWith('= ?')) ? '' : 'flex items-center justify-center'}`}>
           <p className={
-            isWordProblem
+            (isWordProblem || !q.text.endsWith('= ?'))
               ? 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto'
               : 'text-5xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
           }>
