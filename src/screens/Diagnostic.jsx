@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react'
 import { generateDiagnostic } from '../lib/problems'
 import { updateProgress } from '../lib/kidData'
+import { OPERATIONS } from '../lib/progression'
 
-// Pass threshold: 80% of the 36 primary-operation questions = 29 correct
-const PRIMARY_TOTAL   = 36
-const PASS_THRESHOLD  = Math.ceil(PRIMARY_TOTAL * 0.8) // 29
-const LIVES_START     = 4
+const SESSION_TOTAL  = 20
+const PASS_THRESHOLD = 16   // 80% of 20
+const LIVES_START    = 4
 
 // ── Icons ─────────────────────────────────────────────────────────────────
 
@@ -76,25 +76,25 @@ function DiedScreen({ onRetry }) {
   )
 }
 
-function ResultScreen({ passed, primaryCorrect, claimedOperation, saving, onContinue }) {
+function ResultScreen({ passed, correct, claimedOperation, saving, onContinue }) {
   const opLabel = claimedOperation.charAt(0).toUpperCase() + claimedOperation.slice(1)
+  const nextOp = OPERATIONS[OPERATIONS.indexOf(claimedOperation) + 1]
+  const nextLabel = nextOp ? nextOp.charAt(0).toUpperCase() + nextOp.slice(1) : null
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
       <div className="h-screen md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
         <span className="text-8xl select-none">{passed ? '🎉' : '💪'}</span>
-
         <div className="text-center">
           <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">
-            {passed ? 'You passed!' : 'Not quite yet'}
+            {passed ? 'You proved it!' : 'Not quite yet'}
           </h2>
           <p className="font-body text-gray-500 leading-relaxed">
             {passed
-              ? `Great job! You scored ${primaryCorrect}/${PRIMARY_TOTAL} on ${opLabel}. You'll start there.`
-              : `You scored ${primaryCorrect}/${PRIMARY_TOTAL} on ${opLabel}. You'll start from the beginning to build a solid foundation.`}
+              ? `Amazing! You scored ${correct}/${SESSION_TOTAL}. ${nextLabel ? `Time to start ${nextLabel}!` : 'You know it all!'}`
+              : `You scored ${correct}/${SESSION_TOTAL} on ${opLabel}. No worries — you'll start from the beginning and build a solid foundation!`}
           </p>
         </div>
-
         <button onClick={onContinue} disabled={saving}
           className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
           {saving ? 'SAVING…' : 'CONTINUE →'}
@@ -120,16 +120,15 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
   const [selected, setSelected] = useState(null)
   const [revealed, setRevealed] = useState(false)
   const [wrong,    setWrong]    = useState(0)
-  const [primaryWrong, setPrimaryWrong] = useState(0)
-  const [over,     setOver]     = useState(null) // null | 'died' | 'finished'
+  const [over,     setOver]     = useState(null)
   const [passed,   setPassed]   = useState(false)
   const [saving,   setSaving]   = useState(false)
   const [heartKey, setHeartKey] = useState(0)
 
-  const q               = questions[idx]
-  const isCorrect       = selected === q?.answer
+  const q                = questions[idx]
+  const isCorrect        = selected === q?.answer
   const isEquationChoice = q?.choiceType === 'equation'
-  const progressScale   = (idx + (revealed ? 1 : 0)) / SESSION_TOTAL
+  const progressScale    = (idx + (revealed ? 1 : 0)) / SESSION_TOTAL
 
   function handleCheck() {
     if (revealed || selected === null) return
@@ -138,39 +137,39 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
       setWrong(w => w + 1)
       setLives(l => l - 1)
       setHeartKey(k => k + 1)
-      if (q.isPrimary) setPrimaryWrong(w => w + 1)
     }
   }
 
   function handleContinue() {
-    if (lives === 0) {
-      setOver('died')
-      return
-    }
-    if (idx === SESSION_TOTAL - 1) {
-      finalize()
-      return
-    }
+    if (lives === 0) { setOver('died'); return }
+    if (idx === SESSION_TOTAL - 1) { finalize(); return }
     setIdx(i => i + 1)
     setSelected(null)
     setRevealed(false)
   }
 
   async function finalize() {
-    const primaryCorrect = PRIMARY_TOTAL - primaryWrong
-    const didPass = primaryCorrect >= PASS_THRESHOLD
+    const correct = SESSION_TOTAL - wrong
+    const didPass = correct >= PASS_THRESHOLD
     setPassed(didPass)
     setOver('finished')
 
     if (didPass && kidId) {
       setSaving(true)
       try {
-        await updateProgress(kidId, {
-          operation: claimedOperation,
-          table: 1,
-          batch: 1,
-          node: 'learn',
-        })
+        // Pass = claimed chapter is done → start at the NEXT chapter
+        // e.g. claimed addition → starts at subtraction/table1/batch1/learn
+        const claimedIdx = OPERATIONS.indexOf(claimedOperation)
+        const nextOp = OPERATIONS[claimedIdx + 1]
+        if (nextOp) {
+          await updateProgress(kidId, {
+            operation: nextOp,
+            table: 1,
+            batch: 1,
+            node: 'learn', // day 1 of new chapter shows welcome, cursor at learn
+          })
+        }
+        // If claimed division (last op), nothing to advance to — stays at division
       } catch (err) {
         console.error('Diagnostic: failed to set progress cursor:', err)
       } finally {
@@ -184,16 +183,16 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
   if (over === 'died') {
     return <DiedScreen onRetry={() => {
       setIdx(0); setLives(LIVES_START); setSelected(null); setRevealed(false)
-      setWrong(0); setPrimaryWrong(0); setOver(null); setHeartKey(0)
+      setWrong(0); setOver(null); setHeartKey(0)
     }} />
   }
 
   if (over === 'finished') {
-    const primaryCorrect = PRIMARY_TOTAL - primaryWrong
+    const correct = SESSION_TOTAL - wrong
     return (
       <ResultScreen
         passed={passed}
-        primaryCorrect={primaryCorrect}
+        correct={correct}
         claimedOperation={claimedOperation}
         saving={saving}
         onContinue={() => passed ? onPass() : onFail()}
