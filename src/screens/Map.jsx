@@ -120,18 +120,6 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
           </p>
         </div>
 
-        {/* Second bubble — only when not locked */}
-        {!locked && (
-          <div
-            className="absolute top-5 right-5 bg-white rounded-2xl px-4 py-2.5 shadow-sm"
-            style={{ borderBottomRightRadius: 4 }}
-          >
-            <p className="font-display font-extrabold text-xl tracking-wide" style={{ color: '#3C3C3C' }}>
-              {BUBBLE_SYMBOL[operation]}
-            </p>
-          </div>
-        )}
-
         {/* Mascot — anchored bottom-right, bleeds off edge */}
         <img
           src={MASCOTS[operation]}
