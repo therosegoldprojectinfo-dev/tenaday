@@ -1,19 +1,25 @@
-// ── Problem generation ───────────────────────────────────────────────────
-// Generates questions for each of the 6 daily-loop nodes, based on the
-// 3 specific facts in today's batch (or yesterday's batch for Unlock).
+// ── Problem generation ────────────────────────────────────────────────────
+// Generates 12 questions for each of the 6 daily-loop nodes.
 //
-// KEY RULES (confirmed spec):
-//   - 12 questions per session (all nodes)
-//   - Each of the 3 facts appears EXACTLY 4 times (3 × 4 = 12)
-//   - NEVER consecutive — same fact never appears twice in a row
-//   - Randomized order every session
-//   - Practice choices are EQUATIONS (which equation happened?)
-//   - All other nodes' choices are NUMBERS (what is the answer?)
-//   - Rich, relatable word problem contexts — real names, real places
+// SESSION STRUCTURE (all nodes):
+//   12 questions per session
+//   2 facts per batch × 6 appearances each = 12 questions
+//   Never two of the same fact consecutively
+//   Randomized order every session
+//
+// CHOICE TYPES:
+//   Practice     → EQUATION choices ("which equation describes this?")
+//   All others   → NUMBER choices ("what is the answer?")
+//
+// MATH RULES:
+//   Addition:       table N, fact F  → N + F = ?
+//   Subtraction:    table N, fact F  → (N+F) − N = F  (never negative)
+//   Multiplication: table N, fact F  → N × F = ?
+//   Division:       table N, fact F  → (N×F) ÷ N = F  (always whole)
 
 import { factsForBatch } from './progression'
 
-// ── Utility ──────────────────────────────────────────────────────────────
+// ── Utilities ─────────────────────────────────────────────────────────────
 
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
@@ -28,61 +34,53 @@ function shuffle(arr) {
   return a
 }
 
-/** Generates an array of 12 fact indices (0, 1, 2 for the 3 facts) where:
- *  - Each appears exactly 4 times
- *  - No two consecutive indices are the same
- *  This is the ordering backbone used by all 6 nodes. */
+// ── Fact sequence ─────────────────────────────────────────────────────────
+
+/** Returns a shuffled 12-item array of fact indices (0 or 1) where each
+ *  index appears exactly 6 times and no two consecutive entries are equal.
+ *  With only 2 distinct values this is always solvable in very few tries. */
 function makeFactSequence() {
-  // 2 facts × 6 repetitions each = 12 questions total.
-  // With only 2 facts, alternating [0,1,0,1...] is always valid and
-  // the shuffle + no-consecutive check still produces random variety.
-  const pool = [0,0,0,0,0,0, 1,1,1,1,1,1]
-  let attempts = 0
-  while (attempts < 200) {
+  const pool = [0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1]
+  for (let attempt = 0; attempt < 200; attempt++) {
     shuffle(pool)
     let valid = true
     for (let i = 1; i < pool.length; i++) {
       if (pool[i] === pool[i - 1]) { valid = false; break }
     }
     if (valid) return pool
-    attempts++
   }
-  return [0,1,0,1,0,1,0,1,0,1,0,1]
+  // Alternating fallback — always satisfies the no-consecutive constraint
+  return [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 }
 
-// ── Core math: (operation, table, secondOperand) → answer ────────────────
+// ── Core math ─────────────────────────────────────────────────────────────
 
-function computeAnswer(operation, table, secondOperand) {
-  if (operation === 'addition')       return table + secondOperand
-  if (operation === 'subtraction')    return table + secondOperand // result is table, problem is (table+secondOperand) − secondOperand
-  if (operation === 'multiplication') return table * secondOperand
-  if (operation === 'division')       return secondOperand // table * secondOperand ÷ table = secondOperand
-  return table + secondOperand
+const SYMBOL = {
+  addition:       '+',
+  subtraction:    '−',
+  multiplication: '×',
+  division:       '÷',
 }
 
-/** Builds the actual problem values for one fact. Returns { a, b, answer }
- *  where the displayed equation is "a OP b = ?". */
-function factValues(operation, table, secondOperand) {
-  if (operation === 'addition') {
-    return { a: table, b: secondOperand, answer: table + secondOperand }
+/** Returns { a, b, answer } for the displayed equation "a OP b = ?".
+ *
+ *  Subtraction: b is always the table number; a = table + fact so the
+ *  result is always positive (spec: never negative).
+ *  Division: a = table × fact; b = table, so no remainder (spec: whole). */
+function factValues(operation, table, fact) {
+  switch (operation) {
+    case 'addition':
+      return { a: table, b: fact, answer: table + fact }
+    case 'subtraction':
+      return { a: table + fact, b: table, answer: fact }
+    case 'multiplication':
+      return { a: table, b: fact, answer: table * fact }
+    case 'division':
+      return { a: table * fact, b: table, answer: fact }
+    default:
+      return { a: table, b: fact, answer: table + fact }
   }
-  if (operation === 'subtraction') {
-    // Table is the subtrahend; a = table + secondOperand ensures no
-    // negative result (spec §4). The fact is: (table+secondOperand) − table = secondOperand.
-    const a = table + secondOperand
-    return { a, b: table, answer: secondOperand }
-  }
-  if (operation === 'multiplication') {
-    return { a: table, b: secondOperand, answer: table * secondOperand }
-  }
-  if (operation === 'division') {
-    // table × secondOperand ÷ table = secondOperand (always whole, spec §4)
-    return { a: table * secondOperand, b: table, answer: secondOperand }
-  }
-  return { a: table, b: secondOperand, answer: table + secondOperand }
 }
-
-const SYMBOL = { addition: '+', subtraction: '−', multiplication: '×', division: '÷' }
 
 function equationStr(operation, a, b) {
   return `${a} ${SYMBOL[operation]} ${b} = ?`
@@ -90,18 +88,18 @@ function equationStr(operation, a, b) {
 
 // ── Distractor generation ─────────────────────────────────────────────────
 
-/** NUMBER distractors — used for all nodes except Practice.
- *  3 wrong answers that are close to the real answer but never correct. */
+/** Returns `count` wrong numbers close to `answer` but never equal to it. */
 function numberDistractors(answer, count = 3) {
   const used = new Set([answer])
-  const out = []
-  let tries = 0
+  const out  = []
+  let tries  = 0
   while (out.length < count && tries < 100) {
     tries++
     const offset = randInt(1, 4) * (Math.random() < 0.5 ? 1 : -1)
     const d = answer + offset
     if (d > 0 && !used.has(d)) { used.add(d); out.push(d) }
   }
+  // Deterministic fallback in case the random loop doesn't fill the quota
   let pad = 1
   while (out.length < count) {
     const d = answer + count + pad++
@@ -110,19 +108,25 @@ function numberDistractors(answer, count = 3) {
   return out
 }
 
-/** EQUATION distractors — used only for Practice.
- *  3 wrong equations that look plausible but use slightly different
- *  numbers, drawn from nearby values in the same table/batch so a kid
- *  can't trivially eliminate them. */
-function equationDistractors(operation, table, correctA, correctB, count = 3) {
-  const sym = SYMBOL[operation]
-  const used = new Set([`${correctA}${sym}${correctB}`])
-  const out = []
-  const offsets = [-2,-1,1,2,-3,3]
+/** Returns `count` wrong equations that look plausible — nearby operands in
+ *  the same table so a kid can't trivially rule them out. Used only for the
+ *  Practice node where choices are equations, not numbers.
+ *
+ *  @param {string} operation
+ *  @param {number} a   - correct first operand
+ *  @param {number} b   - correct second operand
+ *  @param {number} count
+ */
+function equationDistractors(operation, a, b, count = 3) {
+  const sym  = SYMBOL[operation]
+  const used = new Set([`${a}${sym}${b}`])
+  const out  = []
+  const offsets = [-2, -1, 1, 2, -3, 3]
+
   let i = 0
   while (out.length < count && i < offsets.length * 2) {
-    const da = correctA + offsets[i % offsets.length]
-    const db = correctB + offsets[Math.floor(i / offsets.length)]
+    const da = a + offsets[i % offsets.length]
+    const db = b + offsets[Math.floor(i / offsets.length)]
     i++
     if (da <= 0 || db <= 0) continue
     const key = `${da}${sym}${db}`
@@ -131,295 +135,275 @@ function equationDistractors(operation, table, correctA, correctB, count = 3) {
       out.push(`${da} ${sym} ${db} = ?`)
     }
   }
-  // Fallback
+  // Deterministic fallback
   let pad = 1
   while (out.length < count) {
-    const key = `${correctA + pad}${sym}${correctB}`
-    if (!used.has(key)) { used.add(key); out.push(`${correctA + pad} ${sym} ${correctB} = ?`) }
+    const key = `${a + pad}${sym}${b}`
+    if (!used.has(key)) { used.add(key); out.push(`${a + pad} ${sym} ${b} = ?`) }
     pad++
   }
   return out
 }
 
 // ── Word problem templates ────────────────────────────────────────────────
-// Rich, relatable contexts organized by setting. Each template is a
-// function (table, secondOperand, operation) → string. Using real names
-// and real places — never generic "Tom has apples."
+// 5 rotating contexts, each returning { text } for the word problem.
+// Real names, real situations — never generic "Tom has apples."
 
 const NAMES = ['Yassine', 'Lina', 'Omar', 'Sofia', 'Adam', 'Nora', 'Ziad', 'Mia', 'Karim', 'Aya']
-const name = () => NAMES[randInt(0, NAMES.length - 1)]
-const name2 = (n1) => { let n; do { n = NAMES[randInt(0, NAMES.length - 1)] } while (n === n1); return n }
 
-// Each context returns { text, a, b } where text is the word problem and
-// a, b are the numbers embedded in it (used to build equation distractors
-// for Practice questions).
+function name() { return NAMES[randInt(0, NAMES.length - 1)] }
+function name2(exclude) {
+  let n
+  do { n = NAMES[randInt(0, NAMES.length - 1)] } while (n === exclude)
+  return n
+}
 
-function homeContext(operation, table, second) {
-  const { a, b, answer } = factValues(operation, table, second)
+function homeContext(operation, a, b) {
   const n = name()
-  const contexts = {
+  const opts = {
     addition: [
-      { text: `${n} has ${a} books on the shelf and puts ${b} more there. How many books are on the shelf now?`, a, b },
-      { text: `${n} found ${a} coins in their room and ${b} coins in their jacket. How many coins in total?`, a, b },
-      { text: `${n}'s mom bought ${a} oranges and ${n}'s dad brought home ${b} more. How many oranges do they have?`, a, b },
+      `${n} has ${a} books on the shelf and puts ${b} more there. How many books are on the shelf now?`,
+      `${n} found ${a} coins in their room and ${b} coins in their jacket. How many coins in total?`,
+      `${n}'s mom bought ${a} oranges and ${n}'s dad brought home ${b} more. How many oranges do they have?`,
     ],
     subtraction: [
-      { text: `There were ${a} cookies on the plate. ${n} ate ${b}. How many cookies are left?`, a, b },
-      { text: `${n} had ${a} stickers. They gave ${b} to their little brother. How many stickers does ${n} have now?`, a, b },
-      { text: `The fridge had ${a} juice boxes. The family drank ${b}. How many are left?`, a, b },
+      `There were ${a} cookies on the plate. ${n} ate ${b}. How many cookies are left?`,
+      `${n} had ${a} stickers and gave ${b} to their little brother. How many stickers does ${n} have now?`,
+      `The fridge had ${a} juice boxes. The family drank ${b}. How many are left?`,
     ],
     multiplication: [
-      { text: `${n} has ${a} bags. Each bag holds ${b} apples. How many apples in total?`, a, b },
-      { text: `There are ${a} shelves in the room. Each shelf has ${b} books. How many books are there altogether?`, a, b },
-      { text: `${n} puts ${b} towels in each of the ${a} bathrooms. How many towels did they use?`, a, b },
+      `${n} has ${a} bags. Each bag holds ${b} apples. How many apples in total?`,
+      `There are ${a} shelves in the room. Each shelf has ${b} books. How many books are there altogether?`,
+      `${n} puts ${b} towels in each of the ${a} bathrooms. How many towels did they use?`,
     ],
     division: [
-      { text: `${n} has ${a} candies to share equally among ${b} siblings. How many does each one get?`, a, b },
-      { text: `There are ${a} socks in the laundry. If each pair needs ${b} socks, how many pairs are there?`, a, b },
-      { text: `${n} splits ${a} grapes equally into ${b} bowls. How many grapes per bowl?`, a, b },
+      `${n} has ${a} candies to share equally among ${b} siblings. How many does each one get?`,
+      `There are ${a} socks in the laundry. Each pair has ${b} socks — how many pairs are there?`,
+      `${n} splits ${a} grapes equally into ${b} bowls. How many grapes per bowl?`,
     ],
   }
-  const list = contexts[operation]
+  const list = opts[operation]
   return list[randInt(0, list.length - 1)]
 }
 
-function schoolContext(operation, table, second) {
-  const { a, b } = factValues(operation, table, second)
+function schoolContext(operation, a, b) {
   const n = name()
-  const contexts = {
+  const opts = {
     addition: [
-      { text: `${n} scored ${a} points in the morning quiz and ${b} points in the afternoon quiz. What is their total score?`, a, b },
-      { text: `The class has ${a} red pencils and ${b} blue pencils. How many pencils altogether?`, a, b },
-      { text: `${n} read ${a} pages on Monday and ${b} pages on Tuesday. How many pages did they read in total?`, a, b },
+      `${n} scored ${a} points in the morning quiz and ${b} points in the afternoon quiz. What is their total score?`,
+      `The class has ${a} red pencils and ${b} blue pencils. How many pencils altogether?`,
+      `${n} read ${a} pages on Monday and ${b} pages on Tuesday. How many pages in total?`,
     ],
     subtraction: [
-      { text: `The classroom had ${a} crayons. ${b} of them broke. How many good crayons are left?`, a, b },
-      { text: `${n} brought ${a} sandwiches for lunch and gave ${b} to friends. How many sandwiches does ${n} have left?`, a, b },
-      { text: `There were ${a} kids at recess. ${b} went back inside. How many are still outside?`, a, b },
+      `The classroom had ${a} crayons. ${b} of them broke. How many good crayons are left?`,
+      `${n} brought ${a} sandwiches for lunch and gave ${b} to friends. How many sandwiches does ${n} have left?`,
+      `There were ${a} kids at recess. ${b} went back inside. How many are still outside?`,
     ],
     multiplication: [
-      { text: `There are ${a} tables in the cafeteria. Each table seats ${b} students. How many students can sit altogether?`, a, b },
-      { text: `The teacher hands out ${b} stickers to each of the ${a} students. How many stickers does the teacher give out?`, a, b },
-      { text: `${n}'s class has ${a} groups. Each group made ${b} paper planes. How many paper planes in total?`, a, b },
+      `There are ${a} tables in the cafeteria. Each table seats ${b} students. How many students can sit altogether?`,
+      `The teacher hands out ${b} stickers to each of the ${a} students. How many stickers in total?`,
+      `${n}'s class has ${a} groups. Each group made ${b} paper planes. How many paper planes in total?`,
     ],
     division: [
-      { text: `The teacher has ${a} pencils to give equally to ${b} students. How many pencils does each student get?`, a, b },
-      { text: `${a} students need to form teams of ${b}. How many teams can they make?`, a, b },
-      { text: `The class collected ${a} books for ${b} shelves equally. How many books per shelf?`, a, b },
+      `The teacher has ${a} pencils to give equally to ${b} students. How many pencils does each student get?`,
+      `${a} students form teams of ${b}. How many teams can they make?`,
+      `The class collected ${a} books for ${b} shelves equally. How many books per shelf?`,
     ],
   }
-  const list = contexts[operation]
+  const list = opts[operation]
   return list[randInt(0, list.length - 1)]
 }
 
-function storeContext(operation, table, second) {
-  const { a, b } = factValues(operation, table, second)
+function storeContext(operation, a, b) {
   const n = name()
-  const contexts = {
+  const opts = {
     addition: [
-      { text: `${n} puts ${a} apples and ${b} bananas in the cart. How many fruits are in the cart?`, a, b },
-      { text: `The bakery sold ${a} croissants in the morning and ${b} in the afternoon. How many croissants were sold?`, a, b },
-      { text: `${n} buys a toy for ${a} dollars and a book for ${b} dollars. How much did they spend in total?`, a, b },
+      `${n} puts ${a} apples and ${b} bananas in the cart. How many fruits are in the cart?`,
+      `The bakery sold ${a} croissants in the morning and ${b} in the afternoon. How many croissants were sold?`,
+      `${n} buys a toy for ${a} dollars and a book for ${b} dollars. How much did they spend in total?`,
     ],
     subtraction: [
-      { text: `The store had ${a} bottles of juice. They sold ${b}. How many bottles are still on the shelf?`, a, b },
-      { text: `${n} had ${a} coins. They spent ${b} on a snack. How many coins does ${n} have left?`, a, b },
-      { text: `The toy store had ${a} teddy bears. ${b} were sold today. How many are left?`, a, b },
+      `The store had ${a} bottles of juice. They sold ${b}. How many bottles are still on the shelf?`,
+      `${n} had ${a} coins and spent ${b} on a snack. How many coins does ${n} have left?`,
+      `The toy store had ${a} teddy bears. ${b} were sold today. How many are left?`,
     ],
     multiplication: [
-      { text: `${n} buys ${a} packs of gum. Each pack has ${b} pieces. How many pieces of gum in total?`, a, b },
-      { text: `A store puts ${b} cans in each of ${a} boxes. How many cans is that?`, a, b },
-      { text: `${n} grabs ${a} bags of chips. Each bag costs ${b} dollars. How much does ${n} pay?`, a, b },
+      `${n} buys ${a} packs of gum. Each pack has ${b} pieces. How many pieces of gum in total?`,
+      `A store puts ${b} cans in each of ${a} boxes. How many cans is that?`,
+      `${n} grabs ${a} bags of chips. Each bag costs ${b} dollars. How much does ${n} pay?`,
     ],
     division: [
-      { text: `${n} has ${a} coins and wants to share them equally into ${b} piggy banks. How many coins in each bank?`, a, b },
-      { text: `The bakery made ${a} muffins and packs them ${b} per box. How many boxes are there?`, a, b },
-      { text: `${a} stickers are packed equally into ${b} bags. How many stickers per bag?`, a, b },
+      `${n} has ${a} coins and shares them equally into ${b} piggy banks. How many coins in each bank?`,
+      `The bakery made ${a} muffins and packs them ${b} per box. How many boxes are there?`,
+      `${a} stickers are packed equally into ${b} bags. How many stickers per bag?`,
     ],
   }
-  const list = contexts[operation]
+  const list = opts[operation]
   return list[randInt(0, list.length - 1)]
 }
 
-function vacationContext(operation, table, second) {
-  const { a, b } = factValues(operation, table, second)
+function vacationContext(operation, a, b) {
   const n = name()
-  const contexts = {
+  const opts = {
     addition: [
-      { text: `On the first day of vacation, ${n} collected ${a} shells at the beach. On the second day, they found ${b} more. How many shells altogether?`, a, b },
-      { text: `${n}'s family drove ${a} km before lunch and ${b} km after lunch. How many km did they drive in total?`, a, b },
-      { text: `At the water park, ${n} went down ${a} water slides and ${b} regular slides. How many slides in total?`, a, b },
+      `On the first day of vacation, ${n} collected ${a} shells at the beach. On the second day, they found ${b} more. How many shells altogether?`,
+      `${n}'s family drove ${a} km before lunch and ${b} km after lunch. How many km did they drive in total?`,
+      `At the water park, ${n} went down ${a} water slides and ${b} regular slides. How many slides in total?`,
     ],
     subtraction: [
-      { text: `${n} brought ${a} snacks for the road trip. They ate ${b} before arriving. How many snacks are left?`, a, b },
-      { text: `The hotel pool had ${a} pool toys. ${b} were taken to the rooms. How many are left in the pool?`, a, b },
-      { text: `${n} took ${a} photos on vacation. ${b} of them were blurry. How many good photos does ${n} have?`, a, b },
+      `${n} brought ${a} snacks for the road trip and ate ${b} before arriving. How many snacks are left?`,
+      `The hotel pool had ${a} pool toys. ${b} were taken to the rooms. How many are left in the pool?`,
+      `${n} took ${a} photos on vacation. ${b} of them were blurry. How many good photos does ${n} have?`,
     ],
     multiplication: [
-      { text: `${n}'s family stays at the hotel for ${a} nights. Each night costs ${b} dollars. What is the total cost?`, a, b },
-      { text: `On the beach, ${n} builds ${a} sandcastles. Each one has ${b} towers. How many towers in total?`, a, b },
-      { text: `During the trip, ${n} visits ${a} cities and takes ${b} photos in each. How many photos total?`, a, b },
+      `${n}'s family stays at the hotel for ${a} nights. Each night costs ${b} dollars. What is the total cost?`,
+      `On the beach, ${n} builds ${a} sandcastles. Each one has ${b} towers. How many towers in total?`,
+      `${n} visits ${a} cities and takes ${b} photos in each. How many photos total?`,
     ],
     division: [
-      { text: `${n}'s family collected ${a} seashells and divides them equally among ${b} kids. How many shells each?`, a, b },
-      { text: `The tour guide splits ${a} people into ${b} equal groups. How many people in each group?`, a, b },
-      { text: `${n} walks ${a} km over ${b} days, the same distance each day. How many km per day?`, a, b },
+      `${n}'s family collected ${a} seashells and divides them equally among ${b} kids. How many shells each?`,
+      `The tour guide splits ${a} people into ${b} equal groups. How many people in each group?`,
+      `${n} walks ${a} km over ${b} days, the same distance each day. How many km per day?`,
     ],
   }
-  const list = contexts[operation]
+  const list = opts[operation]
   return list[randInt(0, list.length - 1)]
 }
 
-function partyContext(operation, table, second) {
-  const { a, b } = factValues(operation, table, second)
-  const n = name()
+function partyContext(operation, a, b) {
+  const n  = name()
   const n2 = name2(n)
-  const contexts = {
+  const opts = {
     addition: [
-      { text: `${n} brings ${a} balloons to the party and ${n2} brings ${b} more. How many balloons are there?`, a, b },
-      { text: `${n} got ${a} birthday gifts in the morning and ${b} more at dinner. How many gifts in total?`, a, b },
-      { text: `The party table has ${a} cupcakes and ${b} cookies. How many treats altogether?`, a, b },
+      `${n} brings ${a} balloons to the party and ${n2} brings ${b} more. How many balloons are there?`,
+      `${n} got ${a} birthday gifts in the morning and ${b} more at dinner. How many gifts in total?`,
+      `The party table has ${a} cupcakes and ${b} cookies. How many treats altogether?`,
     ],
     subtraction: [
-      { text: `There were ${a} pieces of cake. The guests ate ${b}. How many pieces are left?`, a, b },
-      { text: `${n} had ${a} party hats. ${b} were given out. How many hats are left?`, a, b },
-      { text: `${n} blew up ${a} balloons, but ${b} popped. How many balloons are still floating?`, a, b },
+      `There were ${a} pieces of cake. The guests ate ${b}. How many pieces are left?`,
+      `${n} had ${a} party hats and gave ${b} out. How many hats are left?`,
+      `${n} blew up ${a} balloons, but ${b} popped. How many are still floating?`,
     ],
     multiplication: [
-      { text: `There are ${a} tables at the party. Each table gets ${b} cupcakes. How many cupcakes in total?`, a, b },
-      { text: `${n} gives ${b} stickers to each of ${a} friends at the party. How many stickers does ${n} hand out?`, a, b },
-      { text: `There are ${a} party bags. Each bag has ${b} sweets inside. How many sweets in total?`, a, b },
+      `There are ${a} tables at the party. Each table gets ${b} cupcakes. How many cupcakes in total?`,
+      `${n} gives ${b} stickers to each of ${a} friends. How many stickers does ${n} hand out?`,
+      `There are ${a} party bags. Each bag has ${b} sweets inside. How many sweets in total?`,
     ],
     division: [
-      { text: `There are ${a} candies to share equally among ${b} kids at the party. How many does each kid get?`, a, b },
-      { text: `${n} cuts a birthday cake into ${a} slices for ${b} friends equally. How many slices per friend?`, a, b },
-      { text: `${a} party balloons are tied into groups of ${b}. How many groups are there?`, a, b },
+      `There are ${a} candies to share equally among ${b} kids at the party. How many does each kid get?`,
+      `${n} cuts a birthday cake into ${a} slices for ${b} friends equally. How many slices per friend?`,
+      `${a} party balloons are tied into groups of ${b}. How many groups are there?`,
     ],
   }
-  const list = contexts[operation]
+  const list = opts[operation]
   return list[randInt(0, list.length - 1)]
 }
 
 const CONTEXT_FNS = [homeContext, schoolContext, storeContext, vacationContext, partyContext]
 
-function randomWordProblem(operation, table, second) {
+function randomWordProblem(operation, a, b) {
   const fn = CONTEXT_FNS[randInt(0, CONTEXT_FNS.length - 1)]
-  return fn(operation, table, second)
+  return fn(operation, a, b)
 }
 
-// ── Question builders ────────────────────────────────────────────────────
+// ── Question builders ─────────────────────────────────────────────────────
 
-/** Plain equation question with NUMBER choices.
- *  Used by: Unlock, Learn, Speed */
-function plainEquationQuestion(operation, table, second) {
-  const { a, b, answer } = factValues(operation, table, second)
+/** Plain equation + NUMBER choices. Used by: unlock, learn, speed. */
+function plainEquationQuestion(operation, table, fact) {
+  const { a, b, answer } = factValues(operation, table, fact)
   return {
-    text: equationStr(operation, a, b),
+    text:       equationStr(operation, a, b),
     answer,
     choiceType: 'number',
-    choices: shuffle([answer, ...numberDistractors(answer)]),
+    choices:    shuffle([answer, ...numberDistractors(answer)]),
   }
 }
 
-/** Word problem with EQUATION choices.
- *  Used by: Practice — "which equation describes this situation?" */
-function practiceQuestion(operation, table, second) {
-  const { a, b, answer } = factValues(operation, table, second)
-  const { text } = randomWordProblem(operation, table, second)
-  const correctEquation = `${a} ${SYMBOL[operation]} ${b} = ?`
-  const distractors = equationDistractors(operation, table, a, b)
+/** Word problem + EQUATION choices ("which equation matches?"). Used by: practice. */
+function practiceQuestion(operation, table, fact) {
+  const { a, b } = factValues(operation, table, fact)
+  const text = randomWordProblem(operation, a, b)
+  const correct = equationStr(operation, a, b)
   return {
     text,
-    answer: correctEquation,
+    answer:     correct,
     choiceType: 'equation',
-    choices: shuffle([correctEquation, ...distractors]),
+    choices:    shuffle([correct, ...equationDistractors(operation, a, b)]),
   }
 }
 
-/** Word problem with NUMBER choices.
- *  Used by: Real Life — "what is the answer in this real situation?" */
-function realLifeQuestion(operation, table, second) {
-  const { a, b, answer } = factValues(operation, table, second)
-  const { text } = randomWordProblem(operation, table, second)
+/** Word problem + NUMBER choices. Used by: real_life. */
+function realLifeQuestion(operation, table, fact) {
+  const { a, b, answer } = factValues(operation, table, fact)
   return {
-    text,
+    text:       randomWordProblem(operation, a, b),
     answer,
     choiceType: 'number',
-    choices: shuffle([answer, ...numberDistractors(answer)]),
+    choices:    shuffle([answer, ...numberDistractors(answer)]),
   }
+}
+
+// ── Review generator ──────────────────────────────────────────────────────
+
+/** Generates 12 review questions from past batches, capped at the most
+ *  recent 8 batches (16 distinct facts). Each "slot" in the sequence picks
+ *  independently from the pool for maximum variety. Format alternates:
+ *  even index → plain equation, odd index → word problem (both number choices). */
+function generateReview(operation, table, batch, reviewPool, sequence) {
+  const pool = reviewPool.length > 0 ? reviewPool : [{ operation, table, batch }]
+
+  // Pick one source batch per fact slot (0 and 1), independently
+  const slotBatches = [
+    pool[randInt(0, pool.length - 1)],
+    pool[randInt(0, pool.length - 1)],
+  ]
+
+  const slotFacts = slotBatches.map(b => {
+    const [f1, f2] = factsForBatch(b.batch)
+    return { operation: b.operation, table: b.table, fact: Math.random() < 0.5 ? f1 : f2 }
+  })
+
+  return sequence.map(({ factIdx, qIdx }) => {
+    const { operation: op, table: t, fact } = slotFacts[factIdx]
+    return qIdx % 2 === 0
+      ? plainEquationQuestion(op, t, fact)
+      : realLifeQuestion(op, t, fact)
+  })
 }
 
 // ── Main export ───────────────────────────────────────────────────────────
 
-/** Generates exactly 12 questions for a daily-loop node:
- *  - Each of the 3 facts in `batch` appears exactly 4 times
- *  - Never two of the same fact consecutively
- *  - Randomized order every call
+/** Generates exactly 12 questions for a daily-loop node.
  *
- *  `unlockBatch` is only needed for the 'unlock' node — it's the
- *  PREVIOUS batch's (operation, table, batch), resolved by the caller
- *  (lib/progression.js's previousBatch()), since the Unlock node tests
- *  yesterday's material, not today's.
+ *  - 2 facts per batch, each appearing exactly 6 times = 12 questions
+ *  - No two consecutive questions test the same fact
+ *  - Randomized order on every call
  *
- *  `reviewPool` is only needed for the 'review' node — an array of
- *  { operation, table, batch } objects, typically built by
- *  lib/progression.js's reviewPoolFor(). */
+ *  @param {string}   operation    - 'addition' | 'subtraction' | 'multiplication' | 'division'
+ *  @param {number}   table        - 1–12
+ *  @param {number}   batch        - 1–6
+ *  @param {string}   node         - 'unlock' | 'learn' | 'practice' | 'real_life' | 'speed' | 'review'
+ *  @param {object}   [opts]
+ *  @param {object}   [opts.unlockBatch]  - { operation, table, batch } for the previous batch; required for 'unlock'
+ *  @param {object[]} [opts.reviewPool]   - array of { operation, table, batch }; required for 'review'
+ */
 export function generateBatch(operation, table, batch, node, { unlockBatch, reviewPool } = {}) {
-  const sequence = makeFactSequence() // [0,1,0,1,...] — 12 items, each 6x, no consecutive
+  const rawSeq = makeFactSequence() // [0,1,0,1,...] 12 items, 6 of each, no consecutive dupes
+  const sequence = rawSeq.map((factIdx, qIdx) => ({ factIdx, qIdx }))
 
   if (node === 'review') {
     return generateReview(operation, table, batch, reviewPool || [], sequence)
   }
 
-  // Resolve which (operation, table, batch) to pull facts FROM
-  const sourceBatch = (node === 'unlock' && unlockBatch)
-    ? unlockBatch
-    : { operation, table, batch }
+  // Unlock tests the PREVIOUS batch's facts; all other nodes test today's
+  const src = (node === 'unlock' && unlockBatch) ? unlockBatch : { operation, table, batch }
+  const [fact0, fact1] = factsForBatch(src.batch)
+  const facts = [fact0, fact1]
 
-  const facts = factsForBatch(sourceBatch.batch)
-
-  return sequence.map(factIdx => {
-    const second = facts[factIdx]
-    if (node === 'practice') {
-      return practiceQuestion(sourceBatch.operation, sourceBatch.table, second)
-    } else {
-      // 'unlock', 'learn', 'speed', 'real_life' → appropriate question type
-      if (node === 'real_life') {
-        return realLifeQuestion(sourceBatch.operation, sourceBatch.table, second)
-      }
-      return plainEquationQuestion(sourceBatch.operation, sourceBatch.table, second)
-    }
-  })
-}
-
-/** Review generates 12 questions from the accumulated pool of past batches,
- *  mixing both plain-equation and word-problem formats for variety.
- *  If the pool is empty (very first session), falls back to today's facts. */
-function generateReview(operation, table, batch, reviewPool, sequence) {
-  const allBatches = reviewPool.length > 0
-    ? reviewPool
-    : [{ operation, table, batch }]
-
-  // Pick 2 "review facts" — one per fact slot in the sequence (0 and 1).
-  // Each comes from a randomly chosen past batch for maximum variety.
-  const pickedBatches = [
-    allBatches[randInt(0, allBatches.length - 1)],
-    allBatches[randInt(0, allBatches.length - 1)],
-  ]
-
-  const reviewFacts = pickedBatches.map(b => {
-    const facts = factsForBatch(b.batch)
-    return { operation: b.operation, table: b.table, second: facts[randInt(0, facts.length - 1)] }
-  })
-
-  // Alternate question format: even index = plain equation, odd = real-life
-  // word problem. Gives exactly 6 of each across 12 questions.
-  return sequence.map((factIdx, i) => {
-    const { operation: op, table: t, second } = reviewFacts[factIdx]
-    if (i % 2 === 0) {
-      return plainEquationQuestion(op, t, second)
-    } else {
-      return realLifeQuestion(op, t, second)
-    }
+  return sequence.map(({ factIdx }) => {
+    const fact = facts[factIdx]
+    if (node === 'practice')  return practiceQuestion(src.operation, src.table, fact)
+    if (node === 'real_life') return realLifeQuestion(src.operation, src.table, fact)
+    return plainEquationQuestion(src.operation, src.table, fact) // unlock, learn, speed
   })
 }
