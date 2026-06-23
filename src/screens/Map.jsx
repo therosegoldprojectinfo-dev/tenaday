@@ -95,21 +95,35 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
       type="button"
       disabled={locked}
       onClick={onPress}
-      className="w-full text-left rounded-2xl border overflow-hidden disabled:opacity-90"
+      className="w-full text-left rounded-3xl border-2 overflow-hidden disabled:opacity-90 transition-transform active:scale-[0.98]"
       style={{
         borderColor: locked ? '#E5E7EB' : '#E5E7EB',
         backgroundColor: '#FFFFFF',
+        boxShadow: locked ? 'none' : '0 4px 16px rgba(0,0,0,0.07)',
       }}
     >
-      {/* Top zone: shared light-blue (or grey if locked), mascot bleeding off
-          the edge, speech bubble with the operation symbol. */}
+      {/* Top zone — taller, bigger mascot, more breathing room */}
       <div
-        className="relative h-44 overflow-hidden"
-        style={{ backgroundColor: locked ? LOCK_GREY : CARD_BLUE }}
+        className="relative overflow-hidden"
+        style={{ backgroundColor: locked ? LOCK_GREY : CARD_BLUE, height: 220 }}
       >
+        {/* Speech bubble — bigger, more personality */}
         <div
-          className="absolute top-4 left-4 bg-white rounded-2xl px-4 py-2.5 max-w-[70%]"
+          className="absolute top-5 left-5 bg-white rounded-2xl px-5 py-3 shadow-sm"
           style={{ borderBottomLeftRadius: 4 }}
+        >
+          <p
+            className="font-display font-extrabold text-2xl tracking-wide"
+            style={{ color: locked ? '#C4C9D1' : '#3C3C3C' }}
+          >
+            {BUBBLE_SYMBOL[operation]}
+          </p>
+        </div>
+
+        {/* Second bubble for visual richness */}
+        <div
+          className="absolute top-6 right-32 bg-white rounded-2xl px-4 py-2.5 shadow-sm"
+          style={{ borderBottomRightRadius: 4 }}
         >
           <p
             className="font-display font-extrabold text-xl tracking-wide"
@@ -119,13 +133,16 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
           </p>
         </div>
 
+        {/* Mascot — bigger, more presence */}
         <img
           src={MASCOTS[operation]}
           alt=""
           draggable={false}
           onContextMenu={(e) => e.preventDefault()}
-          className="absolute bottom-0 right-0 h-40 w-40 object-contain object-bottom select-none pointer-events-none"
+          className="absolute bottom-0 right-2 object-contain object-bottom select-none pointer-events-none"
           style={{
+            height: 180,
+            width: 180,
             filter: locked ? 'grayscale(1) opacity(0.45)' : 'none',
             userSelect: 'none',
             WebkitUserDrag: 'none',
@@ -133,10 +150,10 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
         />
       </div>
 
-      {/* Bottom zone: white, chapter title + either progress bar or lock state */}
-      <div className="px-4 py-4">
+      {/* Bottom zone */}
+      <div className="px-5 py-5">
         <p
-          className="font-display font-bold text-lg leading-tight mb-2"
+          className="font-display font-bold text-xl leading-tight mb-3"
           style={{ color: locked ? LOCK_GREY_TEXT : '#3C3C3C' }}
         >
           {CHAPTER_LABEL[operation]}
@@ -166,7 +183,7 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
               <TrophyIcon color={pct >= 100 ? '#58cc02' : '#D1D5DB'} />
             </div>
             {status === 'active' && resumeLabel && (
-              <p className="font-body font-bold text-xs uppercase tracking-wide mt-2" style={{ color: '#1CB0F6' }}>
+              <p className="font-body font-bold text-xs uppercase tracking-wide mt-2.5" style={{ color: '#1CB0F6' }}>
                 {pct === 0 ? 'Start here' : `Resume · ${resumeLabel}`}
               </p>
             )}
