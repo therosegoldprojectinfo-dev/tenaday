@@ -349,25 +349,26 @@ function realLifeQuestion(operation, table, fact) {
  *  recent 8 batches (16 distinct facts). Each "slot" in the sequence picks
  *  independently from the pool for maximum variety. Format alternates:
  *  even index → plain equation, odd index → word problem (both number choices). */
+/** Generates 12 review questions from past batches.
+ *  Each question independently samples a random batch from the pool and
+ *  picks one of its 2 facts — this ensures genuine variety across the 12
+ *  questions rather than hammering the same 2 facts 6 times each.
+ *  Format alternates: even index → plain equation, odd → word problem. */
 function generateReview(operation, table, batch, reviewPool, sequence) {
   const pool = reviewPool.length > 0 ? reviewPool : [{ operation, table, batch }]
 
-  // Pick one source batch per fact slot (0 and 1), independently
-  const slotBatches = [
-    pool[randInt(0, pool.length - 1)],
-    pool[randInt(0, pool.length - 1)],
-  ]
+  return sequence.map(({ factIdx: _, qIdx }) => {
+    // Pick a completely independent source for every question
+    const src     = pool[randInt(0, pool.length - 1)]
+    const [f1, f2] = factsForBatch(src.batch)
+    // factIdx (0 or 1) selects which of the 2 facts to use, but since we
+    // already randomised the source batch, also randomise the fact pick so
+    // every question is independently drawn from the whole history pool.
+    const fact = Math.random() < 0.5 ? f1 : f2
 
-  const slotFacts = slotBatches.map(b => {
-    const [f1, f2] = factsForBatch(b.batch)
-    return { operation: b.operation, table: b.table, fact: Math.random() < 0.5 ? f1 : f2 }
-  })
-
-  return sequence.map(({ factIdx, qIdx }) => {
-    const { operation: op, table: t, fact } = slotFacts[factIdx]
     return qIdx % 2 === 0
-      ? plainEquationQuestion(op, t, fact)
-      : realLifeQuestion(op, t, fact)
+      ? plainEquationQuestion(src.operation, src.table, fact)
+      : realLifeQuestion(src.operation, src.table, fact)
   })
 }
 
