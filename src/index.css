@@ -76,6 +76,21 @@ body {
 .anim-wrong-shake { animation: wrong-shake    360ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both; }
 .anim-heart-pulse { animation: heart-pulse    340ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
 
+/* 🔥 Fire particles rising from bottom on streak */
+@keyframes fire-rise {
+  0%   { transform: translateY(0) scale(0.5) rotate(-10deg); opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 0.8; }
+  100% { transform: translateY(-80vh) scale(1.2) rotate(10deg); opacity: 0; }
+}
+
+/* 🎉 Confetti bursting up from bottom on session complete */
+@keyframes confetti-rise {
+  0%   { transform: translateY(0) rotate(0deg) scale(0.5); opacity: 1; }
+  60%  { opacity: 1; }
+  100% { transform: translateY(-90vh) rotate(720deg) scale(1); opacity: 0; }
+}
+
 /* ── Duolingo green 3D press button ──────────────────────────── */
 /* Fixed green action color, used for every primary button (Check,
    Continue, Exit, era banner CTA, etc.) across all 4 eras — buttons do
