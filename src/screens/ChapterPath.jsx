@@ -340,7 +340,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
           const day = (data.current_table - 1) * BATCH_COUNT + (data.current_batch || 1)
           setSelectedDay(day)
         } else {
-          setSelectedDay(1)
+          // Chapter is either not yet reached (locked) or already completed.
+          // For completed chapters (cursor is past this operation), show day 72
+          // so the kid sees all their completed work, not an empty day 1.
+          const opIdx = ['addition','subtraction','multiplication','division'].indexOf(operation)
+          const curOpIdx = ['addition','subtraction','multiplication','division'].indexOf(data.current_operation)
+          setSelectedDay(curOpIdx > opIdx ? TABLE_COUNT * BATCH_COUNT : 1)
         }
       })
       .catch(err => {
