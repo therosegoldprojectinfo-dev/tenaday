@@ -197,15 +197,17 @@ function AddRewardSheet({ parentId, onAdded, onClose }) {
     if (!name.trim() || !price) return
     setSaving(true)
     try {
-      await supabase.from('gifts').insert({
+      const { error } = await supabase.from('gifts').insert({
         parent_id: parentId,
         name: name.trim(),
         coin_price: parseInt(price, 10),
         icon: 'gift',
       })
+      if (error) throw error
       onAdded()
     } catch (err) {
       console.error('Failed to add reward:', err)
+      alert('Failed to save reward. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -259,7 +261,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
   const [kidStats,    setKidStats]    = useState({})
   const [gifts,       setGifts]       = useState([])
   const [claims,      setClaims]      = useState([])
-  const [loading,     setLoading]     = useState(true)
+  const [viewingKid, setViewingKid] = useState(null)
   const [showAddReward, setShowAddReward] = useState(false)
   const [activeTab,   setActiveTab]   = useState('kids') // 'kids' | 'rewards' | 'claims'
 
@@ -398,7 +400,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
                 <div className="flex flex-col gap-3">
                   {kids.map(kid => (
                     <KidCard key={kid.id} kid={kid} stats={kidStats[kid.id]}
-                      onViewProgress={() => {}} />
+                      onViewProgress={() => setViewingKid(kid)} />
                   ))}
                 </div>
               )}
@@ -477,6 +479,49 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
           onAdded={() => { setShowAddReward(false); loadAll() }}
           onClose={() => setShowAddReward(false)}
         />
+      )}
+
+      {/* Kid progress modal */}
+      {viewingKid && (
+        <>
+          <div className="fixed inset-0 bg-black/40 z-40" onClick={() => setViewingKid(null)} />
+          <div className="fixed z-50 bg-white bottom-0 left-0 right-0 rounded-t-3xl px-5 pt-5 pb-10 max-w-sm mx-auto">
+            <div className="w-10 h-1.5 rounded-full bg-gray-200 mx-auto mb-5" />
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: avatarColor(viewingKid.id) }}>
+                <span className="font-display font-extrabold text-2xl text-white">
+                  {viewingKid.name[0].toUpperCase()}
+                </span>
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-xl text-gray-900">{viewingKid.name}</h3>
+                <p className="font-body text-sm text-gray-400">
+                  {['Addition','Subtraction','Multiplication','Division'][OPERATIONS.indexOf(viewingKid.current_operation)] || 'Addition'}
+                  {' · Day '}{(viewingKid.current_table - 1) * 6 + (viewingKid.current_batch || 1)} of 72
+                </p>
+              </div>
+            </div>
+            {kidStats[viewingKid.id] ? (
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: 'Days played', value: kidStats[viewingKid.id].distinctDays, emoji: '🔥' },
+                  { label: 'Correct answers', value: kidStats[viewingKid.id].totalCorrect, emoji: '✅' },
+                  { label: 'Sessions done', value: kidStats[viewingKid.id].nodesPassed, emoji: '⭐' },
+                  { label: 'Coin balance', value: viewingKid.coin_balance, emoji: '🪙' },
+                ].map(({ label, value, emoji }) => (
+                  <div key={label} className="rounded-2xl bg-gray-50 px-4 py-3">
+                    <p className="text-2xl mb-1">{emoji}</p>
+                    <p className="font-display font-bold text-2xl text-gray-900">{value}</p>
+                    <p className="font-body text-xs text-gray-400">{label}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="font-body text-gray-400 text-center py-4">Loading stats…</p>
+            )}
+          </div>
+        </>
       )}
     </div>
   )
