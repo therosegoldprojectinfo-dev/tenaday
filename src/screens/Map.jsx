@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { OPERATIONS, eraStatus, eraProgress } from '../lib/progression'
-import { fetchKid, DEMO_KID_ID } from '../lib/kidData'
+import { fetchKid, fetchStreak, DEMO_KID_ID } from '../lib/kidData'
 import { DEBT_FLOOR } from '../lib/economy'
 
 // ── Card visual spec ─────────────────────────────────────────────────────
@@ -171,13 +171,16 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
 
 export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
   const [kid, setKid] = useState(null)
+  const [streak, setStreak] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
   useEffect(() => {
     let cancelled = false
-    fetchKid(kidId)
-      .then(data => { if (!cancelled) setKid(data) })
+    Promise.all([fetchKid(kidId), fetchStreak(kidId)])
+      .then(([kidData, streakData]) => {
+        if (!cancelled) { setKid(kidData); setStreak(streakData) }
+      })
       .catch(err => {
         console.error('Failed to load kid progress:', err)
         if (!cancelled) setError(err)
@@ -229,7 +232,16 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
 
       {/* Top stats bar */}
       <div className="sticky top-0 bg-white z-20 border-b border-gray-100">
-        <div className="flex items-center justify-end px-5 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
+        <div className="flex items-center justify-between px-5 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
+          {/* Streak — left side */}
+          <div className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200">
+            <span className="text-lg leading-none">🔥</span>
+            <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">
+              {streak}
+            </span>
+          </div>
+
+          {/* Hearts + Coins — right side */}
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100">
               <HeartStatIcon />
