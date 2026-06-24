@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { generateDiagnostic } from '../lib/problems'
 import { updateProgress } from '../lib/kidData'
 import { OPERATIONS } from '../lib/progression'
@@ -154,6 +154,44 @@ function ResultScreen({ passed, correct, claimedOperation, saving, onContinue })
   )
 }
 
+function useSpeech() {
+  const [speaking, setSpeaking] = useState(false)
+  function getVoice() {
+    const voices = window.speechSynthesis?.getVoices?.() || []
+    const malePrefs = ['Daniel', 'David', 'Alex', 'Fred', 'Google UK English Male',
+                       'Microsoft David', 'Microsoft Mark', 'Aaron', 'Arthur']
+    for (const name of malePrefs) {
+      const v = voices.find(v => v.name.includes(name))
+      if (v) return v
+    }
+    return voices.find(v => v.lang?.startsWith('en')) || voices[0] || null
+  }
+  function speak(text) {
+    if (!window.speechSynthesis) return
+    window.speechSynthesis.cancel()
+    const utt = new SpeechSynthesisUtterance(text)
+    utt.voice = getVoice()
+    utt.rate = 0.9; utt.pitch = 0.95; utt.volume = 1
+    utt.onstart = () => setSpeaking(true)
+    utt.onend   = () => setSpeaking(false)
+    utt.onerror = () => setSpeaking(false)
+    window.speechSynthesis.speak(utt)
+  }
+  function stop() { window.speechSynthesis?.cancel(); setSpeaking(false) }
+  useEffect(() => () => window.speechSynthesis?.cancel(), [])
+  return { speak, stop, speaking }
+}
+
+function SpeakerIcon({ active }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill={active ? 'currentColor' : 'none'} />
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
+    </svg>
+  )
+}
+
 // ── Main Diagnostic component ─────────────────────────────────────────────
 
 export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) {
@@ -176,6 +214,7 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
   const [heartKey, setHeartKey] = useState(0)
   const [streak,   setStreak]   = useState(0)
   const [fireKey,  setFireKey]  = useState(0)
+  const { speak, stop, speaking } = useSpeech()
 
   const q                = questions[idx]
   const isCorrect        = selected === q?.answer
@@ -307,13 +346,27 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
 
         {/* ── Question text ─────────────────────────────────────────── */}
         <div className={`flex-shrink-0 px-6 pt-6 pb-2 ${q.text.endsWith('= ?') ? 'flex items-center justify-center' : ''}`}>
-          <p className={
-            q.text.endsWith('= ?')
-              ? 'text-5xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
-              : 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto'
-          }>
-            {q.text}
-          </p>
+          <div className="relative">
+            <p className={
+              q.text.endsWith('= ?')
+                ? 'text-5xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
+                : 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto'
+            }>
+              {q.text}
+            </p>
+            <button
+              onClick={() => speaking ? stop() : speak(q.text)}
+              className="absolute -right-2 -top-2 w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90"
+              style={{
+                backgroundColor: speaking ? '#1CB0F6' : '#F3F4F6',
+                color: speaking ? '#FFFFFF' : '#9CA3AF',
+                boxShadow: speaking ? '0 0 8px rgba(28,176,246,0.5)' : 'none',
+              }}
+              aria-label={speaking ? 'Stop reading' : 'Read question aloud'}
+            >
+              <SpeakerIcon active={speaking} />
+            </button>
+          </div>
         </div>
 
         {/* ── Answer choices ────────────────────────────────────────── */}
