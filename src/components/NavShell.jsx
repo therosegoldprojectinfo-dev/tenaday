@@ -56,6 +56,16 @@ function ProfileIcon({ active }) {
   )
 }
 
+function LockIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="5" y="11" width="14" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </svg>
+  )
+}
+
 const NAV_ITEMS = [
   { id: 'home',    label: 'Home',    Icon: HouseIcon },
   { id: 'rewards', label: 'Rewards', Icon: RewardsIcon },
@@ -114,7 +124,7 @@ function NavButton({ item, isActive, onPress, orientation }) {
  *  (Home, Rewards, Profile), same active-state styling, just reflowed per
  *  viewport. Per current scope, only wraps Home and ChapterPath; Practice
  *  renders standalone without this shell (full-focus mode). */
-export default function NavShell({ active, onNavigate, children }) {
+export default function NavShell({ active, onNavigate, onParentZone, children }) {
   return (
     <div className="min-h-screen bg-white md:flex">
 
@@ -132,6 +142,17 @@ export default function NavShell({ active, onNavigate, children }) {
             orientation="sidebar"
           />
         ))}
+        <div className="flex-1" />
+        <button
+          type="button"
+          onClick={onParentZone}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-colors text-gray-400 hover:bg-gray-50"
+        >
+          <span className="w-9 h-9 flex items-center justify-center flex-shrink-0">
+            <LockIcon />
+          </span>
+          <span className="font-body font-bold text-sm">Parent Zone</span>
+        </button>
       </nav>
 
       {/* Page content */}
@@ -154,6 +175,15 @@ export default function NavShell({ active, onNavigate, children }) {
             orientation="bottom"
           />
         ))}
+        {/* Parent zone lock button — small, right side of bottom bar */}
+        <button
+          type="button"
+          onClick={onParentZone}
+          className="flex items-center justify-center px-4 py-2.5 text-gray-300"
+          aria-label="Parent Zone"
+        >
+          <LockIcon />
+        </button>
       </nav>
     </div>
   )
