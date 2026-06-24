@@ -177,9 +177,18 @@ export default function Rewards({ kidId, parentId }) {
   if (error) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center px-6 text-center">
-        <p className="font-body text-gray-500">
-          Couldn't load rewards. Check your Supabase connection and .env file.
-        </p>
+        <div className="flex flex-col items-center gap-4">
+          <span className="text-5xl">😕</span>
+          <p className="font-body text-gray-500">
+            Couldn't load rewards. Check your connection and try again.
+          </p>
+          <button
+            onClick={() => { setError(null); loadAll() }}
+            className="btn-duo px-8 py-3 rounded-2xl font-body font-bold text-base tracking-widest"
+          >
+            RETRY
+          </button>
+        </div>
       </div>
     )
   }
