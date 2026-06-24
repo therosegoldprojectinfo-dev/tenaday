@@ -345,6 +345,69 @@ function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, c
   )
 }
 
+// ── Speech hook ───────────────────────────────────────────────────────────
+// Uses the Web Speech API (built into every modern browser, free, no API key).
+// Picks a male-sounding voice — tries to find an English male voice first,
+// falls back to whatever is available.
+function useSpeech() {
+  const [speaking, setSpeaking] = useState(false)
+
+  function getVoice() {
+    const voices = window.speechSynthesis?.getVoices?.() || []
+    // Prefer male English voices — common names across platforms
+    const malePrefs = ['Daniel', 'David', 'Alex', 'Fred', 'Ralph', 'Junior',
+                       'Albert', 'Bruce', 'English Male', 'Google UK English Male',
+                       'Microsoft David', 'Microsoft Mark', 'Aaron', 'Arthur']
+    for (const name of malePrefs) {
+      const v = voices.find(v => v.name.includes(name))
+      if (v) return v
+    }
+    // Fallback: any English voice
+    return voices.find(v => v.lang?.startsWith('en')) || voices[0] || null
+  }
+
+  function speak(text) {
+    if (!window.speechSynthesis) return
+    window.speechSynthesis.cancel()
+    const utt = new SpeechSynthesisUtterance(text)
+    utt.voice = getVoice()
+    utt.rate  = 0.9   // slightly slower — clearer for kids
+    utt.pitch = 0.95  // slightly lower — more teacher-like
+    utt.volume = 1
+    utt.onstart = () => setSpeaking(true)
+    utt.onend   = () => setSpeaking(false)
+    utt.onerror = () => setSpeaking(false)
+    window.speechSynthesis.speak(utt)
+  }
+
+  function stop() {
+    window.speechSynthesis?.cancel()
+    setSpeaking(false)
+  }
+
+  // Clean up on unmount
+  useEffect(() => { return () => window.speechSynthesis?.cancel() }, [])
+
+  return { speak, stop, speaking }
+}
+
+function SpeakerIcon({ active }) {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill={active ? 'currentColor' : 'none'} />
+      {active ? (
+        <>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+        </>
+      ) : (
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
+      )}
+    </svg>
+  )
+}
+
 // ── Main component ────────────────────────────────────────────────────────
 
 export default function Practice({
@@ -391,6 +454,7 @@ export default function Practice({
   const [streak,   setStreak]   = useState(0)
   const [fireKey,  setFireKey]  = useState(0) // bumped to trigger fire burst
   const timeoutRef = useRef(null)
+  const { speak, stop, speaking } = useSpeech()
 
   const q         = questions[idx]
   const isCorrect = selected === q?.answer
@@ -663,19 +727,30 @@ export default function Practice({
           </div>
         )}
 
-        {/* ── Question text ────────────────────────────────────────── */}
-        {/* isWordProblem covers practice/real_life nodes. For review, we
-            also check the question text itself since review mixes both
-            formats — equation questions end with "= ?" so anything else
-            is a word problem and should use the smaller readable size. */}
+        {/* ── Question text + speak button ─────────────────────────── */}
         <div className={`flex-shrink-0 px-6 pt-6 pb-2 ${(isWordProblem || !q.text.endsWith('= ?')) ? '' : 'flex items-center justify-center'}`}>
-          <p className={
-            (isWordProblem || !q.text.endsWith('= ?'))
-              ? 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto'
-              : 'text-5xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
-          }>
-            {q.text}
-          </p>
+          <div className="relative">
+            <p className={
+              (isWordProblem || !q.text.endsWith('= ?'))
+                ? 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto'
+                : 'text-5xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
+            }>
+              {q.text}
+            </p>
+            {/* 🔊 Read-aloud button — especially helpful for word problems */}
+            <button
+              onClick={() => speaking ? stop() : speak(q.text)}
+              className="absolute -right-2 -top-2 w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90"
+              style={{
+                backgroundColor: speaking ? '#1CB0F6' : '#F3F4F6',
+                color: speaking ? '#FFFFFF' : '#9CA3AF',
+                boxShadow: speaking ? '0 0 8px rgba(28,176,246,0.5)' : 'none',
+              }}
+              aria-label={speaking ? 'Stop reading' : 'Read question aloud'}
+            >
+              <SpeakerIcon active={speaking} />
+            </button>
+          </div>
         </div>
 
         {/* ── Answer choices ───────────────────────────────────────── */}
