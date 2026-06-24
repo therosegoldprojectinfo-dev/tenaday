@@ -346,27 +346,32 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
 
         {/* ── Question text ─────────────────────────────────────────── */}
         <div className={`flex-shrink-0 px-6 pt-6 pb-2 ${q.text.endsWith('= ?') ? 'flex items-center justify-center' : ''}`}>
-          <div className="relative">
-            <p className={
-              q.text.endsWith('= ?')
-                ? 'text-5xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
-                : 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto'
-            }>
-              {q.text}
-            </p>
-            <button
-              onClick={() => speaking ? stop() : speak(q.text)}
-              className="absolute -right-2 -top-2 w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90"
-              style={{
-                backgroundColor: speaking ? '#1CB0F6' : '#F3F4F6',
-                color: speaking ? '#FFFFFF' : '#9CA3AF',
-                boxShadow: speaking ? '0 0 8px rgba(28,176,246,0.5)' : 'none',
-              }}
-              aria-label={speaking ? 'Stop reading' : 'Read question aloud'}
-            >
-              <SpeakerIcon active={speaking} />
-            </button>
-          </div>
+          <p className={
+            q.text.endsWith('= ?')
+              ? 'text-5xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
+              : 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto'
+          }>
+            {q.text}
+          </p>
+        </div>
+
+        {/* ── Read aloud button ─────────────────────────────────────── */}
+        <div className="flex-shrink-0 flex justify-center pb-2">
+          <button
+            onClick={() => speaking ? stop() : speak(q.text)}
+            className="flex items-center gap-2 px-4 py-2 rounded-full transition-all active:scale-90"
+            style={{
+              backgroundColor: speaking ? '#1CB0F6' : '#F3F4F6',
+              color: speaking ? '#FFFFFF' : '#9CA3AF',
+              boxShadow: speaking ? '0 0 8px rgba(28,176,246,0.4)' : 'none',
+            }}
+            aria-label={speaking ? 'Stop reading' : 'Read question aloud'}
+          >
+            <SpeakerIcon active={speaking} />
+            <span className="font-body font-bold text-xs">
+              {speaking ? 'Stop' : 'Read aloud'}
+            </span>
+          </button>
         </div>
 
         {/* ── Answer choices ────────────────────────────────────────── */}
