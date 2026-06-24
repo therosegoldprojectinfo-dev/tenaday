@@ -100,7 +100,21 @@ export default function Auth({ onAuthenticated, onBack }) {
 
       <div className="flex-1 flex items-center justify-center px-6 py-8">
         <div className="w-full max-w-sm">
-          <h1 className="font-display font-bold text-3xl text-gray-900 text-center mb-1">
+
+          {/* Brand identity — logo + tagline */}
+          <div className="flex flex-col items-center mb-8">
+            <img
+              src="/logo.png"
+              alt="Numio"
+              className="h-16 w-auto object-contain mb-3"
+              draggable={false}
+            />
+            <p className="font-body text-sm text-gray-400 text-center">
+              Daily math for kids, coins for real rewards
+            </p>
+          </div>
+
+          <h1 className="font-display font-bold text-2xl text-gray-900 text-center mb-1">
             {isSignup ? 'Create your account' : 'Welcome back'}
           </h1>
           <p className="font-body text-sm text-gray-400 text-center mb-7">
