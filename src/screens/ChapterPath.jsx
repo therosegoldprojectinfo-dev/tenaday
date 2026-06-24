@@ -201,8 +201,6 @@ function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
                   ? '0 4px 0 0 #B0B7C0'
                   : `0 4px 0 0 ${DUO_GREEN_DARK}`,
                 // Shine overlay via outline for selected state
-                outline: isSelected ? `3px solid ${DUO_GREEN_DARK}` : 'none',
-                outlineOffset: '3px',
                 transform: isSelected ? 'scale(1.15)' : 'scale(1)',
               }}
               aria-label={`Day ${day}${isLocked ? ', locked' : isDone ? ', completed' : ', today'}`}
