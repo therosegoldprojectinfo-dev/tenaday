@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { fetchKidStats } from '../lib/kidData'
+import { fetchKidStats, fetchStreak } from '../lib/kidData'
 
 const DUO_GREEN      = '#58cc02'
 const DUO_GREEN_DARK = '#46a302'
@@ -94,7 +94,7 @@ function SectionHeader({ title, action, onAction }) {
 }
 
 // ── Kid card ───────────────────────────────────────────────────────────────
-function KidCard({ kid, stats, onViewProgress }) {
+function KidCard({ kid, stats, streak, onViewProgress }) {
   const color = avatarColor(kid.id)
   const opIdx = OPERATIONS.indexOf(kid.current_operation)
   const chapterLabel = ['Addition','Subtraction','Multiplication','Division'][opIdx] || 'Addition'
@@ -132,8 +132,8 @@ function KidCard({ kid, stats, onViewProgress }) {
       {stats && (
         <div className="flex gap-4 mt-3 pt-3 border-t border-gray-100">
           <div className="text-center">
-            <p className="font-display font-bold text-base text-gray-900">{stats.distinctDays}</p>
-            <p className="font-body text-xs text-gray-400">Days played</p>
+            <p className="font-display font-bold text-base text-gray-900">🔥 {streak ?? 0}</p>
+            <p className="font-body text-xs text-gray-400">Day streak</p>
           </div>
           <div className="text-center">
             <p className="font-display font-bold text-base text-gray-900">{stats.totalCorrect}</p>
@@ -259,6 +259,7 @@ function AddRewardSheet({ parentId, onAdded, onClose }) {
 export default function ParentDashboard({ parentId, onBack, onAddKid }) {
   const [kids,        setKids]        = useState([])
   const [kidStats,    setKidStats]    = useState({})
+  const [kidStreaks,   setKidStreaks]   = useState({})
   const [gifts,       setGifts]       = useState([])
   const [claims,      setClaims]      = useState([])
   const [loading,     setLoading]     = useState(true)
@@ -277,13 +278,16 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
 
       setKids(kidsData || [])
 
-      // Stats per kid
+      // Stats + streaks per kid
       if (kidsData?.length) {
         const statsMap = {}
+        const streakMap = {}
         await Promise.all(kidsData.map(async k => {
           try { statsMap[k.id] = await fetchKidStats(k.id) } catch {}
+          try { streakMap[k.id] = await fetchStreak(k.id) } catch {}
         }))
         setKidStats(statsMap)
+        setKidStreaks(streakMap)
       }
 
       // Parent rewards + global rewards
@@ -400,7 +404,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
               ) : (
                 <div className="flex flex-col gap-3">
                   {kids.map(kid => (
-                    <KidCard key={kid.id} kid={kid} stats={kidStats[kid.id]}
+                    <KidCard key={kid.id} kid={kid} stats={kidStats[kid.id]} streak={kidStreaks[kid.id] ?? 0}
                       onViewProgress={() => setViewingKid(kid)} />
                   ))}
                 </div>
@@ -506,7 +510,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
             {kidStats[viewingKid.id] ? (
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'Days played', value: kidStats[viewingKid.id].distinctDays, emoji: '🔥' },
+                  { label: 'Day streak', value: kidStreaks[viewingKid.id] ?? 0, emoji: '🔥' },
                   { label: 'Correct answers', value: kidStats[viewingKid.id].totalCorrect, emoji: '✅' },
                   { label: 'Sessions done', value: kidStats[viewingKid.id].nodesPassed, emoji: '⭐' },
                   { label: 'Coin balance', value: viewingKid.coin_balance, emoji: '🪙' },
