@@ -286,7 +286,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
       // Parent rewards + global rewards
       const { data: giftsData } = await supabase
         .from('gifts')
-        .select('id, name, coin_price, icon')
+        .select('id, name, coin_price, icon, parent_id')
         .or(`parent_id.eq.${parentId},parent_id.is.null`)
         .order('coin_price', { ascending: true })
       setGifts(giftsData || [])
