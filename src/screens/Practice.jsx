@@ -6,6 +6,7 @@ import { applyPayout, payoutForNode, passThresholdFor, NODE_PAYOUT, ENTRY_FEE } 
 import FlowerJump from '../components/FlowerJump'
 import {
   updateProgress,
+  stampAdvanceDate,
   setCoinBalance,
   logCoinTransaction,
   logAttempt,
@@ -493,8 +494,18 @@ export default function Practice({
         }
 
         if (result === 'passed') {
-          const next = nextStep(operation, table, batchNum, node)
-          if (next) await updateProgress(kidId, next)
+          if (node === 'review') {
+            // Review is the last node of today's batch. Stamp the date so
+            // the next batch is day-gated, but DO NOT advance the cursor to
+            // that next batch — if we did, it would become 'current' and
+            // isPlayableToday would always return true, breaking the gate.
+            // ChapterPath reads last_advance_date fresh on next mount and
+            // shows the next batch's unlock as day_locked until tomorrow.
+            await stampAdvanceDate(kidId)
+          } else {
+            const next = nextStep(operation, table, batchNum, node)
+            if (next) await updateProgress(kidId, next)
+          }
         }
       }
     } catch (err) {
