@@ -228,13 +228,13 @@ function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
 // tomorrow"), not a permanent block.
 // Per-node accent colors — makes each card feel distinct and fun
 const NODE_COLORS = {
-  unlock:       { bg: '#EDE9FE', icon: '#7C3AED', border: '#C4B5FD' },
-  learn:        { bg: '#DCFCE7', icon: '#16A34A', border: '#86EFAC' },
-  what_happened:{ bg: '#FEF3C7', icon: '#D97706', border: '#FCD34D' },
-  practice:     { bg: '#DBEAFE', icon: '#2563EB', border: '#93C5FD' },
-  real_life:    { bg: '#FCE7F3', icon: '#BE185D', border: '#F9A8D4' },
-  speed:        { bg: '#FFF7ED', icon: '#EA580C', border: '#FDBA74' },
-  review:       { bg: '#F0FDF4', icon: '#15803D', border: '#4ADE80' },
+  unlock:        { bg: '#EDE9FE', icon: '#7C3AED', border: '#C4B5FD', shadow: '#A78BFA' },
+  learn:         { bg: '#DCFCE7', icon: '#16A34A', border: '#86EFAC', shadow: '#4ADE80' },
+  what_happened: { bg: '#FEF3C7', icon: '#D97706', border: '#FCD34D', shadow: '#FBBF24' },
+  practice:      { bg: '#DBEAFE', icon: '#2563EB', border: '#93C5FD', shadow: '#60A5FA' },
+  real_life:     { bg: '#FCE7F3', icon: '#BE185D', border: '#F9A8D4', shadow: '#F472B6' },
+  speed:         { bg: '#FFF7ED', icon: '#EA580C', border: '#FDBA74', shadow: '#FB923C' },
+  review:        { bg: '#F0FDF4', icon: '#15803D', border: '#4ADE80', shadow: '#22C55E' },
 }
 
 function NodeRow({ node, status, isCurrent, isWelcome, onPress }) {
@@ -264,11 +264,15 @@ function NodeRow({ node, status, isCurrent, isWelcome, onPress }) {
       disabled={disabled}
       onClick={onPress}
       className="w-full flex items-center gap-4 rounded-3xl border-2 px-4 py-4
-                 transition-transform active:scale-[0.97] disabled:active:scale-100"
+                 transition-all active:translate-y-1 disabled:active:translate-y-0"
       style={{
         backgroundColor: disabled ? '#F9FAFB' : colors.bg,
         borderColor: disabled ? '#E5E7EB' : completed ? DUO_GREEN : colors.border,
-        boxShadow: disabled ? 'none' : isCurrent ? `0 4px 12px ${colors.border}80` : 'none',
+        boxShadow: disabled
+          ? 'none'
+          : completed
+            ? `0 4px 0 0 ${DUO_GREEN_DARK}`
+            : `0 4px 0 0 ${colors.shadow ?? colors.border}`,
       }}
     >
       {/* Big icon badge */}
