@@ -485,6 +485,7 @@ export default function Practice({
 
   function handleTimerExpire() {
     if (revealed || over) return
+    if (selected !== null) { handleCheck(selected); return }
     setRevealed(true)
     setStreak(0)
     setWrong(w => w + 1)
