@@ -101,17 +101,14 @@ export default function Auth({ onAuthenticated, onBack }) {
       <div className="flex-1 flex items-center justify-center px-6 py-8">
         <div className="w-full max-w-sm">
 
-          {/* Brand identity — logo + tagline */}
+          {/* Brand identity — logo */}
           <div className="flex flex-col items-center mb-8">
             <img
               src="/numiologoapp.png"
               alt="Numio"
-              className="h-16 w-auto object-contain mb-3"
+              className="h-24 w-auto object-contain"
               draggable={false}
             />
-            <p className="font-body text-sm text-gray-400 text-center">
-              Daily math for kids, coins for real rewards
-            </p>
           </div>
 
           <h1 className="font-display font-bold text-2xl text-gray-900 text-center mb-1">
