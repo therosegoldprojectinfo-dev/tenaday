@@ -43,6 +43,19 @@ export async function updateProgress(kidId, { operation, table, batch, node }) {
   if (error) throw error
 }
 
+/** Stamps last_advance_date to today WITHOUT moving the cursor.
+ *  Called after a Review node passes — the batch is done for today,
+ *  but the cursor stays at review so the next batch's unlock remains
+ *  chainPosition 'next_new_batch' and the day gate fires correctly. */
+export async function stampAdvanceDate(kidId) {
+  const { error } = await supabase
+    .from('kids')
+    .update({ last_advance_date: todayString() })
+    .eq('id', kidId)
+
+  if (error) throw error
+}
+
 /** Marks a chapter's one-time interactive concept intro as seen, so it
  *  doesn't show again for this kid. Appends rather than overwrites, since
  *  seen_chapter_intros accumulates across all 4 chapters over time. */
