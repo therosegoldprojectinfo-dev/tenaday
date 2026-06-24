@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchKid, fetchKidStats } from '../lib/kidData'
+import { fetchKid, fetchKidStats, fetchStreak } from '../lib/kidData'
 import { eraProgress, OPERATIONS } from '../lib/progression'
 import { themeFor } from '../lib/eraTheme'
 
@@ -64,15 +64,17 @@ function StatCard({ icon, value, label, accent }) {
 export default function Profile({ kidId, onSwitchProfile }) {
   const [kid, setKid] = useState(null)
   const [stats, setStats] = useState(null)
+  const [streak, setStreak] = useState(0)
   const [error, setError] = useState(null)
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([fetchKid(kidId), fetchKidStats(kidId)])
-      .then(([kidData, statsData]) => {
+    Promise.all([fetchKid(kidId), fetchKidStats(kidId), fetchStreak(kidId)])
+      .then(([kidData, statsData, streakData]) => {
         if (cancelled) return
         setKid(kidData)
         setStats(statsData)
+        setStreak(streakData)
       })
       .catch(err => {
         console.error('Failed to load profile:', err)
@@ -156,7 +158,7 @@ export default function Profile({ kidId, onSwitchProfile }) {
         <p className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide mb-2 px-1">Stats</p>
         <div className="flex flex-col gap-2.5">
           <div className="flex gap-2.5">
-            <StatCard icon={<FlameIcon />} value={stats.distinctDays} label="Days played" />
+            <StatCard icon={<FlameIcon />} value={streak} label="Day streak" />
             <StatCard icon={<ZapIcon />} value={stats.totalCorrect} label="Correct answers" />
           </div>
           <div className="flex gap-2.5">
