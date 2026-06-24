@@ -4,12 +4,12 @@
 // nothing else needs to change.
 
 export const STARTING_BALANCE = 50
-export const ENTRY_FEE        = 10
-export const NODE_PAYOUT      = 15   // must stay > ENTRY_FEE per spec §7
-export const REVIEW_PAYOUT    = 30   // 'review' is the table's 6th/capstone node — pays extra, like the old "gift" bonus round
-export const DEBT_CAP_MULT    = 2    // debt floor = -(ENTRY_FEE * DEBT_CAP_MULT)
+export const ENTRY_FEE        = 5
+export const NODE_PAYOUT      = 20
+export const REVIEW_PAYOUT    = 40
+export const DEBT_CAP_MULT    = 2
 
-export const DEBT_FLOOR = -(ENTRY_FEE * DEBT_CAP_MULT)
+export const DEBT_FLOOR = -(ENTRY_FEE * DEBT_CAP_MULT) // -10
 
 // Pass thresholds, out of 10 questions per attempt (spec §6: "8, 9, or
 // 10 correct -> PASS"). NORMAL is the default everywhere. CLAIMED applies
