@@ -16,7 +16,7 @@ const LIVES_START = 4
 const TIMED_MS    = 5000
 
 const TIMED_NODES        = new Set(['speed'])
-const WORD_PROBLEM_NODES = new Set(['what_happened', 'practice', 'real_life'])
+const WORD_PROBLEM_NODES = new Set(['what_happened', 'real_life'])
 
 // ── Icons ─────────────────────────────────────────────────────────────────
 
