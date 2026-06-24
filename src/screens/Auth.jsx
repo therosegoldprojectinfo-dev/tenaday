@@ -104,7 +104,7 @@ export default function Auth({ onAuthenticated, onBack }) {
           {/* Brand identity — logo + tagline */}
           <div className="flex flex-col items-center mb-8">
             <img
-              src="/logo.png"
+              src="/numiologoapp.png"
               alt="Numio"
               className="h-16 w-auto object-contain mb-3"
               draggable={false}
