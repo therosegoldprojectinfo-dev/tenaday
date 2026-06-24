@@ -56,12 +56,14 @@ function ProfileIcon({ active }) {
   )
 }
 
-function LockIcon() {
+function FamilyIcon({ active }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="5" y="11" width="14" height="10" rx="2" />
-      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+      <circle cx="9" cy="7" r="3" fill={active ? 'currentColor' : 'none'} />
+      <path d="M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
+      <circle cx="18" cy="8" r="2" />
+      <path d="M21 21v-1.5a3 3 0 0 0-2-2.83" />
     </svg>
   )
 }
@@ -149,7 +151,7 @@ export default function NavShell({ active, onNavigate, onParentZone, children })
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-colors text-gray-400 hover:bg-gray-50"
         >
           <span className="w-9 h-9 flex items-center justify-center flex-shrink-0">
-            <LockIcon />
+            <FamilyIcon active={false} />
           </span>
           <span className="font-body font-bold text-sm">Parent Zone</span>
         </button>
@@ -175,14 +177,16 @@ export default function NavShell({ active, onNavigate, onParentZone, children })
             orientation="bottom"
           />
         ))}
-        {/* Parent zone lock button — small, right side of bottom bar */}
+        {/* Parent zone — same style as other nav buttons */}
         <button
           type="button"
           onClick={onParentZone}
-          className="flex items-center justify-center px-4 py-2.5 text-gray-300"
+          className="flex-1 flex items-center justify-center py-2.5"
           aria-label="Parent Zone"
         >
-          <LockIcon />
+          <span className="w-11 h-11 rounded-2xl flex items-center justify-center transition-colors text-gray-400">
+            <FamilyIcon active={false} />
+          </span>
         </button>
       </nav>
     </div>
