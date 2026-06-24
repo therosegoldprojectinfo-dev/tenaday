@@ -140,7 +140,7 @@ export default function NavShell({ active, onNavigate, onParentZone, children })
           <img
             src="/numiologoapp.png"
             alt="Numio"
-            className="h-16 w-auto object-contain object-left"
+            className="h-20 w-auto object-contain object-left"
             draggable={false}
           />
         </div>
