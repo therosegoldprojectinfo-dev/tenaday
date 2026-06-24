@@ -73,7 +73,7 @@ function StepNameAge({ onNext, onBack }) {
       <div className="flex-1 flex items-center justify-center px-6 py-8">
         <div className="w-full max-w-sm">
           <div className="flex justify-center mb-6">
-            <img src="/numiologoapp.png" alt="Numio" className="h-12 w-auto object-contain" draggable={false} />
+            <img src="/numiologoapp.png" alt="Numio" className="h-20 w-auto object-contain" draggable={false} />
           </div>
           <h1 className="font-display font-bold text-3xl text-gray-900 text-center mb-1">
             Add a kid
