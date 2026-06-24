@@ -387,8 +387,8 @@ function generateReview(operation, table, batch, reviewPool) {
  *  Node → format mapping:
  *  unlock       → plain equations, NUMBER choices, tests YESTERDAY's facts
  *  learn        → pure lesson (no questions) — just shows today's 2 facts
+ *  practice     → plain equations, NUMBER choices, TODAY's facts (drill)
  *  what_happened→ word problems, EQUATION choices ("which equation fits?")
- *  practice     → word problems, NUMBER choices
  *  real_life    → applied word problems, NUMBER choices
  *  speed        → plain equations, NUMBER choices, timed
  *  review       → all 4 formats mixed, 24 questions total
@@ -502,8 +502,8 @@ export function generateBatch(operation, table, batch, node, { unlockBatch, revi
   return sequence.map(({ factIdx }) => {
     const fact = facts[factIdx]
     if (node === 'what_happened') return practiceQuestion(src.operation, src.table, fact)
-    if (node === 'practice')      return realLifeQuestion(src.operation, src.table, fact)
     if (node === 'real_life')     return realLifeQuestion(src.operation, src.table, fact)
-    return plainEquationQuestion(src.operation, src.table, fact) // speed
+    // practice, speed, unlock → plain equations with number choices
+    return plainEquationQuestion(src.operation, src.table, fact)
   })
 }
