@@ -232,7 +232,7 @@ function FinishedScreen({ passed, correct, total, payout, isReview, saving, onEx
       <div className="h-screen md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6 relative z-10">
         {passed ? (
           <div className="flex flex-col items-center gap-2">
-            <FlowerJump size={220} />
+            <FlowerJump size={220} loop />
             <div className="flex gap-2 mt-1">
               {['⭐','⭐','⭐'].map((s, i) => (
                 <span key={i} className="text-4xl" style={{
