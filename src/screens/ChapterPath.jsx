@@ -173,7 +173,7 @@ function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
 
   return (
     <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-3 justify-start md:justify-center">
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-center gap-4">
         {/* Ellipsis indicator if more days exist before the window */}
         {windowStart > 1 && (
           <span className="font-body text-xs text-gray-400 px-1">···</span>
@@ -192,14 +192,18 @@ function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
               type="button"
               disabled={isLocked}
               onClick={() => !isLocked && onSelect(day)}
-              className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center font-body font-bold text-xs transition-transform"
+              className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-body font-bold text-xs transition-all active:translate-y-1"
               style={{
-                backgroundColor: isDone ? DUO_GREEN : isLocked ? '#F3F4F6' : DUO_GREEN,
-                color: isLocked ? '#D1D5DB' : '#FFFFFF',
+                backgroundColor: isLocked ? '#E5E7EB' : DUO_GREEN,
+                color: isLocked ? '#9CA3AF' : '#FFFFFF',
+                // 3D bottom shadow — darker green for active/done, grey for locked
+                boxShadow: isLocked
+                  ? '0 4px 0 0 #B0B7C0'
+                  : `0 4px 0 0 ${DUO_GREEN_DARK}`,
+                // Shine overlay via outline for selected state
                 outline: isSelected ? `3px solid ${DUO_GREEN_DARK}` : 'none',
-                outlineOffset: '2px',
-                transform: isSelected ? 'scale(1.12)' : 'scale(1)',
-                opacity: isLocked ? 0.5 : 1,
+                outlineOffset: '3px',
+                transform: isSelected ? 'scale(1.15)' : 'scale(1)',
               }}
               aria-label={`Day ${day}${isLocked ? ', locked' : isDone ? ', completed' : ', today'}`}
               aria-pressed={isSelected}
@@ -554,7 +558,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
         </p>
       </div>
 
-      <div className="max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto px-4 pb-10 flex flex-col gap-3">
+      <div className="max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto px-4 pb-10 flex flex-col gap-4">
         {selectedStatus === 'locked' ? (
           <div className="md:col-span-2 rounded-2xl bg-gray-50 border border-gray-100 px-4 py-6 text-center">
             <LockIcon size={26} />
