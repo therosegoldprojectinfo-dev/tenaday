@@ -1,11 +1,61 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { generateDiagnostic } from '../lib/problems'
 import { updateProgress } from '../lib/kidData'
 import { OPERATIONS } from '../lib/progression'
 
 const SESSION_TOTAL  = 20
-const PASS_THRESHOLD = 16   // 80% of 20
+const PASS_THRESHOLD = 16
 const LIVES_START    = 4
+
+function FireParticles({ streakKey, streak }) {
+  if (streak < 3) return null
+  const count = Math.min(streak, 12)
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden" key={streakKey}>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} style={{
+          position: 'absolute', bottom: -40,
+          left: `${10 + Math.random() * 80}%`,
+          fontSize: streak >= 7 ? 28 + Math.random() * 16 : 20 + Math.random() * 12,
+          animation: `fire-rise ${1.2 + Math.random() * 0.6}s ${Math.random() * 0.4}s ease-out both`,
+        }}>🔥</div>
+      ))}
+    </div>
+  )
+}
+
+function ConfettiBlast({ active }) {
+  if (!active) return null
+  const colors = ['#58cc02','#1CB0F6','#FF9600','#FF4B4B','#CE82FF','#FFD900']
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {Array.from({ length: 40 }).map((_, i) => (
+        <div key={i} style={{
+          position: 'absolute', bottom: -20,
+          left: `${Math.random() * 100}%`,
+          width: 8 + Math.random() * 10,
+          height: 8 + Math.random() * 10,
+          borderRadius: i % 3 === 0 ? '50%' : 2,
+          backgroundColor: colors[i % colors.length],
+          animation: `confetti-rise ${1.0 + Math.random() * 0.8}s ${Math.random() * 0.5}s cubic-bezier(0.2,0.8,0.3,1) both`,
+        }} />
+      ))}
+    </div>
+  )
+}
+
+function StreakBadge({ streak }) {
+  if (streak < 2) return null
+  const hot = streak >= 7, warm = streak >= 4
+  return (
+    <div key={streak} className="flex items-center gap-1 px-2.5 py-1 rounded-full anim-correct"
+      style={{ backgroundColor: hot ? '#FF4500' : warm ? '#FF9600' : '#FFB700',
+               boxShadow: hot ? '0 0 12px rgba(255,69,0,0.6)' : 'none' }}>
+      <span style={{ fontSize: hot ? 16 : 14 }}>🔥</span>
+      <span className="font-display font-extrabold text-white" style={{ fontSize: hot ? 15 : 13 }}>{streak}</span>
+    </div>
+  )
+}
 
 // ── Icons ─────────────────────────────────────────────────────────────────
 
@@ -124,6 +174,8 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
   const [passed,   setPassed]   = useState(false)
   const [saving,   setSaving]   = useState(false)
   const [heartKey, setHeartKey] = useState(0)
+  const [streak,   setStreak]   = useState(0)
+  const [fireKey,  setFireKey]  = useState(0)
 
   const q                = questions[idx]
   const isCorrect        = selected === q?.answer
@@ -133,7 +185,12 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
   function handleCheck() {
     if (revealed || selected === null) return
     setRevealed(true)
-    if (selected !== q.answer) {
+    if (selected === q.answer) {
+      const newStreak = streak + 1
+      setStreak(newStreak)
+      if (newStreak >= 3) setFireKey(k => k + 1)
+    } else {
+      setStreak(0)
       setWrong(w => w + 1)
       setLives(l => l - 1)
       setHeartKey(k => k + 1)
@@ -183,20 +240,23 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
   if (over === 'died') {
     return <DiedScreen onRetry={() => {
       setIdx(0); setLives(LIVES_START); setSelected(null); setRevealed(false)
-      setWrong(0); setOver(null); setHeartKey(0)
+      setWrong(0); setOver(null); setHeartKey(0); setStreak(0); setFireKey(0)
     }} />
   }
 
   if (over === 'finished') {
     const correct = SESSION_TOTAL - wrong
     return (
-      <ResultScreen
-        passed={passed}
-        correct={correct}
-        claimedOperation={claimedOperation}
-        saving={saving}
-        onContinue={() => passed ? onPass() : onFail()}
-      />
+      <>
+        <ConfettiBlast active={passed} />
+        <ResultScreen
+          passed={passed}
+          correct={correct}
+          claimedOperation={claimedOperation}
+          saving={saving}
+          onContinue={() => passed ? onPass() : onFail()}
+        />
+      </>
     )
   }
 
@@ -204,6 +264,7 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
+      <FireParticles streakKey={fireKey} streak={streak} />
       <div className="h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md">
 
         {/* ── Top bar ───────────────────────────────────────────────── */}
@@ -212,23 +273,28 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
             <XIcon />
           </div>
 
-          <div className="flex-1 h-5 rounded-full bg-gray-100 overflow-hidden"
+          <div className="flex-1 h-5 rounded-full overflow-hidden"
+            style={{ backgroundColor: streak >= 3 ? '#FFE0B2' : '#F3F4F6', transition: 'background-color 0.4s' }}
             role="progressbar" aria-valuenow={idx} aria-valuemax={SESSION_TOTAL}>
             <div className="h-full rounded-full origin-left"
               style={{
-                backgroundColor: '#58cc02',
+                backgroundColor: streak >= 7 ? '#FF4500' : streak >= 4 ? '#FF9600' : '#58cc02',
                 transform: `scaleX(${progressScale})`,
-                transition: 'transform 350ms cubic-bezier(0.4, 0, 0.2, 1)',
+                transition: 'transform 350ms cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s',
+                boxShadow: streak >= 4 ? `0 0 8px ${streak >= 7 ? '#FF4500' : '#FF9600'}` : 'none',
               }}
             />
           </div>
 
-          <div className="flex items-center gap-1 px-2 py-2">
-            {Array.from({ length: LIVES_START }).map((_, i) => (
-              <HeartIcon key={i} filled={i < lives}
-                className={lives > 0 && i === lives - 1 && heartKey > 0 ? 'anim-heart-pulse' : ''}
-              />
-            ))}
+          <div className="flex items-center gap-1.5">
+            <StreakBadge streak={streak} />
+            <div className="flex items-center gap-1">
+              {Array.from({ length: LIVES_START }).map((_, i) => (
+                <HeartIcon key={i} filled={i < lives}
+                  className={lives > 0 && i === lives - 1 && heartKey > 0 ? 'anim-heart-pulse' : ''}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
