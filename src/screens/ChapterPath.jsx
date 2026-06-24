@@ -16,7 +16,7 @@ import {
   factsForBatch,
 } from '../lib/progression'
 import { isPlayableToday, canAdvanceToday, nextUnlockMessage } from '../lib/dayGate'
-import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
+import { fetchKid, fetchStreak, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
 import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 
 const DUO_GREEN = '#58cc02'
@@ -327,6 +327,7 @@ function NodeRow({ node, status, isCurrent, isWelcome, onPress }) {
 
 export default function ChapterPath({ operation, onStartNode, onBack, kidId = DEMO_KID_ID }) {
   const [kid, setKid] = useState(null)
+  const [streak, setStreak] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedDay, setSelectedDay] = useState(null)
@@ -337,10 +338,11 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
 
   useEffect(() => {
     let cancelled = false
-    fetchKid(kidId)
-      .then(data => {
+    Promise.all([fetchKid(kidId), fetchStreak(kidId)])
+      .then(([data, streakData]) => {
         if (cancelled) return
         setKid(data)
+        setStreak(streakData)
         // Default selected day to the kid's current day within this chapter,
         // or day 1 if they haven't reached this chapter yet.
         if (data.current_operation === operation) {
@@ -491,6 +493,11 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
             <BackIcon />
           </button>
           <div className="flex items-center gap-2">
+            {/* Streak */}
+            <div className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200">
+              <span className="text-base leading-none">🔥</span>
+              <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
+            </div>
             <div className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100">
               <HeartStatIcon />
               <span className="font-body font-bold text-xs text-red-400 leading-none">per session</span>
