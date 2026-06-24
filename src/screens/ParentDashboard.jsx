@@ -261,6 +261,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
   const [kidStats,    setKidStats]    = useState({})
   const [gifts,       setGifts]       = useState([])
   const [claims,      setClaims]      = useState([])
+  const [loading,     setLoading]     = useState(true)
   const [viewingKid, setViewingKid] = useState(null)
   const [showAddReward, setShowAddReward] = useState(false)
   const [activeTab,   setActiveTab]   = useState('kids') // 'kids' | 'rewards' | 'claims'
