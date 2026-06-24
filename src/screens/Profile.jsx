@@ -139,7 +139,7 @@ export default function Profile({ kidId, onSwitchProfile }) {
             {theme.operationLabel}
           </p>
           <p className="font-display font-bold text-lg text-gray-900 mb-2">
-            Table {kid.current_table} · Day {kid.current_batch || 1} of 4 · {overallPct}% complete
+            Table {kid.current_table} · Day {kid.current_batch || 1} of 72 · {overallPct}% complete
           </p>
           <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
             <div
