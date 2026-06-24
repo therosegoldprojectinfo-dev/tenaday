@@ -15,7 +15,7 @@ import {
   previousBatch,
   factsForBatch,
 } from '../lib/progression'
-import { isPlayableToday, nextUnlockMessage } from '../lib/dayGate'
+import { isPlayableToday, canAdvanceToday, nextUnlockMessage } from '../lib/dayGate'
 import { fetchKid, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
 import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 
@@ -325,6 +325,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   const [error, setError] = useState(null)
   const [selectedDay, setSelectedDay] = useState(null)
   const [openNode, setOpenNode] = useState(null)
+  const [dayGateBlocked, setDayGateBlocked] = useState(false)
 
   const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT // 72
 
@@ -418,6 +419,19 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
     const { table, batch, node } = openNode
     setOpenNode(null)
 
+    // Defense-in-depth day gate: the node list already shows next-batch nodes
+    // as day_locked (so they can't be tapped), but re-check here in case the
+    // kid state was stale when the UI rendered. This is the authoritative gate.
+    // We check the first node of the target batch (unlock) against the cursor —
+    // if chainPosition === 'next_new_batch' and today's date is the same as
+    // last_advance_date, the kid has already done their batch today.
+    const targetUnlock = { operation, table, batch, node: 'unlock' }
+    const pos = chainPosition(currentPos, targetUnlock)
+    if (pos === 'next_new_batch' && !canAdvanceToday(kid.last_advance_date)) {
+      setDayGateBlocked(true)
+      return
+    }
+
     // Learn is a free lesson — no entry fee charged, no lives, no stakes.
     // All other nodes pay the entry fee as normal.
     const isLearnNode = node === 'learn'
@@ -506,6 +520,21 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
           <p className="font-body text-xs text-red-500 font-semibold">
             Coins are low — retries are free until you earn some back. Keep playing!
           </p>
+        </div>
+      )}
+
+      {dayGateBlocked && (
+        <div className="mx-4 mt-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto flex items-start justify-between gap-3">
+          <p className="font-body text-sm text-amber-800 font-semibold leading-snug">
+            {nextUnlockMessage()}
+          </p>
+          <button
+            onClick={() => setDayGateBlocked(false)}
+            className="flex-shrink-0 font-body font-bold text-xs text-amber-600 active:opacity-70"
+            aria-label="Dismiss"
+          >
+            OK
+          </button>
         </div>
       )}
 
