@@ -229,3 +229,42 @@ export async function purchaseGift(kidId, gift, currentBalance) {
 
   return newBalance
 }
+
+/** Computes the kid's current consecutive-day streak from their attempt history.
+ *  A "day" is counted if they passed at least one node on that calendar day
+ *  (local timezone). The streak resets to 0 if they missed yesterday.
+ *  Returns an integer ≥ 0.
+ */
+export async function fetchStreak(kidId) {
+  const { data, error } = await supabase
+    .from('attempts')
+    .select('created_at, result')
+    .eq('kid_id', kidId)
+    .eq('result', 'passed')
+
+  if (error || !data || data.length === 0) return 0
+
+  // Collect distinct local-date strings where kid passed something
+  const passedDays = new Set(
+    data.map(a => {
+      const d = new Date(a.created_at)
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    })
+  )
+
+  // Walk backwards from today counting consecutive days
+  let streak = 0
+  const today = new Date()
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today)
+    d.setDate(today.getDate() - i)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    if (passedDays.has(key)) {
+      streak++
+    } else {
+      break
+    }
+  }
+
+  return streak
+}
