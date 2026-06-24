@@ -264,12 +264,12 @@ function NodeRow({ node, status, isCurrent, isWelcome, onPress }) {
       disabled={disabled}
       onClick={onPress}
       className="w-full flex items-center gap-4 rounded-3xl border-2 px-4 py-4
-                 transition-all active:translate-y-1 disabled:active:translate-y-0"
+                 transition-all active:translate-y-1"
       style={{
-        backgroundColor: disabled ? '#F9FAFB' : colors.bg,
+        backgroundColor: disabled ? '#F9FAFB' : completed ? '#DCFCE7' : colors.bg,
         borderColor: disabled ? '#E5E7EB' : completed ? DUO_GREEN : colors.border,
         boxShadow: disabled
-          ? 'none'
+          ? '0 4px 0 0 #D1D5DB'
           : completed
             ? `0 4px 0 0 ${DUO_GREEN_DARK}`
             : `0 4px 0 0 ${colors.shadow ?? colors.border}`,
