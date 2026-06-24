@@ -9,6 +9,8 @@ import Profile from './screens/Profile'
 import Auth from './screens/Auth'
 import KidPicker from './screens/KidPicker'
 import CreateKid from './screens/CreateKid'
+import ParentPinEntry from './screens/ParentPinEntry'
+import ParentDashboard from './screens/ParentDashboard'
 import NavShell from './components/NavShell'
 import { getSession, logOut as authLogOut } from './lib/parentAuth'
 
@@ -31,6 +33,8 @@ export default function App() {
   const [parentId, setParentId] = useState(null)
   const [kidId, setKidId] = useState(null)
   const [pendingClaim, setPendingClaim] = useState(null) // placement claim for the diagnostic phase
+  const [showParentPin, setShowParentPin]   = useState(false)
+  const [showParentDash, setShowParentDash] = useState(false)
 
   // Game-level navigation state (only meaningful once authPhase === 'game')
   const [navTab, setNavTab] = useState('home') // 'home' | 'rewards' | 'profile'
@@ -246,8 +250,32 @@ export default function App() {
     content = <Map key={refreshKey} onOpenChapter={handleOpenChapter} kidId={kidId} />
   }
 
+  // Parent zone overlays — shown on top of the game UI
+  if (showParentPin) {
+    return (
+      <ParentPinEntry
+        parentId={parentId}
+        onSuccess={() => { setShowParentPin(false); setShowParentDash(true) }}
+        onBack={() => setShowParentPin(false)}
+      />
+    )
+  }
+
+  if (showParentDash) {
+    return (
+      <ParentDashboard
+        parentId={parentId}
+        onBack={() => setShowParentDash(false)}
+        onAddKid={() => {
+          setShowParentDash(false)
+          setAuthPhase('createKid')
+        }}
+      />
+    )
+  }
+
   return (
-    <NavShell active={navTab} onNavigate={handleNavigate}>
+    <NavShell active={navTab} onNavigate={handleNavigate} onParentZone={() => setShowParentPin(true)}>
       {content}
     </NavShell>
   )
