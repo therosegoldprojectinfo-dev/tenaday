@@ -390,8 +390,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   // For completed chapters (cursor is past this operation), set to TOTAL_DAYS+1
   // so all 72 circles show as done (green checkmarks) in the strip.
   const opOrder = ['addition','subtraction','multiplication','division']
-  const isChapterCompleted = opOrder.indexOf(currentPos.operation) > opOrder.indexOf(operation)
-  const currentDay = isChapterCompleted
+  const isCompleted = opOrder.indexOf(currentPos.operation) > opOrder.indexOf(operation)
+  const currentDay = isCompleted
     ? TOTAL_DAYS + 1
     : currentPos.operation === operation
       ? (currentPos.table - 1) * BATCH_COUNT + currentPos.batch
@@ -418,17 +418,23 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
     const { table, batch, node } = openNode
     setOpenNode(null)
 
-    const newBalance = applyEntryFee(kid.coin_balance)
-    try {
-      await setCoinBalance(kidId, newBalance)
-      await logCoinTransaction(kidId, {
-        amount: newBalance - kid.coin_balance,
-        reason: 'entry_fee',
-        balanceAfter: newBalance,
-      })
-      setKid(k => ({ ...k, coin_balance: newBalance }))
-    } catch (err) {
-      console.error('Failed to charge entry fee (continuing anyway):', err)
+    // Learn is a free lesson — no entry fee charged, no lives, no stakes.
+    // All other nodes pay the entry fee as normal.
+    const isLearnNode = node === 'learn'
+    const newBalance = isLearnNode ? kid.coin_balance : applyEntryFee(kid.coin_balance)
+
+    if (!isLearnNode) {
+      try {
+        await setCoinBalance(kidId, newBalance)
+        await logCoinTransaction(kidId, {
+          amount: newBalance - kid.coin_balance,
+          reason: 'entry_fee',
+          balanceAfter: newBalance,
+        })
+        setKid(k => ({ ...k, coin_balance: newBalance }))
+      } catch (err) {
+        console.error('Failed to charge entry fee (continuing anyway):', err)
+      }
     }
 
     const unlockBatch = node === 'unlock'
@@ -467,7 +473,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100">
               <HeartStatIcon />
-              <span className="font-body font-bold text-base text-red-500 leading-none tabular-nums">4</span>
+              <span className="font-body font-bold text-xs text-red-400 leading-none">per session</span>
             </div>
             <div
               className={`flex items-center gap-1.5 rounded-full px-3 py-2 border ${
