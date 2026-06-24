@@ -386,10 +386,16 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   const selectedTable = Math.ceil(selectedDay / BATCH_COUNT)
   const selectedBatch = ((selectedDay - 1) % BATCH_COUNT) + 1
 
-  // The kid's current day number within this chapter
-  const currentDay = currentPos.operation === operation
-    ? (currentPos.table - 1) * BATCH_COUNT + currentPos.batch
-    : 0 // not yet in this chapter
+  // The kid's current day number within this chapter.
+  // For completed chapters (cursor is past this operation), set to TOTAL_DAYS+1
+  // so all 72 circles show as done (green checkmarks) in the strip.
+  const opOrder = ['addition','subtraction','multiplication','division']
+  const isCompleted = opOrder.indexOf(currentPos.operation) > opOrder.indexOf(operation)
+  const currentDay = isCompleted
+    ? TOTAL_DAYS + 1
+    : currentPos.operation === operation
+      ? (currentPos.table - 1) * BATCH_COUNT + currentPos.batch
+      : 0
 
   const selectedStatus = tableStatus(currentPos, operation, selectedTable)
 
