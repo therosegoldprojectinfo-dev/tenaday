@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { generateBatch } from '../lib/problems'
 import { themeFor } from '../lib/eraTheme'
 import { nodeLabel, nextStep, OPERATIONS } from '../lib/progression'
-import { applyPayout, payoutForNode, passThresholdFor } from '../lib/economy'
+import { applyPayout, payoutForNode, passThresholdFor, NODE_PAYOUT, ENTRY_FEE } from '../lib/economy'
 import FlowerJump from '../components/FlowerJump'
 import {
   updateProgress,
@@ -281,14 +281,23 @@ function FinishedScreen({ passed, correct, total, payout, isReview, saving, onEx
 // ── Lesson screen (Learn node) ───────────────────────────────────────────
 // Pure display — shows today's 2 facts clearly, no questions, no lives.
 // Kid taps "Got it →" and we advance the cursor to the next node.
-function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, onExit }) {
+function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, coinBalance, onExit, onBalanceChange }) {
   const [saving, setSaving] = useState(false)
+  const [coins, setCoins]   = useState(0)
+  const payout = NODE_PAYOUT
 
   async function handleGotIt() {
     setSaving(true)
     try {
       const next = nextStep(operation, table, batchNum, node)
-      if (next && kidId) await updateProgress(kidId, next)
+      const newBalance = coinBalance + payout
+      await Promise.all([
+        next && kidId ? updateProgress(kidId, next) : Promise.resolve(),
+        kidId ? setCoinBalance(kidId, newBalance) : Promise.resolve(),
+        kidId ? logCoinTransaction(kidId, { amount: payout, reason: 'lesson_complete', balanceAfter: newBalance }) : Promise.resolve(),
+      ])
+      setCoins(payout)
+      onBalanceChange?.(newBalance)
     } catch (err) {
       console.error('Failed to advance after lesson:', err)
     } finally {
@@ -426,15 +435,24 @@ export default function Practice({
   }, [idx, isTimed, over, revealed])
 
   function handleContinue() {
+    // Check last question FIRST — if the kid answered all questions,
+    // evaluate their score regardless of lives remaining. A 4th wrong
+    // answer on Q12 should still trigger the finished screen if they
+    // passed the threshold, not the died screen.
+    if (idx === SESSION_TOTAL - 1) {
+      const correct = SESSION_TOTAL - wrong
+      if (lives === 0 && correct < passThreshold) {
+        setOver('died')
+        finalizeAttempt('died')
+      } else {
+        setOver('finished')
+        finalizeAttempt(correct >= passThreshold ? 'passed' : 'retry')
+      }
+      return
+    }
     if (lives === 0) {
       setOver('died')
       finalizeAttempt('died')
-      return
-    }
-    if (idx === SESSION_TOTAL - 1) {
-      const correct = SESSION_TOTAL - wrong
-      setOver('finished')
-      finalizeAttempt(correct >= passThreshold ? 'passed' : 'retry')
       return
     }
     setIdx(i => i + 1)
@@ -500,7 +518,9 @@ export default function Practice({
         batchNum={batchNum}
         node={node}
         kidId={kidId}
+        coinBalance={coinBalance}
         onExit={onExit}
+        onBalanceChange={onBalanceChange}
       />
     )
   }
@@ -540,7 +560,32 @@ export default function Practice({
         {/* ── Top bar ─────────────────────────────────────────────── */}
         <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-5 pb-3">
           <button
-            onClick={onExit}
+            onClick={async () => {
+              // Log the attempt as abandoned and refund entry fee so
+              // mid-session exits don't silently drain coins
+              try {
+                await logAttempt(kidId, {
+                  operation, table, batch: batchNum, node,
+                  questionsSeen: idx,
+                  correctCount: idx - wrong,
+                  wrongCount: wrong,
+                  livesUsed: LIVES_START - lives,
+                  result: 'retry',
+                  coinsDelta: 0,
+                })
+                // Refund entry fee on exit
+                const refunded = coinBalance + ENTRY_FEE
+                await setCoinBalance(kidId, refunded)
+                await logCoinTransaction(kidId, {
+                  amount: ENTRY_FEE,
+                  reason: 'exit_refund',
+                  balanceAfter: refunded,
+                })
+              } catch (err) {
+                console.error('Exit cleanup failed (non-blocking):', err)
+              }
+              onExit?.()
+            }}
             className="w-11 h-11 flex items-center justify-center rounded-full text-gray-400 transition-colors duration-150 active:bg-gray-100"
             aria-label="Exit practice"
           >
