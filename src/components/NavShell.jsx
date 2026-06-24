@@ -135,6 +135,15 @@ export default function NavShell({ active, onNavigate, onParentZone, children })
         className="hidden md:flex md:flex-col md:w-56 md:flex-shrink-0 md:border-r md:border-gray-100 md:py-6 md:px-3 md:gap-1"
         aria-label="Primary"
       >
+        {/* Logo */}
+        <div className="px-3 mb-4">
+          <img
+            src="/logo.png"
+            alt="Numio"
+            className="h-9 w-auto object-contain object-left"
+            draggable={false}
+          />
+        </div>
         {NAV_ITEMS.map(item => (
           <NavButton
             key={item.id}
