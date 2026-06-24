@@ -237,8 +237,8 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
   }
 
   function handleContinue() {
-    if (lives === 0) { setOver('died'); return }
     if (idx === SESSION_TOTAL - 1) { finalize(); return }
+    if (lives === 0) { setOver('died'); return }
     setIdx(i => i + 1)
     setSelected(null)
     setRevealed(false)
