@@ -300,6 +300,7 @@ where not exists (select 1 from gifts where parent_id is null);
 
 alter table kids add column if not exists timezone text not null default 'America/Toronto';
 alter table kids add column if not exists next_unlock_at timestamptz;
+alter table kids add column if not exists heart_balance int not null default 5;
 
 -- Called after a kid finishes all 7 nodes of a batch (Review node passes).
 -- Stamps last_advance_date and pre-computes next midnight in their timezone.
