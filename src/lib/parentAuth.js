@@ -148,7 +148,7 @@ export async function listKidsForParent(parentId) {
  *  this is a deliberate product decision, not a missing feature.
  *  placementClaim only affects the PASS THRESHOLD later (lib/economy.js),
  *  never where a kid starts playing. */
-export async function createKid(parentId, { name, age, placementClaim }) {
+export async function createKid(parentId, { name, age, placementClaim, timezone }) {
   if (!name || !name.trim()) {
     throw new AuthError('Enter a name for your kid.')
   }
@@ -160,6 +160,7 @@ export async function createKid(parentId, { name, age, placementClaim }) {
       name: name.trim(),
       age: age || null,
       placement_claim: placementClaim || null,
+      timezone: timezone || 'America/Toronto',
       current_operation: 'addition',
       current_table: 1,
       current_batch: 1,
