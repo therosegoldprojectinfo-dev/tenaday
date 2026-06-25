@@ -432,7 +432,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
     // server query in case kid state was stale when the UI rendered.
     const targetUnlock = { operation, table, batch, node: 'unlock' }
     const pos = chainPosition(currentPos, targetUnlock)
-    if (pos === 'next_new_batch') {
+    if (pos === 'next_new_batch' || pos === 'current' || pos === 'next_same_batch') {
       const allowed = await canStartNewUnit(kidId)
       if (!allowed) {
         setDayGateBlocked(true)
@@ -604,10 +604,15 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
 
             let dayLocked = false
             if (selectedStatus === 'active' && unlockedInChain && !completed) {
-              const pos = chainPosition(currentPos, targetPos)
-              if (pos === 'next_new_batch') {
-                const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
-                dayLocked = !gateOpen
+              const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
+              if (!gateOpen) {
+                const pos = chainPosition(currentPos, targetPos)
+                // next_new_batch: classic case — cursor hasn't moved yet (old behavior)
+                // current / next_same_batch: cursor already advanced into the new batch
+                // but midnight hasn't hit — lock the whole current batch too.
+                if (pos === 'next_new_batch' || pos === 'current' || pos === 'next_same_batch') {
+                  dayLocked = true
+                }
               }
             }
 
