@@ -95,11 +95,11 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
       type="button"
       disabled={locked}
       onClick={onPress}
-      className="w-full text-left rounded-3xl border-2 overflow-hidden disabled:opacity-90 transition-transform active:scale-[0.98]"
+      className="w-full text-left rounded-3xl border-2 overflow-hidden disabled:opacity-90 transition-all active:translate-y-1"
       style={{
-        borderColor: locked ? '#E5E7EB' : '#E5E7EB',
+        borderColor: locked ? '#E5E7EB' : '#D1D5DB',
         backgroundColor: '#FFFFFF',
-        boxShadow: locked ? 'none' : '0 4px 16px rgba(0,0,0,0.07)',
+        boxShadow: locked ? '0 4px 0 0 #E5E7EB' : '0 6px 0 0 #C4C4C4',
       }}
     >
       {/* Top zone — taller, bigger mascot, more breathing room */}
