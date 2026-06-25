@@ -334,6 +334,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   const [openNode, setOpenNode] = useState(null)
   const [dayGateBlocked, setDayGateBlocked] = useState(false)
   const [tooltip, setTooltip] = useState(null) // 'streak' | 'hearts' | 'coins' | null
+  const [noHeartsBlocked, setNoHeartsBlocked] = useState(false)
   const [recharging, setRecharging] = useState(false)
   const [rechargeError, setRechargeError] = useState(null)
 
@@ -443,9 +444,13 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
       }
     }
 
-    // Learn is a free lesson — no entry fee charged, no lives, no stakes.
-    // All other nodes pay the entry fee as normal.
+    // Heart gate: non-learn nodes require at least 1 heart to start.
+    // Learn is always free — no lives, no entry fee.
     const isLearnNode = node === 'learn'
+    if (!isLearnNode && (kid.heart_balance ?? 5) === 0) {
+      setNoHeartsBlocked(true)
+      return
+    }
     const newBalance = isLearnNode ? kid.coin_balance : applyEntryFee(kid.coin_balance)
 
     if (!isLearnNode) {
@@ -644,6 +649,50 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
           >
             OK
           </button>
+        </div>
+      )}
+
+      {noHeartsBlocked && (
+        <div className="mx-4 mt-3 rounded-xl bg-red-50 border border-red-200 px-4 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
+          <div className="flex items-start justify-between gap-3">
+            <p className="font-body text-sm text-red-700 font-semibold leading-snug">
+              💔 No hearts left! Recharge a heart to keep playing.
+            </p>
+            <button
+              onClick={() => setNoHeartsBlocked(false)}
+              className="flex-shrink-0 font-body font-bold text-xs text-red-400 active:opacity-70"
+              aria-label="Dismiss"
+            >
+              OK
+            </button>
+          </div>
+          <button
+            onClick={async () => {
+              setRechargeError(null)
+              setRecharging(true)
+              try {
+                const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 0, kid.coin_balance)
+                setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins }))
+                setNoHeartsBlocked(false)
+              } catch (err) {
+                setRechargeError(err.message)
+              } finally {
+                setRecharging(false)
+              }
+            }}
+            disabled={recharging || kid.coin_balance < 10}
+            className="mt-2 w-full py-2.5 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95"
+            style={{
+              backgroundColor: kid.coin_balance >= 10 ? '#ef4444' : '#F3F4F6',
+              color: kid.coin_balance >= 10 ? '#fff' : '#9CA3AF',
+              boxShadow: kid.coin_balance >= 10 ? '0 3px 0 0 #b91c1c' : '0 3px 0 0 #D1D5DB',
+            }}
+          >
+            {recharging ? 'Recharging…' : kid.coin_balance >= 10 ? '❤️ Recharge 1 heart — 10 ⭐' : 'Not enough coins (need 10 ⭐)'}
+          </button>
+          {rechargeError && (
+            <p className="font-body text-xs text-red-400 mt-2">{rechargeError}</p>
+          )}
         </div>
       )}
 
