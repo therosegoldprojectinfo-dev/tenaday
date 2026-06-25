@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { createKid, AuthError } from '../lib/parentAuth'
+import { detectTimezone } from '../lib/dayGate'
 
 function BackIcon() {
   return (
@@ -323,6 +324,7 @@ export default function CreateKid({ parentId, onCreated, onBack }) {
         name: nameAge.name,
         age:  nameAge.age,
         placementClaim,
+        timezone: detectTimezone(),
       })
       onCreated(kidId, placementClaim)
     } catch (err) {
