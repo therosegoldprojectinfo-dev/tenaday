@@ -602,19 +602,18 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
               selectedTable === 1 &&
               (isCurrent || unlockedInChain)
 
-            let dayLocked = false
-            if (selectedStatus === 'active' && unlockedInChain && !completed) {
-              const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
-              if (!gateOpen) {
-                const pos = chainPosition(currentPos, targetPos)
-                // next_new_batch: classic case — cursor hasn't moved yet (old behavior)
-                // current / next_same_batch: cursor already advanced into the new batch
-                // but midnight hasn't hit — lock the whole current batch too.
-                if (pos === 'next_new_batch' || pos === 'current' || pos === 'next_same_batch') {
-                  dayLocked = true
-                }
-              }
-            }
+            // Day gate: check at batch level, not chain level.
+            // After Review passes, cursor advances to next batch's unlock node.
+            // chainPosition only returns 'current'/'next_same_batch' for unlock+learn;
+            // the rest of the batch shows as 'locked' in chain terms — but they should
+            // show as 'day_locked'. So we gate the entire current batch by next_unlock_at.
+            const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
+            const isCurrentBatch =
+              currentPos.operation === operation &&
+              currentPos.table === selectedTable &&
+              currentPos.batch === selectedBatch
+
+            const dayLocked = !gateOpen && isCurrentBatch && !completed
 
             const status = completed
               ? 'completed'
