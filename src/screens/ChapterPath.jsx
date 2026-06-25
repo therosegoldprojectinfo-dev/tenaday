@@ -16,7 +16,7 @@ import {
   factsForBatch,
 } from '../lib/progression'
 import { canStartNewUnit, nextUnlockMessage } from '../lib/dayGate'
-import { fetchKid, fetchStreak, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
+import { fetchKid, fetchStreak, setCoinBalance, logCoinTransaction, rechargeHeart, DEMO_KID_ID } from '../lib/kidData'
 import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 
 const DUO_GREEN = '#58cc02'
@@ -333,6 +333,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
   const [selectedDay, setSelectedDay] = useState(null)
   const [openNode, setOpenNode] = useState(null)
   const [dayGateBlocked, setDayGateBlocked] = useState(false)
+  const [tooltip, setTooltip] = useState(null) // 'streak' | 'hearts' | 'coins' | null
+  const [recharging, setRecharging] = useState(false)
+  const [rechargeError, setRechargeError] = useState(null)
 
   const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT // 72
 
@@ -470,10 +473,25 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
     onStartNode({
       operation, table, batchNum: batch, node,
       coinBalance: newBalance,
+      heartBalance: kid.heart_balance ?? 5,
       reviewPool,
       unlockBatch,
       placementClaim: kid.placement_claim,
     })
+  }
+
+  async function handleRechargeHeart() {
+    if (recharging) return
+    setRechargeError(null)
+    setRecharging(true)
+    try {
+      const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 5, kid.coin_balance)
+      setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins }))
+    } catch (err) {
+      setRechargeError(err.message)
+    } finally {
+      setRecharging(false)
+    }
   }
 
   const inDebt = kid.coin_balance < 0
@@ -492,31 +510,109 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
           >
             <BackIcon />
           </button>
+          {/* Close tooltip on outside click */}
+          {tooltip && (
+            <div className="fixed inset-0 z-40" onClick={() => { setTooltip(null); setRechargeError(null) }} />
+          )}
+
           <div className="flex items-center gap-2">
-            {/* Streak */}
-            <div className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200">
-              <span className="text-base leading-none">🔥</span>
-              <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
-            </div>
-            <div className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100">
-              <HeartStatIcon />
-              <span className="font-body font-bold text-xs text-red-400 leading-none">per session</span>
-            </div>
-            <div
-              className={`flex items-center gap-1.5 rounded-full px-3 py-2 border ${
-                inDebt ? 'border-red-200' : 'border-amber-200'
-              }`}
-              style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}
-            >
-              <CoinStatIcon />
-              <span
-                className={`font-body font-bold text-base leading-none tabular-nums ${
-                  inDebt ? 'text-red-500' : 'text-amber-700'
-                }`}
+
+            {/* ── Streak badge ── */}
+            <div className="relative">
+              <button
+                onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')}
+                className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200 active:scale-95 transition-transform"
               >
-                {kid.coin_balance}
-              </span>
+                <span className="text-base leading-none">🔥</span>
+                <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
+              </button>
+              {tooltip === 'streak' && (
+                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center">
+                  <p className="text-2xl mb-1">🔥</p>
+                  <p className="font-display font-bold text-gray-900 text-sm">Day Streak</p>
+                  <p className="font-body text-xs text-gray-400 mt-1">
+                    {streak === 0 ? 'No streak yet — play today!' : `${streak} day${streak === 1 ? '' : 's'} in a row!`}
+                  </p>
+                </div>
+              )}
             </div>
+
+            {/* ── Hearts badge ── */}
+            <div className="relative">
+              <button
+                onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }}
+                className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100 active:scale-95 transition-transform"
+              >
+                <HeartStatIcon />
+                <span className="font-body font-bold text-base text-red-400 leading-none tabular-nums">
+                  {kid.heart_balance ?? 5}
+                </span>
+              </button>
+              {tooltip === 'hearts' && (
+                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center">
+                  <p className="text-2xl mb-1">❤️</p>
+                  <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
+                  <div className="flex justify-center gap-1 my-2">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}>❤️</span>
+                    ))}
+                  </div>
+                  <p className="font-body text-xs text-gray-400 mb-3">
+                    Hearts are lost when you answer wrong. Recharge with coins.
+                  </p>
+                  {(kid.heart_balance ?? 5) < 5 ? (
+                    <>
+                      {rechargeError && (
+                        <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>
+                      )}
+                      <button
+                        onClick={handleRechargeHeart}
+                        disabled={recharging || kid.coin_balance < 10}
+                        className="w-full py-2.5 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95"
+                        style={{
+                          backgroundColor: kid.coin_balance >= 10 ? '#ef4444' : '#F3F4F6',
+                          color: kid.coin_balance >= 10 ? '#fff' : '#9CA3AF',
+                          boxShadow: kid.coin_balance >= 10 ? '0 3px 0 0 #b91c1c' : '0 3px 0 0 #D1D5DB',
+                        }}
+                      >
+                        {recharging ? 'Recharging…' : '❤️ +1 for 10 ⭐'}
+                      </button>
+                    </>
+                  ) : (
+                    <p className="font-body text-xs text-green-500 font-bold">Full hearts! ✨</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* ── Coins badge ── */}
+            <div className="relative">
+              <button
+                onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-2 border active:scale-95 transition-transform ${
+                  inDebt ? 'border-red-200' : 'border-amber-200'
+                }`}
+                style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}
+              >
+                <CoinStatIcon />
+                <span className={`font-body font-bold text-base leading-none tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-700'}`}>
+                  {kid.coin_balance}
+                </span>
+              </button>
+              {tooltip === 'coins' && (
+                <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center">
+                  <p className="text-2xl mb-1">⭐</p>
+                  <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
+                  <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>
+                    {kid.coin_balance}
+                  </p>
+                  <p className="font-body text-xs text-gray-400 mt-1">
+                    {inDebt ? 'You're in debt — keep playing to earn coins back!' : 'Earn coins by completing activities.'}
+                  </p>
+                </div>
+              )}
+            </div>
+
           </div>
         </div>
 
