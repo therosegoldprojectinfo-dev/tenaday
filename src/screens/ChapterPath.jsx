@@ -15,7 +15,7 @@ import {
   previousBatch,
   factsForBatch,
 } from '../lib/progression'
-import { isPlayableToday, canAdvanceToday, nextUnlockMessage } from '../lib/dayGate'
+import { canStartNewUnit, nextUnlockMessage } from '../lib/dayGate'
 import { fetchKid, fetchStreak, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
 import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 
@@ -239,7 +239,7 @@ const NODE_COLORS = {
   review:        { bg: '#F0FDF4', icon: '#15803D', border: '#4ADE80', shadow: '#22C55E' },
 }
 
-function NodeRow({ node, status, isCurrent, isWelcome, onPress }) {
+function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) {
   const locked    = status === 'locked'
   const dayLocked = status === 'day_locked'
   const completed = status === 'completed'
@@ -249,7 +249,7 @@ function NodeRow({ node, status, isCurrent, isWelcome, onPress }) {
   const subtitle = locked
     ? 'Locked'
     : dayLocked
-      ? nextUnlockMessage()
+      ? nextUnlockMessage(nextUnlockAt)
       : completed
         ? 'Completed — tap to replay'
         : isWelcome
@@ -428,16 +428,16 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
     setOpenNode(null)
 
     // Defense-in-depth day gate: the node list already shows next-batch nodes
-    // as day_locked (so they can't be tapped), but re-check here in case the
-    // kid state was stale when the UI rendered. This is the authoritative gate.
-    // We check the first node of the target batch (unlock) against the cursor —
-    // if chainPosition === 'next_new_batch' and today's date is the same as
-    // last_advance_date, the kid has already done their batch today.
+    // as day_locked (so they can't be tapped), but re-check here with a live
+    // server query in case kid state was stale when the UI rendered.
     const targetUnlock = { operation, table, batch, node: 'unlock' }
     const pos = chainPosition(currentPos, targetUnlock)
-    if (pos === 'next_new_batch' && !canAdvanceToday(kid.last_advance_date)) {
-      setDayGateBlocked(true)
-      return
+    if (pos === 'next_new_batch') {
+      const allowed = await canStartNewUnit(kidId)
+      if (!allowed) {
+        setDayGateBlocked(true)
+        return
+      }
     }
 
     // Learn is a free lesson — no entry fee charged, no lives, no stakes.
@@ -539,7 +539,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
       {dayGateBlocked && (
         <div className="mx-4 mt-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto flex items-start justify-between gap-3">
           <p className="font-body text-sm text-amber-800 font-semibold leading-snug">
-            {nextUnlockMessage()}
+            {nextUnlockMessage(kid.next_unlock_at)}
           </p>
           <button
             onClick={() => setDayGateBlocked(false)}
@@ -605,8 +605,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
             let dayLocked = false
             if (selectedStatus === 'active' && unlockedInChain && !completed) {
               const pos = chainPosition(currentPos, targetPos)
-              const playable = isPlayableToday(pos, kid.last_advance_date, new Date())
-              dayLocked = !playable
+              if (pos === 'next_new_batch') {
+                const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
+                dayLocked = !gateOpen
+              }
             }
 
             const status = completed
@@ -622,6 +624,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
                 key={node}
                 node={node}
                 status={status}
+                nextUnlockAt={kid.next_unlock_at}
                 isCurrent={isCurrent}
                 isWelcome={isWelcome}
                 onPress={() => handleTogglePopover(selectedTable, selectedBatch, node, status, isCurrent)}
