@@ -10,10 +10,11 @@ import {
   setCoinBalance,
   logCoinTransaction,
   logAttempt,
+  setHeartBalance,
 } from '../lib/kidData'
 
 const TOTAL       = 12  // default; review overrides to 24
-const LIVES_START = 4
+const LIVES_START = 5
 const TIMED_MS    = 5000
 
 const TIMED_NODES        = new Set(['speed'])
@@ -417,11 +418,13 @@ export default function Practice({
   node          = 'learn',
   kidId,
   coinBalance   = 0,
+  heartBalance  = 5,
   reviewPool,
   unlockBatch,
   placementClaim = null,
   onExit,
   onBalanceChange,
+  onHeartChange,
 }) {
   const theme         = themeFor(operation)
   const isTimed       = TIMED_NODES.has(node)
@@ -443,7 +446,7 @@ export default function Practice({
   const passThreshold = passThresholdFor(operation, placementClaim, OPERATIONS, SESSION_TOTAL)
 
   const [idx,      setIdx]      = useState(0)
-  const [lives,    setLives]    = useState(LIVES_START)
+  const [lives,    setLives]    = useState(heartBalance ?? LIVES_START)
   const [selected, setSelected] = useState(null)
   const [revealed, setRevealed] = useState(false)
   const [wrong,    setWrong]    = useState(0)
@@ -478,7 +481,12 @@ export default function Practice({
     } else {
       setStreak(0)
       setWrong(w => w + 1)
-      setLives(l => l - 1)
+      setLives(l => {
+        const next = l - 1
+        if (kidId) setHeartBalance(kidId, next).catch(console.error)
+        onHeartChange?.(next)
+        return next
+      })
       setHeartKey(k => k + 1)
     }
   }
@@ -489,7 +497,12 @@ export default function Practice({
     setRevealed(true)
     setStreak(0)
     setWrong(w => w + 1)
-    setLives(l => l - 1)
+    setLives(l => {
+      const next = l - 1
+      if (kidId) setHeartBalance(kidId, next).catch(console.error)
+      onHeartChange?.(next)
+      return next
+    })
     setHeartKey(k => k + 1)
   }
 
