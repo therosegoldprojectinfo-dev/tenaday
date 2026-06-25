@@ -602,17 +602,19 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
               selectedTable === 1 &&
               (isCurrent || unlockedInChain)
 
-            // Day gate: check at batch level, not chain level.
-            // After Review passes, cursor advances to next batch's unlock node.
-            // chainPosition only returns 'current'/'next_same_batch' for unlock+learn;
-            // the rest of the batch shows as 'locked' in chain terms — but they should
-            // show as 'day_locked'. So we gate the entire current batch by next_unlock_at.
+            // Day gate: batch-level check using server next_unlock_at.
+            // When gate is closed and the selected batch IS the cursor's current batch,
+            // every node in that batch shows as day_locked — including nodes that are
+            // not yet unlockedInChain (chain only unlocks unlock+learn after advance;
+            // the rest show as 'locked' by chain but must show 'day_locked' to the kid).
             const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
             const isCurrentBatch =
               currentPos.operation === operation &&
               currentPos.table === selectedTable &&
               currentPos.batch === selectedBatch
 
+            // Batch 4 nodes are all completed=true so they show as 'completed' (replayable).
+            // Batch 5 nodes: if gate closed, ALL are day_locked regardless of chain state.
             const dayLocked = !gateOpen && isCurrentBatch && !completed
 
             const status = completed
