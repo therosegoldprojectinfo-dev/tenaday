@@ -560,13 +560,14 @@ export default function Practice({
 
         if (result === 'passed') {
           if (node === 'review') {
-            // Review is the last node of today's batch. Stamp the date so
-            // the next batch is day-gated, but DO NOT advance the cursor to
-            // that next batch — if we did, it would become 'current' and
-            // isPlayableToday would always return true, breaking the gate.
-            // ChapterPath reads last_advance_date fresh on next mount and
-            // shows the next batch's unlock as day_locked until tomorrow.
+            // Review is the last node of today's batch.
+            // 1. Stamp next_unlock_at = next midnight in kid's timezone (server-side).
+            // 2. Advance cursor to the first node of the next batch so the kid
+            //    sees tomorrow's batch highlighted (but day-locked via next_unlock_at).
+            // The gate is now enforced by next_unlock_at, not by freezing the cursor.
             await stampAdvanceDate(kidId)
+            const next = nextStep(operation, table, batchNum, node)
+            if (next) await updateProgress(kidId, next)
           } else {
             const next = nextStep(operation, table, batchNum, node)
             if (next) await updateProgress(kidId, next)
