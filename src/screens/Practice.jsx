@@ -559,17 +559,19 @@ export default function Practice({
         }
 
         if (result === 'passed') {
+          const next = nextStep(operation, table, batchNum, node)
           if (node === 'review') {
             // Review is the last node of today's batch.
-            // 1. Stamp next_unlock_at = next midnight in kid's timezone (server-side).
-            // 2. Advance cursor to the first node of the next batch so the kid
-            //    sees tomorrow's batch highlighted (but day-locked via next_unlock_at).
-            // The gate is now enforced by next_unlock_at, not by freezing the cursor.
-            await stampAdvanceDate(kidId)
-            const next = nextStep(operation, table, batchNum, node)
+            // Always advance the cursor first (non-negotiable).
+            // Then stamp the gate — if the RPC fails, the cursor still moved
+            // so the kid isn't stuck, and the gate will be missing (fail open).
             if (next) await updateProgress(kidId, next)
+            try {
+              await stampAdvanceDate(kidId)
+            } catch (gateErr) {
+              console.error('stampAdvanceDate failed (gate will be open, cursor advanced):', gateErr)
+            }
           } else {
-            const next = nextStep(operation, table, batchNum, node)
             if (next) await updateProgress(kidId, next)
           }
         }
