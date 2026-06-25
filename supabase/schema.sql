@@ -288,3 +288,53 @@ select * from (values
   ('A small toy',             500, 'gift')
 ) as starter_gifts(name, coin_price, icon)
 where not exists (select 1 from gifts where parent_id is null);
+
+-- ── Server-time day gate (replaces device-clock last_advance_date check) ──
+-- timezone: IANA timezone string detected from the kid's device at profile
+-- creation, used to compute "next midnight" server-side so the gate never
+-- relies on the device clock.
+-- next_unlock_at: the exact server timestamp when the next batch unlocks —
+-- set by complete_unit() RPC, checked by can_start_new_unit() RPC.
+
+alter table kids add column if not exists timezone text not null default 'America/Toronto';
+alter table kids add column if not exists next_unlock_at timestamptz;
+
+-- Called after a kid finishes all 7 nodes of a batch (Review node passes).
+-- Stamps last_advance_date and pre-computes next midnight in their timezone.
+create or replace function complete_unit(kid_id uuid)
+returns timestamptz
+language plpgsql
+security definer
+as $$
+declare
+  kid_tz text;
+  next_midnight timestamptz;
+begin
+  select timezone into kid_tz from kids where id = kid_id;
+
+  -- Next midnight in kid's timezone
+  next_midnight := date_trunc('day', now() at time zone kid_tz)::date + interval '1 day';
+  next_midnight := next_midnight at time zone kid_tz;
+
+  update kids
+  set
+    last_advance_date = now(),
+    next_unlock_at = next_midnight
+  where id = kid_id;
+
+  return next_midnight;
+end;
+$$;
+
+-- Called on the client before allowing a new batch to start.
+-- Returns true if next_unlock_at is null (never locked) or already in the past.
+create or replace function can_start_new_unit(kid_id uuid)
+returns boolean
+language sql
+security definer
+as $$
+  select
+    next_unlock_at is null or now() >= next_unlock_at
+  from kids
+  where id = kid_id;
+$$;
