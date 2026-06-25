@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient'
-import { todayString } from './dayGate'
+import { completeUnit } from './dayGate'
 
 // ── Demo kid ─────────────────────────────────────────────────────────────
 // No parent/login flow yet (that's next build phase per current scope), so
@@ -15,7 +15,7 @@ export const DEMO_KID_ID = '00000000-0000-0000-0000-000000000001'
 export async function fetchKid(kidId) {
   const { data, error } = await supabase
     .from('kids')
-    .select('id, name, age, placement_claim, current_operation, current_table, current_batch, current_node, last_advance_date, seen_chapter_intros, coin_balance')
+    .select('id, name, age, placement_claim, current_operation, current_table, current_batch, current_node, last_advance_date, next_unlock_at, timezone, seen_chapter_intros, coin_balance')
     .eq('id', kidId)
     .single()
 
@@ -36,24 +36,18 @@ export async function updateProgress(kidId, { operation, table, batch, node }) {
       current_table: table,
       current_batch: batch,
       current_node: node,
-      last_advance_date: todayString(),
     })
     .eq('id', kidId)
 
   if (error) throw error
 }
 
-/** Stamps last_advance_date to today WITHOUT moving the cursor.
- *  Called after a Review node passes — the batch is done for today,
- *  but the cursor stays at review so the next batch's unlock remains
- *  chainPosition 'next_new_batch' and the day gate fires correctly. */
+/** Stamps the unit completion server-side via the complete_unit RPC.
+ *  Called after the Review node passes — sets last_advance_date = now()
+ *  and next_unlock_at = next midnight in the kid's timezone, without
+ *  moving the cursor. */
 export async function stampAdvanceDate(kidId) {
-  const { error } = await supabase
-    .from('kids')
-    .update({ last_advance_date: todayString() })
-    .eq('id', kidId)
-
-  if (error) throw error
+  await completeUnit(kidId)
 }
 
 /** Marks a chapter's one-time interactive concept intro as seen, so it
