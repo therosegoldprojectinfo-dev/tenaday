@@ -109,6 +109,8 @@ create table if not exists kids (
 -- new columns back after the drop/recreate above.
 alter table kids add column if not exists current_node node_type not null default 'learn';
 alter table kids add column if not exists current_batch int not null default 1 check (current_batch between 1 and 6);
+alter table kids drop constraint if exists kids_current_batch_check;
+alter table kids add constraint kids_current_batch_check check (current_batch >= 1 and current_batch <= 6);
 alter table kids add column if not exists last_advance_date date;
 alter table kids add column if not exists seen_chapter_intros operation_type[] not null default '{}';
 alter table kids add column if not exists age int check (age is null or (age between 3 and 17));
@@ -312,9 +314,10 @@ declare
 begin
   select timezone into kid_tz from kids where id = kid_id;
 
-  -- Next midnight in kid's timezone
-  next_midnight := date_trunc('day', now() at time zone kid_tz)::date + interval '1 day';
-  next_midnight := next_midnight at time zone kid_tz;
+  -- Correctly compute next midnight in kid's local timezone.
+  -- date_trunc gives local midnight as a timestamp without tz,
+  -- then AT TIME ZONE interprets it as that zone and converts to UTC.
+  next_midnight := (date_trunc('day', now() at time zone kid_tz) + interval '1 day') at time zone kid_tz;
 
   update kids
   set
