@@ -223,6 +223,7 @@ export default function App() {
         node={activeNode.node}
         kidId={kidId}
         coinBalance={activeNode.coinBalance}
+        heartBalance={activeNode.heartBalance}
         reviewPool={activeNode.reviewPool}
         unlockBatch={activeNode.unlockBatch}
         placementClaim={activeNode.placementClaim}
