@@ -607,7 +607,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId = DE
                     {kid.coin_balance}
                   </p>
                   <p className="font-body text-xs text-gray-400 mt-1">
-                    {inDebt ? 'You're in debt — keep playing to earn coins back!' : 'Earn coins by completing activities.'}
+                    {inDebt ? "You're in debt — keep playing to earn coins back!" : "Earn coins by completing activities."}
                   </p>
                 </div>
               )}
