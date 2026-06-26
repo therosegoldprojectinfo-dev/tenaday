@@ -14,7 +14,7 @@ const ANIM = `
 /* ── Slide 1 — Welcome ── */
 function Slide1() {
   return (
-    <div style={{flex:1,position:'relative',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{height:380,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
       {/* confetti */}
       <div style={{position:'absolute',top:100,left:54,width:18,height:18,borderRadius:5,background:'#FFB700',animation:'confettiA 1.9s ease-in-out infinite alternate'}}/>
       <div style={{position:'absolute',top:80,right:60,width:14,height:14,borderRadius:4,background:'#1CB0F6',transform:'rotate(20deg)',animation:'confettiA 2.3s ease-in-out infinite alternate'}}/>
@@ -63,7 +63,7 @@ function MascotOrFallback() {
 /* ── Slide 2 — Earn Coins ── */
 function Slide2() {
   return (
-    <div style={{flex:1,position:'relative',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{height:380,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
       {/* spinning rays */}
       <svg width={260} height={260} viewBox="0 0 320 320" style={{position:'absolute',top:40,animation:'spinslow 26s linear infinite'}}>
         <g fill="#FFE08A">
@@ -106,7 +106,7 @@ function Slide2() {
 /* ── Slide 3 — Protect Hearts ── */
 function Slide3() {
   return (
-    <div style={{flex:1,position:'relative',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:34,paddingTop:40}}>
+    <div style={{height:380,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:34}}>
       {/* hearts row */}
       <div style={{display:'flex',gap:10,alignItems:'center'}}>
         {[0,1,2,3].map(i => (
@@ -143,7 +143,7 @@ function Slide3() {
 /* ── Slide 4 — One Unit Per Day ── */
 function Slide4() {
   return (
-    <div style={{flex:1,position:'relative',display:'flex',alignItems:'center',justifyContent:'center',paddingBottom:20}}>
+    <div style={{height:380,display:"flex",alignItems:"center",justifyContent:"center"}}>
       <svg width={280} height={298} viewBox="0 0 300 320" style={{filter:'drop-shadow(0 12px 26px rgba(0,0,0,.12))'}}>
         <defs>
           <clipPath id="dnCard"><rect x={0} y={0} width={300} height={320} rx={34}/></clipPath>
@@ -255,8 +255,9 @@ export default function Onboarding({ onDone }) {
         minHeight: '100dvh',
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'center',
         background: '#ffffff',
-        fontFamily: "'Nunito', sans-serif",
+        fontFamily: "'Baloo 2', sans-serif",
         transition: 'opacity 0.2s ease',
         opacity: fading ? 0 : 1,
         maxWidth: 390,
@@ -276,7 +277,7 @@ export default function Onboarding({ onDone }) {
       <div style={{padding: '0 32px 40px', textAlign: 'center'}}>
         <h1 style={{
           margin: '0 0 10px',
-          fontFamily: "'Fredoka', 'Nunito', sans-serif",
+          fontFamily: "'Baloo 2', sans-serif",
           fontWeight: 700,
           fontSize: 28,
           lineHeight: 1.15,
@@ -319,7 +320,7 @@ export default function Onboarding({ onDone }) {
             background: '#58cc02',
             boxShadow: '0 4px 0 #46a302',
             color: '#fff',
-            fontFamily: "'Nunito', sans-serif",
+            fontFamily: "'Baloo 2', sans-serif",
             fontWeight: 800,
             fontSize: 16,
             letterSpacing: '0.06em',
