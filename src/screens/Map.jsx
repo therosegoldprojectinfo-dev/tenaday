@@ -249,7 +249,7 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
 
       {/* Tooltip outside-click dismiss */}
       {tooltip && (
-        <div className="fixed inset-0 z-40" onClick={() => { setTooltip(null); setRechargeError(null) }} />
+        <div className="fixed inset-0 z-40" onMouseDown={() => { setTooltip(null); setRechargeError(null) }} />
       )}
 
       {/* Top stats bar */}
