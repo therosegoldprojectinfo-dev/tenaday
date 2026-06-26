@@ -445,16 +445,20 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       }
     }
 
-    // Heart gate: non-learn nodes require at least 1 heart to start.
     // Learn is always free — no lives, no entry fee.
     const isLearnNode = node === 'learn'
-    if (!isLearnNode && (kid.heart_balance ?? 5) === 0) {
+    // Replay: completed nodes are always free per spec.
+    // A node is a replay if it's behind the current cursor (isCompleted returns true).
+    const targetPos = { operation, table, batch, node }
+    const isReplayNode = !isLearnNode && isCompleted(currentPos, targetPos)
+    // Heart gate: non-learn, non-replay nodes require at least 1 heart.
+    if (!isLearnNode && !isReplayNode && (kid.heart_balance ?? 5) === 0) {
       setNoHeartsBlocked(true)
       return
     }
-    const newBalance = isLearnNode ? kid.coin_balance : applyEntryFee(kid.coin_balance)
+    const newBalance = (isLearnNode || isReplayNode) ? kid.coin_balance : applyEntryFee(kid.coin_balance)
 
-    if (!isLearnNode) {
+    if (!isLearnNode && !isReplayNode) {
       try {
         await setCoinBalance(kidId, newBalance)
         await logCoinTransaction(kidId, {
@@ -654,45 +658,59 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       )}
 
       {noHeartsBlocked && (
-        <div className="mx-4 mt-3 rounded-xl bg-red-50 border border-red-200 px-4 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
-          <div className="flex items-start justify-between gap-3">
-            <p className="font-body text-sm text-red-700 font-semibold leading-snug">
-              💔 No hearts left! Recharge a heart to keep playing.
-            </p>
-            <button
-              onClick={() => setNoHeartsBlocked(false)}
-              className="flex-shrink-0 font-body font-bold text-xs text-red-400 active:opacity-70"
-              aria-label="Dismiss"
-            >
-              OK
-            </button>
-          </div>
-          <button
-            onClick={async () => {
-              setRechargeError(null)
-              setRecharging(true)
-              try {
-                const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 0, kid.coin_balance)
-                setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins }))
-                setNoHeartsBlocked(false)
-              } catch (err) {
-                setRechargeError(err.message)
-              } finally {
-                setRecharging(false)
-              }
-            }}
-            disabled={recharging || kid.coin_balance < 10}
-            className="mt-2 w-full py-2.5 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95"
-            style={{
-              backgroundColor: kid.coin_balance >= 10 ? '#ef4444' : '#F3F4F6',
-              color: kid.coin_balance >= 10 ? '#fff' : '#9CA3AF',
-              boxShadow: kid.coin_balance >= 10 ? '0 3px 0 0 #b91c1c' : '0 3px 0 0 #D1D5DB',
-            }}
-          >
-            {recharging ? 'Recharging…' : kid.coin_balance >= 10 ? '❤️ Recharge 1 heart — 10 ⭐' : 'Not enough coins (need 10 ⭐)'}
-          </button>
-          {rechargeError && (
-            <p className="font-body text-xs text-red-400 mt-2">{rechargeError}</p>
+        <div className="mx-4 mt-3 rounded-2xl border-2 border-red-100 bg-red-50 px-5 py-4 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
+          {kid.coin_balance >= 10 ? (
+            /* Has enough coins — show recharge option */
+            <>
+              <div className="flex items-start justify-between gap-3 mb-3">
+                <div>
+                  <p className="font-display font-bold text-base text-red-700">💔 No hearts left!</p>
+                  <p className="font-body text-sm text-red-500 mt-0.5">Recharge a heart to keep playing.</p>
+                </div>
+                <button onClick={() => setNoHeartsBlocked(false)}
+                  className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
+              </div>
+              {rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
+              <button
+                onClick={async () => {
+                  setRechargeError(null)
+                  setRecharging(true)
+                  try {
+                    const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 0, kid.coin_balance)
+                    setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins }))
+                    setNoHeartsBlocked(false)
+                  } catch (err) {
+                    setRechargeError(err.message)
+                  } finally {
+                    setRecharging(false)
+                  }
+                }}
+                disabled={recharging}
+                className="w-full py-3 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95 text-white"
+                style={{ backgroundColor: '#ef4444', boxShadow: '0 3px 0 0 #b91c1c' }}
+              >
+                {recharging ? 'Recharging…' : '❤️ Recharge 1 heart — 10 ⭐'}
+              </button>
+            </>
+          ) : (
+            /* Can't afford recharge — friendly dead-end screen */
+            <>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="font-display font-bold text-base text-red-700">💔 No hearts left!</p>
+                  <p className="font-body text-sm text-red-500 mt-0.5">Not enough coins to recharge (need 10 ⭐).</p>
+                </div>
+                <button onClick={() => setNoHeartsBlocked(false)}
+                  className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
+              </div>
+              <div className="mt-3 rounded-xl bg-white px-4 py-3 text-center">
+                <p className="text-3xl mb-1">🌙</p>
+                <p className="font-display font-bold text-sm text-gray-900">Come back tomorrow!</p>
+                <p className="font-body text-xs text-gray-400 mt-1 leading-snug">
+                  Your hearts refill at midnight. You can still replay completed activities for free!
+                </p>
+              </div>
+            </>
           )}
         </div>
       )}
