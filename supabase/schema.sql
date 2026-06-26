@@ -312,18 +312,20 @@ as $$
 declare
   kid_tz text;
   next_midnight timestamptz;
+  current_hearts int;
 begin
-  select timezone into kid_tz from kids where id = kid_id;
+  select timezone, heart_balance into kid_tz, current_hearts from kids where id = kid_id;
 
   -- Correctly compute next midnight in kid's local timezone.
-  -- date_trunc gives local midnight as a timestamp without tz,
-  -- then AT TIME ZONE interprets it as that zone and converts to UTC.
   next_midnight := (date_trunc('day', now() at time zone kid_tz) + interval '1 day') at time zone kid_tz;
 
   update kids
   set
     last_advance_date = now(),
-    next_unlock_at = next_midnight
+    next_unlock_at    = next_midnight,
+    -- Only refill hearts if kid is completely out (0 hearts).
+    -- Partial hearts are kept — no free refill for kids who still have some.
+    heart_balance     = case when heart_balance = 0 then 5 else heart_balance end
   where id = kid_id;
 
   return next_midnight;
