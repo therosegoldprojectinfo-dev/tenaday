@@ -325,7 +325,8 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
   )
 }
 
-export default function ChapterPath({ operation, onStartNode, onBack, kidId = DEMO_KID_ID }) {
+export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
+  if (!kidId) throw new Error('ChapterPath: kidId is required — do not render without a real kid ID')
   const [kid, setKid] = useState(null)
   const [streak, setStreak] = useState(0)
   const [loading, setLoading] = useState(true)
