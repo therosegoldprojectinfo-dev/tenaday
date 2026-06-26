@@ -453,6 +453,7 @@ export default function Practice({
   const [over,     setOver]     = useState(null)
   const [saving,   setSaving]   = useState(false)
   const [heartKey, setHeartKey] = useState(0)
+  const [showHeartLost, setShowHeartLost] = useState(false)
   const [timerKey, setTimerKey] = useState(1)
   const [streak,   setStreak]   = useState(0)
   const [fireKey,  setFireKey]  = useState(0) // bumped to trigger fire burst
@@ -488,6 +489,8 @@ export default function Practice({
         return next
       })
       setHeartKey(k => k + 1)
+      setShowHeartLost(true)
+      setTimeout(() => setShowHeartLost(false), 1500)
     }
   }
 
@@ -504,6 +507,8 @@ export default function Practice({
       return next
     })
     setHeartKey(k => k + 1)
+    setShowHeartLost(true)
+    setTimeout(() => setShowHeartLost(false), 1500)
   }
 
   useEffect(() => {
@@ -659,7 +664,19 @@ export default function Practice({
       {/* Fire particles — rise from bottom when streak ≥ 3 */}
       <FireParticles streakKey={fireKey} streak={streak} />
 
-      <div className="h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md">
+      <div className="relative h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md">
+
+        {/* Heart lost flash overlay */}
+        {showHeartLost && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
+            style={{ animation: 'fadeInOut 1.5s ease forwards' }}>
+            <div className="bg-red-500 text-white rounded-3xl px-8 py-5 flex flex-col items-center gap-2 shadow-2xl"
+              style={{ animation: 'correct-bounce 0.4s cubic-bezier(0.34,1.56,0.64,1) both' }}>
+              <span className="text-4xl">💔</span>
+              <p className="font-display font-bold text-2xl">-1 Heart!</p>
+            </div>
+          </div>
+        )}
 
         {/* ── Top bar ─────────────────────────────────────────────── */}
         <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-5 pb-3">
