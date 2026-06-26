@@ -291,7 +291,7 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
                 </span>
               </button>
               {tooltip === 'hearts' && (
-                <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center">
+                <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
                   <p className="text-2xl mb-1">❤️</p>
                   <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
                   <div className="flex justify-center gap-1 my-2">
@@ -340,7 +340,7 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
                 </span>
               </button>
               {tooltip === 'coins' && (
-                <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center">
+                <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
                   <p className="text-2xl mb-1">⭐</p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
                   <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>
