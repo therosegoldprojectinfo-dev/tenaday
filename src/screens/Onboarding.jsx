@@ -106,7 +106,7 @@ function Slide2() {
 /* ── Slide 3 — Protect Hearts ── */
 function Slide3() {
   return (
-    <div style={{flex:1,position:'relative',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:34}}>
+    <div style={{flex:1,position:'relative',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:34,paddingTop:40}}>
       {/* hearts row */}
       <div style={{display:'flex',gap:10,alignItems:'center'}}>
         {[0,1,2,3].map(i => (
@@ -143,7 +143,7 @@ function Slide3() {
 /* ── Slide 4 — One Unit Per Day ── */
 function Slide4() {
   return (
-    <div style={{flex:1,position:'relative',display:'flex',alignItems:'center',justifyContent:'center'}}>
+    <div style={{flex:1,position:'relative',display:'flex',alignItems:'center',justifyContent:'center',paddingBottom:20}}>
       <svg width={280} height={298} viewBox="0 0 300 320" style={{filter:'drop-shadow(0 12px 26px rgba(0,0,0,.12))'}}>
         <defs>
           <clipPath id="dnCard"><rect x={0} y={0} width={300} height={320} rx={34}/></clipPath>
