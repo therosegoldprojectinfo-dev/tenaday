@@ -287,3 +287,10 @@ body {
     transition: opacity 150ms ease;
   }
 }
+
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: scale(0.8); }
+  15%  { opacity: 1; transform: scale(1); }
+  70%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.9); }
+}
