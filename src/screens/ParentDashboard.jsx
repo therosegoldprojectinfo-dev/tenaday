@@ -265,7 +265,10 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
   const [loading,     setLoading]     = useState(true)
   const [viewingKid, setViewingKid] = useState(null)
   const [showAddReward, setShowAddReward] = useState(false)
-  const [activeTab,   setActiveTab]   = useState('kids') // 'kids' | 'rewards' | 'claims'
+  const [activeTab,   setActiveTab]   = useState('kids') // 'kids' | 'rewards' | 'claims' | 'coins'
+  const [coinHistory, setCoinHistory] = useState([])
+  const [coinKidId,   setCoinKidId]   = useState(null)
+  const [coinLoading, setCoinLoading] = useState(false)
 
   async function loadAll() {
     try {
@@ -343,10 +346,31 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
     setClaims(cs => cs.filter(c => c.id !== claimId))
   }
 
+  async function fetchCoinHistory(kidId) {
+    setCoinLoading(true)
+    setCoinKidId(kidId)
+    try {
+      const { data, error } = await supabase
+        .from('coin_transactions')
+        .select('id, amount, reason, balance_after, created_at')
+        .eq('kid_id', kidId)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (error) throw error
+      setCoinHistory(data || [])
+    } catch (err) {
+      console.error('Failed to fetch coin history:', err)
+      setCoinHistory([])
+    } finally {
+      setCoinLoading(false)
+    }
+  }
+
   const TABS = [
     { id: 'kids',    label: 'Kids',    badge: kids.length },
     { id: 'rewards', label: 'Rewards', badge: gifts.filter(g => g.parent_id !== null).length },
     { id: 'claims',  label: 'Claims',  badge: claims.length, alert: claims.length > 0 },
+    { id: 'coins',   label: 'Coins',   badge: 0 },
   ]
 
   return (
@@ -454,7 +478,71 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
               )}
             </div>
 
-          /* ── Claims tab ────────────────────────────────────────── */
+          /* ── Coins tab ─────────────────────────────────────────── */
+          ) : activeTab === 'coins' ? (
+            <div>
+              <SectionHeader title="Coin History" />
+              {/* Kid selector */}
+              {kids.length > 1 && (
+                <div className="flex gap-2 mb-4 flex-wrap">
+                  {kids.map(k => (
+                    <button key={k.id} onClick={() => fetchCoinHistory(k.id)}
+                      className="px-3 py-1.5 rounded-full font-body font-bold text-xs transition-colors"
+                      style={{
+                        backgroundColor: coinKidId === k.id ? '#DDF0FB' : '#F3F4F6',
+                        color: coinKidId === k.id ? '#1CB0F6' : '#6B7280',
+                      }}>
+                      {k.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {/* Auto-load first kid */}
+              {!coinKidId && kids.length > 0 && (() => { fetchCoinHistory(kids[0].id); return null })()}
+
+              {coinLoading ? (
+                <p className="font-body text-gray-400 text-center py-8">Loading…</p>
+              ) : coinHistory.length === 0 ? (
+                <div className="rounded-3xl bg-white border-2 border-dashed border-gray-200 py-10 text-center">
+                  <p className="text-4xl mb-2">🪙</p>
+                  <p className="font-body text-sm text-gray-400">No transactions yet.</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2">
+                  {coinHistory.map(tx => {
+                    const isPositive = tx.amount > 0
+                    const reasonLabels = {
+                      node_pass:      '✅ Node passed',
+                      review_pass:    '✅ Review passed',
+                      entry_fee:      '🎮 Started activity',
+                      exit_refund:    '↩️ Exited activity',
+                      heart_recharge: '❤️ Recharged heart',
+                      gift_purchase:  '🎁 Bought reward',
+                    }
+                    const label = reasonLabels[tx.reason] || tx.reason
+                    const date  = new Date(tx.created_at)
+                    const dateStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                    const timeStr = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+                    return (
+                      <div key={tx.id} className="flex items-center gap-3 rounded-2xl border border-gray-100 px-4 py-3 bg-white">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-body font-bold text-sm text-gray-900">{label}</p>
+                          <p className="font-body text-xs text-gray-400">{dateStr} · {timeStr}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className={`font-body font-bold text-sm ${isPositive ? 'text-green-500' : 'text-red-400'}`}>
+                            {isPositive ? '+' : ''}{tx.amount} ⭐
+                          </p>
+                          <p className="font-body text-xs text-gray-400">Balance: {tx.balance_after}</p>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
+
+          /* ── Claims tab ─────────────────────────────────────────── */
           ) : (
             <div>
               <SectionHeader title="Pending Claims" />
