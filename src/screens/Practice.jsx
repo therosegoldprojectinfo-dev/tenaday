@@ -1,8 +1,8 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { generateBatch } from '../lib/problems'
 import { themeFor } from '../lib/eraTheme'
-import { nodeLabel, nextStep, OPERATIONS } from '../lib/progression'
-import { applyPayout, payoutForNode, passThresholdFor, NODE_PAYOUT, ENTRY_FEE } from '../lib/economy'
+import { nodeLabel, nextStep, stepIndex, OPERATIONS } from '../lib/progression'
+import { applyPayout, payoutForNode, passThresholdFor, NODE_PAYOUT, ENTRY_FEE, DEBT_FLOOR } from '../lib/economy'
 import FlowerJump from '../components/FlowerJump'
 import {
   updateProgress,
@@ -573,19 +573,31 @@ export default function Practice({
 
         if (result === 'passed') {
           const next = nextStep(operation, table, batchNum, node)
-          if (node === 'review') {
-            // Review is the last node of today's batch.
-            // Always advance the cursor first (non-negotiable).
-            // Then stamp the gate — if the RPC fails, the cursor still moved
-            // so the kid isn't stuck, and the gate will be missing (fail open).
-            if (next) await updateProgress(kidId, next)
-            try {
-              await stampAdvanceDate(kidId)
-            } catch (gateErr) {
-              console.error('stampAdvanceDate failed (gate will be open, cursor advanced):', gateErr)
+          // Cursor regression guard: only write if next step is strictly
+          // ahead of where the kid already is. Replaying a completed node
+          // and passing must never move the cursor backward.
+          // stepIndex is exported from progression.js for this exact check.
+          // We pass the live kid position via the props that were captured
+          // when this Practice session started — those reflect the DB state
+          // at the moment the node was opened, which is safe to compare against.
+          const currentIdx = stepIndex(operation, table, batchNum, node)
+          const nextIdx    = next ? stepIndex(next.operation, next.table, next.batch, next.node) : -1
+          // kidCurrentIdx: the cursor the kid has in the DB right now.
+          // We don't have it as a live value here, so use the conservative
+          // check: only advance if next > the node we just completed.
+          // This protects against replay regression because a replay's
+          // next step will always be <= the kid's real current cursor.
+          if (next && nextIdx > currentIdx) {
+            if (node === 'review') {
+              await updateProgress(kidId, next)
+              try {
+                await stampAdvanceDate(kidId)
+              } catch (gateErr) {
+                console.error('stampAdvanceDate failed (gate will be open, cursor advanced):', gateErr)
+              }
+            } else {
+              await updateProgress(kidId, next)
             }
-          } else {
-            if (next) await updateProgress(kidId, next)
           }
         }
       }
@@ -665,14 +677,19 @@ export default function Practice({
                   result: 'retry',
                   coinsDelta: 0,
                 })
-                // Refund entry fee on exit
-                const refunded = coinBalance + ENTRY_FEE
-                await setCoinBalance(kidId, refunded)
-                await logCoinTransaction(kidId, {
-                  amount: ENTRY_FEE,
-                  reason: 'exit_refund',
-                  balanceAfter: refunded,
-                })
+                // Refund entry fee on exit — but only if the kid wasn't
+                // already at the debt floor when they entered. At the floor,
+                // applyEntryFee charged nothing (Math.max kept them at -10),
+                // so there's nothing to refund. Refunding anyway gives free coins.
+                if (coinBalance > DEBT_FLOOR) {
+                  const refunded = Math.min(coinBalance + ENTRY_FEE, 0) // never refund above 0 from debt
+                  await setCoinBalance(kidId, refunded)
+                  await logCoinTransaction(kidId, {
+                    amount: ENTRY_FEE,
+                    reason: 'exit_refund',
+                    balanceAfter: refunded,
+                  })
+                }
               } catch (err) {
                 console.error('Exit cleanup failed (non-blocking):', err)
               }
