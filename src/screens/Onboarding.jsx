@@ -143,7 +143,7 @@ function Slide3() {
 /* ── Slide 4 — One Unit Per Day ── */
 function Slide4() {
   return (
-    <div style={{height:380,display:"flex",alignItems:"center",justifyContent:"center"}}>
+    <div style={{height:380,display:"flex",alignItems:"center",justifyContent:"center",paddingTop:80}}>
       <svg width={280} height={298} viewBox="0 0 300 320" style={{filter:'drop-shadow(0 12px 26px rgba(0,0,0,.12))'}}>
         <defs>
           <clipPath id="dnCard"><rect x={0} y={0} width={300} height={320} rx={34}/></clipPath>
