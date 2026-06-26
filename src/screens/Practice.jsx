@@ -682,7 +682,12 @@ export default function Practice({
                 // applyEntryFee charged nothing (Math.max kept them at -10),
                 // so there's nothing to refund. Refunding anyway gives free coins.
                 if (coinBalance > DEBT_FLOOR) {
-                  const refunded = Math.min(coinBalance + ENTRY_FEE, 0) // never refund above 0 from debt
+                  // Refund the entry fee. If kid was in debt, cap the refund
+                  // so they don't go above 0 (they paid nothing at the floor).
+                  // If kid had positive coins, just add the fee back normally.
+                  const refunded = coinBalance < 0
+                    ? Math.min(coinBalance + ENTRY_FEE, 0)
+                    : coinBalance + ENTRY_FEE
                   await setCoinBalance(kidId, refunded)
                   await logCoinTransaction(kidId, {
                     amount: ENTRY_FEE,
