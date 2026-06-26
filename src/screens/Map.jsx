@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { OPERATIONS, eraStatus, eraProgress } from '../lib/progression'
-import { fetchKid, fetchStreak, DEMO_KID_ID } from '../lib/kidData'
-import { DEBT_FLOOR } from '../lib/economy'
+import { fetchKid, fetchStreak, rechargeHeart, DEMO_KID_ID } from '../lib/kidData'
+import { DEBT_FLOOR, ENTRY_FEE } from '../lib/economy'
 
 // ── Card visual spec ─────────────────────────────────────────────────────
 // Per the Duolingo chapter-card reference: every card shares the SAME
@@ -174,6 +174,9 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
   const [streak, setStreak] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [tooltip, setTooltip] = useState(null)
+  const [recharging, setRecharging] = useState(false)
+  const [rechargeError, setRechargeError] = useState(null)
 
   useEffect(() => {
     let cancelled = false
@@ -224,44 +227,132 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
     onOpenChapter(operation)
   }
 
+  async function handleRechargeHeart() {
+    if (recharging) return
+    setRechargeError(null)
+    setRecharging(true)
+    try {
+      const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 5, kid.coin_balance)
+      setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins }))
+    } catch (err) {
+      setRechargeError(err.message)
+    } finally {
+      setRecharging(false)
+    }
+  }
+
   const inDebt = kid.coin_balance < 0
   const atDebtFloor = kid.coin_balance <= DEBT_FLOOR
 
   return (
     <div className="min-h-screen bg-white">
 
+      {/* Tooltip outside-click dismiss */}
+      {tooltip && (
+        <div className="fixed inset-0 z-40" onClick={() => { setTooltip(null); setRechargeError(null) }} />
+      )}
+
       {/* Top stats bar */}
       <div className="sticky top-0 bg-white z-20 border-b border-gray-100">
         <div className="flex items-center justify-between px-5 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
+
           {/* Streak — left side */}
-          <div className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200">
-            <span className="text-lg leading-none">🔥</span>
-            <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">
-              {streak}
-            </span>
+          <div className="relative">
+            <button
+              onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')}
+              className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200 active:scale-95 transition-transform"
+            >
+              <span className="text-lg leading-none">🔥</span>
+              <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
+            </button>
+            {tooltip === 'streak' && (
+              <div className="absolute top-full mt-2 left-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center">
+                <p className="text-2xl mb-1">🔥</p>
+                <p className="font-display font-bold text-gray-900 text-sm">Day Streak</p>
+                <p className="font-body text-xs text-gray-400 mt-1">
+                  {streak === 0 ? 'No streak yet — play today!' : `${streak} day${streak === 1 ? '' : 's'} in a row!`}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Hearts + Coins — right side */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100">
-              <HeartStatIcon />
-              <span className="font-body font-bold text-base text-red-500 leading-none tabular-nums">4</span>
-            </div>
-            <div
-              className={`flex items-center gap-1.5 rounded-full px-3 py-2 border ${
-                inDebt ? 'border-red-200' : 'border-amber-200'
-              }`}
-              style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}
-            >
-              <CoinStatIcon />
-              <span
-                className={`font-body font-bold text-base leading-none tabular-nums ${
-                  inDebt ? 'text-red-500' : 'text-amber-700'
-                }`}
+
+            {/* Hearts */}
+            <div className="relative">
+              <button
+                onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }}
+                className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100 active:scale-95 transition-transform"
               >
-                {kid.coin_balance}
-              </span>
+                <HeartStatIcon />
+                <span className="font-body font-bold text-base text-red-500 leading-none tabular-nums">
+                  {kid.heart_balance ?? 5}
+                </span>
+              </button>
+              {tooltip === 'hearts' && (
+                <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center">
+                  <p className="text-2xl mb-1">❤️</p>
+                  <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
+                  <div className="flex justify-center gap-1 my-2">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}>❤️</span>
+                    ))}
+                  </div>
+                  <p className="font-body text-xs text-gray-400 mb-3">
+                    Hearts are lost when you answer wrong. Recharge with coins.
+                  </p>
+                  {(kid.heart_balance ?? 5) < 5 ? (
+                    <>
+                      {rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
+                      <button
+                        onClick={handleRechargeHeart}
+                        disabled={recharging || kid.coin_balance < 10}
+                        className="w-full py-2.5 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95"
+                        style={{
+                          backgroundColor: kid.coin_balance >= 10 ? '#ef4444' : '#F3F4F6',
+                          color: kid.coin_balance >= 10 ? '#fff' : '#9CA3AF',
+                          boxShadow: kid.coin_balance >= 10 ? '0 3px 0 0 #b91c1c' : '0 3px 0 0 #D1D5DB',
+                        }}
+                      >
+                        {recharging ? 'Recharging…' : '❤️ +1 for 10 ⭐'}
+                      </button>
+                    </>
+                  ) : (
+                    <p className="font-body text-xs text-green-500 font-bold">Full hearts! ✨</p>
+                  )}
+                </div>
+              )}
             </div>
+
+            {/* Coins */}
+            <div className="relative">
+              <button
+                onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-2 border active:scale-95 transition-transform ${
+                  inDebt ? 'border-red-200' : 'border-amber-200'
+                }`}
+                style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}
+              >
+                <CoinStatIcon />
+                <span className={`font-body font-bold text-base leading-none tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-700'}`}>
+                  {kid.coin_balance}
+                </span>
+              </button>
+              {tooltip === 'coins' && (
+                <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center">
+                  <p className="text-2xl mb-1">⭐</p>
+                  <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
+                  <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>
+                    {kid.coin_balance}
+                  </p>
+                  <p className="font-body text-xs text-gray-400 mt-1">
+                    {inDebt ? "You're in debt — keep playing to earn coins back!" : 'Earn coins by completing activities.'}
+                  </p>
+                </div>
+              )}
+            </div>
+
           </div>
         </div>
       </div>
