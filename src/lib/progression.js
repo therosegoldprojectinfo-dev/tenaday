@@ -60,7 +60,7 @@ export function shouldSkipUnlock(operation, table, batch, hasEverAdvanced) {
 // node) position. We convert to/from integer indices to make ordering,
 // comparison, and "next step" trivial.
 
-function stepIndex(operation, table, batch, node) {
+export function stepIndex(operation, table, batch, node) {
   const opIdx    = OPERATIONS.indexOf(operation)
   const nodeIdx  = NODES.indexOf(node)
   if (opIdx === -1 || nodeIdx === -1) return -1
