@@ -247,13 +247,12 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
   return (
     <div className="min-h-screen bg-white">
 
-      {/* Tooltip outside-click dismiss */}
-      {tooltip && (
-        <div className="fixed inset-0 z-40" onMouseDown={() => { setTooltip(null); setRechargeError(null) }} />
-      )}
-
       {/* Top stats bar */}
       <div className="sticky top-0 bg-white z-20 border-b border-gray-100">
+        {/* Tooltip outside-click dismiss — inside the header's stacking context so tooltip z-50 beats overlay z-40 */}
+        {tooltip && (
+          <div className="fixed inset-0 z-40" onClick={() => { setTooltip(null); setRechargeError(null) }} />
+        )}
         <div className="flex items-center justify-between px-5 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
 
           {/* Streak — left side */}
