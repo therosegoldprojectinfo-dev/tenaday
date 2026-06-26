@@ -9,6 +9,7 @@ import Profile from './screens/Profile'
 import Auth from './screens/Auth'
 import KidPicker from './screens/KidPicker'
 import CreateKid from './screens/CreateKid'
+import Onboarding from './screens/Onboarding'
 import ParentPinEntry from './screens/ParentPinEntry'
 import ParentDashboard from './screens/ParentDashboard'
 import NavShell from './components/NavShell'
@@ -70,14 +71,10 @@ export default function App() {
 
   function handleKidCreated(newKidId, placementClaim) {
     setKidId(newKidId)
-    if (placementClaim) {
-      setPendingClaim(placementClaim)
-      setAuthPhase('diagnostic')
-    } else {
-      setAuthPhase('game')
-      setNavTab('home')
-      setScreen('list')
-    }
+    // Always show onboarding first — every new kid sees it.
+    // Store placement claim so we know what to do after onboarding.
+    if (placementClaim) setPendingClaim(placementClaim)
+    setAuthPhase('onboarding')
   }
 
   function handleDiagnosticPass() {
@@ -176,6 +173,22 @@ export default function App() {
         parentId={parentId}
         onCreated={handleKidCreated}
         onBack={() => setAuthPhase('kidPicker')}
+      />
+    )
+  }
+
+  if (authPhase === 'onboarding') {
+    return (
+      <Onboarding
+        onDone={() => {
+          if (pendingClaim) {
+            setAuthPhase('diagnostic')
+          } else {
+            setAuthPhase('game')
+            setNavTab('home')
+            setScreen('list')
+          }
+        }}
       />
     )
   }
