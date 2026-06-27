@@ -165,7 +165,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
       justifyContent: side === 'left' ? 'flex-start' : 'flex-end',
       paddingLeft: side === 'left' ? 0 : 0,
       paddingRight: side === 'right' ? 0 : 0,
-      marginBottom: 28,
+      marginBottom: 14,
     }}>
       <button
         type="button"
