@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import { themeFor } from '../lib/eraTheme'
 import {
   NODES,
@@ -174,8 +174,8 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
             src={imgSrc}
             alt={displayName}
             style={{
-              width: isSpecial ? 160 : 140,
-              height: isSpecial ? 160 : 140,
+              width: isSpecial ? 240 : 210,
+              height: isSpecial ? 240 : 210,
               objectFit: 'contain',
               filter: (disabled && !forceGold) ? 'grayscale(100%) opacity(0.55)' : 'none',
               transform: isCurrent ? 'scale(1.08)' : 'scale(1)',
@@ -253,6 +253,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   const [noHeartsBlocked, setNoHeartsBlocked] = useState(false)
   const [recharging, setRecharging] = useState(false)
   const [rechargeError, setRechargeError] = useState(null)
+  const [visibleUnit, setVisibleUnit] = useState(1)
+  const unitRefs = useRef({})
 
   const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT // 72
 
@@ -603,31 +605,56 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       )}
 
-      {/* ── Chapter heading ── */}
-      <div className="px-4 pt-5 pb-2 max-w-sm md:max-w-md mx-auto">
-        <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.primary }}>
-          {theme.operationLabel}
-        </p>
-        <p className="font-display font-bold text-2xl text-gray-900">
-          {TOTAL_DAYS} Units
-        </p>
-      </div>
+      {/* ── Sticky unit banner (updates as you scroll) ── */}
+      {(() => {
+        const u = allUnits.find(u => u.unitNumber === visibleUnit)
+        const facts = u ? factsForBatch(u.batch) : []
+        const factStr = u ? facts.map(f => `${u.table} ${theme.symbol} ${f}`).join(', ') : ''
+        return (
+          <div style={{
+            position: 'sticky', top: 57, zIndex: 20,
+            margin: '0 16px 0',
+            borderRadius: 18,
+            border: '2px solid #e0e7ff',
+            backgroundColor: '#fff',
+            padding: '12px 18px',
+            boxShadow: '0 2px 0 #c7d2fe',
+            textAlign: 'center',
+          }}>
+            <p style={{
+              fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+              fontWeight: 900, fontSize: 11,
+              letterSpacing: '0.1em', color: '#6366f1',
+              textTransform: 'uppercase', marginBottom: 2,
+            }}>Unit {visibleUnit}</p>
+            <p style={{
+              fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+              fontWeight: 800, fontSize: 15, color: '#1f2937',
+            }}>{factStr}</p>
+          </div>
+        )
+      })()}
 
-      {/* ── Zigzag path ── */}
-      <div className="max-w-sm md:max-w-md mx-auto pt-4 pb-24 overflow-x-hidden">
+      {/* ── Continuous node path ── */}
+      <div className="max-w-sm md:max-w-md mx-auto pt-6 pb-24 overflow-x-hidden">
         {allUnits.map(({ table, batch, unitNumber }) => {
           const unitStatus = tableStatus(currentPos, operation, table)
           const facts = factsForBatch(batch)
 
           return (
-            <div key={unitNumber}>
-              {/* Unit banner */}
-              <UnitBanner
-                unitNumber={unitNumber}
-                facts={facts}
-                operation={operation}
-                table={table}
-              />
+            <div
+              key={unitNumber}
+              ref={el => { unitRefs.current[unitNumber] = el }}
+              data-unit={unitNumber}
+            >
+              {/* Invisible sentinel so IntersectionObserver knows when this unit enters viewport */}
+              <div style={{ height: 1 }} ref={el => {
+                if (!el) return
+                const obs = new IntersectionObserver(([entry]) => {
+                  if (entry.isIntersecting) setVisibleUnit(unitNumber)
+                }, { threshold: 0, rootMargin: '-10% 0px -80% 0px' })
+                obs.observe(el)
+              }} />
 
               {/* 7 nodes for this unit */}
               {NODES.map((node, nodeIdx) => {
