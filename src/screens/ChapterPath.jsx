@@ -257,7 +257,7 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
       type="button"
       disabled={disabled}
       onClick={onPress}
-      className={`w-full flex items-center gap-4 rounded-3xl border-2 px-4 py-4 transition-all active:translate-y-1 ${shimmerClass}`}
+      className={`w-full flex items-center gap-4 rounded-3xl px-4 py-4 transition-all active:translate-y-1 ${shimmerClass ? shimmerClass : 'border-2'}`}
       style={(!isDoubleReward && !isHard) ? {
         backgroundColor: disabled ? '#F9FAFB' : completed ? '#DCFCE7' : colors.bg,
         borderColor: disabled ? '#E5E7EB' : completed ? DUO_GREEN : colors.border,
@@ -540,23 +540,27 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   return (
     <div className="min-h-screen bg-white">
       <style>{`
-        @keyframes shimmer {
-          0% { background-position: -200% center; }
+        @keyframes goldShimmer {
+          0%   { background-position: -200% center; }
+          100% { background-position: 200% center; }
+        }
+        @keyframes redShimmer {
+          0%   { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
         .gold-shimmer {
-          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 40%, #fbbf24 60%, #fef3c7 100%) !important;
+          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 30%, #fbbf24 50%, #fde68a 70%, #fef3c7 100%) !important;
           background-size: 200% 200% !important;
-          animation: shimmer 3s linear infinite !important;
+          animation: goldShimmer 2s linear infinite !important;
           border: 2.5px solid #f59e0b !important;
-          box-shadow: 0 4px 0 #d97706, 0 4px 20px rgba(245,158,11,0.35) !important;
+          box-shadow: 0 4px 0 #d97706, 0 2px 20px rgba(245,158,11,0.4) !important;
         }
         .red-shimmer {
-          background: linear-gradient(135deg, #fff1f0 0%, #ffd4d0 40%, #ff4d3d 60%, #fff1f0 100%) !important;
+          background: linear-gradient(135deg, #fff1f0 0%, #fecaca 30%, #f87171 50%, #fecaca 70%, #fff1f0 100%) !important;
           background-size: 200% 200% !important;
-          animation: shimmer 3s linear infinite !important;
+          animation: redShimmer 2s linear infinite !important;
           border: 2.5px solid #ef4444 !important;
-          box-shadow: 0 4px 0 #b91c1c, 0 4px 20px rgba(239,68,68,0.35) !important;
+          box-shadow: 0 4px 0 #b91c1c, 0 2px 20px rgba(239,68,68,0.4) !important;
         }
       `}</style>
 
