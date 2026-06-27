@@ -3,8 +3,8 @@ import { generateDiagnostic } from '../lib/problems'
 import { updateProgress } from '../lib/kidData'
 import { OPERATIONS } from '../lib/progression'
 
-const SESSION_TOTAL  = 20
-const PASS_THRESHOLD = 16
+const SESSION_TOTAL  = 25
+const PASS_THRESHOLD = 20
 const LIVES_START    = 4
 
 function FireParticles({ streakKey, streak }) {
@@ -194,9 +194,9 @@ function SpeakerIcon({ active }) {
 
 // ── Main Diagnostic component ─────────────────────────────────────────────
 
-export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) {
+export default function Diagnostic({ kidId, claimedOperation, selectedTables, onPass, onFail }) {
   const questions = useMemo(
-    () => generateDiagnostic(claimedOperation),
+    () => generateDiagnostic(claimedOperation, selectedTables || []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [claimedOperation]
   )
@@ -219,6 +219,8 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
   const q                = questions[idx]
   const isCorrect        = selected === q?.answer
   const isEquationChoice = q?.choiceType === 'equation'
+  const isTrueFalse      = q?.choiceType === 'truefalse'
+  const isComparison     = q?.choiceType === 'comparison'
   const progressScale    = (idx + (revealed ? 1 : 0)) / SESSION_TOTAL
 
   function handleCheck() {
@@ -385,6 +387,42 @@ export default function Diagnostic({ kidId, claimedOperation, onPass, onFail }) 
                   className={[
                     'rounded-2xl border-2 font-display font-bold text-2xl card-answer',
                     'flex items-center justify-center py-5 w-full select-none px-4 text-center',
+                    cardColorClass(choice, selected, revealed, q.answer),
+                    cardAnimClass(choice, selected, revealed, q.answer),
+                  ].join(' ')}
+                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}
+                >
+                  {choice}
+                </button>
+              ))}
+            </div>
+          ) : isTrueFalse ? (
+            <div className="flex gap-3">
+              {q.choices.map(choice => (
+                <button key={choice} disabled={revealed}
+                  onClick={() => !revealed && setSelected(choice)}
+                  aria-pressed={selected === choice}
+                  className={[
+                    'flex-1 rounded-2xl border-2 font-display font-bold text-2xl card-answer',
+                    'flex items-center justify-center h-28 select-none',
+                    cardColorClass(choice, selected, revealed, q.answer),
+                    cardAnimClass(choice, selected, revealed, q.answer),
+                  ].join(' ')}
+                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}
+                >
+                  {choice}
+                </button>
+              ))}
+            </div>
+          ) : isComparison ? (
+            <div className="flex flex-col gap-3">
+              {q.choices.map(choice => (
+                <button key={choice} disabled={revealed}
+                  onClick={() => !revealed && setSelected(choice)}
+                  aria-pressed={selected === choice}
+                  className={[
+                    'rounded-2xl border-2 font-display font-bold text-2xl card-answer',
+                    'flex items-center justify-center py-6 w-full select-none',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
