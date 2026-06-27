@@ -154,8 +154,47 @@ function Slide3() {
   )
 }
 
-/* ── Slide 4 — Unlock real rewards (gift box) ── */
+/* ── Slide 4 — Protect hearts ── */
 function Slide4() {
+  return (
+    <div style={{height:380,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
+      {/* spinning rays in red */}
+      <svg width={260} height={260} viewBox="0 0 320 320" style={{position:'absolute',top:40,animation:'spinslow 26s linear infinite'}}>
+        <g fill="#fecaca">
+          <rect x={154} y={14} width={12} height={42} rx={6}/>
+          <rect x={154} y={264} width={12} height={42} rx={6}/>
+          <rect x={14} y={154} width={42} height={12} rx={6}/>
+          <rect x={264} y={154} width={42} height={12} rx={6}/>
+          <rect x={52} y={52} width={12} height={40} rx={6} transform="rotate(-45 58 72)"/>
+          <rect x={256} y={52} width={12} height={40} rx={6} transform="rotate(45 262 72)"/>
+          <rect x={52} y={228} width={12} height={40} rx={6} transform="rotate(45 58 248)"/>
+          <rect x={256} y={228} width={12} height={40} rx={6} transform="rotate(-45 262 248)"/>
+        </g>
+      </svg>
+      {/* big heart */}
+      <svg width={160} height={150} viewBox="0 0 200 185" style={{position:'absolute',top:90,animation:'pulse 2.4s ease-in-out infinite'}}>
+        <path d="M100 178 C20 130 4 88 4 60 C4 28 26 8 52 8 C72 8 88 20 100 36 C112 20 128 8 148 8 C174 8 196 28 196 60 C196 88 180 130 100 178 Z" fill="#c0392b" transform="translate(0,8)"/>
+        <path d="M100 178 C20 130 4 88 4 60 C4 28 26 8 52 8 C72 8 88 20 100 36 C112 20 128 8 148 8 C174 8 196 28 196 60 C196 88 180 130 100 178 Z" fill="#ef4444"/>
+        <path d="M52 28 q14 -16 34 -12" stroke="#fff" strokeWidth="7" fill="none" strokeLinecap="round" opacity={0.45}/>
+      </svg>
+      {/* small heart bottom-left */}
+      <svg width={62} height={58} viewBox="0 0 100 92" style={{position:'absolute',bottom:60,left:46,animation:'floaty 2.8s ease-in-out infinite'}}>
+        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#c0392b" transform="translate(0,4)"/>
+        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#ef4444"/>
+      </svg>
+      {/* small heart bottom-right */}
+      <svg width={44} height={40} viewBox="0 0 100 92" style={{position:'absolute',bottom:120,right:48,animation:'floaty 2.3s ease-in-out infinite'}}>
+        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#c0392b" transform="translate(0,4)"/>
+        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#ef4444"/>
+      </svg>
+      <svg viewBox="0 0 24 24" width={20} height={20} style={{position:'absolute',bottom:80,right:120,animation:'twinkle 2s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#ef4444"/></svg>
+      <svg viewBox="0 0 24 24" width={15} height={15} style={{position:'absolute',bottom:40,left:130,animation:'twinkle 2.5s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#fecaca"/></svg>
+    </div>
+  )
+}
+
+/* ── Slide 5 — Unlock real rewards (gift box) ── */
+function Slide5() {
   return (
     <div style={{height:380,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
       {/* spinning rays — purple */}
@@ -218,8 +257,8 @@ function Slide4() {
   )
 }
 
-/* ── Slide 5 — One small habit (mascot) ── */
-function Slide5() {
+/* ── Slide 6 — One small habit (mascot) ── */
+function Slide6() {
   return (
     <div style={{height:380,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
       {/* spinning rays — soft green */}
@@ -281,6 +320,14 @@ const SLIDES = [
   },
   {
     component: Slide4,
+    title: 'Protect your hearts ❤️',
+    sub: 'Wrong answers cost a heart. Recharge with coins!',
+    dotColor: '#ef4444',
+    btnLabel: 'CONTINUE →',
+    isLast: false,
+  },
+  {
+    component: Slide5,
     title: 'Unlock real rewards 🎁',
     sub: 'Exchange your coins for real rewards your parents choose.',
     dotColor: '#7c3aed',
@@ -288,7 +335,7 @@ const SLIDES = [
     isLast: false,
   },
   {
-    component: Slide5,
+    component: Slide6,
     title: 'One small habit 🌱',
     sub: 'Do your Numio every day. Get better at math. Enjoy your reward.',
     dotColor: '#22c55e',
