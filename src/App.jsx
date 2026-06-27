@@ -181,13 +181,9 @@ export default function App() {
     return (
       <Onboarding
         onDone={() => {
-          if (pendingClaim) {
-            setAuthPhase('diagnostic')
-          } else {
-            setAuthPhase('game')
-            setNavTab('home')
-            setScreen('list')
-          }
+          setAuthPhase('game')
+          setNavTab('home')
+          setScreen('list')
         }}
       />
     )
