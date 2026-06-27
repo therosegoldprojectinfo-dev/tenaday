@@ -97,13 +97,13 @@ const NODE_DISPLAY_NAMES = {
 // ── Duolingo-style S-curve offsets (px from center) ──────────────────────
 // Nodes gently snake left→right→left in a smooth curve
 const ZIGZAG_OFFSETS = [
-  -60,  // node 0: left
-  -20,  // node 1: slightly left
-   20,  // node 2: slightly right
-   60,  // node 3: right
-   20,  // node 4: slightly right
-  -20,  // node 5: slightly left
-  -60,  // node 6: left (review)
+  -30,
+  -10,
+   10,
+   30,
+   10,
+  -10,
+  -30,
 ]
 
 // ── 3D Disc Node button ───────────────────────────────────────────────────
