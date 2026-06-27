@@ -218,7 +218,7 @@ function Slide4() {
   )
 }
 
-/* ── Slide 5 — One small habit (sprouting seed) ── */
+/* ── Slide 5 — One small habit (mascot) ── */
 function Slide5() {
   return (
     <div style={{height:380,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
@@ -236,34 +236,12 @@ function Slide5() {
         </g>
       </svg>
 
-      {/* sprouting seed illustration */}
-      <svg width={180} height={200} viewBox="0 0 200 220" style={{position:'absolute',top:80,animation:'pulse 3s ease-in-out infinite'}}>
-        {/* soil mound shadow */}
-        <ellipse cx={100} cy={188} rx={72} ry={18} fill="#7c4e1a"/>
-        {/* soil mound */}
-        <ellipse cx={100} cy={184} rx={72} ry={18} fill="#a0522d"/>
-        {/* soil highlight */}
-        <ellipse cx={100} cy={180} rx={60} ry={10} fill="#b8601e" opacity={0.5}/>
-
-        {/* seed body buried in soil */}
-        <ellipse cx={100} cy={178} rx={16} ry={12} fill="#7c4e1a"/>
-        <ellipse cx={100} cy={176} rx={16} ry={12} fill="#92400e"/>
-
-        {/* stem */}
-        <path d="M100 175 Q98 148 100 120" stroke="#22c55e" strokeWidth={9} fill="none" strokeLinecap="round"/>
-
-        {/* left sprout leaf */}
-        <path d="M100 148 Q72 130 68 108 Q88 118 100 140" fill="#22c55e"/>
-        <path d="M100 148 Q72 130 68 108 Q88 118 100 140" fill="none" stroke="#16a34a" strokeWidth={2} strokeLinecap="round"/>
-
-        {/* right sprout leaf */}
-        <path d="M100 132 Q128 112 134 90 Q114 102 100 126" fill="#4ade80"/>
-        <path d="M100 132 Q128 112 134 90 Q114 102 100 126" fill="none" stroke="#22c55e" strokeWidth={2} strokeLinecap="round"/>
-
-        {/* tiny top bud */}
-        <ellipse cx={100} cy={114} rx={11} ry={14} fill="#4ade80"/>
-        <ellipse cx={100} cy={110} rx={8} ry={10} fill="#86efac"/>
-      </svg>
+      {/* mascot image */}
+      <img
+        src="/onboarding-mascot.png"
+        alt="Numio mascot"
+        style={{width:220,height:'auto',position:'relative',animation:'bob 3s ease-in-out infinite'}}
+      />
 
       {/* sparkles */}
       <svg viewBox="0 0 24 24" width={22} height={22} style={{position:'absolute',top:130,left:56,animation:'twinkle 1.9s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#FFB700"/></svg>
@@ -312,7 +290,7 @@ const SLIDES = [
   {
     component: Slide5,
     title: 'One small habit 🌱',
-    sub: 'Do your Numio every day.\nGet better at math.\nEnjoy your reward.',
+    sub: 'Do your Numio every day. Get better at math. Enjoy your reward.',
     dotColor: '#22c55e',
     btnLabel: "START TODAY'S NUMIO →",
     isLast: true,
@@ -373,34 +351,15 @@ export default function Onboarding({ onDone }) {
         }}>
           {slide.title}
         </h1>
-
-        {slide.isLast ? (
-          <div style={{margin: '0 0 22px'}}>
-            {['Do your Numio every day.', 'Get better at math.', 'Enjoy your reward.'].map((line, i) => (
-              <p key={i} style={{
-                margin: i === 1 ? '4px 0' : '0',
-                fontWeight: i === 1 ? 800 : 700,
-                fontSize: i === 1 ? 18 : 15,
-                lineHeight: 1.5,
-                color: i === 1 ? '#3c3c3c' : '#aaa',
-                fontFamily: "'Baloo 2', sans-serif",
-              }}>
-                {line}
-              </p>
-            ))}
-          </div>
-        ) : (
-          <p style={{
-            margin: '0 0 22px',
-            fontWeight: 700,
-            fontSize: 16,
-            lineHeight: 1.55,
-            color: '#777',
-            whiteSpace: 'pre-line',
-          }}>
-            {slide.sub}
-          </p>
-        )}
+        <p style={{
+          margin: '0 0 22px',
+          fontWeight: 700,
+          fontSize: 16,
+          lineHeight: 1.55,
+          color: '#777',
+        }}>
+          {slide.sub}
+        </p>
 
         {/* dots */}
         <div style={{display:'flex', gap:8, justifyContent:'center', marginBottom:20}}>
