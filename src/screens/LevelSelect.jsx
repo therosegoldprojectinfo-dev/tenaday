@@ -29,57 +29,13 @@ const LEVELS = [
 
 /* ── Animated mascot (breathing + blinking) ── */
 function AnimatedMascot() {
-  const [blink, setBlink] = useState(false)
-
-  // Trigger blink every ~3.5s
-  useState(() => {
-    const interval = setInterval(() => {
-      setBlink(true)
-      setTimeout(() => setBlink(false), 150)
-    }, 3500)
-    return () => clearInterval(interval)
-  })
-
   return (
     <div style={{ animation: 'breathe 3.2s ease-in-out infinite', display: 'inline-block' }}>
-      <svg width={110} height={110} viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        {/* green leaves base */}
-        <ellipse cx={60}  cy={158} rx={58} ry={22} fill="#3a9e00"/>
-        <ellipse cx={140} cy={158} rx={58} ry={22} fill="#3a9e00"/>
-        <ellipse cx={100} cy={152} rx={72} ry={26} fill="#58cc02"/>
-        {/* leaf highlights */}
-        <ellipse cx={72}  cy={148} rx={28} ry={10} fill="#7ae820" opacity={0.5}/>
-        <ellipse cx={128} cy={148} rx={28} ry={10} fill="#7ae820" opacity={0.5}/>
-
-        {/* body */}
-        <ellipse cx={100} cy={110} rx={74} ry={70} fill="#7c3aed"/>
-        {/* body highlight */}
-        <ellipse cx={100} cy={82}  rx={52} ry={36} fill="#9f67ff" opacity={0.45}/>
-
-        {/* petal bumps on top */}
-        <ellipse cx={60}  cy={52}  rx={32} ry={28} fill="#6d28d9"/>
-        <ellipse cx={100} cy={44}  rx={32} ry={28} fill="#6d28d9"/>
-        <ellipse cx={140} cy={52}  rx={32} ry={28} fill="#6d28d9"/>
-        {/* petal highlights */}
-        <ellipse cx={60}  cy={46}  rx={22} ry={18} fill="#8b5cf6" opacity={0.6}/>
-        <ellipse cx={100} cy={38}  rx={22} ry={18} fill="#8b5cf6" opacity={0.6}/>
-        <ellipse cx={140} cy={46}  rx={22} ry={18} fill="#8b5cf6" opacity={0.6}/>
-
-        {/* left eye white */}
-        <ellipse cx={72} cy={112} rx={24} ry={blink ? 2 : 26} fill="#fff"
-          style={{ transition: 'ry 0.07s ease' }}/>
-        {/* right eye white */}
-        <ellipse cx={128} cy={112} rx={24} ry={blink ? 2 : 26} fill="#fff"
-          style={{ transition: 'ry 0.07s ease' }}/>
-        {/* left pupil */}
-        {!blink && <ellipse cx={76} cy={116} rx={14} ry={16} fill="#3c3c52"/>}
-        {/* right pupil */}
-        {!blink && <ellipse cx={132} cy={116} rx={14} ry={16} fill="#3c3c52"/>}
-        {/* eye shine left */}
-        {!blink && <ellipse cx={80} cy={108} rx={5} ry={6} fill="#fff" opacity={0.9}/>}
-        {/* eye shine right */}
-        {!blink && <ellipse cx={136} cy={108} rx={5} ry={6} fill="#fff" opacity={0.9}/>}
-      </svg>
+      <img
+        src="/onboarding-mascot.png"
+        alt="Numio mascot"
+        style={{ width: 110, height: 'auto', display: 'block' }}
+      />
     </div>
   )
 }
