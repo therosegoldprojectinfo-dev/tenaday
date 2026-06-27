@@ -10,6 +10,7 @@ import Auth from './screens/Auth'
 import KidPicker from './screens/KidPicker'
 import CreateKid from './screens/CreateKid'
 import Onboarding from './screens/Onboarding'
+import LevelSelect from './screens/LevelSelect'
 import ParentPinEntry from './screens/ParentPinEntry'
 import ParentDashboard from './screens/ParentDashboard'
 import NavShell from './components/NavShell'
@@ -180,10 +181,23 @@ export default function App() {
   if (authPhase === 'onboarding') {
     return (
       <Onboarding
-        onDone={() => {
-          setAuthPhase('game')
-          setNavTab('home')
-          setScreen('list')
+        onDone={() => setAuthPhase('levelSelect')}
+      />
+    )
+  }
+
+  if (authPhase === 'levelSelect') {
+    return (
+      <LevelSelect
+        onDone={(claim) => {
+          if (claim) {
+            setPendingClaim(claim)
+            setAuthPhase('diagnostic')
+          } else {
+            setAuthPhase('game')
+            setNavTab('home')
+            setScreen('list')
+          }
         }}
       />
     )
