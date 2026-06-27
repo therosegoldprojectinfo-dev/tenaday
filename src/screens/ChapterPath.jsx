@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { themeFor } from '../lib/eraTheme'
 import {
   NODES,
@@ -82,58 +82,6 @@ function CoinStatIcon() {
 }
 
 // ── Day strip ────────────────────────────────────────────────────────────
-function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
-  const selectedRef = useRef(null)
-
-  useEffect(() => {
-    selectedRef.current?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
-  }, [selectedDay])
-
-  const BEFORE = 5
-  const AFTER  = 4
-  const windowStart = Math.max(1, Math.min(currentDay - BEFORE, totalDays - BEFORE - AFTER))
-  const windowEnd   = Math.min(totalDays, windowStart + BEFORE + AFTER)
-  const visibleDays = Array.from({ length: windowEnd - windowStart + 1 }, (_, i) => windowStart + i)
-
-  return (
-    <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-3 justify-start md:justify-center">
-      <div className="flex items-center gap-4">
-        {windowStart > 1 && (
-          <span className="font-body text-xs text-gray-400 px-1">···</span>
-        )}
-        {visibleDays.map((day) => {
-          const isDone     = day < currentDay
-          const isCurrent  = day === currentDay
-          const isLocked   = day > currentDay
-          const isSelected = day === selectedDay
-          return (
-            <button
-              key={day}
-              ref={isSelected ? selectedRef : null}
-              type="button"
-              disabled={isLocked}
-              onClick={() => !isLocked && onSelect(day)}
-              className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-body font-bold text-xs transition-all active:translate-y-1"
-              style={{
-                backgroundColor: isLocked ? '#E5E7EB' : DUO_GREEN,
-                color: isLocked ? '#9CA3AF' : '#FFFFFF',
-                boxShadow: isLocked ? '0 4px 0 0 #B0B7C0' : `0 4px 0 0 ${DUO_GREEN_DARK}`,
-                transform: isSelected ? 'scale(1.15)' : 'scale(1)',
-              }}
-              aria-label={`Day ${day}${isLocked ? ', locked' : isDone ? ', completed' : ', today'}`}
-              aria-pressed={isSelected}
-            >
-              {isDone ? <CheckIcon size={14} /> : isLocked ? <LockIcon size={13} /> : day}
-            </button>
-          )
-        })}
-        {windowEnd < totalDays && (
-          <span className="font-body text-xs text-gray-400 px-1">···</span>
-        )}
-      </div>
-    </div>
-  )
-}
 
 // ── Node label mapping ────────────────────────────────────────────────────
 const NODE_DISPLAY_NAMES = {
@@ -244,12 +192,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
           padding: '2px 6px',
         }}>NEXT UP</span>
       )}
-      {completed && (
-        <span style={{
-          marginTop: 3, fontSize: 9, fontWeight: 700,
-          color: DUO_GREEN,
-        }}>✓ Done</span>
-      )}
+
       {dayLocked && (
         <span style={{
           marginTop: 3, fontSize: 9, fontWeight: 700,
@@ -290,8 +233,8 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
             src={imgSrc}
             alt={displayName}
             style={{
-              width: isSpecial ? 90 : 80,
-              height: isSpecial ? 90 : 80,
+              width: isSpecial ? 120 : 108,
+              height: isSpecial ? 120 : 108,
               objectFit: 'contain',
               filter: (disabled && !forceGold) ? 'grayscale(100%) opacity(0.55)' : 'none',
               transform: isCurrent ? 'scale(1.08)' : 'scale(1)',
@@ -636,12 +579,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           </div>
         </div>
 
-        <DayStrip
-          totalDays={TOTAL_DAYS}
-          currentDay={currentDay || 1}
-          selectedDay={selectedDay}
-          onSelect={handleSelectDay}
-        />
       </div>
 
       {/* ── Alert banners ── */}
