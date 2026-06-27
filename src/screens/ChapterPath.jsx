@@ -120,82 +120,38 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
       ? '/ChatGPT Image 27 juin 2026, 18_29_52.png'
       : '/ChatGPT Image 27 juin 2026, 18_28_19.png'
 
-  // Status overlay elements
-  const statusIcon = completed
+  // Status overlay — only day-locked clock badge remains; no checkmark, no arrow
+  const statusIcon = dayLocked
     ? <div style={{
         position: 'absolute', bottom: -4, right: -4,
-        width: 26, height: 26, borderRadius: '50%',
-        backgroundColor: DUO_GREEN,
-        boxShadow: `0 2px 0 ${DUO_GREEN_DARK}`,
+        width: 28, height: 28, borderRadius: '50%',
+        backgroundColor: '#FEF3C7',
+        border: '2px solid #FCD34D',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: '#fff',
+        color: '#D97706',
       }}>
-        <CheckIcon size={14} />
+        <ClockLockIcon size={14} />
       </div>
-    : dayLocked
-      ? <div style={{
-          position: 'absolute', bottom: -4, right: -4,
-          width: 26, height: 26, borderRadius: '50%',
-          backgroundColor: '#FEF3C7',
-          border: '2px solid #FCD34D',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#D97706',
-        }}>
-          <ClockLockIcon size={13} />
-        </div>
-      : locked && !forceGold
-        ? <div style={{
-            position: 'absolute', bottom: -4, right: -4,
-            width: 26, height: 26, borderRadius: '50%',
-            backgroundColor: '#E5E7EB',
-            border: '2px solid #D1D5DB',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#9CA3AF',
-          }}>
-            <LockIcon size={13} />
-          </div>
-        : isCurrent
-          ? <div style={{
-              position: 'absolute', bottom: -4, right: -4,
-              width: 26, height: 26, borderRadius: '50%',
-              backgroundColor: '#7C3AED',
-              boxShadow: '0 2px 0 #5b21b6',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              color: '#fff', fontSize: 14,
-            }}>→</div>
-          : null
+    : null
 
-  // Label side
+  // Label side — no NEXT UP badge, no arrow, just the name
   const label = (
     <div style={{
       display: 'flex', flexDirection: 'column',
       alignItems: side === 'left' ? 'flex-start' : 'flex-end',
-      maxWidth: 100,
+      maxWidth: 110,
     }}>
       <span style={{
         fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
         fontWeight: 800,
-        fontSize: 13,
+        fontSize: 15,
         color: (disabled && !forceGold) ? '#9CA3AF' : '#1f2937',
         lineHeight: 1.2,
         textAlign: side === 'left' ? 'left' : 'right',
       }}>{displayName}</span>
-      {isCurrent && !disabled && (
-        <span style={{
-          marginTop: 3,
-          fontSize: 9,
-          fontWeight: 900,
-          letterSpacing: '0.05em',
-          color: '#fff',
-          backgroundColor: '#7C3AED',
-          borderRadius: 20,
-          padding: '2px 6px',
-        }}>NEXT UP</span>
-      )}
-
       {dayLocked && (
         <span style={{
-          marginTop: 3, fontSize: 9, fontWeight: 700,
+          marginTop: 3, fontSize: 10, fontWeight: 700,
           color: '#D97706',
         }}>⏰ Tomorrow</span>
       )}
@@ -206,9 +162,9 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
     <div style={{
       display: 'flex',
       justifyContent: side === 'left' ? 'flex-start' : 'flex-end',
-      paddingLeft: side === 'left' ? 24 : 0,
-      paddingRight: side === 'right' ? 24 : 0,
-      marginBottom: 32,
+      paddingLeft: side === 'left' ? 16 : 0,
+      paddingRight: side === 'right' ? 16 : 0,
+      marginBottom: 28,
     }}>
       <button
         type="button"
@@ -218,7 +174,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
           display: 'flex',
           flexDirection: side === 'left' ? 'row' : 'row-reverse',
           alignItems: 'center',
-          gap: 14,
+          gap: 8,
           background: 'none',
           border: 'none',
           padding: 0,
@@ -233,8 +189,8 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
             src={imgSrc}
             alt={displayName}
             style={{
-              width: isSpecial ? 120 : 108,
-              height: isSpecial ? 120 : 108,
+              width: isSpecial ? 240 : 216,
+              height: isSpecial ? 240 : 216,
               objectFit: 'contain',
               filter: (disabled && !forceGold) ? 'grayscale(100%) opacity(0.55)' : 'none',
               transform: isCurrent ? 'scale(1.08)' : 'scale(1)',
