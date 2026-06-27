@@ -14,6 +14,7 @@ import {
   reviewPoolFor,
   previousBatch,
   factsForBatch,
+  normalizeNode,
 } from '../lib/progression'
 import { canStartNewUnit, nextUnlockMessage } from '../lib/dayGate'
 import { fetchKid, fetchStreak, setCoinBalance, logCoinTransaction, rechargeHeart, DEMO_KID_ID } from '../lib/kidData'
@@ -89,59 +90,41 @@ function CoinStatIcon() {
 // are visually scannable. Each maps to its node's pedagogical purpose
 // rather than being arbitrary: unlock=key, learn=seedling, practice=
 // repeat-arrows, real_life=house, speed=stopwatch, review=brain/refresh.
-function NodeTypeIcon({ node, size = 22 }) {
+function NodeTypeIcon({ node, size = 28 }) {
   const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', 'aria-hidden': true }
-  if (node === 'unlock') {
-    return (
-      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="8" cy="15" r="4" />
-        <path d="M11 12l8-8M16 7l2 2M19 4l2 2" />
-      </svg>
-    )
-  }
-  if (node === 'learn') {
-    return (
-      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 21V10M12 10C12 6 9 5 6 5c0 4 1 6 6 5ZM12 10c0-4 3-5 6-5 0 4-1 6-6 5Z" />
-      </svg>
-    )
-  }
-  if (node === 'easy') {
-    // Star
-    return (
-      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-      </svg>
-    )
-  }
-  if (node === 'medium') {
-    // Brain
-    return (
-      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24A2.5 2.5 0 0 1 9.5 2Z" />
-        <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24A2.5 2.5 0 0 0 14.5 2Z" />
-      </svg>
-    )
-  }
-  if (node === 'hard') {
-    // Fire
-    return (
-      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M8.5 14.5A4.5 4.5 0 0 0 12 19a4.5 4.5 0 0 0 3.5-7.5c-.5-.7-1-1-1-2.5 0 0-1 1-1 2.5 0-1.5-1-3-2-4 0 2-1 3.5-2.5 5" />
-        <path d="M12 19c0 0-3-2-3-6 0 0 1.5 1 2 2 .5-2 0-4-1.5-5.5C11 11 13 13 13 16c.5-1 .5-2 .5-3 1 1 1.5 3 1 5" />
-      </svg>
-    )
-  }
-  if (node === 'double_reward') {
-    // Coin/star double
-    return (
-      <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="10" cy="12" r="7" />
-        <path d="M10 8v8M7 10h6M7 14h6" />
-        <path d="M19 5l1 1-1 1M21 7l-3-2" />
-      </svg>
-    )
-  }
+
+  if (node === 'unlock') return (
+    <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="8" cy="15" r="4" />
+      <path d="M11 12l8-8M16 7l2 2M19 4l2 2" />
+    </svg>
+  )
+
+  if (node === 'learn') return (
+    <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 21V10M12 10C12 6 9 5 6 5c0 4 1 6 6 5ZM12 10c0-4 3-5 6-5 0 4-1 6-6 5Z" />
+    </svg>
+  )
+
+  if (node === 'easy') return (
+    <span style={{ fontSize: size * 0.9, lineHeight: 1 }}>⭐</span>
+  )
+
+  if (node === 'medium') return (
+    <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24A2.5 2.5 0 0 1 9.5 2Z" />
+      <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24A2.5 2.5 0 0 0 14.5 2Z" />
+    </svg>
+  )
+
+  if (node === 'hard') return (
+    <span style={{ fontSize: size * 0.9, lineHeight: 1 }}>🔥</span>
+  )
+
+  if (node === 'double_reward') return (
+    <span style={{ fontSize: size * 0.9, lineHeight: 1 }}>🪙</span>
+  )
+
   // review
   return (
     <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
@@ -270,13 +253,10 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
       type="button"
       disabled={disabled}
       onClick={onPress}
-      className="w-full flex items-center gap-4 rounded-3xl border-2 px-4 py-4 transition-all active:translate-y-1"
+      className={`w-full flex items-center gap-4 rounded-3xl border-2 px-4 py-4 transition-all active:translate-y-1 ${isDoubleReward && !disabled ? 'gold-shimmer' : ''}`}
       style={isDoubleReward && !disabled ? {
-        background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 40%, #fbbf24 60%, #fef3c7 100%)',
-        backgroundSize: '200% 200%',
-        animation: 'shimmer 3s linear infinite',
         borderColor: '#f59e0b',
-        boxShadow: '0 4px 0 0 #d97706, 0 0 20px rgba(245,158,11,0.3)',
+        boxShadow: '0 4px 0 0 #d97706, 0 4px 20px rgba(245,158,11,0.25)',
       } : {
         backgroundColor: disabled ? '#F9FAFB' : completed ? '#DCFCE7' : colors.bg,
         borderColor: disabled ? '#E5E7EB' : completed ? DUO_GREEN : isCurrent ? colors.border : colors.border,
@@ -430,7 +410,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
     operation: kid.current_operation,
     table: kid.current_table,
     batch: kid.current_batch || 1,
-    node: kid.current_node,
+    node: normalizeNode(kid.current_node),
   }
 
   // Derive table/batch from the selected day number (1-72)
@@ -548,8 +528,13 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
     <div className="min-h-screen bg-white">
       <style>{`
         @keyframes shimmer {
-          0% { background-position: 0% center; }
-          100% { background-position: 200% center; }
+          0% { background-position: 200% center; }
+          100% { background-position: -200% center; }
+        }
+        .gold-shimmer {
+          background: linear-gradient(90deg, #fef3c7 0%, #fde68a 25%, #fbbf24 50%, #fde68a 75%, #fef3c7 100%);
+          background-size: 400% 100%;
+          animation: shimmer 2.5s linear infinite;
         }
       `}</style>
 
