@@ -237,9 +237,7 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
   const disabled  = locked || dayLocked
   const colors    = NODE_COLORS[node] || NODE_COLORS.learn
   const isDoubleReward = node === 'double_reward'
-  const isHard = node === 'hard'
-
-  const subtitle = locked
+  const shimmerClass = isDoubleReward ? 'gold-shimmer' : ''
     ? 'Locked'
     : dayLocked
       ? nextUnlockMessage(nextUnlockAt)
@@ -250,7 +248,7 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
   const displayLabel = isWelcome ? 'Welcome!' : nodeLabel(node)
 
   // Shimmer classes always apply for hard/double_reward regardless of lock state
-  const shimmerClass = isDoubleReward ? 'gold-shimmer' : isHard ? 'red-shimmer' : ''
+  const shimmerClass = isDoubleReward ? 'gold-shimmer' : ''
 
   return (
     <button
@@ -258,7 +256,7 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
       disabled={disabled}
       onClick={onPress}
       className={`w-full flex items-center gap-4 rounded-3xl px-4 py-4 transition-all active:translate-y-1 ${shimmerClass ? shimmerClass : 'border-2'}`}
-      style={(!isDoubleReward && !isHard) ? {
+      style={!isDoubleReward ? {
         backgroundColor: disabled ? '#F9FAFB' : completed ? '#DCFCE7' : colors.bg,
         borderColor: disabled ? '#E5E7EB' : completed ? DUO_GREEN : colors.border,
         boxShadow: disabled
@@ -277,10 +275,6 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
           background: disabled ? 'rgba(245,158,11,0.25)' : 'linear-gradient(135deg, #f59e0b, #d97706)',
           color: disabled ? '#d97706' : '#fff',
           boxShadow: disabled ? 'none' : '0 3px 0 #b45309',
-        } : isHard ? {
-          background: disabled ? 'rgba(239,68,68,0.15)' : 'linear-gradient(135deg, #ef4444, #b91c1c)',
-          color: disabled ? '#ef4444' : '#fff',
-          boxShadow: disabled ? 'none' : '0 3px 0 #991b1b',
         } : {
           backgroundColor: disabled ? '#E5E7EB' : completed ? `${DUO_GREEN}22` : `${colors.icon}22`,
           color: disabled ? '#9CA3AF' : completed ? DUO_GREEN : colors.icon,
@@ -293,7 +287,6 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
         <div className="flex items-center gap-2 flex-wrap">
           <p className={`font-display font-bold text-lg leading-tight ${
             isDoubleReward ? (disabled ? 'text-amber-600' : 'text-amber-900')
-            : isHard       ? (disabled ? 'text-red-400'   : 'text-red-900')
             : disabled     ? 'text-gray-300'
             : 'text-gray-900'
           }`}>
@@ -301,7 +294,7 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
           </p>
           {isCurrent && !completed && !disabled && (
             <span className="text-white font-display font-black rounded-full px-2 py-0.5"
-              style={{ backgroundColor: isDoubleReward ? '#d97706' : isHard ? '#b91c1c' : colors.icon, fontSize: 10 }}>
+              style={{ backgroundColor: isDoubleReward ? '#d97706' : colors.icon, fontSize: 10 }}>
               NEXT UP
             </span>
           )}
@@ -315,12 +308,11 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
         <p className={`font-body text-sm mt-0.5 leading-snug font-semibold ${
           dayLocked        ? 'text-amber-500'
           : isDoubleReward ? (disabled ? 'text-amber-500' : 'text-amber-700')
-          : isHard         ? (disabled ? 'text-red-300'   : 'text-red-600')
           : locked         ? 'text-gray-300'
           : completed      ? 'text-gray-400'
           : 'text-gray-500'
         }`}
-        style={{ color: !dayLocked && !locked && !completed && !isDoubleReward && !isHard && isCurrent ? colors.icon : undefined }}
+        style={{ color: !dayLocked && !locked && !completed && !isDoubleReward && isCurrent ? colors.icon : undefined }}
         >
           {subtitle}
         </p>
@@ -333,10 +325,6 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
           background: disabled ? 'rgba(245,158,11,0.2)' : 'linear-gradient(135deg, #f59e0b, #d97706)',
           color: disabled ? '#d97706' : '#fff',
           boxShadow: disabled ? 'none' : '0 2px 0 #b45309',
-        } : isHard && !completed ? {
-          background: disabled ? 'rgba(239,68,68,0.15)' : 'linear-gradient(135deg, #ef4444, #b91c1c)',
-          color: disabled ? '#ef4444' : '#fff',
-          boxShadow: disabled ? 'none' : '0 2px 0 #991b1b',
         } : {
           backgroundColor: dayLocked ? '#FEF3C7' : locked ? '#F3F4F6' : completed ? DUO_GREEN : `${colors.icon}22`,
           color: dayLocked ? '#D97706' : locked ? '#D1D5DB' : completed ? '#FFFFFF' : colors.icon,
@@ -544,23 +532,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           0%   { background-position: -200% center; }
           100% { background-position: 200% center; }
         }
-        @keyframes redShimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
         .gold-shimmer {
           background: linear-gradient(135deg, #fef3c7 0%, #fde68a 30%, #fbbf24 50%, #fde68a 70%, #fef3c7 100%) !important;
           background-size: 200% 200% !important;
           animation: goldShimmer 2s linear infinite !important;
           border: 2.5px solid #f59e0b !important;
           box-shadow: 0 4px 0 #d97706, 0 2px 20px rgba(245,158,11,0.4) !important;
-        }
-        .red-shimmer {
-          background: linear-gradient(135deg, #fff1f0 0%, #fecaca 30%, #f87171 50%, #fecaca 70%, #fff1f0 100%) !important;
-          background-size: 200% 200% !important;
-          animation: redShimmer 2s linear infinite !important;
-          border: 2.5px solid #ef4444 !important;
-          box-shadow: 0 4px 0 #b91c1c, 0 2px 20px rgba(239,68,68,0.4) !important;
         }
       `}</style>
 
