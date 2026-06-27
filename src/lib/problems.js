@@ -421,14 +421,9 @@ export function generateBatch(operation, table, batch, node, { unlockBatch, revi
   if (node === 'learn') return generateLesson(operation, table, batch)
   if (node === 'review') return generateReview(operation, table, batch, reviewPool || [])
 
-  const isTimed = node === 'speed'
+  const isTimed = node === 'double_reward' || node === 'speed'
   const TOTAL = 12
-  const formats = buildFormatPool(TOTAL)
 
-  const [fact0, fact1] = factsForBatch(batch)
-  const facts = [fact0, fact1]
-
-  // Unlock uses yesterday's batch
   const src = (node === 'unlock' && unlockBatch)
     ? { operation: unlockBatch.operation, table: unlockBatch.table, batch: unlockBatch.batch }
     : { operation, table, batch }
@@ -436,10 +431,40 @@ export function generateBatch(operation, table, batch, node, { unlockBatch, revi
   const [sf0, sf1] = factsForBatch(src.batch)
   const srcFacts = [sf0, sf1]
 
-  // Build no-consecutive-same-fact sequence
+  // Per-node difficulty distribution
+  let nodeFormats
+  if (node === 'easy') {
+    nodeFormats = shuffle([
+      ...Array(8).fill('classic'),
+      ...Array(2).fill('missing'),
+      ...Array(1).fill('truefalse'),
+      ...Array(1).fill('reverse'),
+    ])
+  } else if (node === 'medium') {
+    nodeFormats = shuffle([
+      ...Array(4).fill('classic'),
+      ...Array(3).fill('word'),
+      ...Array(2).fill('missing'),
+      ...Array(2).fill('reverse'),
+      ...Array(1).fill('truefalse'),
+    ])
+  } else if (node === 'hard') {
+    nodeFormats = shuffle([
+      ...Array(2).fill('classic'),
+      ...Array(2).fill('word'),
+      ...Array(2).fill('missing'),
+      ...Array(2).fill('reverse'),
+      ...Array(2).fill('truefalse'),
+      ...Array(2).fill('comparison'),
+    ])
+  } else {
+    // unlock, double_reward, legacy nodes → balanced default
+    nodeFormats = buildFormatPool(TOTAL)
+  }
+
   const factSeq = makeFactSequence(2)
 
-  return formats.map((fmt, i) => {
+  return nodeFormats.map((fmt, i) => {
     const fact = srcFacts[factSeq[i] % 2]
     return makeQuestion(fmt, src.operation, src.table, fact, isTimed)
   })
