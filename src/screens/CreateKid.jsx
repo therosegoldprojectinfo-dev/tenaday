@@ -295,56 +295,33 @@ function StepTestWarning({ name, claim, onConfirm, onBack }) {
 
 // ── Main CreateKid orchestrator ───────────────────────────────────────────
 export default function CreateKid({ parentId, onCreated, onBack }) {
-  const [step, setStep]             = useState(1)   // 1 | 2 | 3
   const [nameAge, setNameAge]       = useState(null)
-  const [pendingClaim, setPendingClaim] = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError]           = useState(null)
 
-  function handleStep1Done({ name, age }) {
+  async function handleStep1Done({ name, age }) {
     setNameAge({ name, age })
-    setStep(2)
-  }
-
-  function handleStep2Done(placementClaim) {
-    setPendingClaim(placementClaim)
-    if (placementClaim) {
-      // Show the test warning before creating the profile
-      setStep(3)
-    } else {
-      doCreateKid(null)
-    }
-  }
-
-  async function doCreateKid(placementClaim) {
     setSubmitting(true)
     setError(null)
     try {
       const kidId = await createKid(parentId, {
-        name: nameAge.name,
-        age:  nameAge.age,
-        placementClaim,
+        name,
+        age,
+        placementClaim: null,
         timezone: detectTimezone(),
       })
-      onCreated(kidId, placementClaim)
+      onCreated(kidId, null)
     } catch (err) {
       setError(err instanceof AuthError ? err.message : 'Something went wrong. Please try again.')
       setSubmitting(false)
     }
   }
 
-  if (step === 1) {
-    return <StepNameAge onNext={handleStep1Done} onBack={onBack} />
-  }
-
-  if (step === 3 && pendingClaim) {
+  if (submitting) {
     return (
-      <StepTestWarning
-        name={nameAge.name}
-        claim={pendingClaim}
-        onConfirm={() => doCreateKid(pendingClaim)}
-        onBack={() => setStep(2)}
-      />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="font-body text-gray-400">Creating profile…</p>
+      </div>
     )
   }
 
@@ -355,17 +332,7 @@ export default function CreateKid({ parentId, onCreated, onBack }) {
           <p className="font-body text-sm text-red-600">{error}</p>
         </div>
       )}
-      {submitting ? (
-        <div className="min-h-screen bg-white flex items-center justify-center">
-          <p className="font-body text-gray-400">Creating profile…</p>
-        </div>
-      ) : (
-        <StepLevel
-          name={nameAge.name}
-          onNext={handleStep2Done}
-          onBack={() => setStep(1)}
-        />
-      )}
+      <StepNameAge onNext={handleStep1Done} onBack={onBack} />
     </div>
   )
 }
