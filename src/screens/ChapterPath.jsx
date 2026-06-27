@@ -605,36 +605,46 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       )}
 
-      {/* ── Sticky unit banner (compact pill) ── */}
+      {/* ── Sticky unit banner (colorful Duolingo pill) ── */}
       {(() => {
         const u = allUnits.find(u => u.unitNumber === visibleUnit)
         const facts = u ? factsForBatch(u.batch) : []
         const factStr = u ? facts.map(f => `${u.table} ${theme.symbol} ${f}`).join(', ') : ''
+        const UNIT_COLORS = [
+          { bg: '#58cc02', shadow: '#46a302' }, // green
+          { bg: '#1cb0f6', shadow: '#0a8fcb' }, // blue
+          { bg: '#ffb700', shadow: '#d99700' }, // yellow
+          { bg: '#ff4b4b', shadow: '#cc0000' }, // red
+          { bg: '#ff9600', shadow: '#cc7a00' }, // orange
+          { bg: '#ce82ff', shadow: '#9b59b6' }, // purple
+          { bg: '#ff86d0', shadow: '#cc5ca3' }, // pink
+        ]
+        const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
         return (
           <div style={{
             position: 'sticky', top: 0, zIndex: 20,
             display: 'flex', justifyContent: 'center',
-            padding: '6px 16px',
+            padding: '10px 16px 6px',
             backgroundColor: '#fff',
           }}>
             <div style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8,
-              borderRadius: 99,
-              border: '2px solid #e0e7ff',
-              backgroundColor: '#fff',
-              padding: '6px 16px',
-              boxShadow: '0 2px 0 #c7d2fe',
+              display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
+              borderRadius: 16,
+              backgroundColor: color.bg,
+              padding: '10px 24px',
+              boxShadow: `0 4px 0 ${color.shadow}`,
+              minWidth: 200, textAlign: 'center',
             }}>
               <span style={{
                 fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
                 fontWeight: 900, fontSize: 11,
-                letterSpacing: '0.08em', color: '#6366f1',
+                letterSpacing: '0.1em', color: 'rgba(255,255,255,0.85)',
                 textTransform: 'uppercase',
               }}>Unit {visibleUnit}</span>
-              <span style={{ color: '#d1d5db', fontSize: 12 }}>·</span>
               <span style={{
                 fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                fontWeight: 700, fontSize: 13, color: '#374151',
+                fontWeight: 800, fontSize: 16, color: '#fff',
+                marginTop: 1,
               }}>{factStr}</span>
             </div>
           </div>
