@@ -17,7 +17,7 @@ const TOTAL       = 12  // default; review overrides to 24
 const LIVES_START = 5
 const TIMED_MS    = 5000
 
-const TIMED_NODES        = new Set(['speed'])
+const TIMED_NODES        = new Set(['speed', 'double_reward'])
 const WORD_PROBLEM_NODES = new Set(['what_happened', 'real_life'])
 
 // ── Icons ─────────────────────────────────────────────────────────────────
