@@ -106,36 +106,39 @@ function NodeTypeIcon({ node, size = 22 }) {
       </svg>
     )
   }
-  if (node === 'what_happened') {
-    // Question mark bubble — "which equation describes this?"
+  if (node === 'easy') {
+    // Star
     return (
       <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 9a3 3 0 1 1 4 2.8c-.6.2-1 .8-1 1.4V14" />
-        <circle cx="12" cy="17" r="0.8" fill="currentColor" stroke="none" />
-        <circle cx="12" cy="12" r="9" />
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
       </svg>
     )
   }
-  if (node === 'practice') {
+  if (node === 'medium') {
+    // Brain
     return (
       <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 2l4 4-4 4M21 6H8a4 4 0 0 0-4 4v1M7 22l-4-4 4-4M3 18h13a4 4 0 0 0 4-4v-1" />
+        <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24A2.5 2.5 0 0 1 9.5 2Z" />
+        <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24A2.5 2.5 0 0 0 14.5 2Z" />
       </svg>
     )
   }
-  if (node === 'real_life') {
+  if (node === 'hard') {
+    // Fire
     return (
       <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 20V10l8-6 8 6v10" />
-        <path d="M9 20v-6h6v6" />
+        <path d="M8.5 14.5A4.5 4.5 0 0 0 12 19a4.5 4.5 0 0 0 3.5-7.5c-.5-.7-1-1-1-2.5 0 0-1 1-1 2.5 0-1.5-1-3-2-4 0 2-1 3.5-2.5 5" />
+        <path d="M12 19c0 0-3-2-3-6 0 0 1.5 1 2 2 .5-2 0-4-1.5-5.5C11 11 13 13 13 16c.5-1 .5-2 .5-3 1 1 1.5 3 1 5" />
       </svg>
     )
   }
-  if (node === 'speed') {
+  if (node === 'double_reward') {
+    // Coin/star double
     return (
       <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2.5a9.5 9.5 0 1 0 6.7 16.2M12 7v5l3.5 2" />
-        <path d="M18 4l1.5-1.5M20 6l1.5-1.5" />
+        <circle cx="10" cy="12" r="7" />
+        <path d="M10 8v8M7 10h6M7 14h6" />
+        <path d="M19 5l1 1-1 1M21 7l-3-2" />
       </svg>
     )
   }
@@ -230,13 +233,18 @@ function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
 // tomorrow"), not a permanent block.
 // Per-node accent colors — makes each card feel distinct and fun
 const NODE_COLORS = {
-  unlock:        { bg: '#EDE9FE', icon: '#7C3AED', border: '#C4B5FD', shadow: '#A78BFA' },
+  unlock:        { bg: '#DCFCE7', icon: '#16A34A', border: '#86EFAC', shadow: '#4ADE80' },
   learn:         { bg: '#DCFCE7', icon: '#16A34A', border: '#86EFAC', shadow: '#4ADE80' },
+  easy:          { bg: '#DCFCE7', icon: '#16A34A', border: '#86EFAC', shadow: '#4ADE80' },
+  medium:        { bg: '#DBEAFE', icon: '#2563EB', border: '#93C5FD', shadow: '#60A5FA' },
+  hard:          { bg: '#FFF7ED', icon: '#EA580C', border: '#FDBA74', shadow: '#FB923C' },
+  double_reward: { bg: '#FEF3C7', icon: '#D97706', border: '#FCD34D', shadow: '#FBBF24' },
+  review:        { bg: '#F5F3FF', icon: '#7C3AED', border: '#C4B5FD', shadow: '#A78BFA' },
+  // legacy
   what_happened: { bg: '#FEF3C7', icon: '#D97706', border: '#FCD34D', shadow: '#FBBF24' },
   practice:      { bg: '#DBEAFE', icon: '#2563EB', border: '#93C5FD', shadow: '#60A5FA' },
   real_life:     { bg: '#FCE7F3', icon: '#BE185D', border: '#F9A8D4', shadow: '#F472B6' },
   speed:         { bg: '#FFF7ED', icon: '#EA580C', border: '#FDBA74', shadow: '#FB923C' },
-  review:        { bg: '#F0FDF4', icon: '#15803D', border: '#4ADE80', shadow: '#22C55E' },
 }
 
 function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) {
@@ -245,6 +253,7 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
   const completed = status === 'completed'
   const disabled  = locked || dayLocked
   const colors    = NODE_COLORS[node] || NODE_COLORS.learn
+  const isDoubleReward = node === 'double_reward'
 
   const subtitle = locked
     ? 'Locked'
@@ -252,11 +261,7 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
       ? nextUnlockMessage(nextUnlockAt)
       : completed
         ? 'Completed — tap to replay'
-        : isWelcome
-          ? "Let's get started! 🎉"
-          : isCurrent
-            ? nodePurpose(node)
-            : 'Ready to play!'
+        : nodePurpose(node)
 
   const displayLabel = isWelcome ? 'Welcome!' : nodeLabel(node)
 
@@ -265,22 +270,33 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
       type="button"
       disabled={disabled}
       onClick={onPress}
-      className="w-full flex items-center gap-4 rounded-3xl border-2 px-4 py-4
-                 transition-all active:translate-y-1"
-      style={{
+      className="w-full flex items-center gap-4 rounded-3xl border-2 px-4 py-4 transition-all active:translate-y-1"
+      style={isDoubleReward && !disabled ? {
+        background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 40%, #fbbf24 60%, #fef3c7 100%)',
+        backgroundSize: '200% 200%',
+        animation: 'shimmer 3s linear infinite',
+        borderColor: '#f59e0b',
+        boxShadow: '0 4px 0 0 #d97706, 0 0 20px rgba(245,158,11,0.3)',
+      } : {
         backgroundColor: disabled ? '#F9FAFB' : completed ? '#DCFCE7' : colors.bg,
-        borderColor: disabled ? '#E5E7EB' : completed ? DUO_GREEN : colors.border,
+        borderColor: disabled ? '#E5E7EB' : completed ? DUO_GREEN : isCurrent ? colors.border : colors.border,
         boxShadow: disabled
           ? '0 4px 0 0 #D1D5DB'
           : completed
             ? `0 4px 0 0 ${DUO_GREEN_DARK}`
-            : `0 4px 0 0 ${colors.shadow ?? colors.border}`,
+            : isCurrent
+              ? `0 4px 0 0 ${colors.shadow}, 0 0 0 3px ${colors.border}`
+              : `0 4px 0 0 ${colors.shadow ?? colors.border}`,
       }}
     >
       {/* Big icon badge */}
       <div
         className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
-        style={{
+        style={isDoubleReward && !disabled ? {
+          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+          color: '#fff',
+          boxShadow: '0 3px 0 #b45309',
+        } : {
           backgroundColor: disabled ? '#E5E7EB' : completed ? `${DUO_GREEN}22` : `${colors.icon}22`,
           color: disabled ? '#9CA3AF' : completed ? DUO_GREEN : colors.icon,
         }}
@@ -289,17 +305,33 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
       </div>
 
       <div className="flex-1 text-left min-w-0">
-        <p className={`font-display font-bold text-lg leading-tight ${disabled ? 'text-gray-300' : 'text-gray-900'}`}>
-          {displayLabel}
-        </p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <p className={`font-display font-bold text-lg leading-tight ${
+            disabled ? 'text-gray-300' : isDoubleReward && !completed ? 'text-amber-900' : 'text-gray-900'
+          }`}>
+            {displayLabel}
+          </p>
+          {isCurrent && !completed && !disabled && (
+            <span className="text-white font-display font-black rounded-full px-2 py-0.5"
+              style={{ backgroundColor: isDoubleReward ? '#d97706' : colors.icon, fontSize: 10 }}>
+              NEXT UP
+            </span>
+          )}
+          {isDoubleReward && !disabled && (
+            <span className="text-white font-display font-black rounded-full px-2 py-0.5"
+              style={{ backgroundColor: '#d97706', fontSize: 10 }}>
+              2×
+            </span>
+          )}
+        </div>
         <p className={`font-body text-sm mt-0.5 leading-snug font-semibold ${
-          dayLocked   ? 'text-amber-500'
-          : locked    ? 'text-gray-300'
-          : completed ? 'text-gray-400'
-          : isCurrent ? `text-[${colors.icon}]`
-          : 'text-green-500'
+          dayLocked        ? 'text-amber-500'
+          : locked         ? 'text-gray-300'
+          : completed      ? 'text-gray-400'
+          : isDoubleReward ? 'text-amber-700'
+          : 'text-gray-500'
         }`}
-        style={{ color: !dayLocked && !locked && !completed && isCurrent ? colors.icon : undefined }}
+        style={{ color: !dayLocked && !locked && !completed && !isDoubleReward && isCurrent ? colors.icon : undefined }}
         >
           {subtitle}
         </p>
@@ -308,7 +340,11 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
       {/* Status badge */}
       <div
         className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
-        style={{
+        style={isDoubleReward && !disabled && !completed ? {
+          background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+          color: '#fff',
+          boxShadow: '0 2px 0 #b45309',
+        } : {
           backgroundColor: dayLocked ? '#FEF3C7' : locked ? '#F3F4F6' : completed ? DUO_GREEN : `${colors.icon}22`,
           color: dayLocked ? '#D97706' : locked ? '#D1D5DB' : completed ? '#FFFFFF' : colors.icon,
         }}
@@ -324,6 +360,7 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
     </button>
   )
 }
+
 
 export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   if (!kidId) throw new Error('ChapterPath: kidId is required — do not render without a real kid ID')
@@ -509,6 +546,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
 
   return (
     <div className="min-h-screen bg-white">
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: 0% center; }
+          100% { background-position: 200% center; }
+        }
+      `}</style>
 
       <div className="sticky top-0 bg-white z-30 border-b border-gray-100">
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
