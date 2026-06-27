@@ -541,22 +541,22 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
     <div className="min-h-screen bg-white">
       <style>{`
         @keyframes shimmer {
-          0% { background-position: 200% center; }
-          100% { background-position: -200% center; }
+          0% { background-position: -200% center; }
+          100% { background-position: 200% center; }
         }
         .gold-shimmer {
-          background: linear-gradient(90deg, #fef3c7 0%, #fde68a 25%, #fbbf24 50%, #fde68a 75%, #fef3c7 100%) !important;
-          background-size: 400% 100% !important;
-          animation: shimmer 2.5s linear infinite !important;
-          border-color: #f59e0b !important;
-          box-shadow: 0 4px 0 0 #d97706, 0 4px 20px rgba(245,158,11,0.25) !important;
+          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 40%, #fbbf24 60%, #fef3c7 100%) !important;
+          background-size: 200% 200% !important;
+          animation: shimmer 3s linear infinite !important;
+          border: 2.5px solid #f59e0b !important;
+          box-shadow: 0 4px 0 #d97706, 0 4px 20px rgba(245,158,11,0.35) !important;
         }
         .red-shimmer {
-          background: linear-gradient(90deg, #fff1f0 0%, #ffd4d0 25%, #ff6b55 50%, #ffd4d0 75%, #fff1f0 100%) !important;
-          background-size: 400% 100% !important;
-          animation: shimmer 2.5s linear infinite !important;
-          border-color: #ef4444 !important;
-          box-shadow: 0 4px 0 0 #b91c1c, 0 4px 20px rgba(239,68,68,0.25) !important;
+          background: linear-gradient(135deg, #fff1f0 0%, #ffd4d0 40%, #ff4d3d 60%, #fff1f0 100%) !important;
+          background-size: 200% 200% !important;
+          animation: shimmer 3s linear infinite !important;
+          border: 2.5px solid #ef4444 !important;
+          box-shadow: 0 4px 0 #b91c1c, 0 4px 20px rgba(239,68,68,0.35) !important;
         }
       `}</style>
 
