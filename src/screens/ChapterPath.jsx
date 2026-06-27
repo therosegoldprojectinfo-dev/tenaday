@@ -44,8 +44,6 @@ function LockIcon({ size = 20 }) {
   )
 }
 
-// Distinct from a permanent lock — this is "come back tomorrow," a
-// temporary/calendar state, not a progression block.
 function ClockLockIcon({ size = 20 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
@@ -78,70 +76,12 @@ function CoinStatIcon() {
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
       <circle cx="10" cy="10" r="10" fill="#FFB700" />
       <circle cx="10" cy="10" r="7" fill="#FFD700" />
-      <path
-        d="M10 5.5l1.1 3.4h3.6l-2.9 2.1 1.1 3.4L10 12.4 6.9 14.4l1.1-3.4-2.9-2.1h3.6z"
-        fill="#CC7700"
-      />
-    </svg>
-  )
-}
-
-// Per-node-type icons for the list rows — distinct glyphs so the 6 rows
-// are visually scannable. Each maps to its node's pedagogical purpose
-// rather than being arbitrary: unlock=key, learn=seedling, practice=
-// repeat-arrows, real_life=house, speed=stopwatch, review=brain/refresh.
-function NodeTypeIcon({ node, size = 28 }) {
-  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', 'aria-hidden': true }
-
-  if (node === 'unlock') return (
-    <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="8" cy="15" r="4" />
-      <path d="M11 12l8-8M16 7l2 2M19 4l2 2" />
-    </svg>
-  )
-
-  if (node === 'learn') return (
-    <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 21V10M12 10C12 6 9 5 6 5c0 4 1 6 6 5ZM12 10c0-4 3-5 6-5 0 4-1 6-6 5Z" />
-    </svg>
-  )
-
-  if (node === 'easy') return (
-    <span style={{ fontSize: size * 0.9, lineHeight: 1 }}>⭐</span>
-  )
-
-  if (node === 'medium') return (
-    <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24A2.5 2.5 0 0 1 9.5 2Z" />
-      <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24A2.5 2.5 0 0 0 14.5 2Z" />
-    </svg>
-  )
-
-  if (node === 'hard') return (
-    <span style={{ fontSize: size * 0.9, lineHeight: 1 }}>🔥</span>
-  )
-
-  if (node === 'double_reward') return (
-    <span style={{ fontSize: size * 0.9, lineHeight: 1 }}>🪙</span>
-  )
-
-  // review
-  return (
-    <svg {...common} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 12a9 9 0 1 1 3 6.7" />
-      <path d="M3 16v-4h4" />
+      <path d="M10 5.5l1.1 3.4h3.6l-2.9 2.1 1.1 3.4L10 12.4 6.9 14.4l1.1-3.4-2.9-2.1h3.6z" fill="#CC7700" />
     </svg>
   )
 }
 
 // ── Day strip ────────────────────────────────────────────────────────────
-// 72 circles total per chapter (12 tables × 6 batches). Shows a sliding
-// window of ~10 circles centered on the kid's current position — enough
-// context to see what's done and what's coming without scrolling through
-// 72 at once. Each circle shows the day number. Color state:
-//   green filled  = completed (playable as replay)
-//   green outline = today's active day session (current cursor)
-//   grey locked   = not yet reached OR day-gated (next calendar day)
 function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
   const selectedRef = useRef(null)
 
@@ -149,8 +89,6 @@ function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
     selectedRef.current?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
   }, [selectedDay])
 
-  // Window: show 5 circles before current, current, 4 after — always 10
-  // visible, clamped to the 1-totalDays range.
   const BEFORE = 5
   const AFTER  = 4
   const windowStart = Math.max(1, Math.min(currentDay - BEFORE, totalDays - BEFORE - AFTER))
@@ -160,17 +98,14 @@ function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
   return (
     <div className="flex items-center overflow-x-auto no-scrollbar px-4 py-3 justify-start md:justify-center">
       <div className="flex items-center gap-4">
-        {/* Ellipsis indicator if more days exist before the window */}
         {windowStart > 1 && (
           <span className="font-body text-xs text-gray-400 px-1">···</span>
         )}
-
         {visibleDays.map((day) => {
           const isDone     = day < currentDay
           const isCurrent  = day === currentDay
           const isLocked   = day > currentDay
           const isSelected = day === selectedDay
-
           return (
             <button
               key={day}
@@ -182,26 +117,16 @@ function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
               style={{
                 backgroundColor: isLocked ? '#E5E7EB' : DUO_GREEN,
                 color: isLocked ? '#9CA3AF' : '#FFFFFF',
-                // 3D bottom shadow — darker green for active/done, grey for locked
-                boxShadow: isLocked
-                  ? '0 4px 0 0 #B0B7C0'
-                  : `0 4px 0 0 ${DUO_GREEN_DARK}`,
-                // Shine overlay via outline for selected state
+                boxShadow: isLocked ? '0 4px 0 0 #B0B7C0' : `0 4px 0 0 ${DUO_GREEN_DARK}`,
                 transform: isSelected ? 'scale(1.15)' : 'scale(1)',
               }}
               aria-label={`Day ${day}${isLocked ? ', locked' : isDone ? ', completed' : ', today'}`}
               aria-pressed={isSelected}
             >
-              {isDone
-                ? <CheckIcon size={14} />
-                : isLocked
-                  ? <LockIcon size={13} />
-                  : day}
+              {isDone ? <CheckIcon size={14} /> : isLocked ? <LockIcon size={13} /> : day}
             </button>
           )
         })}
-
-        {/* Ellipsis indicator if more days exist after the window */}
         {windowEnd < totalDays && (
           <span className="font-body text-xs text-gray-400 px-1">···</span>
         )}
@@ -210,139 +135,221 @@ function DayStrip({ totalDays, currentDay, selectedDay, onSelect }) {
   )
 }
 
-// ── Node list row ────────────────────────────────────────────────────────
-// 'dayLocked' is a distinct visual state from a normal progression lock —
-// uses a clock icon and different copy, since it's temporary ("come back
-// tomorrow"), not a permanent block.
-// Per-node accent colors — makes each card feel distinct and fun
-const NODE_COLORS = {
-  unlock:        { bg: '#DCFCE7', icon: '#16A34A', border: '#86EFAC', shadow: '#4ADE80' },
-  learn:         { bg: '#DCFCE7', icon: '#16A34A', border: '#86EFAC', shadow: '#4ADE80' },
-  easy:          { bg: '#DCFCE7', icon: '#16A34A', border: '#86EFAC', shadow: '#4ADE80' },
-  medium:        { bg: '#DBEAFE', icon: '#2563EB', border: '#93C5FD', shadow: '#60A5FA' },
-  hard:          { bg: '#FFF7ED', icon: '#EA580C', border: '#FDBA74', shadow: '#FB923C' },
-  double_reward: { bg: '#FEF3C7', icon: '#D97706', border: '#FCD34D', shadow: '#FBBF24' },
-  review:        { bg: '#F5F3FF', icon: '#7C3AED', border: '#C4B5FD', shadow: '#A78BFA' },
-  // legacy
-  what_happened: { bg: '#FEF3C7', icon: '#D97706', border: '#FCD34D', shadow: '#FBBF24' },
-  practice:      { bg: '#DBEAFE', icon: '#2563EB', border: '#93C5FD', shadow: '#60A5FA' },
-  real_life:     { bg: '#FCE7F3', icon: '#BE185D', border: '#F9A8D4', shadow: '#F472B6' },
-  speed:         { bg: '#FFF7ED', icon: '#EA580C', border: '#FDBA74', shadow: '#FB923C' },
+// ── Node label mapping ────────────────────────────────────────────────────
+const NODE_DISPLAY_NAMES = {
+  unlock:        'Welcome',
+  learn:         'Learn',
+  easy:          'Easy',
+  medium:        'Medium',
+  hard:          'Hard',
+  double_reward: 'Double Reward',
+  review:        'Review',
 }
 
-function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) {
-  const locked    = status === 'locked'
-  const dayLocked = status === 'day_locked'
-  const completed = status === 'completed'
-  const disabled  = locked || dayLocked
-  const colors    = NODE_COLORS[node] || NODE_COLORS.learn
+// ── Zigzag positions: alternates left / right ─────────────────────────────
+// index 0,2,4,6 → left; 1,3,5 → right
+const ZIGZAG_SIDES = ['left', 'right', 'left', 'right', 'left', 'right', 'left']
+
+// ── 3D Disc Node button ───────────────────────────────────────────────────
+function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnlockAt }) {
+  const locked       = status === 'locked'
+  const dayLocked    = status === 'day_locked'
+  const completed    = status === 'completed'
+  const disabled     = locked || dayLocked
+  const isReview     = node === 'review'
   const isDoubleReward = node === 'double_reward'
-  const shimmerClass = isDoubleReward ? 'gold-shimmer' : ''
+  const isSpecial    = isReview || isDoubleReward
 
-  const subtitle = locked
-    ? 'Locked'
+  // Double reward always keeps gold color even when locked
+  const forceGold = isDoubleReward
+
+  const displayName = isWelcome ? 'Welcome' : (NODE_DISPLAY_NAMES[node] || nodeLabel(node))
+
+  // Node image src
+  const imgSrc = isDoubleReward
+    ? '/ChatGPT Image 27 juin 2026, 18_34_34.png'
+    : isReview
+      ? '/ChatGPT Image 27 juin 2026, 18_29_52.png'
+      : '/ChatGPT Image 27 juin 2026, 18_28_19.png'
+
+  // Status overlay elements
+  const statusIcon = completed
+    ? <div style={{
+        position: 'absolute', bottom: -4, right: -4,
+        width: 26, height: 26, borderRadius: '50%',
+        backgroundColor: DUO_GREEN,
+        boxShadow: `0 2px 0 ${DUO_GREEN_DARK}`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: '#fff',
+      }}>
+        <CheckIcon size={14} />
+      </div>
     : dayLocked
-      ? nextUnlockMessage(nextUnlockAt)
-      : completed
-        ? 'Completed — tap to replay'
-        : nodePurpose(node)
+      ? <div style={{
+          position: 'absolute', bottom: -4, right: -4,
+          width: 26, height: 26, borderRadius: '50%',
+          backgroundColor: '#FEF3C7',
+          border: '2px solid #FCD34D',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: '#D97706',
+        }}>
+          <ClockLockIcon size={13} />
+        </div>
+      : locked && !forceGold
+        ? <div style={{
+            position: 'absolute', bottom: -4, right: -4,
+            width: 26, height: 26, borderRadius: '50%',
+            backgroundColor: '#E5E7EB',
+            border: '2px solid #D1D5DB',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#9CA3AF',
+          }}>
+            <LockIcon size={13} />
+          </div>
+        : isCurrent
+          ? <div style={{
+              position: 'absolute', bottom: -4, right: -4,
+              width: 26, height: 26, borderRadius: '50%',
+              backgroundColor: '#7C3AED',
+              boxShadow: '0 2px 0 #5b21b6',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#fff', fontSize: 14,
+            }}>→</div>
+          : null
 
-  const displayLabel = isWelcome ? 'Welcome!' : nodeLabel(node)
-
+  // Label side
+  const label = (
+    <div style={{
+      display: 'flex', flexDirection: 'column',
+      alignItems: side === 'left' ? 'flex-start' : 'flex-end',
+      maxWidth: 100,
+    }}>
+      <span style={{
+        fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+        fontWeight: 800,
+        fontSize: 13,
+        color: (disabled && !forceGold) ? '#9CA3AF' : '#1f2937',
+        lineHeight: 1.2,
+        textAlign: side === 'left' ? 'left' : 'right',
+      }}>{displayName}</span>
+      {isCurrent && !disabled && (
+        <span style={{
+          marginTop: 3,
+          fontSize: 9,
+          fontWeight: 900,
+          letterSpacing: '0.05em',
+          color: '#fff',
+          backgroundColor: '#7C3AED',
+          borderRadius: 20,
+          padding: '2px 6px',
+        }}>NEXT UP</span>
+      )}
+      {completed && (
+        <span style={{
+          marginTop: 3, fontSize: 9, fontWeight: 700,
+          color: DUO_GREEN,
+        }}>✓ Done</span>
+      )}
+      {dayLocked && (
+        <span style={{
+          marginTop: 3, fontSize: 9, fontWeight: 700,
+          color: '#D97706',
+        }}>⏰ Tomorrow</span>
+      )}
+    </div>
+  )
 
   return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={onPress}
-      className={`w-full flex items-center gap-4 rounded-3xl px-4 py-4 transition-all active:translate-y-1 ${shimmerClass ? shimmerClass : 'border-2'}`}
-      style={!isDoubleReward ? {
-        backgroundColor: disabled ? '#F9FAFB' : completed ? '#DCFCE7' : colors.bg,
-        borderColor: disabled ? '#E5E7EB' : completed ? DUO_GREEN : colors.border,
-        boxShadow: disabled
-          ? '0 4px 0 0 #D1D5DB'
-          : completed
-            ? `0 4px 0 0 ${DUO_GREEN_DARK}`
-            : isCurrent
-              ? `0 4px 0 0 ${colors.shadow}, 0 0 0 3px ${colors.border}`
-              : `0 4px 0 0 ${colors.shadow ?? colors.border}`,
-      } : {}}
-    >
-      {/* Big icon badge */}
-      <div
-        className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
-        style={isDoubleReward ? {
-          background: disabled ? 'rgba(245,158,11,0.25)' : 'linear-gradient(135deg, #f59e0b, #d97706)',
-          color: disabled ? '#d97706' : '#fff',
-          boxShadow: disabled ? 'none' : '0 3px 0 #b45309',
-        } : {
-          backgroundColor: disabled ? '#E5E7EB' : completed ? `${DUO_GREEN}22` : `${colors.icon}22`,
-          color: disabled ? '#9CA3AF' : completed ? DUO_GREEN : colors.icon,
+    <div style={{
+      display: 'flex',
+      justifyContent: side === 'left' ? 'flex-start' : 'flex-end',
+      paddingLeft: side === 'left' ? 24 : 0,
+      paddingRight: side === 'right' ? 24 : 0,
+      marginBottom: 32,
+    }}>
+      <button
+        type="button"
+        disabled={disabled && !forceGold}
+        onClick={(!disabled || forceGold) ? onPress : undefined}
+        style={{
+          display: 'flex',
+          flexDirection: side === 'left' ? 'row' : 'row-reverse',
+          alignItems: 'center',
+          gap: 14,
+          background: 'none',
+          border: 'none',
+          padding: 0,
+          cursor: disabled && !forceGold ? 'default' : 'pointer',
+          WebkitTapHighlightColor: 'transparent',
         }}
+        aria-label={displayName}
       >
-        <NodeTypeIcon node={node} size={28} />
-      </div>
-
-      <div className="flex-1 text-left min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <p className={`font-display font-bold text-lg leading-tight ${
-            isDoubleReward ? (disabled ? 'text-amber-600' : 'text-amber-900')
-            : disabled     ? 'text-gray-300'
-            : 'text-gray-900'
-          }`}>
-            {displayLabel}
-          </p>
-          {isCurrent && !completed && !disabled && (
-            <span className="text-white font-display font-black rounded-full px-2 py-0.5"
-              style={{ backgroundColor: isDoubleReward ? '#d97706' : colors.icon, fontSize: 10 }}>
-              NEXT UP
-            </span>
-          )}
-          {isDoubleReward && (
-            <span className="font-display font-black rounded-full px-2 py-0.5"
-              style={{ backgroundColor: disabled ? 'rgba(217,119,6,0.2)' : '#d97706', color: disabled ? '#d97706' : '#fff', fontSize: 10 }}>
-              2×
-            </span>
-          )}
+        {/* Disc image */}
+        <div style={{ position: 'relative', flexShrink: 0 }}>
+          <img
+            src={imgSrc}
+            alt={displayName}
+            style={{
+              width: isSpecial ? 90 : 80,
+              height: isSpecial ? 90 : 80,
+              objectFit: 'contain',
+              filter: (disabled && !forceGold) ? 'grayscale(100%) opacity(0.55)' : 'none',
+              transform: isCurrent ? 'scale(1.08)' : 'scale(1)',
+              transition: 'transform 0.2s ease',
+              display: 'block',
+              // pulse shadow for current node
+              ...(isCurrent ? { filter: 'drop-shadow(0 0 10px rgba(124,58,237,0.5))' } : {}),
+            }}
+            draggable={false}
+          />
+          {statusIcon}
         </div>
-        <p className={`font-body text-sm mt-0.5 leading-snug font-semibold ${
-          dayLocked        ? 'text-amber-500'
-          : isDoubleReward ? (disabled ? 'text-amber-500' : 'text-amber-700')
-          : locked         ? 'text-gray-300'
-          : completed      ? 'text-gray-400'
-          : 'text-gray-500'
-        }`}
-        style={{ color: !dayLocked && !locked && !completed && !isDoubleReward && isCurrent ? colors.icon : undefined }}
-        >
-          {subtitle}
-        </p>
-      </div>
 
-      {/* Status badge */}
-      <div
-        className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0"
-        style={isDoubleReward && !completed ? {
-          background: disabled ? 'rgba(245,158,11,0.2)' : 'linear-gradient(135deg, #f59e0b, #d97706)',
-          color: disabled ? '#d97706' : '#fff',
-          boxShadow: disabled ? 'none' : '0 2px 0 #b45309',
-        } : {
-          backgroundColor: dayLocked ? '#FEF3C7' : locked ? '#F3F4F6' : completed ? DUO_GREEN : `${colors.icon}22`,
-          color: dayLocked ? '#D97706' : locked ? '#D1D5DB' : completed ? '#FFFFFF' : colors.icon,
-        }}
-      >
-        {dayLocked
-          ? <ClockLockIcon size={18} />
-          : locked
-            ? <LockIcon size={18} />
-            : completed
-              ? <CheckIcon size={18} />
-              : <span style={{ fontSize: 18 }}>→</span>}
-      </div>
-    </button>
+        {label}
+      </button>
+    </div>
   )
 }
 
+// ── Unit banner ───────────────────────────────────────────────────────────
+function UnitBanner({ unitNumber, facts, operation, table }) {
+  const theme = themeFor(operation)
+  const factStr = facts.map(f => `${table} ${theme.symbol} ${f}`).join(', ')
+  return (
+    <div style={{
+      margin: '8px 20px 28px',
+      borderRadius: 18,
+      border: '2px solid',
+      borderColor: '#e0e7ff',
+      backgroundColor: '#fff',
+      padding: '14px 18px',
+      boxShadow: '0 2px 0 #c7d2fe',
+      textAlign: 'center',
+    }}>
+      <p style={{
+        fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+        fontWeight: 900,
+        fontSize: 11,
+        letterSpacing: '0.1em',
+        color: '#6366f1',
+        textTransform: 'uppercase',
+        marginBottom: 2,
+      }}>
+        Unit {unitNumber}
+      </p>
+      <p style={{
+        fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+        fontWeight: 800,
+        fontSize: 15,
+        color: '#1f2937',
+      }}>
+        {factStr}
+      </p>
+    </div>
+  )
+}
 
+// ── Main component ────────────────────────────────────────────────────────
 export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   if (!kidId) throw new Error('ChapterPath: kidId is required — do not render without a real kid ID')
   const [kid, setKid] = useState(null)
@@ -352,7 +359,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   const [selectedDay, setSelectedDay] = useState(null)
   const [openNode, setOpenNode] = useState(null)
   const [dayGateBlocked, setDayGateBlocked] = useState(false)
-  const [tooltip, setTooltip] = useState(null) // 'streak' | 'hearts' | 'coins' | null
+  const [tooltip, setTooltip] = useState(null)
   const [noHeartsBlocked, setNoHeartsBlocked] = useState(false)
   const [recharging, setRecharging] = useState(false)
   const [rechargeError, setRechargeError] = useState(null)
@@ -366,15 +373,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         if (cancelled) return
         setKid(data)
         setStreak(streakData)
-        // Default selected day to the kid's current day within this chapter,
-        // or day 1 if they haven't reached this chapter yet.
         if (data.current_operation === operation) {
           const day = (data.current_table - 1) * BATCH_COUNT + (data.current_batch || 1)
           setSelectedDay(day)
         } else {
-          // Chapter is either not yet reached (locked) or already completed.
-          // For completed chapters (cursor is past this operation), show day 72
-          // so the kid sees all their completed work, not an empty day 1.
           const opIdx = ['addition','subtraction','multiplication','division'].indexOf(operation)
           const curOpIdx = ['addition','subtraction','multiplication','division'].indexOf(data.current_operation)
           setSelectedDay(curOpIdx > opIdx ? TABLE_COUNT * BATCH_COUNT : 1)
@@ -414,13 +416,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
     node: normalizeNode(kid.current_node),
   }
 
-  // Derive table/batch from the selected day number (1-72)
   const selectedTable = Math.ceil(selectedDay / BATCH_COUNT)
   const selectedBatch = ((selectedDay - 1) % BATCH_COUNT) + 1
 
-  // The kid's current day number within this chapter.
-  // For completed chapters (cursor is past this operation), set to TOTAL_DAYS+1
-  // so all 72 circles show as done (green checkmarks) in the strip.
   const opOrder = ['addition','subtraction','multiplication','division']
   const isChapterCompleted = opOrder.indexOf(currentPos.operation) > opOrder.indexOf(operation)
   const currentDay = isChapterCompleted
@@ -437,7 +435,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   }
 
   function handleTogglePopover(table, batch, node, status, isCurrent) {
-    if (status === 'locked' || status === 'day_locked') return
+    if (status === 'locked') return
+    if (status === 'day_locked') return
     setOpenNode(prev =>
       prev && prev.table === table && prev.batch === batch && prev.node === node
         ? null
@@ -450,9 +449,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
     const { table, batch, node } = openNode
     setOpenNode(null)
 
-    // Defense-in-depth day gate: the node list already shows next-batch nodes
-    // as day_locked (so they can't be tapped), but re-check here with a live
-    // server query in case kid state was stale when the UI rendered.
     const targetUnlock = { operation, table, batch, node: 'unlock' }
     const pos = chainPosition(currentPos, targetUnlock)
     if (pos === 'next_new_batch' || pos === 'current' || pos === 'next_same_batch') {
@@ -463,13 +459,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       }
     }
 
-    // Learn is always free — no lives, no entry fee.
     const isLearnNode = node === 'learn'
-    // Replay: completed nodes are always free per spec.
-    // A node is a replay if it's behind the current cursor (isCompleted returns true).
     const targetPos = { operation, table, batch, node }
     const isReplayNode = !isLearnNode && isCompleted(currentPos, targetPos)
-    // Heart gate: non-learn, non-replay nodes require at least 1 heart.
     if (!isLearnNode && !isReplayNode && (kid.heart_balance ?? 5) === 0) {
       setNoHeartsBlocked(true)
       return
@@ -525,50 +517,54 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   const inDebt = kid.coin_balance < 0
   const atDebtFloor = kid.coin_balance <= DEBT_FLOOR
 
+  // ── Build full path: all 72 units, each with 7 nodes ─────────────────
+  // We render ALL units in the path (not just selected day),
+  // but dim/lock based on current progress.
+  // Unit number = (table - 1) * BATCH_COUNT + batch  (1-indexed)
+  const allUnits = []
+  for (let t = 1; t <= TABLE_COUNT; t++) {
+    for (let b = 1; b <= BATCH_COUNT; b++) {
+      allUnits.push({ table: t, batch: b, unitNumber: (t - 1) * BATCH_COUNT + b })
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <style>{`
-        @keyframes goldShimmer {
-          0%   { background-position: -200% center; }
-          100% { background-position: 200% center; }
+        @keyframes pulse-glow {
+          0%, 100% { filter: drop-shadow(0 0 8px rgba(124,58,237,0.4)); }
+          50% { filter: drop-shadow(0 0 18px rgba(124,58,237,0.8)); }
         }
-        .gold-shimmer {
-          background: linear-gradient(135deg, #fef3c7 0%, #fde68a 30%, #fbbf24 50%, #fde68a 70%, #fef3c7 100%) !important;
-          background-size: 200% 200% !important;
-          animation: goldShimmer 2s linear infinite !important;
-          border: 2.5px solid #f59e0b !important;
-          box-shadow: 0 4px 0 #d97706, 0 2px 20px rgba(245,158,11,0.4) !important;
+        .node-current img {
+          animation: pulse-glow 2s ease-in-out infinite;
         }
       `}</style>
 
+      {/* ── Sticky header ── */}
       <div className="sticky top-0 bg-white z-30 border-b border-gray-100">
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <button
             onClick={onBack}
-            className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500
-                       transition-colors duration-150 active:bg-gray-100"
+            className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors duration-150 active:bg-gray-100"
             aria-label="Back to chapters"
           >
             <BackIcon />
           </button>
-          {/* Close tooltip on outside click */}
+
           {tooltip && (
             <div className="fixed inset-0 z-40" onClick={() => { setTooltip(null); setRechargeError(null) }} />
           )}
 
           <div className="flex items-center gap-2">
-
-            {/* ── Streak badge ── */}
+            {/* Streak */}
             <div className="relative">
-              <button
-                onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')}
-                className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200 active:scale-95 transition-transform"
-              >
+              <button onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')}
+                className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200 active:scale-95 transition-transform">
                 <span className="text-base leading-none">🔥</span>
                 <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
               </button>
               {tooltip === 'streak' && (
-<div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
+                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
                   <p className="text-2xl mb-1">🔥</p>
                   <p className="font-display font-bold text-gray-900 text-sm">Day Streak</p>
                   <p className="font-body text-xs text-gray-400 mt-1">
@@ -578,19 +574,15 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               )}
             </div>
 
-            {/* ── Hearts badge ── */}
+            {/* Hearts */}
             <div className="relative">
-              <button
-                onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }}
-                className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100 active:scale-95 transition-transform"
-              >
+              <button onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }}
+                className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100 active:scale-95 transition-transform">
                 <HeartStatIcon />
-                <span className="font-body font-bold text-base text-red-400 leading-none tabular-nums">
-                  {kid.heart_balance ?? 5}
-                </span>
+                <span className="font-body font-bold text-base text-red-400 leading-none tabular-nums">{kid.heart_balance ?? 5}</span>
               </button>
               {tooltip === 'hearts' && (
-<div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
+                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
                   <p className="text-2xl mb-1">❤️</p>
                   <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
                   <div className="flex justify-center gap-1 my-2">
@@ -598,14 +590,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                       <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}>❤️</span>
                     ))}
                   </div>
-                  <p className="font-body text-xs text-gray-400 mb-3">
-                    Hearts are lost when you answer wrong. Recharge with coins.
-                  </p>
+                  <p className="font-body text-xs text-gray-400 mb-3">Hearts are lost when you answer wrong. Recharge with coins.</p>
                   {(kid.heart_balance ?? 5) < 5 ? (
                     <>
-                      {rechargeError && (
-                        <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>
-                      )}
+                      {rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
                       <button
                         onClick={handleRechargeHeart}
                         disabled={recharging || kid.coin_balance < 10}
@@ -626,34 +614,25 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               )}
             </div>
 
-            {/* ── Coins badge ── */}
+            {/* Coins */}
             <div className="relative">
-              <button
-                onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-2 border active:scale-95 transition-transform ${
-                  inDebt ? 'border-red-200' : 'border-amber-200'
-                }`}
-                style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}
-              >
+              <button onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-2 border active:scale-95 transition-transform ${inDebt ? 'border-red-200' : 'border-amber-200'}`}
+                style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}>
                 <CoinStatIcon />
-                <span className={`font-body font-bold text-base leading-none tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-700'}`}>
-                  {kid.coin_balance}
-                </span>
+                <span className={`font-body font-bold text-base leading-none tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-700'}`}>{kid.coin_balance}</span>
               </button>
               {tooltip === 'coins' && (
-<div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
+                <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
                   <p className="text-2xl mb-1">⭐</p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
-                  <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>
-                    {kid.coin_balance}
-                  </p>
+                  <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>{kid.coin_balance}</p>
                   <p className="font-body text-xs text-gray-400 mt-1">
                     {inDebt ? "You're in debt — keep playing to earn coins back!" : "Earn coins by completing activities."}
                   </p>
                 </div>
               )}
             </div>
-
           </div>
         </div>
 
@@ -665,6 +644,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         />
       </div>
 
+      {/* ── Alert banners ── */}
       {atDebtFloor && (
         <div className="mx-4 mt-3 rounded-xl bg-red-50 border border-red-100 px-3 py-2 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
           <p className="font-body text-xs text-red-500 font-semibold">
@@ -678,11 +658,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           <p className="font-body text-sm text-amber-800 font-semibold leading-snug">
             {nextUnlockMessage(kid.next_unlock_at)}
           </p>
-          <button
-            onClick={() => setDayGateBlocked(false)}
-            className="flex-shrink-0 font-body font-bold text-xs text-amber-600 active:opacity-70"
-            aria-label="Dismiss"
-          >
+          <button onClick={() => setDayGateBlocked(false)}
+            className="flex-shrink-0 font-body font-bold text-xs text-amber-600 active:opacity-70" aria-label="Dismiss">
             OK
           </button>
         </div>
@@ -691,15 +668,13 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       {noHeartsBlocked && (
         <div className="mx-4 mt-3 rounded-2xl border-2 border-red-100 bg-red-50 px-5 py-4 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
           {kid.coin_balance >= 10 ? (
-            /* Has enough coins — show recharge option */
             <>
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div>
                   <p className="font-display font-bold text-base text-red-700">💔 No hearts left!</p>
                   <p className="font-body text-sm text-red-500 mt-0.5">Recharge a heart to keep playing.</p>
                 </div>
-                <button onClick={() => setNoHeartsBlocked(false)}
-                  className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
+                <button onClick={() => setNoHeartsBlocked(false)} className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
               </div>
               {rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
               <button
@@ -724,15 +699,13 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               </button>
             </>
           ) : (
-            /* Can't afford recharge — friendly dead-end screen */
             <>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="font-display font-bold text-base text-red-700">💔 No hearts left!</p>
                   <p className="font-body text-sm text-red-500 mt-0.5">Not enough coins to recharge (need 10 ⭐).</p>
                 </div>
-                <button onClick={() => setNoHeartsBlocked(false)}
-                  className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
+                <button onClick={() => setNoHeartsBlocked(false)} className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
               </div>
               <div className="mt-3 rounded-xl bg-white px-4 py-3 text-center">
                 <p className="text-3xl mb-1">🌙</p>
@@ -746,107 +719,100 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       )}
 
-      <div className="px-4 pt-5 pb-2 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
+      {/* ── Chapter heading ── */}
+      <div className="px-4 pt-5 pb-2 max-w-sm md:max-w-md mx-auto">
         <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.primary }}>
-          {theme.operationLabel} · Table {selectedTable}
+          {theme.operationLabel}
         </p>
         <p className="font-display font-bold text-2xl text-gray-900">
-          Day {selectedDay} of {TOTAL_DAYS}
-        </p>
-        <p className="font-body text-xs text-gray-400 mt-0.5">
-          Today's facts: {factsForBatch(selectedBatch).map(f => `${selectedTable} ${theme.symbol} ${f}`).join(', ')}
+          {TOTAL_DAYS} Units
         </p>
       </div>
 
-      <div className="max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto px-4 pb-10 flex flex-col gap-4">
-        {selectedStatus === 'locked' ? (
-          <div className="md:col-span-2 rounded-2xl bg-gray-50 border border-gray-100 px-4 py-6 text-center">
-            <LockIcon size={26} />
-            <p className="font-body text-sm text-gray-400 mt-2">
-              Complete the previous day to unlock this one.
-            </p>
-          </div>
-        ) : (
-          NODES.map(node => {
-            const targetPos = {
-              operation,
-              table: selectedTable,
-              batch: selectedBatch,
-              node,
-            }
+      {/* ── Zigzag path ── */}
+      <div className="max-w-sm md:max-w-md mx-auto pt-4 pb-24">
+        {allUnits.map(({ table, batch, unitNumber }) => {
+          const unitStatus = tableStatus(currentPos, operation, table)
+          const facts = factsForBatch(batch)
 
-            const unlockedInChain =
-              selectedStatus === 'completed' ||
-              (selectedStatus === 'active' && isUnlocked(currentPos, targetPos))
-
-            const completed =
-              selectedStatus === 'completed' ||
-              (selectedStatus === 'active' && isCompleted(currentPos, targetPos))
-
-            const isCurrent =
-              selectedStatus === 'active' &&
-              currentPos.table === selectedTable &&
-              currentPos.batch === selectedBatch &&
-              currentPos.node === node
-
-            // Day 1 of any chapter (batch 1, unlock node, table 1) →
-            // this is the Welcome/Intro screen, not a regular unlock exercise.
-            // Show it as a special state so the label reflects that.
-            const isWelcome = node === 'unlock' &&
-              selectedBatch === 1 &&
-              selectedTable === 1 &&
-              (isCurrent || unlockedInChain)
-
-            // Day gate: batch-level check using server next_unlock_at.
-            // When gate is closed and the selected batch IS the cursor's current batch,
-            // every node in that batch shows as day_locked — including nodes that are
-            // not yet unlockedInChain (chain only unlocks unlock+learn after advance;
-            // the rest show as 'locked' by chain but must show 'day_locked' to the kid).
-            const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
-            const isCurrentBatch =
-              currentPos.operation === operation &&
-              currentPos.table === selectedTable &&
-              currentPos.batch === selectedBatch
-
-            // Batch 4 nodes are all completed=true so they show as 'completed' (replayable).
-            // Batch 5 nodes: if gate closed, ALL are day_locked regardless of chain state.
-            const dayLocked = !gateOpen && isCurrentBatch && !completed
-
-            const status = completed
-              ? 'completed'
-              : dayLocked
-                ? 'day_locked'
-                : unlockedInChain
-                  ? 'active'
-                  : 'locked'
-
-            return (
-              <NodeRow
-                key={node}
-                node={node}
-                status={status}
-                nextUnlockAt={kid.next_unlock_at}
-                isCurrent={isCurrent}
-                isWelcome={isWelcome}
-                onPress={() => handleTogglePopover(selectedTable, selectedBatch, node, status, isCurrent)}
+          return (
+            <div key={unitNumber}>
+              {/* Unit banner */}
+              <UnitBanner
+                unitNumber={unitNumber}
+                facts={facts}
+                operation={operation}
+                table={table}
               />
-            )
-          })
-        )}
+
+              {/* 7 nodes for this unit */}
+              {NODES.map((node, nodeIdx) => {
+                const targetPos = { operation, table, batch, node }
+
+                const unlockedInChain =
+                  unitStatus === 'completed' ||
+                  (unitStatus === 'active' && isUnlocked(currentPos, targetPos))
+
+                const completedNode =
+                  unitStatus === 'completed' ||
+                  (unitStatus === 'active' && isCompleted(currentPos, targetPos))
+
+                const isCurrent =
+                  unitStatus === 'active' &&
+                  currentPos.table === table &&
+                  currentPos.batch === batch &&
+                  currentPos.node === node
+
+                const isWelcome = node === 'unlock' &&
+                  batch === 1 &&
+                  table === 1 &&
+                  (isCurrent || unlockedInChain)
+
+                const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
+                const isCurrentBatch =
+                  currentPos.operation === operation &&
+                  currentPos.table === table &&
+                  currentPos.batch === batch
+
+                const dayLocked = !gateOpen && isCurrentBatch && !completedNode
+
+                const status = completedNode
+                  ? 'completed'
+                  : dayLocked
+                    ? 'day_locked'
+                    : unlockedInChain
+                      ? 'active'
+                      : 'locked'
+
+                const side = ZIGZAG_SIDES[nodeIdx % ZIGZAG_SIDES.length]
+
+                return (
+                  <div key={node} className={isCurrent ? 'node-current' : ''}>
+                    <DiscNode
+                      node={node}
+                      status={status}
+                      isCurrent={isCurrent}
+                      isWelcome={isWelcome}
+                      nextUnlockAt={kid.next_unlock_at}
+                      side={side}
+                      onPress={() => handleTogglePopover(table, batch, node, status, isCurrent)}
+                    />
+                  </div>
+                )
+              })}
+            </div>
+          )
+        })}
       </div>
 
+      {/* ── Node popover ── */}
       {openNode && (
         <>
-          <div
-            className="fixed inset-0 bg-black/30 z-40"
-            onClick={() => setOpenNode(null)}
-          />
-          <div
-            className="fixed z-50 bg-white anim-sheet-in
-                       bottom-0 left-0 right-0 rounded-t-3xl px-5 pt-5 pb-8 max-w-sm mx-auto
-                       md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto
-                       md:rounded-3xl md:max-w-md md:w-full md:px-6 md:pt-6 md:pb-7"
-          >
+          <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setOpenNode(null)} />
+          <div className="fixed z-50 bg-white anim-sheet-in
+                         bottom-0 left-0 right-0 rounded-t-3xl px-5 pt-5 pb-8 max-w-sm mx-auto
+                         md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto
+                         md:rounded-3xl md:max-w-md md:w-full md:px-6 md:pt-6 md:pb-7">
             <div className="w-10 h-1.5 rounded-full bg-gray-200 mx-auto mb-4 md:hidden" />
             <p className="font-display font-bold text-xl text-gray-900 mb-1">
               {nodeLabel(openNode.node)}
