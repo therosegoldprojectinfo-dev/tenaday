@@ -612,7 +612,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         const factStr = u ? facts.map(f => `${u.table} ${theme.symbol} ${f}`).join(', ') : ''
         return (
           <div style={{
-            position: 'sticky', top: 57, zIndex: 20,
+            position: 'sticky', top: 0, zIndex: 20,
             display: 'flex', justifyContent: 'center',
             padding: '6px 16px',
             backgroundColor: '#fff',
