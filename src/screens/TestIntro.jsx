@@ -3,10 +3,6 @@ const ANIM = `
     0%,100% { transform: scale(1) translateY(0); }
     50%      { transform: scale(1.04) translateY(-6px); }
   }
-  @keyframes shadowPulse {
-    0%,100% { transform: scaleX(1); opacity: 0.18; }
-    50%      { transform: scaleX(0.82); opacity: 0.10; }
-  }
   @keyframes fadeUp {
     from { opacity:0; transform: translateY(20px); }
     to   { opacity:1; transform: translateY(0); }
@@ -36,8 +32,8 @@ export default function TestIntro({ onStart, onSkip }) {
         padding: '40px 36px 20px',
         gap: 0,
       }}>
-        {/* Mascot + shadow */}
-        <div style={{ position: 'relative', display: 'inline-block', marginBottom: 32 }}>
+        {/* Mascot */}
+        <div style={{ marginBottom: 32 }}>
           <img
             src="/ChatGPT Image 27 juin 2026, 14_15_36.png"
             alt="Numio test mascot"
@@ -46,23 +42,8 @@ export default function TestIntro({ onStart, onSkip }) {
               height: 'auto',
               display: 'block',
               animation: 'breathe 2.8s ease-in-out infinite',
-              position: 'relative',
-              zIndex: 1,
             }}
           />
-          {/* ground shadow */}
-          <div style={{
-            position: 'absolute',
-            bottom: -8,
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 120,
-            height: 14,
-            borderRadius: '50%',
-            background: '#000',
-            opacity: 0.12,
-            animation: 'shadowPulse 2.8s ease-in-out infinite',
-          }}/>
         </div>
 
         {/* Text */}
@@ -80,7 +61,7 @@ export default function TestIntro({ onStart, onSkip }) {
         </p>
       </div>
 
-      {/* Bottom bar — like the Duolingo screenshot */}
+      {/* Bottom bar */}
       <div style={{
         borderTop: '2px solid #f0f0f0',
         display: 'flex',
@@ -89,7 +70,6 @@ export default function TestIntro({ onStart, onSkip }) {
         padding: '20px 28px 36px',
         gap: 16,
       }}>
-        {/* Skip */}
         <button
           onClick={onSkip}
           style={{
@@ -109,7 +89,6 @@ export default function TestIntro({ onStart, onSkip }) {
           MAYBE LATER
         </button>
 
-        {/* Continue */}
         <button
           onClick={onStart}
           style={{
