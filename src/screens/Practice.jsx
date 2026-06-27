@@ -427,8 +427,6 @@ export default function Practice({
   onHeartChange,
 }) {
   const theme         = themeFor(operation)
-  const isTimed       = TIMED_NODES.has(node)
-  const isWordProblem = WORD_PROBLEM_NODES.has(node)
   const isReview      = node === 'review'
   const payout        = payoutForNode(node)
 
@@ -460,9 +458,13 @@ export default function Practice({
   const timeoutRef = useRef(null)
   const { speak, stop, speaking } = useSpeech()
 
-  const q         = questions[idx]
-  const isCorrect = selected === q?.answer
+  const q                = questions[idx]
+  const isCorrect        = selected === q?.answer
   const isEquationChoice = q?.choiceType === 'equation'
+  const isTrueFalse      = q?.choiceType === 'truefalse'
+  const isComparison     = q?.choiceType === 'comparison'
+  const isTimed          = q?.isTimed === true
+  const isWordProblem    = q?.format === 'word'
 
   const progressScale = (idx + (revealed ? 1 : 0)) / SESSION_TOTAL
 
@@ -816,7 +818,7 @@ export default function Practice({
         {/* ── Answer choices ───────────────────────────────────────── */}
         <div className="flex-1 flex flex-col justify-center px-4 gap-3">
           {isEquationChoice ? (
-            // Equation choices: single column, monospace-style, legible
+            // Equation choices: single column
             <div className="flex flex-col gap-3">
               {q.choices.map(choice => (
                 <button
@@ -836,8 +838,50 @@ export default function Practice({
                 </button>
               ))}
             </div>
+          ) : isTrueFalse ? (
+            // True / False: 2 wide buttons side by side
+            <div className="flex gap-3">
+              {q.choices.map(choice => (
+                <button
+                  key={choice}
+                  disabled={revealed}
+                  onClick={() => !revealed && setSelected(choice)}
+                  aria-pressed={selected === choice}
+                  className={[
+                    'flex-1 rounded-2xl border-2 font-display font-bold text-2xl card-answer',
+                    'flex items-center justify-center h-28 select-none',
+                    cardColorClass(choice, selected, revealed, q.answer),
+                    cardAnimClass(choice, selected, revealed, q.answer),
+                  ].join(' ')}
+                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}
+                >
+                  {choice}
+                </button>
+              ))}
+            </div>
+          ) : isComparison ? (
+            // Comparison: 2 expression buttons stacked
+            <div className="flex flex-col gap-3">
+              {q.choices.map(choice => (
+                <button
+                  key={choice}
+                  disabled={revealed}
+                  onClick={() => !revealed && setSelected(choice)}
+                  aria-pressed={selected === choice}
+                  className={[
+                    'rounded-2xl border-2 font-display font-bold text-2xl card-answer',
+                    'flex items-center justify-center py-6 w-full select-none',
+                    cardColorClass(choice, selected, revealed, q.answer),
+                    cardAnimClass(choice, selected, revealed, q.answer),
+                  ].join(' ')}
+                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}
+                >
+                  {choice}
+                </button>
+              ))}
+            </div>
           ) : (
-            // Number choices: 2×2 grid, large numbers
+            // Number choices: 2×2 grid
             <div className="grid grid-cols-2 gap-3">
               {q.choices.map(choice => (
                 <button
