@@ -39,7 +39,7 @@ export default function TestIntro({ onStart, onSkip }) {
         {/* Mascot + shadow */}
         <div style={{ position: 'relative', display: 'inline-block', marginBottom: 32 }}>
           <img
-            src="/testmascot.png"
+            src="/ChatGPT Image 27 juin 2026, 14_15_36.png"
             alt="Numio test mascot"
             style={{
               width: 180,
