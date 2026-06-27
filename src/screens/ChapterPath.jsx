@@ -608,7 +608,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       )}
 
-      {/* ── Sticky unit banner (full width Duolingo style) ── */}
+      {/* ── Sticky unit banner (Duolingo/Ludolang style) ── */}
       {(() => {
         const u = allUnits.find(u => u.unitNumber === visibleUnit)
         const facts = u ? factsForBatch(u.batch) : []
@@ -626,20 +626,29 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         return (
           <div style={{
             position: 'sticky', top: 0, zIndex: 100,
-            backgroundColor: color.bg,
-            boxShadow: `0 4px 0 ${color.shadow}`,
-            padding: '14px 20px',
+            padding: '10px 16px',
+            backgroundColor: '#f7f7f7',
           }}>
-            <p style={{
-              fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-              fontWeight: 900, fontSize: 11,
-              letterSpacing: '0.1em', color: 'rgba(255,255,255,0.85)',
-              textTransform: 'uppercase', marginBottom: 2,
-            }}>Unit {visibleUnit}</p>
-            <p style={{
-              fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-              fontWeight: 800, fontSize: 18, color: '#fff',
-            }}>{factStr}</p>
+            <div style={{
+              width: '100%',
+              backgroundColor: color.bg,
+              borderRadius: 16,
+              boxShadow: `0 5px 0 ${color.shadow}`,
+              padding: '14px 20px',
+              cursor: 'default',
+            }}>
+              <p style={{
+                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+                fontWeight: 700, fontSize: 12,
+                letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)',
+                textTransform: 'uppercase', marginBottom: 3,
+              }}>Unit {visibleUnit}</p>
+              <p style={{
+                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+                fontWeight: 800, fontSize: 20, color: '#fff',
+                lineHeight: 1.2,
+              }}>{factStr}</p>
+            </div>
           </div>
         )
       })()}
