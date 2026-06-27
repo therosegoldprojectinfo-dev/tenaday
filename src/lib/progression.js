@@ -60,9 +60,21 @@ export function shouldSkipUnlock(operation, table, batch, hasEverAdvanced) {
 // node) position. We convert to/from integer indices to make ordering,
 // comparison, and "next step" trivial.
 
+// Legacy node name migration — old DB values map to new node names
+const LEGACY_NODE_MAP = {
+  practice:      'easy',
+  what_happened: 'medium',
+  real_life:     'hard',
+  speed:         'double_reward',
+}
+
+export function normalizeNode(node) {
+  return LEGACY_NODE_MAP[node] || node
+}
+
 export function stepIndex(operation, table, batch, node) {
   const opIdx    = OPERATIONS.indexOf(operation)
-  const nodeIdx  = NODES.indexOf(node)
+  const nodeIdx  = NODES.indexOf(normalizeNode(node))
   if (opIdx === -1 || nodeIdx === -1) return -1
   if (table < 1 || table > TABLE_COUNT) return -1
   if (batch < 1 || batch > BATCH_COUNT) return -1
