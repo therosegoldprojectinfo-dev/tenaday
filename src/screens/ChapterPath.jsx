@@ -139,7 +139,8 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
     <div style={{
       display: 'flex', flexDirection: 'column',
       alignItems: side === 'left' ? 'flex-start' : 'flex-end',
-      maxWidth: 110,
+      justifyContent: 'center',
+      maxWidth: 90,
     }}>
       <span style={{
         fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
@@ -162,8 +163,8 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
     <div style={{
       display: 'flex',
       justifyContent: side === 'left' ? 'flex-start' : 'flex-end',
-      paddingLeft: side === 'left' ? 16 : 0,
-      paddingRight: side === 'right' ? 16 : 0,
+      paddingLeft: side === 'left' ? 0 : 0,
+      paddingRight: side === 'right' ? 0 : 0,
       marginBottom: 28,
     }}>
       <button
@@ -174,7 +175,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
           display: 'flex',
           flexDirection: side === 'left' ? 'row' : 'row-reverse',
           alignItems: 'center',
-          gap: 8,
+          gap: 4,
           background: 'none',
           border: 'none',
           padding: 0,
