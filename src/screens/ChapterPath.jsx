@@ -628,9 +628,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             position: 'sticky', top: 0, zIndex: 100,
             padding: '10px 16px',
             backgroundColor: 'transparent',
+            display: 'flex', justifyContent: 'center',
           }}>
             <div style={{
-              width: '100%',
+              width: '100%', maxWidth: 420,
               backgroundColor: color.bg,
               borderRadius: 16,
               boxShadow: `0 5px 0 ${color.shadow}`,
@@ -665,6 +666,23 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               ref={el => { unitRefs.current[unitNumber] = el }}
               data-unit={unitNumber}
             >
+              {/* Unit separator line (skip first unit) */}
+              {unitNumber > 1 && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  margin: '16px 24px 8px',
+                }}>
+                  <div style={{ flex: 1, height: 1.5, backgroundColor: '#e5e7eb', borderRadius: 2 }} />
+                  <span style={{
+                    fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+                    fontWeight: 700, fontSize: 12, color: '#9ca3af',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {facts.map(f => `${table} ${theme.symbol} ${f}`).join(', ')}
+                  </span>
+                  <div style={{ flex: 1, height: 1.5, backgroundColor: '#e5e7eb', borderRadius: 2 }} />
+                </div>
+              )}
               {/* Invisible sentinel so IntersectionObserver knows when this unit enters viewport */}
               <div style={{ height: 1 }} ref={el => {
                 if (!el) return
