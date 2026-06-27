@@ -247,8 +247,6 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
 
   const displayLabel = isWelcome ? 'Welcome!' : nodeLabel(node)
 
-  // Shimmer classes always apply for hard/double_reward regardless of lock state
-  const shimmerClass = isDoubleReward ? 'gold-shimmer' : ''
 
   return (
     <button
