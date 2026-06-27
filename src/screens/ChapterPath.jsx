@@ -134,38 +134,13 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
       </div>
     : null
 
-  // Label side — no NEXT UP badge, no arrow, just the name
-  const label = (
-    <div style={{
-      display: 'flex', flexDirection: 'column',
-      alignItems: side === 'left' ? 'flex-start' : 'flex-end',
-      justifyContent: 'center',
-      maxWidth: 90,
-    }}>
-      <span style={{
-        fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-        fontWeight: 800,
-        fontSize: 15,
-        color: (disabled && !forceGold) ? '#9CA3AF' : '#1f2937',
-        lineHeight: 1.2,
-        textAlign: side === 'left' ? 'left' : 'right',
-      }}>{displayName}</span>
-      {dayLocked && (
-        <span style={{
-          marginTop: 3, fontSize: 10, fontWeight: 700,
-          color: '#D97706',
-        }}>⏰ Tomorrow</span>
-      )}
-    </div>
-  )
-
   return (
     <div style={{
       display: 'flex',
       justifyContent: side === 'left' ? 'flex-start' : 'flex-end',
-      paddingLeft: side === 'left' ? 0 : 0,
-      paddingRight: side === 'right' ? 0 : 0,
-      marginBottom: 7,
+      paddingLeft: side === 'left' ? 16 : 0,
+      paddingRight: side === 'right' ? 16 : 0,
+      marginBottom: 4,
     }}>
       <button
         type="button"
@@ -173,7 +148,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
         onClick={(!disabled || forceGold) ? onPress : undefined}
         style={{
           display: 'flex',
-          flexDirection: side === 'left' ? 'row' : 'row-reverse',
+          flexDirection: 'column',
           alignItems: 'center',
           gap: 4,
           background: 'none',
@@ -184,6 +159,18 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
         }}
         aria-label={displayName}
       >
+        {/* Label above disc */}
+        <span style={{
+          fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+          fontWeight: 800,
+          fontSize: 15,
+          color: (disabled && !forceGold) ? '#9CA3AF' : '#1f2937',
+          textAlign: 'center',
+        }}>{displayName}</span>
+        {dayLocked && (
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#D97706' }}>⏰ Tomorrow</span>
+        )}
+
         {/* Disc image */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
           <img
@@ -197,15 +184,12 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
               transform: isCurrent ? 'scale(1.08)' : 'scale(1)',
               transition: 'transform 0.2s ease',
               display: 'block',
-              // pulse shadow for current node
               ...(isCurrent ? { filter: 'drop-shadow(0 0 10px rgba(124,58,237,0.5))' } : {}),
             }}
             draggable={false}
           />
           {statusIcon}
         </div>
-
-        {label}
       </button>
     </div>
   )
