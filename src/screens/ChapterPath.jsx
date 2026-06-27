@@ -146,7 +146,6 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
     <div style={{
       display: 'flex',
       justifyContent: 'center',
-      transform: `translateX(${offset}px)`,
       marginBottom: -60,
     }}>
       <button
@@ -155,28 +154,20 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
         onClick={(!disabled || forceGold) ? onPress : undefined}
         style={{
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           alignItems: 'center',
-          gap: 0,
+          gap: 8,
           background: 'none',
           border: 'none',
           padding: 0,
           cursor: disabled && !forceGold ? 'default' : 'pointer',
           WebkitTapHighlightColor: 'transparent',
+          transform: `translateX(${offset}px)`,
+          // Clamp so nodes never overflow on narrow screens
+          maxWidth: 'calc(100vw - 32px)',
         }}
         aria-label={displayName}
       >
-        {/* Label directly above disc */}
-        <span style={{
-          fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-          fontWeight: 800,
-          fontSize: 15,
-          color: (disabled && !forceGold) ? '#9CA3AF' : '#1f2937',
-          textAlign: 'center',
-          marginBottom: 2,
-          zIndex: 1,
-        }}>{displayName}</span>
-
         {/* Disc image */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
           <img
@@ -196,6 +187,15 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
           />
           {statusIcon}
         </div>
+
+        {/* Label beside disc, vertically centered */}
+        <span style={{
+          fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+          fontWeight: 800,
+          fontSize: 15,
+          color: (disabled && !forceGold) ? '#9CA3AF' : '#1f2937',
+          whiteSpace: 'nowrap',
+        }}>{displayName}</span>
       </button>
     </div>
   )
@@ -614,7 +614,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       </div>
 
       {/* ── Zigzag path ── */}
-      <div className="max-w-sm md:max-w-md mx-auto pt-4 pb-24">
+      <div className="max-w-sm md:max-w-md mx-auto pt-4 pb-24 overflow-x-hidden">
         {allUnits.map(({ table, batch, unitNumber }) => {
           const unitStatus = tableStatus(currentPos, operation, table)
           const facts = factsForBatch(batch)
