@@ -421,7 +421,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="h-screen overflow-y-auto bg-white">
       <style>{`
         @keyframes pulse-glow {
           0%, 100% { filter: drop-shadow(0 0 8px rgba(124,58,237,0.4)); }
@@ -605,7 +605,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       )}
 
-      {/* ── Sticky unit banner (updates as you scroll) ── */}
+      {/* ── Sticky unit banner (compact pill) ── */}
       {(() => {
         const u = allUnits.find(u => u.unitNumber === visibleUnit)
         const facts = u ? factsForBatch(u.batch) : []
@@ -613,24 +613,30 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         return (
           <div style={{
             position: 'sticky', top: 57, zIndex: 20,
-            margin: '0 16px 0',
-            borderRadius: 18,
-            border: '2px solid #e0e7ff',
+            display: 'flex', justifyContent: 'center',
+            padding: '6px 16px',
             backgroundColor: '#fff',
-            padding: '12px 18px',
-            boxShadow: '0 2px 0 #c7d2fe',
-            textAlign: 'center',
           }}>
-            <p style={{
-              fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-              fontWeight: 900, fontSize: 11,
-              letterSpacing: '0.1em', color: '#6366f1',
-              textTransform: 'uppercase', marginBottom: 2,
-            }}>Unit {visibleUnit}</p>
-            <p style={{
-              fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-              fontWeight: 800, fontSize: 15, color: '#1f2937',
-            }}>{factStr}</p>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              borderRadius: 99,
+              border: '2px solid #e0e7ff',
+              backgroundColor: '#fff',
+              padding: '6px 16px',
+              boxShadow: '0 2px 0 #c7d2fe',
+            }}>
+              <span style={{
+                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+                fontWeight: 900, fontSize: 11,
+                letterSpacing: '0.08em', color: '#6366f1',
+                textTransform: 'uppercase',
+              }}>Unit {visibleUnit}</span>
+              <span style={{ color: '#d1d5db', fontSize: 12 }}>·</span>
+              <span style={{
+                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+                fontWeight: 700, fontSize: 13, color: '#374151',
+              }}>{factStr}</span>
+            </div>
           </div>
         )
       })()}
