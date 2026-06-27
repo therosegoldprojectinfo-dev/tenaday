@@ -9,9 +9,10 @@ const ANIM = `
   @keyframes confettiA { 0%{transform:translateY(0) rotate(0)} 100%{transform:translateY(22px) rotate(160deg)} }
   @keyframes twinkle   { 0%,100%{opacity:.3;transform:scale(.7)} 50%{opacity:1;transform:scale(1)} }
   @keyframes slideIn   { from{opacity:0;transform:translateX(30px)} to{opacity:1;transform:translateX(0)} }
+  @keyframes grow      { 0%,100%{transform:scaleY(1)} 50%{transform:scaleY(1.18)} }
 `
 
-/* ── Slide 1 — Welcome ── */
+/* ── Slide 1 — Welcome (mascot + confetti) ── */
 function Slide1() {
   return (
     <div style={{height:380,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
@@ -27,7 +28,7 @@ function Slide1() {
       <svg viewBox="0 0 24 24" width={26} height={26} style={{position:'absolute',top:130,left:62,animation:'twinkle 1.9s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#FFB700"/></svg>
       <svg viewBox="0 0 24 24" width={20} height={20} style={{position:'absolute',top:260,right:64,animation:'twinkle 2.4s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#1CB0F6"/></svg>
       <svg viewBox="0 0 24 24" width={16} height={16} style={{position:'absolute',top:90,right:118,animation:'twinkle 2.1s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#58cc02"/></svg>
-      {/* mascot — use existing asset if available, otherwise draw the purple owl SVG */}
+      {/* mascot */}
       <MascotOrFallback/>
     </div>
   )
@@ -45,7 +46,6 @@ function MascotOrFallback() {
       />
     )
   }
-  /* inline SVG fallback — friendly purple owl face */
   return (
     <svg viewBox="0 0 200 200" width={200} height={200} style={{position:'relative',animation:'bob 3s ease-in-out infinite'}}>
       <circle cx={100} cy={110} r={80} fill="#a78bfa"/>
@@ -60,8 +60,59 @@ function MascotOrFallback() {
   )
 }
 
-/* ── Slide 2 — Earn Coins ── */
+/* ── Slide 2 — Find your level (target/podium) ── */
 function Slide2() {
+  return (
+    <div style={{height:380,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
+      {/* spinning rays — green */}
+      <svg width={260} height={260} viewBox="0 0 320 320" style={{position:'absolute',top:40,animation:'spinslow 26s linear infinite'}}>
+        <g fill="#c8f5b0">
+          <rect x={154} y={14} width={12} height={42} rx={6}/>
+          <rect x={154} y={264} width={12} height={42} rx={6}/>
+          <rect x={14} y={154} width={42} height={12} rx={6}/>
+          <rect x={264} y={154} width={42} height={12} rx={6}/>
+          <rect x={52} y={52} width={12} height={40} rx={6} transform="rotate(-45 58 72)"/>
+          <rect x={256} y={52} width={12} height={40} rx={6} transform="rotate(45 262 72)"/>
+          <rect x={52} y={228} width={12} height={40} rx={6} transform="rotate(45 58 248)"/>
+          <rect x={256} y={228} width={12} height={40} rx={6} transform="rotate(-45 262 248)"/>
+        </g>
+      </svg>
+
+      {/* big target */}
+      <svg width={160} height={160} viewBox="0 0 200 200" style={{position:'absolute',top:90,animation:'pulse 2.4s ease-in-out infinite'}}>
+        <circle cx={100} cy={104} r={84} fill="#46a302"/>
+        <circle cx={100} cy={100} r={84} fill="#58cc02"/>
+        <circle cx={100} cy={100} r={62} fill="#fff"/>
+        <circle cx={100} cy={100} r={42} fill="#58cc02"/>
+        <circle cx={100} cy={100} r={22} fill="#fff"/>
+        <circle cx={100} cy={100} r={10} fill="#ef4444"/>
+        {/* arrow */}
+        <line x1={148} y1={52} x2={106} y2={96} stroke="#1a1a2e" strokeWidth={6} strokeLinecap="round"/>
+        <polygon points="148,38 162,62 136,58" fill="#1a1a2e"/>
+      </svg>
+
+      {/* small target bottom-left */}
+      <svg width={62} height={62} viewBox="0 0 100 100" style={{position:'absolute',bottom:60,left:46,animation:'floaty 2.8s ease-in-out infinite'}}>
+        <circle cx={50} cy={54} r={40} fill="#46a302"/>
+        <circle cx={50} cy={50} r={40} fill="#58cc02"/>
+        <circle cx={50} cy={50} r={28} fill="#fff"/>
+        <circle cx={50} cy={50} r={16} fill="#58cc02"/>
+        <circle cx={50} cy={50} r={7} fill="#ef4444"/>
+      </svg>
+
+      {/* star bottom-right */}
+      <svg width={44} height={44} viewBox="0 0 100 100" style={{position:'absolute',bottom:120,right:48,animation:'floaty 2.3s ease-in-out infinite'}}>
+        <path d="M50 8 l11 30 32 0 -26 19 10 30 -27 -18 -27 18 10 -30 -26 -19 32 0 Z" fill="#FFB700"/>
+      </svg>
+
+      <svg viewBox="0 0 24 24" width={20} height={20} style={{position:'absolute',bottom:80,right:120,animation:'twinkle 2s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#58cc02"/></svg>
+      <svg viewBox="0 0 24 24" width={15} height={15} style={{position:'absolute',bottom:40,left:130,animation:'twinkle 2.5s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#c8f5b0"/></svg>
+    </div>
+  )
+}
+
+/* ── Slide 3 — Earn coins ── */
+function Slide3() {
   return (
     <div style={{height:380,display:"flex",alignItems:"center",justifyContent:"center",position:"relative"}}>
       {/* spinning rays */}
@@ -103,13 +154,13 @@ function Slide2() {
   )
 }
 
-/* ── Slide 3 — Protect Hearts ── */
-function Slide3() {
+/* ── Slide 4 — Unlock real rewards (gift box) ── */
+function Slide4() {
   return (
     <div style={{height:380,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
-      {/* spinning rays in red */}
+      {/* spinning rays — purple */}
       <svg width={260} height={260} viewBox="0 0 320 320" style={{position:'absolute',top:40,animation:'spinslow 26s linear infinite'}}>
-        <g fill="#fecaca">
+        <g fill="#e9d5ff">
           <rect x={154} y={14} width={12} height={42} rx={6}/>
           <rect x={154} y={264} width={12} height={42} rx={6}/>
           <rect x={14} y={154} width={42} height={12} rx={6}/>
@@ -121,42 +172,59 @@ function Slide3() {
         </g>
       </svg>
 
-      {/* big heart */}
-      <svg width={160} height={150} viewBox="0 0 200 185" style={{position:'absolute',top:90,animation:'pulse 2.4s ease-in-out infinite'}}>
+      {/* big gift box */}
+      <svg width={160} height={160} viewBox="0 0 200 200" style={{position:'absolute',top:90,animation:'pulse 2.4s ease-in-out infinite'}}>
         {/* shadow */}
-        <path d="M100 178 C20 130 4 88 4 60 C4 28 26 8 52 8 C72 8 88 20 100 36 C112 20 128 8 148 8 C174 8 196 28 196 60 C196 88 180 130 100 178 Z" fill="#c0392b" transform="translate(0,8)"/>
-        {/* main */}
-        <path d="M100 178 C20 130 4 88 4 60 C4 28 26 8 52 8 C72 8 88 20 100 36 C112 20 128 8 148 8 C174 8 196 28 196 60 C196 88 180 130 100 178 Z" fill="#ef4444"/>
-        {/* shine */}
-        <path d="M52 28 q14 -16 34 -12" stroke="#fff" strokeWidth="7" fill="none" strokeLinecap="round" opacity={0.45}/>
+        <rect x={20} y={92} width={160} height={106} rx={10} fill="#6d28d9"/>
+        {/* box body */}
+        <rect x={20} y={88} width={160} height={106} rx={10} fill="#7c3aed"/>
+        {/* lid shadow */}
+        <rect x={14} y={62} width={172} height={38} rx={8} fill="#6d28d9"/>
+        {/* lid */}
+        <rect x={14} y={58} width={172} height={38} rx={8} fill="#8b5cf6"/>
+        {/* ribbon vertical */}
+        <rect x={88} y={58} width={24} height={136} fill="#FFB700"/>
+        {/* ribbon horizontal on lid */}
+        <rect x={14} y={70} width={172} height={14} fill="#FFB700"/>
+        {/* bow left */}
+        <ellipse cx={72} cy={58} rx={26} ry={14} fill="#ffc933" transform="rotate(-30 72 58)"/>
+        {/* bow right */}
+        <ellipse cx={128} cy={58} rx={26} ry={14} fill="#ffc933" transform="rotate(30 128 58)"/>
+        {/* bow center */}
+        <circle cx={100} cy={58} r={12} fill="#FFB700"/>
+        {/* shine on box */}
+        <rect x={36} y={98} width={12} height={60} rx={6} fill="#9f67ff" opacity={0.5}/>
       </svg>
 
-      {/* small heart bottom-left */}
-      <svg width={62} height={58} viewBox="0 0 100 92" style={{position:'absolute',bottom:60,left:46,animation:'floaty 2.8s ease-in-out infinite'}}>
-        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#c0392b" transform="translate(0,4)"/>
-        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#ef4444"/>
+      {/* small star top-left */}
+      <svg width={50} height={50} viewBox="0 0 100 100" style={{position:'absolute',bottom:60,left:46,animation:'floaty 2.8s ease-in-out infinite'}}>
+        <path d="M50 8 l11 30 32 0 -26 19 10 30 -27 -18 -27 18 10 -30 -26 -19 32 0 Z" fill="#FFB700"/>
       </svg>
 
-      {/* small heart bottom-right */}
-      <svg width={44} height={40} viewBox="0 0 100 92" style={{position:'absolute',bottom:120,right:48,animation:'floaty 2.3s ease-in-out infinite'}}>
-        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#c0392b" transform="translate(0,4)"/>
-        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#ef4444"/>
+      {/* small gift bottom-right */}
+      <svg width={44} height={44} viewBox="0 0 100 100" style={{position:'absolute',bottom:120,right:48,animation:'floaty 2.3s ease-in-out infinite'}}>
+        <rect x={10} y={46} width={80} height={52} rx={6} fill="#6d28d9"/>
+        <rect x={10} y={44} width={80} height={52} rx={6} fill="#8b5cf6"/>
+        <rect x={7} y={28} width={86} height={20} rx={5} fill="#7c3aed"/>
+        <rect x={7} y={26} width={86} height={20} rx={5} fill="#9f67ff"/>
+        <rect x={44} y={26} width={12} height={70} fill="#FFB700"/>
+        <rect x={7} y={32} width={86} height={8} fill="#FFB700"/>
+        <circle cx={50} cy={26} r={8} fill="#ffc933"/>
       </svg>
 
-      {/* sparkles */}
-      <svg viewBox="0 0 24 24" width={20} height={20} style={{position:'absolute',bottom:80,right:120,animation:'twinkle 2s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#ef4444"/></svg>
-      <svg viewBox="0 0 24 24" width={15} height={15} style={{position:'absolute',bottom:40,left:130,animation:'twinkle 2.5s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#fecaca"/></svg>
+      <svg viewBox="0 0 24 24" width={20} height={20} style={{position:'absolute',bottom:80,right:120,animation:'twinkle 2s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#c4b5fd"/></svg>
+      <svg viewBox="0 0 24 24" width={15} height={15} style={{position:'absolute',bottom:40,left:130,animation:'twinkle 2.5s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#e9d5ff"/></svg>
     </div>
   )
 }
 
-/* ── Slide 4 — One Unit Per Day ── */
-function Slide4() {
+/* ── Slide 5 — One small habit (plant growing) ── */
+function Slide5() {
   return (
     <div style={{height:380,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
-      {/* spinning rays — same as coins slide but in blue */}
-      <svg width={260} height={260} viewBox="0 0 320 320" style={{position:'absolute',top:40,animation:'spinslow 26s linear infinite'}}>
-        <g fill="#b3e5fc">
+      {/* spinning rays — green */}
+      <svg width={260} height={260} viewBox="0 0 320 320" style={{position:'absolute',top:40,animation:'spinslow 30s linear infinite'}}>
+        <g fill="#bbf7d0">
           <rect x={154} y={14} width={12} height={42} rx={6}/>
           <rect x={154} y={264} width={12} height={42} rx={6}/>
           <rect x={14} y={154} width={42} height={12} rx={6}/>
@@ -168,53 +236,37 @@ function Slide4() {
         </g>
       </svg>
 
-      {/* big clock */}
-      <svg width={160} height={160} viewBox="0 0 200 200" style={{position:'absolute',top:90,animation:'pulse 2.4s ease-in-out infinite'}}>
-        {/* shadow ring */}
-        <circle cx={100} cy={108} r={84} fill="#0d8fcf"/>
-        {/* face */}
-        <circle cx={100} cy={100} r={84} fill="#1CB0F6"/>
-        {/* inner face */}
-        <circle cx={100} cy={100} r={68} fill="#e8f7ff"/>
-        {/* hour marks */}
-        {[0,30,60,90,120,150,180,210,240,270,300,330].map((deg,i) => {
-          const r = deg * Math.PI / 180
-          const x1 = 100 + 56*Math.sin(r), y1 = 100 - 56*Math.cos(r)
-          const x2 = 100 + 64*Math.sin(r), y2 = 100 - 64*Math.cos(r)
-          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#1CB0F6" strokeWidth={i%3===0?4:2.5} strokeLinecap="round"/>
-        })}
-        {/* hour hand — pointing ~10 */}
-        <line x1={100} y1={100} x2={72} y2={60} stroke="#1a1a2e" strokeWidth={7} strokeLinecap="round"/>
-        {/* minute hand — pointing ~2 */}
-        <line x1={100} y1={100} x2={134} y2={54} stroke="#1a1a2e" strokeWidth={5} strokeLinecap="round"/>
-        {/* center dot */}
-        <circle cx={100} cy={100} r={8} fill="#1CB0F6"/>
-        <circle cx={100} cy={100} r={4} fill="#fff"/>
+      {/* pot shadow */}
+      <svg width={170} height={200} viewBox="0 0 200 230" style={{position:'absolute',top:82,animation:'pulse 3s ease-in-out infinite'}}>
+        {/* stem */}
+        <rect x={96} y={60} width={8} height={110} rx={4} fill="#16a34a"/>
+        {/* left leaf */}
+        <ellipse cx={62} cy={110} rx={38} ry={18} fill="#22c55e" transform="rotate(-20 62 110)"/>
+        <line x1={96} y1={120} x2={62} y2={110} stroke="#16a34a" strokeWidth={4} strokeLinecap="round"/>
+        {/* right leaf */}
+        <ellipse cx={138} cy={90} rx={38} ry={18} fill="#22c55e" transform="rotate(20 138 90)"/>
+        <line x1={100} y1={100} x2={138} y2={90} stroke="#16a34a" strokeWidth={4} strokeLinecap="round"/>
+        {/* top leaves */}
+        <ellipse cx={100} cy={52} rx={30} ry={18} fill="#22c55e" transform="rotate(-10 100 52)"/>
+        <ellipse cx={100} cy={48} rx={22} ry={14} fill="#4ade80"/>
+        {/* pot body shadow */}
+        <path d="M60 170 Q58 220 100 224 Q142 220 140 170 Z" fill="#b45309"/>
+        {/* pot body */}
+        <path d="M60 166 Q58 216 100 220 Q142 216 140 166 Z" fill="#d97706"/>
+        {/* pot rim shadow */}
+        <rect x={52} y={164} width={96} height={14} rx={7} fill="#b45309"/>
+        {/* pot rim */}
+        <rect x={52} y={160} width={96} height={14} rx={7} fill="#f59e0b"/>
+        {/* soil */}
+        <ellipse cx={100} cy={170} rx={44} ry={10} fill="#92400e"/>
       </svg>
 
-      {/* small clock top-left */}
-      <svg width={62} height={62} viewBox="0 0 100 100" style={{position:'absolute',bottom:60,left:46,animation:'floaty 2.8s ease-in-out infinite'}}>
-        <circle cx={50} cy={54} r={40} fill="#0d8fcf"/>
-        <circle cx={50} cy={50} r={40} fill="#1CB0F6"/>
-        <circle cx={50} cy={50} r={30} fill="#e8f7ff"/>
-        <line x1={50} y1={50} x2={36} y2={30} stroke="#1a1a2e" strokeWidth={4} strokeLinecap="round"/>
-        <line x1={50} y1={50} x2={67} y2={27} stroke="#1a1a2e" strokeWidth={3} strokeLinecap="round"/>
-        <circle cx={50} cy={50} r={5} fill="#1CB0F6"/>
-      </svg>
-
-      {/* small clock bottom-right */}
-      <svg width={44} height={44} viewBox="0 0 100 100" style={{position:'absolute',bottom:120,right:48,animation:'floaty 2.3s ease-in-out infinite'}}>
-        <circle cx={50} cy={54} r={40} fill="#0d8fcf"/>
-        <circle cx={50} cy={50} r={40} fill="#1CB0F6"/>
-        <circle cx={50} cy={50} r={30} fill="#e8f7ff"/>
-        <line x1={50} y1={50} x2={36} y2={30} stroke="#1a1a2e" strokeWidth={4} strokeLinecap="round"/>
-        <line x1={50} y1={50} x2={67} y2={27} stroke="#1a1a2e" strokeWidth={3} strokeLinecap="round"/>
-        <circle cx={50} cy={50} r={5} fill="#1CB0F6"/>
-      </svg>
-
-      {/* sparkles */}
-      <svg viewBox="0 0 24 24" width={20} height={20} style={{position:'absolute',bottom:80,right:120,animation:'twinkle 2s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#1CB0F6"/></svg>
-      <svg viewBox="0 0 24 24" width={15} height={15} style={{position:'absolute',bottom:40,left:130,animation:'twinkle 2.5s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#b3e5fc"/></svg>
+      {/* small star floaters */}
+      <svg viewBox="0 0 24 24" width={22} height={22} style={{position:'absolute',top:130,left:62,animation:'twinkle 1.9s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#FFB700"/></svg>
+      <svg viewBox="0 0 24 24" width={16} height={16} style={{position:'absolute',top:260,right:64,animation:'twinkle 2.4s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#22c55e"/></svg>
+      <svg viewBox="0 0 24 24" width={14} height={14} style={{position:'absolute',top:90,right:80,animation:'twinkle 2.1s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#1CB0F6"/></svg>
+      <div style={{position:'absolute',top:200,left:38,width:12,height:12,borderRadius:'50%',background:'#22c55e',animation:'twinkle 1.7s ease-in-out infinite'}}/>
+      <div style={{position:'absolute',top:70,right:54,width:14,height:14,borderRadius:4,background:'#FFB700',transform:'rotate(20deg)',animation:'confettiA 2.3s ease-in-out infinite alternate'}}/>
     </div>
   )
 }
@@ -223,30 +275,42 @@ function Slide4() {
 const SLIDES = [
   {
     component: Slide1,
-    title: 'Welcome to Numio! 🎉',
-    sub: 'Math made fun, one day at a time.',
+    title: 'Welcome to Numio! 👋',
+    sub: 'Get better at math in just a few minutes every day.',
     dotColor: '#58cc02',
+    btnLabel: 'SEE HOW IT WORKS →',
     isLast: false,
   },
   {
     component: Slide2,
-    title: 'Answer right, earn coins ⭐',
-    sub: 'Use your coins to unlock real rewards!',
-    dotColor: '#FFB700',
+    title: 'Find your level 🎯',
+    sub: 'Choose your level, then complete a quick test to make sure it\'s the right one.',
+    dotColor: '#58cc02',
+    btnLabel: 'CONTINUE →',
     isLast: false,
   },
   {
     component: Slide3,
-    title: 'Protect your hearts ❤️',
-    sub: 'Wrong answers cost a heart. Recharge with coins!',
-    dotColor: '#ef4444',
+    title: 'Earn coins 🪙',
+    sub: 'Complete your daily Numio to earn coins.',
+    dotColor: '#FFB700',
+    btnLabel: 'CONTINUE →',
     isLast: false,
   },
   {
     component: Slide4,
-    title: 'One unit per day 🌙',
-    sub: "Finish today's unit and come back tomorrow!",
-    dotColor: '#1CB0F6',
+    title: 'Unlock real rewards 🎁',
+    sub: 'Exchange your coins for real rewards your parents choose.',
+    dotColor: '#7c3aed',
+    btnLabel: 'CONTINUE →',
+    isLast: false,
+  },
+  {
+    component: Slide5,
+    title: 'One small habit 🌱',
+    sub: 'Do your Numio every day.\nGet better at math.\nEnjoy your reward.',
+    dotColor: '#22c55e',
+    btnLabel: "START TODAY'S NUMIO →",
     isLast: true,
   },
 ]
@@ -309,8 +373,9 @@ export default function Onboarding({ onDone }) {
           margin: '0 0 22px',
           fontWeight: 700,
           fontSize: 16,
-          lineHeight: 1.45,
+          lineHeight: 1.55,
           color: '#777',
+          whiteSpace: 'pre-line',
         }}>
           {slide.sub}
         </p>
@@ -348,7 +413,7 @@ export default function Onboarding({ onDone }) {
             WebkitTapHighlightColor: 'transparent',
           }}
         >
-          {slide.isLast ? 'GET STARTED →' : 'CONTINUE →'}
+          {slide.btnLabel}
         </button>
       </div>
     </div>
