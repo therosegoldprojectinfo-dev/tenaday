@@ -106,36 +106,46 @@ function Slide2() {
 /* ── Slide 3 — Protect Hearts ── */
 function Slide3() {
   return (
-    <div style={{height:380,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:34}}>
-      {/* hearts row */}
-      <div style={{display:'flex',gap:10,alignItems:'center'}}>
-        {[0,1,2,3].map(i => (
-          <svg key={i} width={48} height={44} viewBox="0 0 48 44">
-            <path d="M24 42 C6 28 2 18 2 12 C2 5 7 1 13 1 C18 1 22 4 24 8 C26 4 30 1 35 1 C41 1 46 5 46 12 C46 18 42 28 24 42 Z" fill="#ef4444"/>
-          </svg>
-        ))}
-        {/* cracked heart */}
-        <svg width={56} height={52} viewBox="0 0 56 52" style={{overflow:'visible',animation:'bob 1.6s ease-in-out infinite'}}>
-          <path d="M28 49 C7 33 2 22 2 14 C2 6 8 1 15 1 C21 1 25 4 28 9 C31 4 35 1 41 1 C48 1 54 6 54 14 C54 22 49 33 28 49 Z" fill="#e5e5e5"/>
-          <path d="M28 9 C25 4 21 1 15 1 C8 1 2 6 2 14 C2 22 7 33 24 47 L30 30 L22 26 L31 18 L26 13 Z" fill="#ef4444"/>
-          <path d="M30 30 L40 24" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"/>
-          <circle cx={48} cy={6} r={2.5} fill="#ef4444"/>
-          <circle cx={52} cy={14} r={2} fill="#ef4444"/>
-        </svg>
-      </div>
-      {/* big broken heart */}
-      <svg width={200} height={185} viewBox="0 0 120 110" style={{overflow:'visible'}}>
-        <g fill="#ef4444" style={{animation:'twinkle 2.2s ease-in-out infinite'}}>
-          <path d="M14 24 l8 3 -4 7 Z"/>
-          <circle cx={6} cy={46} r={4}/>
-          <path d="M108 22 l-8 4 5 6 Z"/>
-          <circle cx={116} cy={50} r={4.5}/>
-          <circle cx={60} cy={108} r={3.5}/>
+    <div style={{height:380,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
+      {/* spinning rays in red */}
+      <svg width={260} height={260} viewBox="0 0 320 320" style={{position:'absolute',top:40,animation:'spinslow 26s linear infinite'}}>
+        <g fill="#fecaca">
+          <rect x={154} y={14} width={12} height={42} rx={6}/>
+          <rect x={154} y={264} width={12} height={42} rx={6}/>
+          <rect x={14} y={154} width={42} height={12} rx={6}/>
+          <rect x={264} y={154} width={42} height={12} rx={6}/>
+          <rect x={52} y={52} width={12} height={40} rx={6} transform="rotate(-45 58 72)"/>
+          <rect x={256} y={52} width={12} height={40} rx={6} transform="rotate(45 262 72)"/>
+          <rect x={52} y={228} width={12} height={40} rx={6} transform="rotate(45 58 248)"/>
+          <rect x={256} y={228} width={12} height={40} rx={6} transform="rotate(-45 262 248)"/>
         </g>
-        <path d="M55 22 L47 40 L59 54 L45 70 L55 100 C15 70 0 45 0 30 C0 12 15 5 30 5 C43 5 51 14 55 22 Z" fill="#ef4444"/>
-        <path d="M65 22 L57 40 L69 54 L55 70 L65 100 C105 70 120 45 120 30 C120 12 105 5 90 5 C77 5 69 14 65 22 Z" fill="#d4d7dd"/>
-        <path d="M20 22 q6 -10 16 -8" stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" opacity={0.55}/>
       </svg>
+
+      {/* big heart */}
+      <svg width={160} height={150} viewBox="0 0 200 185" style={{position:'absolute',top:90,animation:'pulse 2.4s ease-in-out infinite'}}>
+        {/* shadow */}
+        <path d="M100 178 C20 130 4 88 4 60 C4 28 26 8 52 8 C72 8 88 20 100 36 C112 20 128 8 148 8 C174 8 196 28 196 60 C196 88 180 130 100 178 Z" fill="#c0392b" transform="translate(0,8)"/>
+        {/* main */}
+        <path d="M100 178 C20 130 4 88 4 60 C4 28 26 8 52 8 C72 8 88 20 100 36 C112 20 128 8 148 8 C174 8 196 28 196 60 C196 88 180 130 100 178 Z" fill="#ef4444"/>
+        {/* shine */}
+        <path d="M52 28 q14 -16 34 -12" stroke="#fff" strokeWidth="7" fill="none" strokeLinecap="round" opacity={0.45}/>
+      </svg>
+
+      {/* small heart bottom-left */}
+      <svg width={62} height={58} viewBox="0 0 100 92" style={{position:'absolute',bottom:60,left:46,animation:'floaty 2.8s ease-in-out infinite'}}>
+        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#c0392b" transform="translate(0,4)"/>
+        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#ef4444"/>
+      </svg>
+
+      {/* small heart bottom-right */}
+      <svg width={44} height={40} viewBox="0 0 100 92" style={{position:'absolute',bottom:120,right:48,animation:'floaty 2.3s ease-in-out infinite'}}>
+        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#c0392b" transform="translate(0,4)"/>
+        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#ef4444"/>
+      </svg>
+
+      {/* sparkles */}
+      <svg viewBox="0 0 24 24" width={20} height={20} style={{position:'absolute',bottom:80,right:120,animation:'twinkle 2s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#ef4444"/></svg>
+      <svg viewBox="0 0 24 24" width={15} height={15} style={{position:'absolute',bottom:40,left:130,animation:'twinkle 2.5s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#fecaca"/></svg>
     </div>
   )
 }
@@ -143,58 +153,68 @@ function Slide3() {
 /* ── Slide 4 — One Unit Per Day ── */
 function Slide4() {
   return (
-    <div style={{height:380,display:"flex",alignItems:"center",justifyContent:"center",paddingTop:80}}>
-      <svg width={280} height={298} viewBox="0 0 300 320" style={{filter:'drop-shadow(0 12px 26px rgba(0,0,0,.12))'}}>
-        <defs>
-          <clipPath id="dnCard"><rect x={0} y={0} width={300} height={320} rx={34}/></clipPath>
-          <linearGradient id="dnSky" x1="0" y1="0.15" x2="1" y2="0.85">
-            <stop offset="0.38" stopColor="#42b8f7"/>
-            <stop offset="0.5" stopColor="#5a6fb5"/>
-            <stop offset="0.62" stopColor="#16205c"/>
-          </linearGradient>
-        </defs>
-        <g clipPath="url(#dnCard)">
-          <rect width={300} height={320} fill="url(#dnSky)"/>
-          <g fill="#ffffff">
-            <circle cx={252} cy={48} r={2.6}/>
-            <circle cx={220} cy={92} r={2}/>
-            <circle cx={270} cy={120} r={2.3}/>
-            <circle cx={238} cy={150} r={1.8}/>
-            <circle cx={200} cy={56} r={1.6}/>
-          </g>
-          <g fill="#ffe9a8">
-            <path d="M286 70 l1.6 4.6 4.6 .4 -3.5 3 1.1 4.5 -3.8 -2.5 -3.8 2.5 1.1 -4.5 -3.5 -3 4.6 -.4 Z"/>
-          </g>
-          <circle cx={238} cy={74} r={26} fill="#FFE08A"/>
-          <circle cx={252} cy={66} r={22} fill="#16205c"/>
-          {/* sun */}
-          <g style={{transformOrigin:'72px 70px',animation:'spinslow 30s linear infinite'}}>
-            <g stroke="#FFD21E" strokeWidth={6} strokeLinecap="round">
-              <line x1={72} y1={14} x2={72} y2={28}/>
-              <line x1={72} y1={112} x2={72} y2={126}/>
-              <line x1={16} y1={70} x2={30} y2={70}/>
-              <line x1={114} y1={70} x2={128} y2={70}/>
-              <line x1={32} y1={30} x2={42} y2={40}/>
-              <line x1={102} y1={100} x2={112} y2={110}/>
-              <line x1={32} y1={110} x2={42} y2={100}/>
-              <line x1={102} y1={40} x2={112} y2={30}/>
-            </g>
-          </g>
-          <circle cx={72} cy={70} r={30} fill="#FFD21E"/>
-          <path d="M0 232 C60 200 120 200 170 226 C220 252 270 236 300 222 L300 320 L0 320 Z" fill="#58cc02"/>
-          <path d="M0 272 C70 248 140 262 210 262 C260 262 285 254 300 250 L300 320 L0 320 Z" fill="#3f9e1f"/>
-          {/* calendar */}
-          <g transform="translate(108,232)">
-            <rect x={0} y={8} width={84} height={78} rx={14} fill="#fff" stroke="#e7eaf0" strokeWidth={3}/>
-            <rect x={0} y={8} width={84} height={24} rx={12} fill="#1CB0F6"/>
-            <rect x={18} y={2} width={8} height={16} rx={4} fill="#1CB0F6"/>
-            <rect x={58} y={2} width={8} height={16} rx={4} fill="#1CB0F6"/>
-            <circle cx={42} cy={58} r={18} fill="none" stroke="#3c3c3c" strokeWidth={3.5}/>
-            <path d="M42 58 L42 46" stroke="#3c3c3c" strokeWidth={3.5} strokeLinecap="round"/>
-            <path d="M42 58 L52 62" stroke="#3c3c3c" strokeWidth={3.5} strokeLinecap="round"/>
-          </g>
+    <div style={{height:380,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
+      {/* spinning rays — same as coins slide but in blue */}
+      <svg width={260} height={260} viewBox="0 0 320 320" style={{position:'absolute',top:40,animation:'spinslow 26s linear infinite'}}>
+        <g fill="#b3e5fc">
+          <rect x={154} y={14} width={12} height={42} rx={6}/>
+          <rect x={154} y={264} width={12} height={42} rx={6}/>
+          <rect x={14} y={154} width={42} height={12} rx={6}/>
+          <rect x={264} y={154} width={42} height={12} rx={6}/>
+          <rect x={52} y={52} width={12} height={40} rx={6} transform="rotate(-45 58 72)"/>
+          <rect x={256} y={52} width={12} height={40} rx={6} transform="rotate(45 262 72)"/>
+          <rect x={52} y={228} width={12} height={40} rx={6} transform="rotate(45 58 248)"/>
+          <rect x={256} y={228} width={12} height={40} rx={6} transform="rotate(-45 262 248)"/>
         </g>
       </svg>
+
+      {/* big clock */}
+      <svg width={160} height={160} viewBox="0 0 200 200" style={{position:'absolute',top:90,animation:'pulse 2.4s ease-in-out infinite'}}>
+        {/* shadow ring */}
+        <circle cx={100} cy={108} r={84} fill="#0d8fcf"/>
+        {/* face */}
+        <circle cx={100} cy={100} r={84} fill="#1CB0F6"/>
+        {/* inner face */}
+        <circle cx={100} cy={100} r={68} fill="#e8f7ff"/>
+        {/* hour marks */}
+        {[0,30,60,90,120,150,180,210,240,270,300,330].map((deg,i) => {
+          const r = deg * Math.PI / 180
+          const x1 = 100 + 56*Math.sin(r), y1 = 100 - 56*Math.cos(r)
+          const x2 = 100 + 64*Math.sin(r), y2 = 100 - 64*Math.cos(r)
+          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#1CB0F6" strokeWidth={i%3===0?4:2.5} strokeLinecap="round"/>
+        })}
+        {/* hour hand — pointing ~10 */}
+        <line x1={100} y1={100} x2={72} y2={60} stroke="#1a1a2e" strokeWidth={7} strokeLinecap="round"/>
+        {/* minute hand — pointing ~2 */}
+        <line x1={100} y1={100} x2={134} y2={54} stroke="#1a1a2e" strokeWidth={5} strokeLinecap="round"/>
+        {/* center dot */}
+        <circle cx={100} cy={100} r={8} fill="#1CB0F6"/>
+        <circle cx={100} cy={100} r={4} fill="#fff"/>
+      </svg>
+
+      {/* small clock top-left */}
+      <svg width={62} height={62} viewBox="0 0 100 100" style={{position:'absolute',bottom:60,left:46,animation:'floaty 2.8s ease-in-out infinite'}}>
+        <circle cx={50} cy={54} r={40} fill="#0d8fcf"/>
+        <circle cx={50} cy={50} r={40} fill="#1CB0F6"/>
+        <circle cx={50} cy={50} r={30} fill="#e8f7ff"/>
+        <line x1={50} y1={50} x2={36} y2={30} stroke="#1a1a2e" strokeWidth={4} strokeLinecap="round"/>
+        <line x1={50} y1={50} x2={67} y2={27} stroke="#1a1a2e" strokeWidth={3} strokeLinecap="round"/>
+        <circle cx={50} cy={50} r={5} fill="#1CB0F6"/>
+      </svg>
+
+      {/* small clock bottom-right */}
+      <svg width={44} height={44} viewBox="0 0 100 100" style={{position:'absolute',bottom:120,right:48,animation:'floaty 2.3s ease-in-out infinite'}}>
+        <circle cx={50} cy={54} r={40} fill="#0d8fcf"/>
+        <circle cx={50} cy={50} r={40} fill="#1CB0F6"/>
+        <circle cx={50} cy={50} r={30} fill="#e8f7ff"/>
+        <line x1={50} y1={50} x2={36} y2={30} stroke="#1a1a2e" strokeWidth={4} strokeLinecap="round"/>
+        <line x1={50} y1={50} x2={67} y2={27} stroke="#1a1a2e" strokeWidth={3} strokeLinecap="round"/>
+        <circle cx={50} cy={50} r={5} fill="#1CB0F6"/>
+      </svg>
+
+      {/* sparkles */}
+      <svg viewBox="0 0 24 24" width={20} height={20} style={{position:'absolute',bottom:80,right:120,animation:'twinkle 2s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#1CB0F6"/></svg>
+      <svg viewBox="0 0 24 24" width={15} height={15} style={{position:'absolute',bottom:40,left:130,animation:'twinkle 2.5s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#b3e5fc"/></svg>
     </div>
   )
 }
