@@ -18,7 +18,7 @@
 // Per chapter: 12 tables × 6 batches = 72 day-sessions
 
 export const OPERATIONS = ['addition', 'subtraction', 'multiplication', 'division']
-export const NODES = ['unlock', 'learn', 'practice', 'what_happened', 'real_life', 'speed', 'review']
+export const NODES = ['unlock', 'learn', 'easy', 'medium', 'hard', 'double_reward', 'review']
 export const TABLE_COUNT = 12
 export const BATCH_COUNT = 6
 export const FACTS_PER_BATCH = 2 // always 2; 2 × 6 batches = 12 facts per table
@@ -216,24 +216,29 @@ export function tablesForOperation() {
 }
 
 export function nodeLabel(node) {
-  if (node === 'unlock')        return 'Unlock'
+  if (node === 'unlock')        return 'Welcome!'
   if (node === 'learn')         return 'Learn'
+  if (node === 'easy')          return 'Easy'
+  if (node === 'medium')        return 'Medium'
+  if (node === 'hard')          return 'Hard'
+  if (node === 'double_reward') return 'Double Reward'
+  if (node === 'review')        return 'Review'
+  // legacy fallbacks
   if (node === 'practice')      return 'Practice'
   if (node === 'what_happened') return 'What Happened?'
   if (node === 'real_life')     return 'Real Life'
   if (node === 'speed')         return 'Speed'
-  if (node === 'review')        return 'Review'
   return node
 }
 
 export function nodePurpose(node) {
-  if (node === 'unlock')        return 'Remember yesterday?'
+  if (node === 'unlock')        return 'Unlock today\'s lesson'
   if (node === 'learn')         return 'Today\'s new facts'
-  if (node === 'practice')      return 'Drill today\'s facts'
-  if (node === 'what_happened') return 'Which equation fits?'
-  if (node === 'real_life')     return 'Use it for real'
-  if (node === 'speed')         return 'Answer fast'
-  if (node === 'review')        return 'Remember everything'
+  if (node === 'easy')          return 'Warm up your brain'
+  if (node === 'medium')        return 'Level up'
+  if (node === 'hard')          return 'Push yourself'
+  if (node === 'double_reward') return '2× coins tonight!'
+  if (node === 'review')        return 'Remember it all'
   return ''
 }
 
