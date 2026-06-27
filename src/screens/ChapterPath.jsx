@@ -622,7 +622,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
         return (
           <div style={{
-            position: 'sticky', top: 0, zIndex: 20,
+            position: 'sticky', top: 0, zIndex: 100,
             display: 'flex', justifyContent: 'center',
             padding: '10px 16px 6px',
             backgroundColor: '#fff',
@@ -652,7 +652,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       })()}
 
       {/* ── Continuous node path ── */}
-      <div className="max-w-sm md:max-w-md mx-auto pt-6 pb-24 overflow-x-hidden">
+      <div className="max-w-sm md:max-w-md mx-auto pt-6 pb-24 overflow-x-hidden" style={{ position: 'relative', zIndex: 1 }}>
         {allUnits.map(({ table, batch, unitNumber }) => {
           const unitStatus = tableStatus(currentPos, operation, table)
           const facts = factsForBatch(batch)
