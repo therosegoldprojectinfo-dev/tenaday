@@ -94,12 +94,20 @@ const NODE_DISPLAY_NAMES = {
   review:        'Review',
 }
 
-// ── Zigzag positions: alternates left / right ─────────────────────────────
-// index 0,2,4,6 → left; 1,3,5 → right
-const ZIGZAG_SIDES = ['left', 'right', 'left', 'right', 'left', 'right', 'left']
+// ── Duolingo-style S-curve offsets (px from center) ──────────────────────
+// Nodes gently snake left→right→left in a smooth curve
+const ZIGZAG_OFFSETS = [
+  -60,  // node 0: left
+  -20,  // node 1: slightly left
+   20,  // node 2: slightly right
+   60,  // node 3: right
+   20,  // node 4: slightly right
+  -20,  // node 5: slightly left
+  -60,  // node 6: left (review)
+]
 
 // ── 3D Disc Node button ───────────────────────────────────────────────────
-function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnlockAt }) {
+function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnlockAt }) {
   const locked       = status === 'locked'
   const dayLocked    = status === 'day_locked'
   const completed    = status === 'completed'
@@ -137,9 +145,8 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
   return (
     <div style={{
       display: 'flex',
-      justifyContent: side === 'left' ? 'flex-start' : 'flex-end',
-      paddingLeft: side === 'left' ? 16 : 0,
-      paddingRight: side === 'right' ? 16 : 0,
+      justifyContent: 'center',
+      transform: `translateX(${offset}px)`,
       marginBottom: -60,
     }}>
       <button
@@ -169,9 +176,6 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
           marginBottom: 2,
           zIndex: 1,
         }}>{displayName}</span>
-        {dayLocked && (
-          <span style={{ fontSize: 10, fontWeight: 700, color: '#D97706', marginBottom: 2 }}>⏰ Tomorrow</span>
-        )}
 
         {/* Disc image */}
         <div style={{ position: 'relative', flexShrink: 0 }}>
@@ -427,7 +431,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       `}</style>
 
       {/* ── Sticky header ── */}
-      <div className="sticky top-0 bg-white z-30 border-b border-gray-100 md:fixed md:top-0 md:left-0 md:right-0">
+      <div className="sticky top-0 bg-white z-30 border-b border-gray-100">
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <button
             onClick={onBack}
@@ -600,7 +604,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       )}
 
       {/* ── Chapter heading ── */}
-      <div className="px-4 pt-5 pb-2 max-w-sm md:max-w-md mx-auto md:pt-24">
+      <div className="px-4 pt-5 pb-2 max-w-sm md:max-w-md mx-auto">
         <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.primary }}>
           {theme.operationLabel}
         </p>
@@ -664,7 +668,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                       ? 'active'
                       : 'locked'
 
-                const side = ZIGZAG_SIDES[nodeIdx % ZIGZAG_SIDES.length]
+                const offset = ZIGZAG_OFFSETS[nodeIdx % ZIGZAG_OFFSETS.length]
 
                 return (
                   <div key={node} className={isCurrent ? 'node-current' : ''}>
@@ -674,7 +678,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                       isCurrent={isCurrent}
                       isWelcome={isWelcome}
                       nextUnlockAt={kid.next_unlock_at}
-                      side={side}
+                      offset={offset}
                       onPress={() => handleTogglePopover(table, batch, node, status, isCurrent)}
                     />
                   </div>
