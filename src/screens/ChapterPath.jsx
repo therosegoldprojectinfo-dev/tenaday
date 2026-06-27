@@ -608,48 +608,38 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       )}
 
-      {/* ── Sticky unit banner (colorful Duolingo pill) ── */}
+      {/* ── Sticky unit banner (full width Duolingo style) ── */}
       {(() => {
         const u = allUnits.find(u => u.unitNumber === visibleUnit)
         const facts = u ? factsForBatch(u.batch) : []
         const factStr = u ? facts.map(f => `${u.table} ${theme.symbol} ${f}`).join(', ') : ''
         const UNIT_COLORS = [
-          { bg: '#58cc02', shadow: '#46a302' }, // green
-          { bg: '#1cb0f6', shadow: '#0a8fcb' }, // blue
-          { bg: '#ffb700', shadow: '#d99700' }, // yellow
-          { bg: '#ff4b4b', shadow: '#cc0000' }, // red
-          { bg: '#ff9600', shadow: '#cc7a00' }, // orange
-          { bg: '#ce82ff', shadow: '#9b59b6' }, // purple
-          { bg: '#ff86d0', shadow: '#cc5ca3' }, // pink
+          { bg: '#58cc02', shadow: '#46a302' },
+          { bg: '#1cb0f6', shadow: '#0a8fcb' },
+          { bg: '#ffb700', shadow: '#d99700' },
+          { bg: '#ff4b4b', shadow: '#cc0000' },
+          { bg: '#ff9600', shadow: '#cc7a00' },
+          { bg: '#ce82ff', shadow: '#9b59b6' },
+          { bg: '#ff86d0', shadow: '#cc5ca3' },
         ]
         const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
         return (
           <div style={{
             position: 'sticky', top: 0, zIndex: 100,
-            display: 'flex', justifyContent: 'center',
-            padding: '10px 16px 6px',
-            backgroundColor: '#fff',
+            backgroundColor: color.bg,
+            boxShadow: `0 4px 0 ${color.shadow}`,
+            padding: '14px 20px',
           }}>
-            <div style={{
-              display: 'inline-flex', flexDirection: 'column', alignItems: 'center',
-              borderRadius: 16,
-              backgroundColor: color.bg,
-              padding: '10px 24px',
-              boxShadow: `0 4px 0 ${color.shadow}`,
-              minWidth: 200, textAlign: 'center',
-            }}>
-              <span style={{
-                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                fontWeight: 900, fontSize: 11,
-                letterSpacing: '0.1em', color: 'rgba(255,255,255,0.85)',
-                textTransform: 'uppercase',
-              }}>Unit {visibleUnit}</span>
-              <span style={{
-                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                fontWeight: 800, fontSize: 16, color: '#fff',
-                marginTop: 1,
-              }}>{factStr}</span>
-            </div>
+            <p style={{
+              fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+              fontWeight: 900, fontSize: 11,
+              letterSpacing: '0.1em', color: 'rgba(255,255,255,0.85)',
+              textTransform: 'uppercase', marginBottom: 2,
+            }}>Unit {visibleUnit}</p>
+            <p style={{
+              fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+              fontWeight: 800, fontSize: 18, color: '#fff',
+            }}>{factStr}</p>
           </div>
         )
       })()}
