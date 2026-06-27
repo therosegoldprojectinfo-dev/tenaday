@@ -627,7 +627,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           <div style={{
             position: 'sticky', top: 0, zIndex: 100,
             padding: '10px 16px',
-            backgroundColor: '#f7f7f7',
+            backgroundColor: 'transparent',
           }}>
             <div style={{
               width: '100%',
