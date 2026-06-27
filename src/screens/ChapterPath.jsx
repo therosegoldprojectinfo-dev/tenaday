@@ -421,7 +421,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   }
 
   return (
-    <div className="h-screen overflow-y-auto bg-white">
+    <div className="h-screen flex flex-col bg-white">
       <style>{`
         @keyframes pulse-glow {
           0%, 100% { filter: drop-shadow(0 0 8px rgba(124,58,237,0.4)); }
@@ -432,8 +432,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         }
       `}</style>
 
-      {/* ── Sticky header ── */}
-      <div className="sticky top-0 bg-white z-30 border-b border-gray-100">
+      {/* ── Fixed header ── */}
+      <div className="flex-shrink-0 bg-white z-30 border-b border-gray-100">
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <button
             onClick={onBack}
@@ -529,6 +529,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
 
       </div>
+
+      {/* ── Scrollable content ── */}
+      <div className="flex-1 overflow-y-auto">
 
       {/* ── Alert banners ── */}
       {atDebtFloor && (
@@ -766,6 +769,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           </div>
         </>
       )}
+      </div>{/* end scrollable content */}
     </div>
   )
 }
