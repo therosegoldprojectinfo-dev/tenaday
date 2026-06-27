@@ -37,6 +37,7 @@ export default function App() {
   const [parentId, setParentId] = useState(null)
   const [kidId, setKidId] = useState(null)
   const [pendingClaim, setPendingClaim] = useState(null) // placement claim for the diagnostic phase
+  const [selectedTables, setSelectedTables] = useState([]) // tables the kid picked in TablePicker
   const [showParentPin, setShowParentPin]   = useState(false)
   const [showParentDash, setShowParentDash] = useState(false)
 
@@ -209,8 +210,8 @@ export default function App() {
     return (
       <TablePicker
         operation={pendingClaim}
-        onDone={(_tables) => {
-          // tables selected — move to test intro
+        onDone={(tables) => {
+          setSelectedTables(tables)
           setAuthPhase('testIntro')
         }}
       />
@@ -235,6 +236,7 @@ export default function App() {
       <Diagnostic
         kidId={kidId}
         claimedOperation={pendingClaim}
+        selectedTables={selectedTables}
         onPass={handleDiagnosticPass}
         onFail={handleDiagnosticFail}
       />
