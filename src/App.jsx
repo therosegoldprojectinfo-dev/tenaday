@@ -11,6 +11,8 @@ import KidPicker from './screens/KidPicker'
 import CreateKid from './screens/CreateKid'
 import Onboarding from './screens/Onboarding'
 import LevelSelect from './screens/LevelSelect'
+import TablePicker from './screens/TablePicker'
+import TestIntro from './screens/TestIntro'
 import ParentPinEntry from './screens/ParentPinEntry'
 import ParentDashboard from './screens/ParentDashboard'
 import NavShell from './components/NavShell'
@@ -192,12 +194,37 @@ export default function App() {
         onDone={(claim) => {
           if (claim) {
             setPendingClaim(claim)
-            setAuthPhase('diagnostic')
+            setAuthPhase('tablePicker')
           } else {
             setAuthPhase('game')
             setNavTab('home')
             setScreen('list')
           }
+        }}
+      />
+    )
+  }
+
+  if (authPhase === 'tablePicker') {
+    return (
+      <TablePicker
+        operation={pendingClaim}
+        onDone={(_tables) => {
+          // tables selected — move to test intro
+          setAuthPhase('testIntro')
+        }}
+      />
+    )
+  }
+
+  if (authPhase === 'testIntro') {
+    return (
+      <TestIntro
+        onStart={() => setAuthPhase('diagnostic')}
+        onSkip={() => {
+          setAuthPhase('game')
+          setNavTab('home')
+          setScreen('list')
         }}
       />
     )
