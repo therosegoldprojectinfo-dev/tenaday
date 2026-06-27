@@ -156,7 +156,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 2,
+          gap: 0,
           background: 'none',
           border: 'none',
           padding: 0,
