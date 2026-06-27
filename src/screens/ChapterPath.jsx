@@ -156,7 +156,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 0,
+          gap: 2,
           background: 'none',
           border: 'none',
           padding: 0,
@@ -174,8 +174,8 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
             src={imgSrc}
             alt={displayName}
             style={{
-              width: isSpecial ? 240 : 216,
-              height: isSpecial ? 240 : 216,
+              width: isSpecial ? 160 : 140,
+              height: isSpecial ? 160 : 140,
               objectFit: 'contain',
               filter: (disabled && !forceGold) ? 'grayscale(100%) opacity(0.55)' : 'none',
               transform: isCurrent ? 'scale(1.08)' : 'scale(1)',
