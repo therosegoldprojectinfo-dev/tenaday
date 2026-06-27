@@ -140,7 +140,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
       justifyContent: side === 'left' ? 'flex-start' : 'flex-end',
       paddingLeft: side === 'left' ? 16 : 0,
       paddingRight: side === 'right' ? 16 : 0,
-      marginBottom: 4,
+      marginBottom: -60,
     }}>
       <button
         type="button"
@@ -150,7 +150,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          gap: 4,
+          gap: 0,
           background: 'none',
           border: 'none',
           padding: 0,
@@ -159,16 +159,18 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, side, nextUnloc
         }}
         aria-label={displayName}
       >
-        {/* Label above disc */}
+        {/* Label directly above disc */}
         <span style={{
           fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
           fontWeight: 800,
           fontSize: 15,
           color: (disabled && !forceGold) ? '#9CA3AF' : '#1f2937',
           textAlign: 'center',
+          marginBottom: 2,
+          zIndex: 1,
         }}>{displayName}</span>
         {dayLocked && (
-          <span style={{ fontSize: 10, fontWeight: 700, color: '#D97706' }}>⏰ Tomorrow</span>
+          <span style={{ fontSize: 10, fontWeight: 700, color: '#D97706', marginBottom: 2 }}>⏰ Tomorrow</span>
         )}
 
         {/* Disc image */}
@@ -425,7 +427,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       `}</style>
 
       {/* ── Sticky header ── */}
-      <div className="sticky top-0 bg-white z-30 border-b border-gray-100">
+      <div className="sticky top-0 bg-white z-30 border-b border-gray-100 md:fixed md:top-0 md:left-0 md:right-0">
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <button
             onClick={onBack}
@@ -598,7 +600,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       )}
 
       {/* ── Chapter heading ── */}
-      <div className="px-4 pt-5 pb-2 max-w-sm md:max-w-md mx-auto">
+      <div className="px-4 pt-5 pb-2 max-w-sm md:max-w-md mx-auto md:pt-24">
         <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.primary }}>
           {theme.operationLabel}
         </p>
