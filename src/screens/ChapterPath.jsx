@@ -238,6 +238,8 @@ function NodeRow({ node, status, nextUnlockAt, isCurrent, isWelcome, onPress }) 
   const colors    = NODE_COLORS[node] || NODE_COLORS.learn
   const isDoubleReward = node === 'double_reward'
   const shimmerClass = isDoubleReward ? 'gold-shimmer' : ''
+
+  const subtitle = locked
     ? 'Locked'
     : dayLocked
       ? nextUnlockMessage(nextUnlockAt)
