@@ -34,7 +34,9 @@ export function applyEntryFee(balance) {
  *  than last, still pays the standard rate — it's a real test (spec:
  *  "must reach a small success threshold to continue"), not a freebie. */
 export function payoutForNode(node) {
-  return node === 'review' ? REVIEW_PAYOUT : NODE_PAYOUT
+  if (node === 'review')        return REVIEW_PAYOUT
+  if (node === 'double_reward') return NODE_PAYOUT * 2
+  return NODE_PAYOUT
 }
 
 /** Applies a node-pass payout. While in debt, earnings pay down the debt
