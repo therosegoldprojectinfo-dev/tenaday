@@ -218,11 +218,11 @@ function Slide4() {
   )
 }
 
-/* ── Slide 5 — One small habit (plant growing) ── */
+/* ── Slide 5 — One small habit (sprouting seed) ── */
 function Slide5() {
   return (
     <div style={{height:380,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
-      {/* spinning rays — green */}
+      {/* spinning rays — soft green */}
       <svg width={260} height={260} viewBox="0 0 320 320" style={{position:'absolute',top:40,animation:'spinslow 30s linear infinite'}}>
         <g fill="#bbf7d0">
           <rect x={154} y={14} width={12} height={42} rx={6}/>
@@ -236,37 +236,41 @@ function Slide5() {
         </g>
       </svg>
 
-      {/* pot shadow */}
-      <svg width={170} height={200} viewBox="0 0 200 230" style={{position:'absolute',top:82,animation:'pulse 3s ease-in-out infinite'}}>
+      {/* sprouting seed illustration */}
+      <svg width={180} height={200} viewBox="0 0 200 220" style={{position:'absolute',top:80,animation:'pulse 3s ease-in-out infinite'}}>
+        {/* soil mound shadow */}
+        <ellipse cx={100} cy={188} rx={72} ry={18} fill="#7c4e1a"/>
+        {/* soil mound */}
+        <ellipse cx={100} cy={184} rx={72} ry={18} fill="#a0522d"/>
+        {/* soil highlight */}
+        <ellipse cx={100} cy={180} rx={60} ry={10} fill="#b8601e" opacity={0.5}/>
+
+        {/* seed body buried in soil */}
+        <ellipse cx={100} cy={178} rx={16} ry={12} fill="#7c4e1a"/>
+        <ellipse cx={100} cy={176} rx={16} ry={12} fill="#92400e"/>
+
         {/* stem */}
-        <rect x={96} y={60} width={8} height={110} rx={4} fill="#16a34a"/>
-        {/* left leaf */}
-        <ellipse cx={62} cy={110} rx={38} ry={18} fill="#22c55e" transform="rotate(-20 62 110)"/>
-        <line x1={96} y1={120} x2={62} y2={110} stroke="#16a34a" strokeWidth={4} strokeLinecap="round"/>
-        {/* right leaf */}
-        <ellipse cx={138} cy={90} rx={38} ry={18} fill="#22c55e" transform="rotate(20 138 90)"/>
-        <line x1={100} y1={100} x2={138} y2={90} stroke="#16a34a" strokeWidth={4} strokeLinecap="round"/>
-        {/* top leaves */}
-        <ellipse cx={100} cy={52} rx={30} ry={18} fill="#22c55e" transform="rotate(-10 100 52)"/>
-        <ellipse cx={100} cy={48} rx={22} ry={14} fill="#4ade80"/>
-        {/* pot body shadow */}
-        <path d="M60 170 Q58 220 100 224 Q142 220 140 170 Z" fill="#b45309"/>
-        {/* pot body */}
-        <path d="M60 166 Q58 216 100 220 Q142 216 140 166 Z" fill="#d97706"/>
-        {/* pot rim shadow */}
-        <rect x={52} y={164} width={96} height={14} rx={7} fill="#b45309"/>
-        {/* pot rim */}
-        <rect x={52} y={160} width={96} height={14} rx={7} fill="#f59e0b"/>
-        {/* soil */}
-        <ellipse cx={100} cy={170} rx={44} ry={10} fill="#92400e"/>
+        <path d="M100 175 Q98 148 100 120" stroke="#22c55e" strokeWidth={9} fill="none" strokeLinecap="round"/>
+
+        {/* left sprout leaf */}
+        <path d="M100 148 Q72 130 68 108 Q88 118 100 140" fill="#22c55e"/>
+        <path d="M100 148 Q72 130 68 108 Q88 118 100 140" fill="none" stroke="#16a34a" strokeWidth={2} strokeLinecap="round"/>
+
+        {/* right sprout leaf */}
+        <path d="M100 132 Q128 112 134 90 Q114 102 100 126" fill="#4ade80"/>
+        <path d="M100 132 Q128 112 134 90 Q114 102 100 126" fill="none" stroke="#22c55e" strokeWidth={2} strokeLinecap="round"/>
+
+        {/* tiny top bud */}
+        <ellipse cx={100} cy={114} rx={11} ry={14} fill="#4ade80"/>
+        <ellipse cx={100} cy={110} rx={8} ry={10} fill="#86efac"/>
       </svg>
 
-      {/* small star floaters */}
-      <svg viewBox="0 0 24 24" width={22} height={22} style={{position:'absolute',top:130,left:62,animation:'twinkle 1.9s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#FFB700"/></svg>
-      <svg viewBox="0 0 24 24" width={16} height={16} style={{position:'absolute',top:260,right:64,animation:'twinkle 2.4s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#22c55e"/></svg>
-      <svg viewBox="0 0 24 24" width={14} height={14} style={{position:'absolute',top:90,right:80,animation:'twinkle 2.1s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#1CB0F6"/></svg>
-      <div style={{position:'absolute',top:200,left:38,width:12,height:12,borderRadius:'50%',background:'#22c55e',animation:'twinkle 1.7s ease-in-out infinite'}}/>
-      <div style={{position:'absolute',top:70,right:54,width:14,height:14,borderRadius:4,background:'#FFB700',transform:'rotate(20deg)',animation:'confettiA 2.3s ease-in-out infinite alternate'}}/>
+      {/* sparkles */}
+      <svg viewBox="0 0 24 24" width={22} height={22} style={{position:'absolute',top:130,left:56,animation:'twinkle 1.9s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#FFB700"/></svg>
+      <svg viewBox="0 0 24 24" width={16} height={16} style={{position:'absolute',top:240,right:58,animation:'twinkle 2.4s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#22c55e"/></svg>
+      <svg viewBox="0 0 24 24" width={14} height={14} style={{position:'absolute',top:88,right:72,animation:'twinkle 2.1s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#1CB0F6"/></svg>
+      <div style={{position:'absolute',top:195,left:42,width:11,height:11,borderRadius:'50%',background:'#22c55e',animation:'twinkle 1.7s ease-in-out infinite'}}/>
+      <div style={{position:'absolute',top:68,right:50,width:13,height:13,borderRadius:4,background:'#FFB700',transform:'rotate(20deg)',animation:'confettiA 2.3s ease-in-out infinite alternate'}}/>
     </div>
   )
 }
@@ -369,16 +373,34 @@ export default function Onboarding({ onDone }) {
         }}>
           {slide.title}
         </h1>
-        <p style={{
-          margin: '0 0 22px',
-          fontWeight: 700,
-          fontSize: 16,
-          lineHeight: 1.55,
-          color: '#777',
-          whiteSpace: 'pre-line',
-        }}>
-          {slide.sub}
-        </p>
+
+        {slide.isLast ? (
+          <div style={{margin: '0 0 22px'}}>
+            {['Do your Numio every day.', 'Get better at math.', 'Enjoy your reward.'].map((line, i) => (
+              <p key={i} style={{
+                margin: i === 1 ? '4px 0' : '0',
+                fontWeight: i === 1 ? 800 : 700,
+                fontSize: i === 1 ? 18 : 15,
+                lineHeight: 1.5,
+                color: i === 1 ? '#3c3c3c' : '#aaa',
+                fontFamily: "'Baloo 2', sans-serif",
+              }}>
+                {line}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <p style={{
+            margin: '0 0 22px',
+            fontWeight: 700,
+            fontSize: 16,
+            lineHeight: 1.55,
+            color: '#777',
+            whiteSpace: 'pre-line',
+          }}>
+            {slide.sub}
+          </p>
+        )}
 
         {/* dots */}
         <div style={{display:'flex', gap:8, justifyContent:'center', marginBottom:20}}>
