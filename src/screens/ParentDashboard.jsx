@@ -504,7 +504,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
                 <p className="font-body text-gray-400 text-center py-8">Loading…</p>
               ) : coinHistory.length === 0 ? (
                 <div className="rounded-3xl bg-white border-2 border-dashed border-gray-200 py-10 text-center">
-                  <p className="text-4xl mb-2">🪙</p>
+                  <p className="mb-2"><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="40" height="40" alt="coin" /></p>
                   <p className="font-body text-sm text-gray-400">No transactions yet.</p>
                 </div>
               ) : (
@@ -516,7 +516,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
                       review_pass:    '✅ Review passed',
                       entry_fee:      '🎮 Started activity',
                       exit_refund:    '↩️ Exited activity',
-                      heart_recharge: '❤️ Recharged heart',
+                      heart_recharge: '♥ Recharged heart',
                       gift_purchase:  '🎁 Bought reward',
                     }
                     const label = reasonLabels[tx.reason] || tx.reason
@@ -531,7 +531,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
                         </div>
                         <div className="text-right">
                           <p className={`font-body font-bold text-sm ${isPositive ? 'text-green-500' : 'text-red-400'}`}>
-                            {isPositive ? '+' : ''}{tx.amount} ⭐
+                            {isPositive ? '+' : ''}{tx.amount} coins
                           </p>
                           <p className="font-body text-xs text-gray-400">Balance: {tx.balance_after}</p>
                         </div>
@@ -601,7 +601,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
                   { label: 'Day streak', value: kidStreaks[viewingKid.id] ?? 0, emoji: '🔥' },
                   { label: 'Correct answers', value: kidStats[viewingKid.id].totalCorrect, emoji: '✅' },
                   { label: 'Sessions done', value: kidStats[viewingKid.id].nodesPassed, emoji: '⭐' },
-                  { label: 'Coin balance', value: viewingKid.coin_balance, emoji: '🪙' },
+                  { label: 'Coin balance', value: viewingKid.coin_balance, icon: <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="18" height="18" alt="coin" /> },
                 ].map(({ label, value, emoji }) => (
                   <div key={label} className="rounded-2xl bg-gray-50 px-4 py-3">
                     <p className="text-2xl mb-1">{emoji}</p>
