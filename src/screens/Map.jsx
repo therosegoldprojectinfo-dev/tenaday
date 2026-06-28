@@ -23,8 +23,8 @@ function HeartStatIcon() {
   return (
     <img
       src="/ChatGPT Image 28 juin 2026, 09_20_15.png"
-      width="18"
-      height="18"
+      width="36"
+      height="36"
       aria-hidden="true"
       alt=""
     />
@@ -32,25 +32,25 @@ function HeartStatIcon() {
 }
 
 function CoinStatIcon() {
-  return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="20" height="20" aria-hidden="true" alt="" />
+  return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="40" height="40" aria-hidden="true" alt="" />
 }
 
 function TrophyIcon({ color = '#58cc02' }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M7 4h10v4a5 5 0 0 1-10 0V4Z" fill={color} />
       <path d="M7 5H4a2 2 0 0 0-2 2c0 2.2 1.8 4 4 4M17 5h3a2 2 0 0 1 2 2c0 2.2-1.8 4-4 4" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
-      <rect x="10" y="13" width="4" height="4" fill={color} />
-      <rect x="7" y="17" width="10" height="3" rx="1.5" fill={color} />
+      <rect x="10" y="13" width="8" height="8" fill={color} />
+      <rect x="7" y="17" width="20" height="6" rx="1.5" fill={color} />
     </svg>
   )
 }
 
 function LockIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5"
+    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <rect x="5" y="11" width="28" height="18" rx="2" />
       <path d="M8 11V7a4 4 0 0 1 8 0v4" />
     </svg>
   )
@@ -204,9 +204,9 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
               </button>
               {tooltip === 'hearts' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="28" height="28" alt="heart" /></p>
+                  <p className="mb-1"><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="56" height="56" alt="heart" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
-                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="18" height="18" alt="heart" /></span>)}</div>
+                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="36" height="36" alt="heart" /></span>)}</div>
                   <p className="font-body text-xs text-gray-400 mb-3">Hearts are lost when you answer wrong. Recharge with coins.</p>
                   {(kid.heart_balance ?? 5) < 5 ? (
                     <>
@@ -227,7 +227,7 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
               </button>
               {tooltip === 'coins' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="28" height="28" alt="coin" /></p>
+                  <p className="mb-1"><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="56" height="56" alt="coin" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
                   <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>{kid.coin_balance}</p>
                   <p className="font-body text-xs text-gray-400 mt-1">{inDebt ? "You're in debt — keep playing to earn coins back!" : 'Earn coins by completing activities.'}</p>
