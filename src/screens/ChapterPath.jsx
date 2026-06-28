@@ -63,20 +63,18 @@ function BackIcon() {
 
 function HeartStatIcon() {
   return (
-    <svg width="18" height="16" viewBox="0 0 22 20" fill="#ef4444" aria-hidden="true">
-      <path d="M11 18.5S1 12.3 1 6.5a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 5.8-10 12-10 12z" />
-    </svg>
+    <img
+      src="/ChatGPT Image 28 juin 2026, 09_20_15.png"
+      width="18"
+      height="18"
+      aria-hidden="true"
+      alt=""
+    />
   )
 }
 
 function CoinStatIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <circle cx="10" cy="10" r="10" fill="#FFB700" />
-      <circle cx="10" cy="10" r="7" fill="#FFD700" />
-      <path d="M10 5.5l1.1 3.4h3.6l-2.9 2.1 1.1 3.4L10 12.4 6.9 14.4l1.1-3.4-2.9-2.1h3.6z" fill="#CC7700" />
-    </svg>
-  )
+  return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="20" height="20" aria-hidden="true" alt="" />
 }
 
 // ── Node label mapping ────────────────────────────────────────────────────
@@ -448,13 +446,13 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               </button>
               {tooltip === 'hearts' && (
                 <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="text-2xl mb-1">❤️</p>
+                  <p className="mb-1"><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="28" height="28" alt="heart" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
-                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}>❤️</span>)}</div>
+                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="18" height="18" alt="heart" /></span>)}</div>
                   <p className="font-body text-xs text-gray-400 mb-3">Hearts are lost when you answer wrong. Recharge with coins.</p>
                   {(kid.heart_balance ?? 5) < 5 ? (
                     <>{rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
-                    <button onClick={handleRechargeHeart} disabled={recharging || kid.coin_balance < 10} className="w-full py-2.5 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95" style={{ backgroundColor: kid.coin_balance >= 10 ? '#ef4444' : '#F3F4F6', color: kid.coin_balance >= 10 ? '#fff' : '#9CA3AF', boxShadow: kid.coin_balance >= 10 ? '0 3px 0 0 #b91c1c' : '0 3px 0 0 #D1D5DB' }}>{recharging ? 'Recharging…' : '❤️ +1 for 10 ⭐'}</button></>
+                    <button onClick={handleRechargeHeart} disabled={recharging || kid.coin_balance < 10} className="w-full py-2.5 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95" style={{ backgroundColor: kid.coin_balance >= 10 ? '#ef4444' : '#F3F4F6', color: kid.coin_balance >= 10 ? '#fff' : '#9CA3AF', boxShadow: kid.coin_balance >= 10 ? '0 3px 0 0 #b91c1c' : '0 3px 0 0 #D1D5DB' }}>{recharging ? 'Recharging…' : '♥ +1 for 10 coins'}</button></>
                   ) : <p className="font-body text-xs text-green-500 font-bold">Full hearts! ✨</p>}
                 </div>
               )}
@@ -467,7 +465,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               </button>
               {tooltip === 'coins' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="text-2xl mb-1">⭐</p>
+                  <p className="mb-1"><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="28" height="28" alt="coin" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
                   <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>{kid.coin_balance}</p>
                   <p className="font-body text-xs text-gray-400 mt-1">{inDebt ? "You're in debt — keep playing!" : "Earn coins by completing activities."}</p>
@@ -498,16 +496,16 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             {kid.coin_balance >= 10 ? (
               <>
                 <div className="flex items-start justify-between gap-3 mb-3">
-                  <div><p className="font-display font-bold text-base text-red-700">💔 No hearts left!</p><p className="font-body text-sm text-red-500 mt-0.5">Recharge a heart to keep playing.</p></div>
+                  <div><p className="font-display font-bold text-base text-red-700">🩶 No hearts left!</p><p className="font-body text-sm text-red-500 mt-0.5">Recharge a heart to keep playing.</p></div>
                   <button onClick={() => setNoHeartsBlocked(false)} className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
                 </div>
                 {rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
-                <button onClick={async () => { setRechargeError(null); setRecharging(true); try { const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 0, kid.coin_balance); setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins })); setNoHeartsBlocked(false) } catch (err) { setRechargeError(err.message) } finally { setRecharging(false) } }} disabled={recharging} className="w-full py-3 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95 text-white" style={{ backgroundColor: '#ef4444', boxShadow: '0 3px 0 0 #b91c1c' }}>{recharging ? 'Recharging…' : '❤️ Recharge 1 heart — 10 ⭐'}</button>
+                <button onClick={async () => { setRechargeError(null); setRecharging(true); try { const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 0, kid.coin_balance); setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins })); setNoHeartsBlocked(false) } catch (err) { setRechargeError(err.message) } finally { setRecharging(false) } }} disabled={recharging} className="w-full py-3 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95 text-white" style={{ backgroundColor: '#ef4444', boxShadow: '0 3px 0 0 #b91c1c' }}>{recharging ? 'Recharging…' : '♥ Recharge 1 heart — 10 coins'}</button>
               </>
             ) : (
               <>
                 <div className="flex items-start justify-between gap-3">
-                  <div><p className="font-display font-bold text-base text-red-700">💔 No hearts left!</p><p className="font-body text-sm text-red-500 mt-0.5">Not enough coins to recharge (need 10 ⭐).</p></div>
+                  <div><p className="font-display font-bold text-base text-red-700">🩶 No hearts left!</p><p className="font-body text-sm text-red-500 mt-0.5">Not enough coins to recharge (need 10 coins).</p></div>
                   <button onClick={() => setNoHeartsBlocked(false)} className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
                 </div>
                 <div className="mt-3 rounded-xl bg-white px-4 py-3 text-center">
