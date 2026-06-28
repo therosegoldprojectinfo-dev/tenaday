@@ -5,7 +5,7 @@ import { themeFor } from '../lib/eraTheme'
 
 function FlameIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M12 2c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.3-2-1-3 2 1 3 3 3 5.5A6.5 6.5 0 0 1 13.5 18 6.5 6.5 0 0 1 7 11.5C7 7 12 6 12 2Z"
         fill="#FF9600"
@@ -16,19 +16,19 @@ function FlameIcon() {
 
 function ZapIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="#FFC700" aria-hidden="true">
+    <svg width="44" height="44" viewBox="0 0 24 24" fill="#FFC700" aria-hidden="true">
       <path d="M13 2 4 14h6l-1 8 9-12h-6z" />
     </svg>
   )
 }
 
 function CoinIcon() {
-  return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="22" height="22" aria-hidden="true" alt="" />
+  return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="44" height="44" aria-hidden="true" alt="" />
 }
 
 function TargetIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1CB0F6" strokeWidth="2.3"
+    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1CB0F6" strokeWidth="2.3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="9" />
       <circle cx="12" cy="12" r="5" />
