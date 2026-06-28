@@ -426,7 +426,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       </div>
 
       {/* ── Fixed header ── */}
-      <div className="flex-shrink-0 bg-white z-30 border-b border-gray-100">
+      <div className="flex-shrink-0 bg-white z-50 border-b border-gray-100">
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors duration-150 active:bg-gray-100" aria-label="Back">
             <BackIcon />
@@ -501,7 +501,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           </div>
         )}
         {noHeartsBlocked && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 999, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+          <div style={{ position: 'fixed', inset: 0, zIndex: 40, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
             onClick={() => setNoHeartsBlocked(false)}>
             <div onClick={e => e.stopPropagation()}
               style={{ backgroundColor: 'white', borderRadius: 24, padding: 28, width: '100%', maxWidth: 360, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
