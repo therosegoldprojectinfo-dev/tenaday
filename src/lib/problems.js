@@ -100,6 +100,27 @@ function smartDistractors(operation, table, fact, answer, count = 3) {
   return out.slice(0, count)
 }
 
+// ── Safe choices builder ───────────────────────────────────────────────────
+// Always guarantees the correct answer is in the list, handles 0 answers,
+// deduplicates, and returns exactly 4 choices.
+function safeChoices(answer, distractors) {
+  const used = new Set([answer])
+  const out = [answer]
+  for (const d of distractors) {
+    if (!used.has(d)) { used.add(d); out.push(d) }
+    if (out.length === 4) break
+  }
+  // Fallback padding
+  let pad = 1
+  while (out.length < 4) {
+    const d = answer + pad
+    if (!used.has(d)) { used.add(d); out.push(d) }
+    pad++
+  }
+  return shuffle(out.slice(0, 4))
+}
+
+
 // ── Names & word templates ─────────────────────────────────────────────────
 
 const NAMES = ['Yassine', 'Lina', 'Omar', 'Sofia', 'Adam', 'Nora', 'Ziad', 'Mia', 'Karim', 'Aya']
@@ -517,12 +538,14 @@ function q_story_missing(operation, table, fact) {
 function q_story_compare(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
   const n = name(), n2 = name2(n)
-  const diff = Math.abs(a - b)
-  const bigger = a > b ? n : n2
+  // Ensure a != b so diff > 0 and question makes sense
+  const safeA = a === b ? a + 1 : a
+  const diff = Math.abs(safeA - b)
+  const bigger = safeA > b ? n : n2
   return {
-    text: `${n} has ${a} points and ${n2} has ${b}. How many more does ${bigger} have?`,
+    text: `${n} has ${safeA} points and ${n2} has ${b}. How many more does ${bigger} have?`,
     answer: diff, choiceType: 'number',
-    choices: shuffle([diff, diff + 1, diff - 1 > 0 ? diff - 1 : diff + 2, diff + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
+    choices: safeChoices(diff, [diff + 1, diff + 2, diff + 3]),
     format: 'story_compare', isTimed: false,
   }
 }
@@ -536,7 +559,7 @@ function q_before_after(operation, table, fact) {
   return {
     text: `${a} ${sym} ${b} = ${answer}. What is ${prevA} ${sym} ${b}?`,
     answer: prevAnswer, choiceType: 'number',
-    choices: shuffle([prevAnswer, prevAnswer + 1, prevAnswer - 1 > 0 ? prevAnswer - 1 : prevAnswer + 2, prevAnswer + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
+    choices: safeChoices(prevAnswer, [prevAnswer + 1, prevAnswer + 2, prevAnswer + 3]),
     format: 'before_after', isTimed: false,
   }
 }
@@ -550,7 +573,7 @@ function q_missing_middle(operation, table, fact) {
   return {
     text: `${a} ${sym} ${b} = ${altA > 0 ? altA : a + 1} ${sym} ___`,
     answer: missing, choiceType: 'number',
-    choices: shuffle([missing, missing + 1, missing - 1 > 0 ? missing - 1 : missing + 2, missing + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
+    choices: safeChoices(missing, [missing + 1, missing + 2, missing + 3]),
     format: 'missing_middle', isTimed: false,
   }
 }
@@ -590,7 +613,7 @@ function q_story_leftover(operation, table, fact) {
   return {
     text: templates[operation] || templates.addition,
     answer: answer, choiceType: 'number',
-    choices: shuffle([answer, ...smartDistractors(operation, table, fact, answer)]),
+    choices: safeChoices(answer, smartDistractors(operation, table, fact, answer)),
     format: 'story_leftover', isTimed: false,
   }
 }
@@ -625,7 +648,7 @@ function q_multistep(operation, table, fact) {
   return {
     text: `${a} ${sym} ${b} ${operator2} ${displayC} = ?`,
     answer: finalAnswer, choiceType: 'number',
-    choices: shuffle([finalAnswer, finalAnswer + 1, finalAnswer - 1 > 0 ? finalAnswer - 1 : finalAnswer + 3, finalAnswer + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
+    choices: safeChoices(finalAnswer, [finalAnswer + 1, finalAnswer + 2, finalAnswer - 1, finalAnswer + 3]),
     format: 'multistep', isTimed: false,
   }
 }
@@ -663,7 +686,7 @@ function q_pattern_completion(operation, table, fact) {
   return {
     text: `${a} ${sym} ${b} = ${answer}\n${a+1} ${sym} ${b} = ${next}\n${a+2} ${sym} ${b} = ?`,
     answer: nextNext, choiceType: 'number',
-    choices: shuffle([nextNext, nextNext + 1, nextNext - 1, nextNext + 2].filter(v => v > 0).slice(0,4)),
+    choices: safeChoices(nextNext, [nextNext + 1, nextNext - 1, nextNext + 2]),
     format: 'pattern_completion', isTimed: false,
   }
 }
@@ -724,7 +747,7 @@ function q_next_in_sequence(operation, table, fact) {
   return {
     text: `${a} ${sym} 2 = ${v1}\n${a} ${sym} 4 = ${v2}\n${a} ${sym} 6 = ?`,
     answer: v3, choiceType: 'number',
-    choices: shuffle([v3, v3 + 1, v3 - 1 > 0 ? v3 - 1 : v3 + 3, v3 + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
+    choices: safeChoices(v3, [v3 + 1, v3 + 2, v3 - 1]),
     format: 'next_in_sequence', isTimed: false,
   }
 }
@@ -792,7 +815,7 @@ function q_missing_result(operation, table, fact) {
   return {
     text: `${a} ${sym} ${b} = ? ${'+' } ${c}`,
     answer: rightSide, choiceType: 'number',
-    choices: shuffle([rightSide, rightSide + 1, rightSide - 1 > 0 ? rightSide - 1 : rightSide + 3, rightSide + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
+    choices: safeChoices(rightSide, [rightSide + 1, rightSide + 2, rightSide - 1]),
     format: 'missing_result', isTimed: false,
   }
 }
@@ -811,7 +834,7 @@ function q_story_share(operation, table, fact) {
   return {
     text: templates[operation] || templates.addition,
     answer: a, choiceType: 'number',
-    choices: shuffle([a, ...smartDistractors(operation, table, fact, a)]),
+    choices: safeChoices(a, smartDistractors(operation, table, fact, a)),
     format: 'story_share', isTimed: false,
   }
 }
@@ -830,7 +853,7 @@ function q_times_check(operation, table, fact) {
   return {
     text: templates[operation] || templates.addition,
     answer: b, choiceType: 'number',
-    choices: shuffle([b, b + 1, b - 1 > 0 ? b - 1 : b + 2, b + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
+    choices: safeChoices(b, [b + 1, b + 2, b - 1]),
     format: 'times_check', isTimed: false,
   }
 }
@@ -911,7 +934,7 @@ function q_double_missing(operation, table, fact) {
   return {
     text: `___ ${sym} ___ = ${answer}\n(Both numbers are equal)`,
     answer: half, choiceType: 'number',
-    choices: shuffle([half, half + 1, half - 1 > 0 ? half - 1 : half + 2, half + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
+    choices: safeChoices(half, [half + 1, half + 2, half - 1]),
     format: 'double_missing', isTimed: true,
   }
 }
