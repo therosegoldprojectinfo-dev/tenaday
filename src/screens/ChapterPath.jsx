@@ -333,16 +333,22 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       backgroundSize: '400px',
       backgroundColor: '#ffffff',
     }}>
-      <style>{`
-        @media (min-width: 768px) {
-          .chapter-path-root {
-            background-image: url("/ChatGPT Image 27 juin 2026, 22_02_36.png") !important;
-            background-repeat: repeat !important;
-            background-size: 500px !important;
-            background-position: top left !important;
-          }
-        }
-      `}</style>
+      {/* ── Mirrored background layer (desktop only) ── */}
+      <div className="hidden md:block fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div key={i} style={{
+            position: 'absolute',
+            left: 0, right: 0,
+            top: i * 500,
+            height: 500,
+            backgroundImage: 'url("/ChatGPT Image 27 juin 2026, 22_02_36.png")',
+            backgroundRepeat: 'repeat-x',
+            backgroundSize: '500px 500px',
+            transform: i % 2 === 1 ? 'scaleY(-1)' : 'none',
+          }} />
+        ))}
+      </div>
+      <style>{`@media (min-width: 768px) { .chapter-path-root { background-image: none !important; } }`}</style>
       <style>{`
         @keyframes pulse-glow {
           0%, 100% { filter: drop-shadow(0 0 8px rgba(124,58,237,0.4)); }
@@ -411,7 +417,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       </div>
 
       {/* ── Scrollable content ── */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto relative z-10">
 
         {/* Alerts */}
         {atDebtFloor && (
