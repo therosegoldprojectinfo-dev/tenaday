@@ -23,8 +23,6 @@ import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 const DUO_GREEN = '#58cc02'
 const DUO_GREEN_DARK = '#46a302'
 
-// ── Icons ────────────────────────────────────────────────────────────────
-
 function CheckIcon({ size = 22 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"
@@ -81,8 +79,6 @@ function CoinStatIcon() {
   )
 }
 
-// ── Day strip ────────────────────────────────────────────────────────────
-
 // ── Node label mapping ────────────────────────────────────────────────────
 const NODE_DISPLAY_NAMES = {
   unlock:        'Welcome',
@@ -95,7 +91,6 @@ const NODE_DISPLAY_NAMES = {
 }
 
 // ── Duolingo-style S-curve offsets (px from center) ──────────────────────
-// Nodes gently snake left→right→left in a smooth curve
 const ZIGZAG_OFFSETS = [
   -30,
   -10,
@@ -115,20 +110,16 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
   const isReview     = node === 'review'
   const isDoubleReward = node === 'double_reward'
   const isSpecial    = isReview || isDoubleReward
-
-  // Double reward always keeps gold color even when locked
-  const forceGold = isDoubleReward
+  const forceGold    = isDoubleReward
 
   const displayName = isWelcome ? 'Welcome' : (NODE_DISPLAY_NAMES[node] || nodeLabel(node))
 
-  // Node image src
   const imgSrc = isDoubleReward
     ? '/ChatGPT Image 27 juin 2026, 18_34_34.png'
     : isReview
       ? '/ChatGPT Image 27 juin 2026, 18_29_52.png'
       : '/ChatGPT Image 27 juin 2026, 18_28_19.png'
 
-  // Status overlay — only day-locked clock badge remains; no checkmark, no arrow
   const statusIcon = dayLocked
     ? <div style={{
         position: 'absolute', bottom: -4, right: -4,
@@ -163,7 +154,6 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
           cursor: disabled && !forceGold ? 'default' : 'pointer',
           WebkitTapHighlightColor: 'transparent',
           transform: `translateX(${offset}px)`,
-          // Clamp so nodes never overflow on narrow screens
           maxWidth: 'calc(100vw - 32px)',
         }}
         aria-label={displayName}
@@ -174,8 +164,8 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
             src={imgSrc}
             alt={displayName}
             style={{
-              width: isSpecial ? 240 : 210,
-              height: isSpecial ? 240 : 210,
+              width: isSpecial ? 210 : 190,
+              height: isSpecial ? 210 : 190,
               objectFit: 'contain',
               filter: (disabled && !forceGold) ? 'grayscale(100%) opacity(0.55)' : 'none',
               transform: isCurrent ? 'scale(1.08)' : 'scale(1)',
@@ -201,47 +191,8 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
   )
 }
 
-// ── Unit banner ───────────────────────────────────────────────────────────
-function UnitBanner({ unitNumber, facts, operation, table }) {
-  const theme = themeFor(operation)
-  const factStr = facts.map(f => `${table} ${theme.symbol} ${f}`).join(', ')
-  return (
-    <div style={{
-      margin: '8px 20px 28px',
-      borderRadius: 18,
-      border: '2px solid',
-      borderColor: '#e0e7ff',
-      backgroundColor: '#fff',
-      padding: '14px 18px',
-      boxShadow: '0 2px 0 #c7d2fe',
-      textAlign: 'center',
-    }}>
-      <p style={{
-        fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-        fontWeight: 900,
-        fontSize: 11,
-        letterSpacing: '0.1em',
-        color: '#6366f1',
-        textTransform: 'uppercase',
-        marginBottom: 2,
-      }}>
-        Unit {unitNumber}
-      </p>
-      <p style={{
-        fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-        fontWeight: 800,
-        fontSize: 15,
-        color: '#1f2937',
-      }}>
-        {factStr}
-      </p>
-    </div>
-  )
-}
-
-// ── Main component ────────────────────────────────────────────────────────
 export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
-  if (!kidId) throw new Error('ChapterPath: kidId is required — do not render without a real kid ID')
+  if (!kidId) throw new Error('ChapterPath: kidId is required')
   const [kid, setKid] = useState(null)
   const [streak, setStreak] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -256,7 +207,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   const [visibleUnit, setVisibleUnit] = useState(1)
   const unitRefs = useRef({})
 
-  const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT // 72
+  const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT
 
   useEffect(() => {
     let cancelled = false
@@ -274,30 +225,16 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           setSelectedDay(curOpIdx > opIdx ? TABLE_COUNT * BATCH_COUNT : 1)
         }
       })
-      .catch(err => {
-        console.error('Failed to load kid progress:', err)
-        if (!cancelled) setError(err)
-      })
+      .catch(err => { if (!cancelled) setError(err) })
       .finally(() => !cancelled && setLoading(false))
     return () => { cancelled = true }
   }, [kidId, operation])
 
   if (loading || selectedDay === null) {
-    return (
-      <div className="bg-white min-h-screen flex items-center justify-center">
-        <p className="font-body text-gray-400">Loading…</p>
-      </div>
-    )
+    return <div className="bg-white min-h-screen flex items-center justify-center"><p className="font-body text-gray-400">Loading…</p></div>
   }
-
   if (error || !kid) {
-    return (
-      <div className="bg-white min-h-screen flex items-center justify-center px-6 text-center">
-        <p className="font-body text-gray-500">
-          Couldn't load progress. Check your Supabase connection and .env file.
-        </p>
-      </div>
-    )
+    return <div className="bg-white min-h-screen flex items-center justify-center px-6 text-center"><p className="font-body text-gray-500">Couldn't load progress.</p></div>
   }
 
   const theme = themeFor(operation)
@@ -310,7 +247,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
 
   const selectedTable = Math.ceil(selectedDay / BATCH_COUNT)
   const selectedBatch = ((selectedDay - 1) % BATCH_COUNT) + 1
-
   const opOrder = ['addition','subtraction','multiplication','division']
   const isChapterCompleted = opOrder.indexOf(currentPos.operation) > opOrder.indexOf(operation)
   const currentDay = isChapterCompleted
@@ -319,16 +255,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       ? (currentPos.table - 1) * BATCH_COUNT + currentPos.batch
       : 0
 
-  const selectedStatus = tableStatus(currentPos, operation, selectedTable)
-
-  function handleSelectDay(day) {
-    setOpenNode(null)
-    setSelectedDay(day)
-  }
-
   function handleTogglePopover(table, batch, node, status, isCurrent) {
-    if (status === 'locked') return
-    if (status === 'day_locked') return
+    if (status === 'locked' || status === 'day_locked') return
     setOpenNode(prev =>
       prev && prev.table === table && prev.batch === batch && prev.node === node
         ? null
@@ -345,51 +273,27 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
     const pos = chainPosition(currentPos, targetUnlock)
     if (pos === 'next_new_batch' || pos === 'current' || pos === 'next_same_batch') {
       const allowed = await canStartNewUnit(kidId)
-      if (!allowed) {
-        setDayGateBlocked(true)
-        return
-      }
+      if (!allowed) { setDayGateBlocked(true); return }
     }
 
     const isLearnNode = node === 'learn'
     const targetPos = { operation, table, batch, node }
     const isReplayNode = !isLearnNode && isCompleted(currentPos, targetPos)
-    if (!isLearnNode && !isReplayNode && (kid.heart_balance ?? 5) === 0) {
-      setNoHeartsBlocked(true)
-      return
-    }
+    if (!isLearnNode && !isReplayNode && (kid.heart_balance ?? 5) === 0) { setNoHeartsBlocked(true); return }
     const newBalance = (isLearnNode || isReplayNode) ? kid.coin_balance : applyEntryFee(kid.coin_balance)
 
     if (!isLearnNode && !isReplayNode) {
       try {
         await setCoinBalance(kidId, newBalance)
-        await logCoinTransaction(kidId, {
-          amount: newBalance - kid.coin_balance,
-          reason: 'entry_fee',
-          balanceAfter: newBalance,
-        })
+        await logCoinTransaction(kidId, { amount: newBalance - kid.coin_balance, reason: 'entry_fee', balanceAfter: newBalance })
         setKid(k => ({ ...k, coin_balance: newBalance }))
-      } catch (err) {
-        console.error('Failed to charge entry fee (continuing anyway):', err)
-      }
+      } catch (err) { console.error('Failed to charge entry fee:', err) }
     }
 
-    const unlockBatch = node === 'unlock'
-      ? previousBatch(operation, table, batch)
-      : undefined
+    const unlockBatch = node === 'unlock' ? previousBatch(operation, table, batch) : undefined
+    const reviewPool = node === 'review' ? reviewPoolFor(operation, table, batch) : undefined
 
-    const reviewPool = node === 'review'
-      ? reviewPoolFor(operation, table, batch)
-      : undefined
-
-    onStartNode({
-      operation, table, batchNum: batch, node,
-      coinBalance: newBalance,
-      heartBalance: kid.heart_balance ?? 5,
-      reviewPool,
-      unlockBatch,
-      placementClaim: kid.placement_claim,
-    })
+    onStartNode({ operation, table, batchNum: batch, node, coinBalance: newBalance, heartBalance: kid.heart_balance ?? 5, reviewPool, unlockBatch, placementClaim: kid.placement_claim })
   }
 
   async function handleRechargeHeart() {
@@ -399,26 +303,29 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
     try {
       const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 5, kid.coin_balance)
       setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins }))
-    } catch (err) {
-      setRechargeError(err.message)
-    } finally {
-      setRecharging(false)
-    }
+    } catch (err) { setRechargeError(err.message) }
+    finally { setRecharging(false) }
   }
 
   const inDebt = kid.coin_balance < 0
   const atDebtFloor = kid.coin_balance <= DEBT_FLOOR
 
-  // ── Build full path: all 72 units, each with 7 nodes ─────────────────
-  // We render ALL units in the path (not just selected day),
-  // but dim/lock based on current progress.
-  // Unit number = (table - 1) * BATCH_COUNT + batch  (1-indexed)
   const allUnits = []
   for (let t = 1; t <= TABLE_COUNT; t++) {
     for (let b = 1; b <= BATCH_COUNT; b++) {
       allUnits.push({ table: t, batch: b, unitNumber: (t - 1) * BATCH_COUNT + b })
     }
   }
+
+  const UNIT_COLORS = [
+    { bg: '#58cc02', shadow: '#46a302' },
+    { bg: '#1cb0f6', shadow: '#0a8fcb' },
+    { bg: '#ffb700', shadow: '#d99700' },
+    { bg: '#ff4b4b', shadow: '#cc0000' },
+    { bg: '#ff9600', shadow: '#cc7a00' },
+    { bg: '#ce82ff', shadow: '#9b59b6' },
+    { bg: '#ff86d0', shadow: '#cc5ca3' },
+  ]
 
   return (
     <div className="h-screen flex flex-col bg-white">
@@ -427,31 +334,20 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           0%, 100% { filter: drop-shadow(0 0 8px rgba(124,58,237,0.4)); }
           50% { filter: drop-shadow(0 0 18px rgba(124,58,237,0.8)); }
         }
-        .node-current img {
-          animation: pulse-glow 2s ease-in-out infinite;
-        }
+        .node-current img { animation: pulse-glow 2s ease-in-out infinite; }
       `}</style>
 
       {/* ── Fixed header ── */}
       <div className="flex-shrink-0 bg-white z-30 border-b border-gray-100">
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
-          <button
-            onClick={onBack}
-            className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors duration-150 active:bg-gray-100"
-            aria-label="Back to chapters"
-          >
+          <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors duration-150 active:bg-gray-100" aria-label="Back">
             <BackIcon />
           </button>
-
-          {tooltip && (
-            <div className="fixed inset-0 z-40" onClick={() => { setTooltip(null); setRechargeError(null) }} />
-          )}
-
+          {tooltip && <div className="fixed inset-0 z-40" onClick={() => { setTooltip(null); setRechargeError(null) }} />}
           <div className="flex items-center gap-2">
             {/* Streak */}
             <div className="relative">
-              <button onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')}
-                className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200 active:scale-95 transition-transform">
+              <button onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')} className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200 active:scale-95 transition-transform">
                 <span className="text-base leading-none">🔥</span>
                 <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
               </button>
@@ -459,17 +355,13 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                 <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
                   <p className="text-2xl mb-1">🔥</p>
                   <p className="font-display font-bold text-gray-900 text-sm">Day Streak</p>
-                  <p className="font-body text-xs text-gray-400 mt-1">
-                    {streak === 0 ? 'No streak yet — play today!' : `${streak} day${streak === 1 ? '' : 's'} in a row!`}
-                  </p>
+                  <p className="font-body text-xs text-gray-400 mt-1">{streak === 0 ? 'No streak yet — play today!' : `${streak} day${streak === 1 ? '' : 's'} in a row!`}</p>
                 </div>
               )}
             </div>
-
             {/* Hearts */}
             <div className="relative">
-              <button onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }}
-                className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100 active:scale-95 transition-transform">
+              <button onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }} className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100 active:scale-95 transition-transform">
                 <HeartStatIcon />
                 <span className="font-body font-bold text-base text-red-400 leading-none tabular-nums">{kid.heart_balance ?? 5}</span>
               </button>
@@ -477,40 +369,18 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                 <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
                   <p className="text-2xl mb-1">❤️</p>
                   <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
-                  <div className="flex justify-center gap-1 my-2">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}>❤️</span>
-                    ))}
-                  </div>
+                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}>❤️</span>)}</div>
                   <p className="font-body text-xs text-gray-400 mb-3">Hearts are lost when you answer wrong. Recharge with coins.</p>
                   {(kid.heart_balance ?? 5) < 5 ? (
-                    <>
-                      {rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
-                      <button
-                        onClick={handleRechargeHeart}
-                        disabled={recharging || kid.coin_balance < 10}
-                        className="w-full py-2.5 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95"
-                        style={{
-                          backgroundColor: kid.coin_balance >= 10 ? '#ef4444' : '#F3F4F6',
-                          color: kid.coin_balance >= 10 ? '#fff' : '#9CA3AF',
-                          boxShadow: kid.coin_balance >= 10 ? '0 3px 0 0 #b91c1c' : '0 3px 0 0 #D1D5DB',
-                        }}
-                      >
-                        {recharging ? 'Recharging…' : '❤️ +1 for 10 ⭐'}
-                      </button>
-                    </>
-                  ) : (
-                    <p className="font-body text-xs text-green-500 font-bold">Full hearts! ✨</p>
-                  )}
+                    <>{rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
+                    <button onClick={handleRechargeHeart} disabled={recharging || kid.coin_balance < 10} className="w-full py-2.5 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95" style={{ backgroundColor: kid.coin_balance >= 10 ? '#ef4444' : '#F3F4F6', color: kid.coin_balance >= 10 ? '#fff' : '#9CA3AF', boxShadow: kid.coin_balance >= 10 ? '0 3px 0 0 #b91c1c' : '0 3px 0 0 #D1D5DB' }}>{recharging ? 'Recharging…' : '❤️ +1 for 10 ⭐'}</button></>
+                  ) : <p className="font-body text-xs text-green-500 font-bold">Full hearts! ✨</p>}
                 </div>
               )}
             </div>
-
             {/* Coins */}
             <div className="relative">
-              <button onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')}
-                className={`flex items-center gap-1.5 rounded-full px-3 py-2 border active:scale-95 transition-transform ${inDebt ? 'border-red-200' : 'border-amber-200'}`}
-                style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}>
+              <button onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')} className={`flex items-center gap-1.5 rounded-full px-3 py-2 border active:scale-95 transition-transform ${inDebt ? 'border-red-200' : 'border-amber-200'}`} style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}>
                 <CoinStatIcon />
                 <span className={`font-body font-bold text-base leading-none tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-700'}`}>{kid.coin_balance}</span>
               </button>
@@ -519,308 +389,151 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                   <p className="text-2xl mb-1">⭐</p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
                   <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>{kid.coin_balance}</p>
-                  <p className="font-body text-xs text-gray-400 mt-1">
-                    {inDebt ? "You're in debt — keep playing to earn coins back!" : "Earn coins by completing activities."}
-                  </p>
+                  <p className="font-body text-xs text-gray-400 mt-1">{inDebt ? "You're in debt — keep playing!" : "Earn coins by completing activities."}</p>
                 </div>
               )}
             </div>
           </div>
         </div>
-
       </div>
 
       {/* ── Scrollable content ── */}
-      <div className="flex-1 overflow-hidden flex">
+      <div className="flex-1 overflow-y-auto">
 
-        {/* ── Desktop-only: sticky chapter info card (left column) ── */}
-        <div className="hidden md:flex flex-col justify-start p-6 w-72 flex-shrink-0 border-r border-gray-100 overflow-y-auto">
-          <div style={{
-            backgroundColor: '#fff',
-            borderRadius: 20,
-            border: '2px solid #f0f0f0',
-            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-            padding: '20px',
-          }}>
-            <img
-              src={`/mascots/flower-${operation}.png`}
-              alt={operation}
-              style={{ width: 72, height: 72, objectFit: 'contain', marginBottom: 12 }}
-            />
-            <p className="font-display font-black text-xl text-gray-900" style={{ marginBottom: 6 }}>
-              {theme.operationLabel}
-            </p>
-            <p className="font-body text-sm text-gray-500" style={{ lineHeight: 1.5, marginBottom: 14 }}>
-              Master all tables 1–12 through daily practice sessions.
-            </p>
-            <div style={{ display: 'flex', gap: 16 }}>
-              <div style={{ textAlign: 'center' }}>
-                <p className="font-display font-black text-2xl" style={{ color: theme.colors?.primary || '#7C3AED' }}>72</p>
-                <p className="font-body text-xs text-gray-400">Units</p>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <p className="font-display font-black text-2xl" style={{ color: theme.colors?.primary || '#7C3AED' }}>504</p>
-                <p className="font-body text-xs text-gray-400">Nodes</p>
-              </div>
-              <div style={{ textAlign: 'center' }}>
-                <p className="font-display font-black text-2xl" style={{ color: theme.colors?.primary || '#7C3AED' }}>{visibleUnit}</p>
-                <p className="font-body text-xs text-gray-400">Current</p>
-              </div>
-            </div>
+        {/* Alerts */}
+        {atDebtFloor && (
+          <div className="mx-4 mt-3 rounded-xl bg-red-50 border border-red-100 px-3 py-2 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
+            <p className="font-body text-xs text-red-500 font-semibold">Coins are low — retries are free until you earn some back. Keep playing!</p>
           </div>
-        </div>
-
-        {/* ── Right column: banner + scrollable path ── */}
-        <div className="flex-1 overflow-y-auto flex flex-col">
-
-      {/* ── Alert banners ── */}
-      {atDebtFloor && (
-        <div className="mx-4 mt-3 rounded-xl bg-red-50 border border-red-100 px-3 py-2 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
-          <p className="font-body text-xs text-red-500 font-semibold">
-            Coins are low — retries are free until you earn some back. Keep playing!
-          </p>
-        </div>
-      )}
-
-      {dayGateBlocked && (
-        <div className="mx-4 mt-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto flex items-start justify-between gap-3">
-          <p className="font-body text-sm text-amber-800 font-semibold leading-snug">
-            {nextUnlockMessage(kid.next_unlock_at)}
-          </p>
-          <button onClick={() => setDayGateBlocked(false)}
-            className="flex-shrink-0 font-body font-bold text-xs text-amber-600 active:opacity-70" aria-label="Dismiss">
-            OK
-          </button>
-        </div>
-      )}
-
-      {noHeartsBlocked && (
-        <div className="mx-4 mt-3 rounded-2xl border-2 border-red-100 bg-red-50 px-5 py-4 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
-          {kid.coin_balance >= 10 ? (
-            <>
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div>
-                  <p className="font-display font-bold text-base text-red-700">💔 No hearts left!</p>
-                  <p className="font-body text-sm text-red-500 mt-0.5">Recharge a heart to keep playing.</p>
-                </div>
-                <button onClick={() => setNoHeartsBlocked(false)} className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
-              </div>
-              {rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
-              <button
-                onClick={async () => {
-                  setRechargeError(null)
-                  setRecharging(true)
-                  try {
-                    const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 0, kid.coin_balance)
-                    setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins }))
-                    setNoHeartsBlocked(false)
-                  } catch (err) {
-                    setRechargeError(err.message)
-                  } finally {
-                    setRecharging(false)
-                  }
-                }}
-                disabled={recharging}
-                className="w-full py-3 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95 text-white"
-                style={{ backgroundColor: '#ef4444', boxShadow: '0 3px 0 0 #b91c1c' }}
-              >
-                {recharging ? 'Recharging…' : '❤️ Recharge 1 heart — 10 ⭐'}
-              </button>
-            </>
-          ) : (
-            <>
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="font-display font-bold text-base text-red-700">💔 No hearts left!</p>
-                  <p className="font-body text-sm text-red-500 mt-0.5">Not enough coins to recharge (need 10 ⭐).</p>
-                </div>
-                <button onClick={() => setNoHeartsBlocked(false)} className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
-              </div>
-              <div className="mt-3 rounded-xl bg-white px-4 py-3 text-center">
-                <p className="text-3xl mb-1">🌙</p>
-                <p className="font-display font-bold text-sm text-gray-900">Come back tomorrow!</p>
-                <p className="font-body text-xs text-gray-400 mt-1 leading-snug">
-                  Your hearts refill at midnight. You can still replay completed activities for free!
-                </p>
-              </div>
-            </>
-          )}
-        </div>
-      )}
-
-      {/* ── Sticky unit banner ── */}
-      {(() => {
-        const u = allUnits.find(u => u.unitNumber === visibleUnit)
-        const facts = u ? factsForBatch(u.batch) : []
-        const factStr = u ? facts.map(f => `${u.table} ${theme.symbol} ${f}`).join(', ') : ''
-        const UNIT_COLORS = [
-          { bg: '#58cc02', shadow: '#46a302' },
-          { bg: '#1cb0f6', shadow: '#0a8fcb' },
-          { bg: '#ffb700', shadow: '#d99700' },
-          { bg: '#ff4b4b', shadow: '#cc0000' },
-          { bg: '#ff9600', shadow: '#cc7a00' },
-          { bg: '#ce82ff', shadow: '#9b59b6' },
-          { bg: '#ff86d0', shadow: '#cc5ca3' },
-        ]
-        const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
-        return (
-          <div style={{ position: 'sticky', top: 0, zIndex: 100, padding: '10px 16px' }}>
-            <div style={{
-              backgroundColor: color.bg,
-              borderRadius: 16,
-              boxShadow: `0 5px 0 ${color.shadow}`,
-              padding: '12px 16px 14px',
-            }}>
-              <p style={{
-                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                fontWeight: 700, fontSize: 11,
-                letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)',
-                textTransform: 'uppercase', marginBottom: 3,
-              }}>Unit {visibleUnit}</p>
-              <p style={{
-                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                fontWeight: 800, fontSize: 20, color: '#fff',
-                lineHeight: 1.2,
-              }}>{factStr}</p>
-            </div>
+        )}
+        {dayGateBlocked && (
+          <div className="mx-4 mt-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto flex items-start justify-between gap-3">
+            <p className="font-body text-sm text-amber-800 font-semibold leading-snug">{nextUnlockMessage(kid.next_unlock_at)}</p>
+            <button onClick={() => setDayGateBlocked(false)} className="flex-shrink-0 font-body font-bold text-xs text-amber-600 active:opacity-70">OK</button>
           </div>
-        )
-      })()}
+        )}
+        {noHeartsBlocked && (
+          <div className="mx-4 mt-3 rounded-2xl border-2 border-red-100 bg-red-50 px-5 py-4 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
+            {kid.coin_balance >= 10 ? (
+              <>
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div><p className="font-display font-bold text-base text-red-700">💔 No hearts left!</p><p className="font-body text-sm text-red-500 mt-0.5">Recharge a heart to keep playing.</p></div>
+                  <button onClick={() => setNoHeartsBlocked(false)} className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
+                </div>
+                {rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
+                <button onClick={async () => { setRechargeError(null); setRecharging(true); try { const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 0, kid.coin_balance); setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins })); setNoHeartsBlocked(false) } catch (err) { setRechargeError(err.message) } finally { setRecharging(false) } }} disabled={recharging} className="w-full py-3 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95 text-white" style={{ backgroundColor: '#ef4444', boxShadow: '0 3px 0 0 #b91c1c' }}>{recharging ? 'Recharging…' : '❤️ Recharge 1 heart — 10 ⭐'}</button>
+              </>
+            ) : (
+              <>
+                <div className="flex items-start justify-between gap-3">
+                  <div><p className="font-display font-bold text-base text-red-700">💔 No hearts left!</p><p className="font-body text-sm text-red-500 mt-0.5">Not enough coins to recharge (need 10 ⭐).</p></div>
+                  <button onClick={() => setNoHeartsBlocked(false)} className="font-body font-bold text-xs text-red-300 active:opacity-70 flex-shrink-0">✕</button>
+                </div>
+                <div className="mt-3 rounded-xl bg-white px-4 py-3 text-center">
+                  <p className="text-3xl mb-1">🌙</p>
+                  <p className="font-display font-bold text-sm text-gray-900">Come back tomorrow!</p>
+                  <p className="font-body text-xs text-gray-400 mt-1 leading-snug">Your hearts refill at midnight.</p>
+                </div>
+              </>
+            )}
+          </div>
+        )}
 
-      {/* ── Continuous node path ── */}
-      <div className="max-w-sm md:max-w-md mx-auto pt-6 pb-24 overflow-x-hidden" style={{ position: 'relative', zIndex: 1 }}>
-        {allUnits.map(({ table, batch, unitNumber }) => {
-          const unitStatus = tableStatus(currentPos, operation, table)
-          const facts = factsForBatch(batch)
-
+        {/* ── Sticky unit banner ── */}
+        {(() => {
+          const u = allUnits.find(u => u.unitNumber === visibleUnit)
+          const facts = u ? factsForBatch(u.batch) : []
+          const factStr = u ? facts.map(f => `${u.table} ${theme.symbol} ${f}`).join(', ') : ''
+          const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
           return (
-            <div
-              key={unitNumber}
-              ref={el => { unitRefs.current[unitNumber] = el }}
-              data-unit={unitNumber}
-            >
-              {/* Unit separator line (skip first unit) */}
-              {unitNumber > 1 && (
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  margin: '16px 24px 8px',
-                }}>
-                  <div style={{ flex: 1, height: 1.5, backgroundColor: '#e5e7eb', borderRadius: 2 }} />
-                  <span style={{
-                    fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                    fontWeight: 700, fontSize: 12, color: '#9ca3af',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {facts.map(f => `${table} ${theme.symbol} ${f}`).join(', ')}
-                  </span>
-                  <div style={{ flex: 1, height: 1.5, backgroundColor: '#e5e7eb', borderRadius: 2 }} />
-                </div>
-              )}
-              {/* Invisible sentinel so IntersectionObserver knows when this unit enters viewport */}
-              <div style={{ height: 1 }} ref={el => {
-                if (!el) return
-                const obs = new IntersectionObserver(([entry]) => {
-                  if (entry.isIntersecting) setVisibleUnit(unitNumber)
-                }, { threshold: 0, rootMargin: '-10% 0px -80% 0px' })
-                obs.observe(el)
-              }} />
-
-              {/* 7 nodes for this unit */}
-              {NODES.map((node, nodeIdx) => {
-                const targetPos = { operation, table, batch, node }
-
-                const unlockedInChain =
-                  unitStatus === 'completed' ||
-                  (unitStatus === 'active' && isUnlocked(currentPos, targetPos))
-
-                const completedNode =
-                  unitStatus === 'completed' ||
-                  (unitStatus === 'active' && isCompleted(currentPos, targetPos))
-
-                const isCurrent =
-                  unitStatus === 'active' &&
-                  currentPos.table === table &&
-                  currentPos.batch === batch &&
-                  currentPos.node === node
-
-                const isWelcome = node === 'unlock' &&
-                  batch === 1 &&
-                  table === 1 &&
-                  (isCurrent || unlockedInChain)
-
-                const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
-                const isCurrentBatch =
-                  currentPos.operation === operation &&
-                  currentPos.table === table &&
-                  currentPos.batch === batch
-
-                const dayLocked = !gateOpen && isCurrentBatch && !completedNode
-
-                const status = completedNode
-                  ? 'completed'
-                  : dayLocked
-                    ? 'day_locked'
-                    : unlockedInChain
-                      ? 'active'
-                      : 'locked'
-
-                const offset = ZIGZAG_OFFSETS[nodeIdx % ZIGZAG_OFFSETS.length]
-
-                return (
-                  <div key={node} className={isCurrent ? 'node-current' : ''}>
-                    <DiscNode
-                      node={node}
-                      status={status}
-                      isCurrent={isCurrent}
-                      isWelcome={isWelcome}
-                      nextUnlockAt={kid.next_unlock_at}
-                      offset={offset}
-                      onPress={() => handleTogglePopover(table, batch, node, status, isCurrent)}
-                    />
-                  </div>
-                )
-              })}
+            <div style={{ position: 'sticky', top: 0, zIndex: 100, padding: '10px 16px' }}>
+              <div style={{
+                backgroundColor: color.bg,
+                borderRadius: 16,
+                boxShadow: `0 5px 0 ${color.shadow}`,
+                padding: '12px 16px 14px',
+              }}>
+                <p style={{ fontFamily: 'var(--font-display, "Baloo 2", sans-serif)', fontWeight: 700, fontSize: 11, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', marginBottom: 3 }}>Unit {visibleUnit}</p>
+                <p style={{ fontFamily: 'var(--font-display, "Baloo 2", sans-serif)', fontWeight: 800, fontSize: 20, color: '#fff', lineHeight: 1.2 }}>{factStr}</p>
+              </div>
             </div>
           )
-        })}
+        })()}
+
+        {/* ── Node path ── */}
+        <div className="max-w-sm md:max-w-md mx-auto pt-6 pb-24 overflow-x-hidden" style={{ position: 'relative', zIndex: 1 }}>
+          {allUnits.map(({ table, batch, unitNumber }) => {
+            const unitStatus = tableStatus(currentPos, operation, table)
+            const facts = factsForBatch(batch)
+
+            return (
+              <div key={unitNumber} ref={el => { unitRefs.current[unitNumber] = el }} data-unit={unitNumber}>
+                {/* Separator line between units */}
+                {unitNumber > 1 && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '16px 24px 8px' }}>
+                    <div style={{ flex: 1, height: 1.5, backgroundColor: '#e5e7eb', borderRadius: 2 }} />
+                    <span style={{ fontFamily: 'var(--font-display, "Baloo 2", sans-serif)', fontWeight: 700, fontSize: 12, color: '#9ca3af', whiteSpace: 'nowrap' }}>
+                      {facts.map(f => `${table} ${theme.symbol} ${f}`).join(', ')}
+                    </span>
+                    <div style={{ flex: 1, height: 1.5, backgroundColor: '#e5e7eb', borderRadius: 2 }} />
+                  </div>
+                )}
+
+                {/* Invisible sentinel for IntersectionObserver */}
+                <div style={{ height: 1 }} ref={el => {
+                  if (!el) return
+                  const obs = new IntersectionObserver(([entry]) => {
+                    if (entry.isIntersecting) setVisibleUnit(unitNumber)
+                  }, { threshold: 0, rootMargin: '-10% 0px -80% 0px' })
+                  obs.observe(el)
+                }} />
+
+                {NODES.map((node, nodeIdx) => {
+                  const targetPos = { operation, table, batch, node }
+                  const unlockedInChain = unitStatus === 'completed' || (unitStatus === 'active' && isUnlocked(currentPos, targetPos))
+                  const completedNode = unitStatus === 'completed' || (unitStatus === 'active' && isCompleted(currentPos, targetPos))
+                  const isCurrent = unitStatus === 'active' && currentPos.table === table && currentPos.batch === batch && currentPos.node === node
+                  const isWelcome = node === 'unlock' && batch === 1 && table === 1 && (isCurrent || unlockedInChain)
+                  const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
+                  const isCurrentBatch = currentPos.operation === operation && currentPos.table === table && currentPos.batch === batch
+                  const dayLocked = !gateOpen && isCurrentBatch && !completedNode
+                  const status = completedNode ? 'completed' : dayLocked ? 'day_locked' : unlockedInChain ? 'active' : 'locked'
+                  const offset = ZIGZAG_OFFSETS[nodeIdx % ZIGZAG_OFFSETS.length]
+
+                  return (
+                    <div key={node} className={isCurrent ? 'node-current' : ''}>
+                      <DiscNode
+                        node={node}
+                        status={status}
+                        isCurrent={isCurrent}
+                        isWelcome={isWelcome}
+                        nextUnlockAt={kid.next_unlock_at}
+                        offset={offset}
+                        onPress={() => handleTogglePopover(table, batch, node, status, isCurrent)}
+                      />
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </div>
       </div>
 
       {/* ── Node popover ── */}
       {openNode && (
         <>
           <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setOpenNode(null)} />
-          <div className="fixed z-50 bg-white anim-sheet-in
-                         bottom-0 left-0 right-0 rounded-t-3xl px-5 pt-5 pb-8 max-w-sm mx-auto
-                         md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto
-                         md:rounded-3xl md:max-w-md md:w-full md:px-6 md:pt-6 md:pb-7">
+          <div className="fixed z-50 bg-white anim-sheet-in bottom-0 left-0 right-0 rounded-t-3xl px-5 pt-5 pb-8 max-w-sm mx-auto md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto md:rounded-3xl md:max-w-md md:w-full md:px-6 md:pt-6 md:pb-7">
             <div className="w-10 h-1.5 rounded-full bg-gray-200 mx-auto mb-4 md:hidden" />
-            <p className="font-display font-bold text-xl text-gray-900 mb-1">
-              {nodeLabel(openNode.node)}
-            </p>
-            <p className="font-body text-sm text-gray-400 mb-5">
-              {openNode.status === 'completed'
-                ? 'Tap to replay this node'
-                : openNode.isCurrent
-                  ? nodePurpose(openNode.node)
-                  : 'Tap to play'}
-            </p>
-            <button
-              onClick={handleConfirmStart}
-              className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
-            >
-              {openNode.status === 'completed'
-                ? `REPLAY ${nodeLabel(openNode.node).toUpperCase()}`
-                : openNode.node === 'learn'
-                  ? 'START LESSON'
-                  : openNode.node === 'review'
-                    ? 'START REVIEW'
-                    : `START ${nodeLabel(openNode.node).toUpperCase()}`}
+            <p className="font-display font-bold text-xl text-gray-900 mb-1">{nodeLabel(openNode.node)}</p>
+            <p className="font-body text-sm text-gray-400 mb-5">{openNode.status === 'completed' ? 'Tap to replay this node' : openNode.isCurrent ? nodePurpose(openNode.node) : 'Tap to play'}</p>
+            <button onClick={handleConfirmStart} className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
+              {openNode.status === 'completed' ? `REPLAY ${nodeLabel(openNode.node).toUpperCase()}` : openNode.node === 'learn' ? 'START LESSON' : openNode.node === 'review' ? 'START REVIEW' : `START ${nodeLabel(openNode.node).toUpperCase()}`}
             </button>
           </div>
         </>
       )}
-        </div>{/* end right column */}
-      </div>{/* end scrollable content flex */}
     </div>
   )
 }
