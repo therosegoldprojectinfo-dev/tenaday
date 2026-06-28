@@ -211,6 +211,21 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   const [rechargeError, setRechargeError] = useState(null)
   const [visibleUnit, setVisibleUnit] = useState(1)
   const unitRefs = useRef({})
+  const hasScrolled = useRef(false)
+
+  // Auto-scroll to current unit once after load
+  useEffect(() => {
+    if (!kid || hasScrolled.current) return
+    const currentDay = kid.current_operation === operation
+      ? (kid.current_table - 1) * BATCH_COUNT + (kid.current_batch || 1)
+      : null
+    if (!currentDay) return
+    const el = unitRefs.current[currentDay]
+    if (el) {
+      hasScrolled.current = true
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)
+    }
+  }, [kid, operation])
 
   const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT
 
@@ -297,7 +312,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
     const unlockBatch = node === 'unlock' ? previousBatch(operation, table, batch) : undefined
     const reviewPool = node === 'review' ? reviewPoolFor(operation, table, batch) : undefined
 
-    onStartNode({ operation, table, batchNum: batch, node, coinBalance: newBalance, heartBalance: kid.heart_balance ?? 5, reviewPool, unlockBatch, placementClaim: kid.placement_claim })
+    onStartNode({ operation, table, batchNum: batch, node, coinBalance: newBalance, heartBalance: kid.heart_balance ?? 5, reviewPool, unlockBatch, placementClaim: kid.placement_claim, kidCurrentStep: { operation: kid.current_operation, table: kid.current_table, batch: kid.current_batch || 1, node: normalizeNode(kid.current_node) } })
   }
 
   async function handleRechargeHeart() {
