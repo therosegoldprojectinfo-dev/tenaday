@@ -337,9 +337,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         @media (min-width: 768px) {
           .chapter-path-root {
             background-image: url("/ChatGPT Image 27 juin 2026, 22_02_36.png") !important;
-            background-repeat: no-repeat !important;
-            background-size: cover !important;
-            background-position: center !important;
+            background-repeat: repeat !important;
+            background-size: 800px !important;
+            background-position: top left !important;
           }
         }
       `}</style>
