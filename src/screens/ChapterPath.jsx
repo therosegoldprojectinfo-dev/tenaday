@@ -290,7 +290,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
 
     const targetUnlock = { operation, table, batch, node: 'unlock' }
     const pos = chainPosition(currentPos, targetUnlock)
-    if (pos === 'next_new_batch' || pos === 'current' || pos === 'next_same_batch') {
+    if (pos === 'next_new_batch') {
       const allowed = await canStartNewUnit(kidId)
       if (!allowed) { setDayGateBlocked(true); return }
     }
@@ -581,7 +581,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                   const targetPos = { operation, table, batch, node }
                   const unlockedInChain = unitStatus === 'completed' || (unitStatus === 'active' && isUnlocked(currentPos, targetPos))
                   const completedNode = unitStatus === 'completed' || (unitStatus === 'active' && isCompleted(currentPos, targetPos))
-                  const isCurrent = unitStatus === 'active' && currentPos.table === table && currentPos.batch === batch && currentPos.node === node
+                  const isCurrent = unitStatus === 'active' && currentPos.table === table && currentPos.batch === batch && normalizeNode(currentPos.node) === node
                   const isWelcome = node === 'unlock' && batch === 1 && table === 1 && (isCurrent || unlockedInChain)
                   const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
                   const isCurrentBatch = currentPos.operation === operation && currentPos.table === table && currentPos.batch === batch
