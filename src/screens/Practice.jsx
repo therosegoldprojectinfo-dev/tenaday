@@ -784,7 +784,7 @@ export default function Practice({
         </div>
 
         {/* ── Answer choices ───────────────────────────────────────── */}
-        <div className="flex-1 flex flex-col justify-center px-4 gap-3">
+        <div key={`choices-${idx}`} className="flex-1 flex flex-col justify-center px-4 gap-3">
           {isMultiSelect ? (
             // two_truths: pick 2, then CHECK button enables
             <div className="flex flex-col gap-3">
