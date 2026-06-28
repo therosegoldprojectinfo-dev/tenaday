@@ -155,17 +155,18 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
           WebkitTapHighlightColor: 'transparent',
           transform: `translateX(${offset}px)`,
           maxWidth: 'calc(100vw - 32px)',
-          transition: 'transform 0.08s ease',
         }}
-        onMouseDown={e => { e.currentTarget.style.transform = `translateX(${offset}px) scale(0.88) translateY(5px)` }}
-        onMouseUp={e => { e.currentTarget.style.transform = `translateX(${offset}px)` }}
-        onMouseLeave={e => { e.currentTarget.style.transform = `translateX(${offset}px)` }}
-        onTouchStart={e => { e.currentTarget.style.transform = `translateX(${offset}px) scale(0.88) translateY(5px)` }}
-        onTouchEnd={e => { e.currentTarget.style.transform = `translateX(${offset}px)` }}
         aria-label={displayName}
       >
         {/* Disc image */}
-        <div style={{ position: 'relative', flexShrink: 0 }}>
+        <div
+          style={{ position: 'relative', flexShrink: 0, transition: 'transform 0.08s ease' }}
+          onMouseDown={e => { e.currentTarget.style.transform = 'scale(0.88) translateY(5px)' }}
+          onMouseUp={e => { e.currentTarget.style.transform = 'scale(1) translateY(0px)' }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1) translateY(0px)' }}
+          onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.88) translateY(5px)' }}
+          onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1) translateY(0px)' }}
+        >
           <img
             src={imgSrc}
             alt={displayName}
