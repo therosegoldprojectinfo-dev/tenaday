@@ -279,6 +279,7 @@ export default function App() {
         reviewPool={activeNode.reviewPool}
         unlockBatch={activeNode.unlockBatch}
         placementClaim={activeNode.placementClaim}
+        kidCurrentStep={activeNode.kidCurrentStep}
         onExit={handleExitPractice}
       />
     )
