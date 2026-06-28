@@ -608,7 +608,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       )}
 
-      {/* ── Sticky unit banner (Duolingo/Ludolang style) ── */}
+      {/* ── Sticky unit banner (card with mascot + text) ── */}
       {(() => {
         const u = allUnits.find(u => u.unitNumber === visibleUnit)
         const facts = u ? factsForBatch(u.batch) : []
@@ -623,11 +623,11 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           { bg: '#ff86d0', shadow: '#cc5ca3' },
         ]
         const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
+        const mascotSrc = `/mascots/flower-${operation}.png`
         return (
           <div style={{
             position: 'sticky', top: 0, zIndex: 100,
             padding: '10px 16px',
-            backgroundColor: 'transparent',
             display: 'flex', justifyContent: 'center',
           }}>
             <div style={{
@@ -635,20 +635,35 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               backgroundColor: color.bg,
               borderRadius: 16,
               boxShadow: `0 5px 0 ${color.shadow}`,
-              padding: '14px 20px',
-              cursor: 'default',
+              display: 'flex', alignItems: 'center',
+              overflow: 'hidden',
+              minHeight: 80,
             }}>
-              <p style={{
-                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                fontWeight: 700, fontSize: 12,
-                letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)',
-                textTransform: 'uppercase', marginBottom: 3,
-              }}>Unit {visibleUnit}</p>
-              <p style={{
-                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                fontWeight: 800, fontSize: 20, color: '#fff',
-                lineHeight: 1.2,
-              }}>{factStr}</p>
+              {/* Mascot */}
+              <img
+                src={mascotSrc}
+                alt="mascot"
+                style={{
+                  width: 90, height: 90,
+                  objectFit: 'contain',
+                  flexShrink: 0,
+                  marginLeft: 8,
+                }}
+              />
+              {/* Text */}
+              <div style={{ padding: '12px 16px 12px 8px', flex: 1 }}>
+                <p style={{
+                  fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+                  fontWeight: 700, fontSize: 11,
+                  letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)',
+                  textTransform: 'uppercase', marginBottom: 3,
+                }}>Unit {visibleUnit}</p>
+                <p style={{
+                  fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+                  fontWeight: 800, fontSize: 18, color: '#fff',
+                  lineHeight: 1.2,
+                }}>{factStr}</p>
+              </div>
             </div>
           </div>
         )
