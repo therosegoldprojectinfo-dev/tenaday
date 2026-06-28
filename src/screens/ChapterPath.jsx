@@ -608,7 +608,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       )}
 
-      {/* ── Sticky unit banner ── */}
+      {/* ── Sticky unit banner + desktop chapter card ── */}
       {(() => {
         const u = allUnits.find(u => u.unitNumber === visibleUnit)
         const facts = u ? factsForBatch(u.batch) : []
@@ -624,39 +624,55 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         ]
         const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
         return (
-          <div style={{
-            position: 'sticky', top: 0, zIndex: 100,
-            padding: '10px 16px',
-            display: 'flex', justifyContent: 'center',
-          }}>
+          <div style={{ position: 'sticky', top: 0, zIndex: 100, display: 'flex', gap: 16, padding: '10px 16px', alignItems: 'flex-start' }}>
+            {/* Banner — full width on mobile, left portion on desktop */}
             <div style={{
-              width: '100%', maxWidth: 420,
+              flex: 1,
               backgroundColor: color.bg,
               borderRadius: 16,
               boxShadow: `0 5px 0 ${color.shadow}`,
               padding: '12px 16px 14px',
-              position: 'relative',
             }}>
-              {/* Chapter tag top-left */}
-              <div style={{
-                display: 'inline-flex', alignItems: 'center', gap: 5,
-                backgroundColor: 'rgba(0,0,0,0.15)',
-                borderRadius: 8, padding: '3px 8px',
-                marginBottom: 6,
-              }}>
-                <span style={{
-                  fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                  fontWeight: 800, fontSize: 10,
-                  color: 'rgba(255,255,255,0.9)',
-                  textTransform: 'uppercase', letterSpacing: '0.08em',
-                }}>{theme.operationLabel} · Unit {visibleUnit}</span>
-              </div>
-              {/* Facts */}
+              <p style={{
+                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+                fontWeight: 700, fontSize: 11,
+                letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)',
+                textTransform: 'uppercase', marginBottom: 3,
+              }}>Unit {visibleUnit}</p>
               <p style={{
                 fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
                 fontWeight: 800, fontSize: 20, color: '#fff',
                 lineHeight: 1.2,
               }}>{factStr}</p>
+            </div>
+
+            {/* Desktop-only chapter info card */}
+            <div className="hidden md:flex" style={{
+              width: 220, flexShrink: 0,
+              backgroundColor: '#fff',
+              borderRadius: 16,
+              border: '2px solid #f0f0f0',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+              padding: '14px 16px',
+              flexDirection: 'column', gap: 6,
+            }}>
+              <img
+                src={`/mascots/flower-${operation}.png`}
+                alt={operation}
+                style={{ width: 48, height: 48, objectFit: 'contain' }}
+              />
+              <p style={{
+                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+                fontWeight: 800, fontSize: 15, color: '#1f2937',
+                lineHeight: 1.2, marginTop: 4,
+              }}>{theme.operationLabel}</p>
+              <p style={{
+                fontFamily: 'var(--font-body, sans-serif)',
+                fontSize: 12, color: '#6b7280', lineHeight: 1.4,
+              }}>Tables 1–12 · 72 units · 504 nodes</p>
+              <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
+                <span style={{ fontSize: 11, color: '#9ca3af', fontWeight: 600 }}>📅 Unit {visibleUnit} / 72</span>
+              </div>
             </div>
           </div>
         )
