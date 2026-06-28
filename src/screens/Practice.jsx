@@ -24,7 +24,7 @@ const WORD_PROBLEM_NODES = new Set(['what_happened', 'real_life'])
 
 function XIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+    <svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor"
       strokeWidth="2.5" strokeLinecap="round" aria-hidden="true">
       <path d="M4 4l12 12M16 4L4 16" />
     </svg>
@@ -35,8 +35,8 @@ function HeartIcon({ filled = true, className = '', style }) {
   return (
     <img
       src="/ChatGPT Image 28 juin 2026, 09_20_15.png"
-      width="22"
-      height="22"
+      width="44"
+      height="44"
       className={className}
       style={{ opacity: filled ? 1 : 0.3, ...style }}
       aria-hidden="true"
@@ -45,7 +45,7 @@ function HeartIcon({ filled = true, className = '', style }) {
   )
 }
 
-function CoinIcon({ size = 18 }) {
+function CoinIcon({ size = 36 }) {
   return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width={size} height={size} aria-hidden="true" alt="" />
 }
 
@@ -196,7 +196,7 @@ function DiedScreen({ saving, onExit }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
       <div className="h-screen md:h-auto md:min-h-[560px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
-        <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="80" height="80" style={{opacity:0.4}} alt="heart" />
+        <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="160" height="160" style={{opacity:0.4}} alt="heart" />
         <div className="flex gap-2" aria-label="No lives left">
           {Array.from({ length: LIVES_START }).map((_, i) => (
             <HeartIcon key={i} filled={false} style={{ opacity: 0.3 }} />
@@ -234,7 +234,7 @@ function FinishedScreen({ passed, correct, total, payout, isReview, saving, onEx
                   display: 'inline-block',
                   animation: `correct-bounce 0.5s ${0.1 + i * 0.13}s cubic-bezier(0.34,1.56,0.64,1) both`
                 }}>
-                  <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="40" height="40" alt="coin" />
+                  <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="80" height="80" alt="coin" />
                 </span>
               ))}
             </div>
@@ -259,7 +259,7 @@ function FinishedScreen({ passed, correct, total, payout, isReview, saving, onEx
           )}
           {passed && (
             <div className="flex items-center justify-center gap-2 mt-4 font-display font-extrabold text-3xl text-amber-500">
-              <CoinIcon size={30} />
+              <CoinIcon size={60} />
               <span className="tabular-nums">+{coinDisplayed}</span>
             </div>
           )}
@@ -390,7 +390,7 @@ function useSpeech() {
 
 function SpeakerIcon({ active }) {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor"
       strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill={active ? 'currentColor' : 'none'} />
       {active ? (
@@ -670,7 +670,7 @@ export default function Practice({
             style={{ animation: 'fadeInOut 1.5s ease forwards' }}>
             <div className="bg-red-500 text-white rounded-3xl px-8 py-5 flex flex-col items-center gap-2 shadow-2xl"
               style={{ animation: 'correct-bounce 0.4s cubic-bezier(0.34,1.56,0.64,1) both' }}>
-              <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="40" height="40" style={{opacity:0.6}} alt="heart" />
+              <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="80" height="80" style={{opacity:0.6}} alt="heart" />
               <p className="font-display font-bold text-2xl">-1 Heart!</p>
             </div>
           </div>
