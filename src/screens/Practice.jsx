@@ -33,20 +33,12 @@ function XIcon() {
 
 function HeartIcon({ filled = true, className = '', style }) {
   return (
-    <img
-      src="/ChatGPT Image 28 juin 2026, 09_20_15.png"
-      width="44"
-      height="44"
-      className={className}
-      style={{ opacity: filled ? 1 : 0.3, ...style }}
-      aria-hidden="true"
-      alt=""
-    />
+    <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="44" height="44" alt="" />
   )
 }
 
 function CoinIcon({ size = 36 }) {
-  return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width={size} height={size} aria-hidden="true" alt="" />
+  return <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width={size} height={size} alt="" />
 }
 
 // ── Answer card helpers ───────────────────────────────────────────────────
@@ -196,7 +188,7 @@ function DiedScreen({ saving, onExit }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
       <div className="h-screen md:h-auto md:min-h-[560px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
-        <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="160" height="160" style={{opacity:0.4}} alt="heart" />
+        <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="160" height="160" style={{opacity:0.4}} alt="" />
         <div className="flex gap-2" aria-label="No lives left">
           {Array.from({ length: LIVES_START }).map((_, i) => (
             <HeartIcon key={i} filled={false} style={{ opacity: 0.3 }} />
@@ -234,7 +226,7 @@ function FinishedScreen({ passed, correct, total, payout, isReview, saving, onEx
                   display: 'inline-block',
                   animation: `correct-bounce 0.5s ${0.1 + i * 0.13}s cubic-bezier(0.34,1.56,0.64,1) both`
                 }}>
-                  <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="80" height="80" alt="coin" />
+                  <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="80" height="80" alt="" />
                 </span>
               ))}
             </div>
@@ -670,7 +662,7 @@ export default function Practice({
             style={{ animation: 'fadeInOut 1.5s ease forwards' }}>
             <div className="bg-red-500 text-white rounded-3xl px-8 py-5 flex flex-col items-center gap-2 shadow-2xl"
               style={{ animation: 'correct-bounce 0.4s cubic-bezier(0.34,1.56,0.64,1) both' }}>
-              <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="80" height="80" style={{opacity:0.6}} alt="heart" />
+              <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="80" height="80" style={{opacity:0.6}} alt="" />
               <p className="font-display font-bold text-2xl">-1 Heart!</p>
             </div>
           </div>
