@@ -63,12 +63,12 @@ function BackIcon() {
 
 function HeartStatIcon() {
   return (
-    <img src="/Création sans titre (28).png" width="36" height="36" alt="" />
+    <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="36" height="36" alt="" />
   )
 }
 
 function CoinStatIcon() {
-  return <img src="/Création sans titre (27).png" width="40" height="40" alt="" />
+  return <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="40" height="40" alt="" />
 }
 
 // ── Node label mapping ────────────────────────────────────────────────────
@@ -426,7 +426,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               </button>
               {tooltip === 'streak' && (
                 <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="text-2xl mb-1">🔥</p>
+                  <p className="mb-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(29).png" width="40" height="40" alt="" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Day Streak</p>
                   <p className="font-body text-xs text-gray-400 mt-1">{streak === 0 ? 'No streak yet — play today!' : `${streak} day${streak === 1 ? '' : 's'} in a row!`}</p>
                 </div>
@@ -440,9 +440,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               </button>
               {tooltip === 'hearts' && (
                 <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><img src="/Création sans titre (28).png" width="56" height="56" alt="" /></p>
+                  <p className="mb-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="56" height="56" alt="" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
-                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><img src="/Création sans titre (28).png" width="36" height="36" alt="" /></span>)}</div>
+                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="36" height="36" alt="" /></span>)}</div>
                   <p className="font-body text-xs text-gray-400 mb-3">Hearts are lost when you answer wrong. Recharge with coins.</p>
                   {(kid.heart_balance ?? 5) < 5 ? (
                     <>{rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
@@ -459,7 +459,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               </button>
               {tooltip === 'coins' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><img src="/Création sans titre (27).png" width="56" height="56" alt="" /></p>
+                  <p className="mb-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="56" height="56" alt="" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
                   <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>{kid.coin_balance}</p>
                   <p className="font-body text-xs text-gray-400 mt-1">{inDebt ? "You're in debt — keep playing!" : "Earn coins by completing activities."}</p>
