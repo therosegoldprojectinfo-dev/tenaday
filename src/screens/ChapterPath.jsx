@@ -344,7 +344,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             backgroundImage: 'url("/ChatGPT Image 27 juin 2026, 22_02_36.png")',
             backgroundRepeat: 'repeat-x',
             backgroundSize: '500px 500px',
-            transform: i % 2 === 1 ? 'scaleY(-1)' : 'none',
+            transform: [
+              i % 2 === 1 ? 'scaleY(-1)' : '',
+              i % 4 >= 2 ? 'scaleX(-1)' : '',
+            ].filter(Boolean).join(' ') || 'none',
           }} />
         ))}
       </div>
