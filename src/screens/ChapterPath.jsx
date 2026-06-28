@@ -327,26 +327,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   ]
 
   return (
-    <div className="h-screen flex flex-col chapter-path-root relative" style={{
-      backgroundImage: 'url("/ChatGPT Image 27 juin 2026, 21_51_22.png")',
-      backgroundRepeat: 'repeat',
-      backgroundSize: '400px',
-      backgroundColor: '#ffffff',
-    }}>
-      {/* ── Background layer (desktop only) ── */}
-      <div className="hidden md:block absolute inset-0 z-0 pointer-events-none" style={{
-        backgroundImage: 'url("/ChatGPT Image 27 juin 2026, 22_02_36.png")',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }} />
-      {/* ── Liquid glass overlay ── */}
-      <div className="hidden md:block absolute inset-0 z-0 pointer-events-none" style={{
-        backdropFilter: 'blur(3px) saturate(1.2) brightness(1.02)',
-        WebkitBackdropFilter: 'blur(3px) saturate(1.2) brightness(1.02)',
-        backgroundColor: 'rgba(255,255,255,0.15)',
-      }} />
-      <style>{`@media (min-width: 768px) { .chapter-path-root { background-image: none !important; } }`}</style>
+    <div className="h-screen flex flex-col chapter-path-root relative" style={{ backgroundColor: '#ffffff' }}>
+
       <style>{`
         @keyframes pulse-glow {
           0%, 100% { filter: drop-shadow(0 0 8px rgba(124,58,237,0.4)); }
