@@ -592,13 +592,13 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
             {kidStats[viewingKid.id] ? (
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'Day streak', value: kidStreaks[viewingKid.id] ?? 0, emoji: '__STREAK__' },
+                  { label: 'Day streak', value: kidStreaks[viewingKid.id] ?? 0, icon: <img src="/Cr%C3%A9ation%20sans%20titre%20(29).png" width="36" height="36" alt="" /> },
                   { label: 'Correct answers', value: kidStats[viewingKid.id].totalCorrect, emoji: '✅' },
                   { label: 'Sessions done', value: kidStats[viewingKid.id].nodesPassed, emoji: '⭐' },
                   { label: 'Coin balance', value: viewingKid.coin_balance, icon: <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="36" height="36" alt="" /> },
-                ].map(({ label, value, emoji }) => (
+                ].map(({ label, value, emoji, icon }) => (
                   <div key={label} className="rounded-2xl bg-gray-50 px-4 py-3">
-                    <p className="text-2xl mb-1">{emoji}</p>
+                    <p className="text-2xl mb-1">{icon ?? emoji}</p>
                     <p className="font-display font-bold text-2xl text-gray-900">{value}</p>
                     <p className="font-body text-xs text-gray-400">{label}</p>
                   </div>
