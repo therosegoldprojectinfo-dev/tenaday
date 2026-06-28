@@ -327,14 +327,14 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   ]
 
   return (
-    <div className="h-screen flex flex-col chapter-path-root" style={{
+    <div className="h-screen flex flex-col chapter-path-root relative" style={{
       backgroundImage: 'url("/ChatGPT Image 27 juin 2026, 21_51_22.png")',
       backgroundRepeat: 'repeat',
       backgroundSize: '400px',
       backgroundColor: '#ffffff',
     }}>
       {/* ── Mirrored background layer (desktop only) ── */}
-      <div className="hidden md:block fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div className="hidden md:block absolute inset-0 z-0 pointer-events-none overflow-hidden">
         {Array.from({ length: 10 }).map((_, i) => (
           <div key={i} style={{
             position: 'absolute',
