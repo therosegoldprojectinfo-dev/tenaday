@@ -109,9 +109,9 @@ export default function ChapterIntro({ operation, table, batchNum, node, kidId, 
             style={{ animation: 'correct-bounce 0.5s cubic-bezier(0.34,1.56,0.64,1) both' }}
           >
             {slide.emoji === '__HEART__'
-              ? <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="80" height="80" alt="heart" style={{ display: 'inline' }} />
+              ? <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="160" height="160" alt="heart" style={{ display: 'inline' }} />
               : slide.emoji === '__COIN__'
-              ? <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="80" height="80" alt="coin" style={{ display: 'inline' }} />
+              ? <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="160" height="160" alt="coin" style={{ display: 'inline' }} />
               : slide.emoji}
           </span>
           <div>
