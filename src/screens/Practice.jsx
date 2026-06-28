@@ -33,26 +33,20 @@ function XIcon() {
 
 function HeartIcon({ filled = true, className = '', style }) {
   return (
-    <svg width="22" height="20" viewBox="0 0 22 20"
-      fill={filled ? '#ef4444' : '#fecaca'}
+    <img
+      src="/ChatGPT Image 28 juin 2026, 09_20_15.png"
+      width="22"
+      height="22"
       className={className}
-      style={style}
+      style={{ opacity: filled ? 1 : 0.3, ...style }}
       aria-hidden="true"
-    >
-      <path d="M11 18.5S1 12.3 1 6.5a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 5.8-10 12-10 12z" />
-    </svg>
+      alt=""
+    />
   )
 }
 
 function CoinIcon({ size = 18 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <circle cx="10" cy="10" r="10" fill="#FFB700" />
-      <circle cx="10" cy="10" r="7" fill="#FFD700" />
-      <path d="M10 5.5l1.1 3.4h3.6l-2.9 2.1 1.1 3.4L10 12.4 6.9 14.4l1.1-3.4-2.9-2.1h3.6z"
-        fill="#CC7700" />
-    </svg>
-  )
+  return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width={size} height={size} aria-hidden="true" alt="" />
 }
 
 // ── Answer card helpers ───────────────────────────────────────────────────
@@ -202,7 +196,7 @@ function DiedScreen({ saving, onExit }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
       <div className="h-screen md:h-auto md:min-h-[560px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
-        <span className="text-8xl select-none">💔</span>
+        <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="80" height="80" style={{opacity:0.4}} alt="heart" />
         <div className="flex gap-2" aria-label="No lives left">
           {Array.from({ length: LIVES_START }).map((_, i) => (
             <HeartIcon key={i} filled={false} style={{ opacity: 0.3 }} />
@@ -235,11 +229,13 @@ function FinishedScreen({ passed, correct, total, payout, isReview, saving, onEx
           <div className="flex flex-col items-center gap-2">
             <FlowerJump size={220} loop />
             <div className="flex gap-2 mt-1">
-              {['⭐','⭐','⭐'].map((s, i) => (
-                <span key={i} className="text-4xl" style={{
+              {[0,1,2].map((i) => (
+                <span key={i} style={{
                   display: 'inline-block',
                   animation: `correct-bounce 0.5s ${0.1 + i * 0.13}s cubic-bezier(0.34,1.56,0.64,1) both`
-                }}>{s}</span>
+                }}>
+                  <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="40" height="40" alt="coin" />
+                </span>
               ))}
             </div>
           </div>
@@ -674,7 +670,7 @@ export default function Practice({
             style={{ animation: 'fadeInOut 1.5s ease forwards' }}>
             <div className="bg-red-500 text-white rounded-3xl px-8 py-5 flex flex-col items-center gap-2 shadow-2xl"
               style={{ animation: 'correct-bounce 0.4s cubic-bezier(0.34,1.56,0.64,1) both' }}>
-              <span className="text-4xl">💔</span>
+              <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="40" height="40" style={{opacity:0.6}} alt="heart" />
               <p className="font-display font-bold text-2xl">-1 Heart!</p>
             </div>
           </div>
