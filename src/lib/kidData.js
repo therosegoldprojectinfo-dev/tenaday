@@ -225,38 +225,41 @@ export async function purchaseGift(kidId, gift, currentBalance) {
 }
 
 /** Computes the kid's current consecutive-day streak from their attempt history.
- *  A "day" is counted if they passed at least one node on that calendar day
- *  (local timezone). The streak resets to 0 if they missed yesterday.
+ *  A "day" counts only if the kid COMPLETED a full unit on that calendar day —
+ *  meaning they passed the 'review' node (the last node of a batch).
+ *  The streak resets to 0 if they missed yesterday.
  *  Returns an integer ≥ 0.
  */
 export async function fetchStreak(kidId) {
   const { data, error } = await supabase
     .from('attempts')
-    .select('created_at, result')
+    .select('created_at, result, node')
     .eq('kid_id', kidId)
     .eq('result', 'passed')
+    .eq('node', 'review')
 
   if (error || !data || data.length === 0) return 0
 
-  // Collect distinct local-date strings where kid passed something
-  const passedDays = new Set(
+  // Collect distinct local-date strings where kid completed a full unit
+  const completedDays = new Set(
     data.map(a => {
       const d = new Date(a.created_at)
       return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
     })
   )
 
-  // Walk backwards from today counting consecutive days
+  // Walk backwards from today counting consecutive days with a completed unit
   let streak = 0
   const today = new Date()
   for (let i = 0; i < 365; i++) {
     const d = new Date(today)
     d.setDate(today.getDate() - i)
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-    if (passedDays.has(key)) {
+    if (completedDays.has(key)) {
       streak++
     } else {
-      break
+      // Allow today to be incomplete (don't break if i===0 and today not done yet)
+      if (i > 0) break
     }
   }
 
