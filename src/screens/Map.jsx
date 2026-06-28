@@ -21,21 +21,21 @@ const CHAPTER_LABEL = {
 
 function HeartStatIcon() {
   return (
-    <img src="/Création sans titre (28).png" width="36" height="36" alt="" />
+    <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="36" height="36" alt="" />
   )
 }
 
 function CoinStatIcon() {
-  return <img src="/Création sans titre (27).png" width="40" height="40" alt="" />
+  return <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="40" height="40" alt="" />
 }
 
 function TrophyIcon({ color = '#58cc02' }) {
   return (
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M7 4h10v4a5 5 0 0 1-10 0V4Z" fill={color} />
-      <path d="M7 5H4a2 2 0 0 0-2 2c0 2.2 1.8 4 4 4M17 5h3a2 2 0 0 1 2 2c0 2.2-1.8 4-4 4" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
-      <rect x="10" y="13" width="8" height="8" fill={color} />
-      <rect x="7" y="17" width="20" height="6" rx="1.5" fill={color} />
+      <path d="M6 3h12v5a6 6 0 0 1-12 0V3Z" fill={color} />
+      <path d="M6 5H3a1.5 1.5 0 0 0-1.5 1.5C1.5 8.5 3 10 5 10.5M18 5h3a1.5 1.5 0 0 1 1.5 1.5C22.5 8.5 21 10 19 10.5" stroke={color} strokeWidth="2" strokeLinecap="round" />
+      <rect x="9" y="14" width="6" height="4" fill={color} />
+      <rect x="6" y="18" width="12" height="3" rx="1.5" fill={color} />
     </svg>
   )
 }
@@ -179,12 +179,12 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
         <div className="flex items-center justify-between px-5 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <div className="relative">
             <button onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')} className="flex items-center gap-1.5 active:scale-95 transition-transform">
-              <span className="text-lg leading-none">🔥</span>
+              <img src="/Cr%C3%A9ation%20sans%20titre%20(29).png" width="32" height="32" alt="" />
               <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
             </button>
             {tooltip === 'streak' && (
               <div className="absolute top-full mt-2 left-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center">
-                <p className="text-2xl mb-1">🔥</p>
+                <p className="mb-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(29).png" width="40" height="40" alt="" /></p>
                 <p className="font-display font-bold text-gray-900 text-sm">Day Streak</p>
                 <p className="font-body text-xs text-gray-400 mt-1">{streak === 0 ? 'No streak yet — play today!' : `${streak} day${streak === 1 ? '' : 's'} in a row!`}</p>
               </div>
@@ -198,9 +198,9 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
               </button>
               {tooltip === 'hearts' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><img src="/Création sans titre (28).png" width="56" height="56" alt="" /></p>
+                  <p className="mb-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="56" height="56" alt="" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
-                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><img src="/Création sans titre (28).png" width="36" height="36" alt="" /></span>)}</div>
+                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="36" height="36" alt="" /></span>)}</div>
                   <p className="font-body text-xs text-gray-400 mb-3">Hearts are lost when you answer wrong. Recharge with coins.</p>
                   {(kid.heart_balance ?? 5) < 5 ? (
                     <>
@@ -221,7 +221,7 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
               </button>
               {tooltip === 'coins' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><img src="/Création sans titre (27).png" width="56" height="56" alt="" /></p>
+                  <p className="mb-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="56" height="56" alt="" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
                   <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>{kid.coin_balance}</p>
                   <p className="font-body text-xs text-gray-400 mt-1">{inDebt ? "You're in debt — keep playing to earn coins back!" : 'Earn coins by completing activities.'}</p>
