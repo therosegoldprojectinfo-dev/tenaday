@@ -44,14 +44,23 @@ function CheckIcon() {
     </svg>
   )
 }
-function GiftIcon() {
+function GiftIconBadge({ icon }) {
+  const icons = {
+    tv: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="13" rx="2" /><path d="M8 20h8M12 20v-1M8 7l4-4 4 4" /></svg>,
+    utensils: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 3v7a2 2 0 0 0 2 2v9M6 3v7M9 3v7M16 3c-1.5 0-3 2-3 5s1 5 3 5v9" /></svg>,
+    moon: <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.5A9 9 0 1 1 11.5 3 7 7 0 0 0 21 12.5Z" /></svg>,
+    tree: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22v-7M8 15h8l-2.5-4h1.5L12 7l-2.5 4H11z" /><path d="M9 11 6.5 7H8l-2-3.5h12L16 7h1.5L15 11" /></svg>,
+    film: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="M7 4v16M17 4v16M2 9h5M17 9h5M2 15h5M17 15h5" /></svg>,
+    gift: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="9" width="20" height="13" rx="1" /><path d="M2 9h20M12 9v13M12 9C9.5 9 8 7.5 8 6a2 2 0 0 1 4 0ZM12 9c2.5 0 4-1.5 4-3a2 2 0 0 0-4 0Z" /></svg>,
+  }
   return (
-    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="9" width="36" height="22" rx="1" />
-      <path d="M3 9h18M12 9v11M12 9C9 9 7 7 7 5.5A2.5 2.5 0 0 1 9.5 3C11.5 3 12 6 12 9ZM12 9c3 0 5-2 5-3.5A2.5 2.5 0 0 0 14.5 3C12.5 3 12 6 12 9Z" />
-    </svg>
+    <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: '#EAF8DC', color: '#2d6e00' }}>
+      {icons[icon] || icons.gift}
+    </div>
   )
+}
+function GiftIcon() {
+  return <GiftIconBadge icon="gift" />
 }
 function EditIcon() {
   return (
@@ -147,7 +156,7 @@ function KidCard({ kid, stats, streak, onViewProgress }) {
 function RewardItem({ gift, onDelete }) {
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-gray-100 px-4 py-3 bg-white">
-      <GiftIcon />
+      <GiftIconBadge icon={gift.icon || 'gift'} />
       <div className="flex-1 min-w-0">
         <p className="font-body font-bold text-sm text-gray-900 truncate">{gift.name}</p>
         <div className="flex items-center gap-1 mt-0.5">
@@ -450,16 +459,19 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
               <p className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide mb-2">Starter rewards</p>
               <div className="flex flex-col gap-2">
                 {gifts.filter(g => g.parent_id === null).map(gift => (
-                  <div key={gift.id} className="flex items-center gap-3 rounded-2xl border border-gray-100 px-4 py-3 bg-white opacity-70">
-                    <GiftIcon />
+                  <div key={gift.id} className="flex items-center gap-3 rounded-2xl border border-gray-100 px-4 py-3 bg-white">
+                    <GiftIconBadge icon={gift.icon || 'gift'} />
                     <div className="flex-1">
-                      <p className="font-body font-bold text-sm text-gray-700">{gift.name}</p>
+                      <p className="font-body font-bold text-sm text-gray-900">{gift.name}</p>
                       <div className="flex items-center gap-1 mt-0.5">
                         <CoinIcon />
                         <span className="font-body text-xs text-amber-700 font-bold">{gift.coin_price} coins</span>
                       </div>
                     </div>
-                    <span className="font-body text-xs text-gray-300">Default</span>
+                    <button onClick={() => handleDeleteReward(gift.id)}
+                      className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 active:bg-red-50 active:text-red-400 transition-colors">
+                      <TrashIcon />
+                    </button>
                   </div>
                 ))}
               </div>
