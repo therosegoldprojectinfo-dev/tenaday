@@ -21,12 +21,12 @@ const CHAPTER_LABEL = {
 
 function HeartStatIcon() {
   return (
-    <span style={{display:"inline-flex",width:36,height:36,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" style={{width:95,height:95,flexShrink:0}} alt="" /></span>
+    <img src="/Création sans titre (28).png" width="36" height="36" alt="" />
   )
 }
 
 function CoinStatIcon() {
-  return <span style={{display:"inline-flex",width:40,height:40,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" style={{height:64,width:"auto",transform:"translateY(5%)",flexShrink:0}} alt="" /></span>
+  return <img src="/Création sans titre (27).png" width="40" height="40" alt="" />
 }
 
 function TrophyIcon({ color = '#58cc02' }) {
@@ -178,7 +178,7 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
         {tooltip && <div className="fixed inset-0 z-40" onClick={() => { setTooltip(null); setRechargeError(null) }} />}
         <div className="flex items-center justify-between px-5 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <div className="relative">
-            <button onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')} className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200 active:scale-95 transition-transform">
+            <button onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')} className="flex items-center gap-1.5 active:scale-95 transition-transform">
               <span className="text-lg leading-none">🔥</span>
               <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
             </button>
@@ -192,15 +192,15 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
           </div>
           <div className="flex items-center gap-2">
             <div className="relative">
-              <button onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }} className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100 active:scale-95 transition-transform">
+              <button onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }} className="flex items-center gap-1.5 active:scale-95 transition-transform">
                 <HeartStatIcon />
                 <span className="font-body font-bold text-base text-red-500 leading-none tabular-nums">{kid.heart_balance ?? 5}</span>
               </button>
               {tooltip === 'hearts' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><span style={{display:"inline-flex",width:56,height:56,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" style={{width:148,height:148,flexShrink:0}} alt="" /></span></p>
+                  <p className="mb-1"><img src="/Création sans titre (28).png" width="56" height="56" alt="" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
-                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><span style={{display:"inline-flex",width:36,height:36,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" style={{width:95,height:95,flexShrink:0}} alt="" /></span></span>)}</div>
+                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><img src="/Création sans titre (28).png" width="36" height="36" alt="" /></span>)}</div>
                   <p className="font-body text-xs text-gray-400 mb-3">Hearts are lost when you answer wrong. Recharge with coins.</p>
                   {(kid.heart_balance ?? 5) < 5 ? (
                     <>
@@ -215,13 +215,13 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
               )}
             </div>
             <div className="relative">
-              <button onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')} className={`flex items-center gap-1.5 rounded-full px-3 py-2 border active:scale-95 transition-transform ${inDebt ? 'border-red-200' : 'border-amber-200'}`} style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}>
+              <button onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')} className="flex items-center gap-1.5 active:scale-95 transition-transform">
                 <CoinStatIcon />
                 <span className={`font-body font-bold text-base leading-none tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-700'}`}>{kid.coin_balance}</span>
               </button>
               {tooltip === 'coins' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><span style={{display:"inline-flex",width:56,height:56,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" style={{height:90,width:"auto",transform:"translateY(5%)",flexShrink:0}} alt="" /></span></p>
+                  <p className="mb-1"><img src="/Création sans titre (27).png" width="56" height="56" alt="" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
                   <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>{kid.coin_balance}</p>
                   <p className="font-body text-xs text-gray-400 mt-1">{inDebt ? "You're in debt — keep playing to earn coins back!" : 'Earn coins by completing activities.'}</p>
