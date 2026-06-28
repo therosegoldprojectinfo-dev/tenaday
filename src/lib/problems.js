@@ -396,25 +396,14 @@ function q_hidden_operation(operation, table, fact) {
 // 17. reverse_thinking ❌
 function q_reverse_thinking(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
-  // Show the inverse operation
-  if (operation === 'addition') {
-    return {
-      text: `${answer} − ${b} = ?`,
-      answer: a, choiceType: 'number',
-      choices: shuffle([a, ...smartDistractors(operation, table, fact, a)]),
-      format: 'reverse_thinking', isTimed: false,
-    }
+  const sym = SYMBOL[operation]
+  // Always stays within the same operation — asks for the missing first number
+  return {
+    text: `If ___ ${sym} ${b} = ${answer}, what is ___?`,
+    answer: a, choiceType: 'number',
+    choices: shuffle([a, ...smartDistractors(operation, table, fact, a)]),
+    format: 'reverse_thinking', isTimed: false,
   }
-  if (operation === 'multiplication') {
-    return {
-      text: `${answer} ÷ ${b} = ?`,
-      answer: a, choiceType: 'number',
-      choices: shuffle([a, ...smartDistractors(operation, table, fact, a)]),
-      format: 'reverse_thinking', isTimed: false,
-    }
-  }
-  // subtraction/division — just use classic
-  return q_classic(operation, table, fact)
 }
 
 // 18. context_switch ❌
@@ -589,14 +578,19 @@ function q_biggest_sum(operation, table, fact) {
 // 28. story_leftover ❌
 function q_story_leftover(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
-  const total = answer
-  const used = b
-  const left = a
+  const sym = SYMBOL[operation]
   const n = name()
+  const item = pick(['seats', 'points', 'coins', 'cards'])
+  const templates = {
+    addition: `${n} has ${a} ${item} and gets ${b} more. Total ${item}?`,
+    subtraction: `${n} had ${answer} ${item} and used ${b}. How many left?`,
+    multiplication: `${a} rows of ${b} ${item}. Total?`,
+    division: `${answer} ${item} split ${b} ways. Each share?`,
+  }
   return {
-    text: `There are ${total} spots. ${used} are taken. How many are free?`,
-    answer: left, choiceType: 'number',
-    choices: shuffle([left, ...smartDistractors(operation, table, fact, left)]),
+    text: templates[operation] || templates.addition,
+    answer: answer, choiceType: 'number',
+    choices: shuffle([answer, ...smartDistractors(operation, table, fact, answer)]),
     format: 'story_leftover', isTimed: false,
   }
 }
@@ -806,14 +800,18 @@ function q_missing_result(operation, table, fact) {
 // 41. story_share ❌
 function q_story_share(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
-  const n = name()
-  const total = answer
-  const groups = b
-  const each = a
+  const sym = SYMBOL[operation]
+  const item = pick(['apples', 'coins', 'stickers', 'books'])
+  const templates = {
+    addition: `${a} kids each bring ${b} ${item}. ${name()} brings ${a} more. Total with ${name2(name())}?`,
+    subtraction: `${answer} ${item} total, ${b} used. How many remain?`,
+    multiplication: `${a} groups of ${b} ${item}. What is ${a} ${sym} ${b}?`,
+    division: `${answer} ${item} shared equally among ${b} kids. How many each?`,
+  }
   return {
-    text: `${total} ${pick(['kids', 'apples', 'coins', 'stickers'])} split into ${groups} equal groups. How many in each group?`,
-    answer: each, choiceType: 'number',
-    choices: shuffle([each, ...smartDistractors(operation, table, fact, each)]),
+    text: templates[operation] || templates.addition,
+    answer: a, choiceType: 'number',
+    choices: shuffle([a, ...smartDistractors(operation, table, fact, a)]),
     format: 'story_share', isTimed: false,
   }
 }
@@ -821,12 +819,18 @@ function q_story_share(operation, table, fact) {
 // 42. times_check ❌
 function q_times_check(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
-  // How many times does a appear in answer
-  const reps = b
+  const sym = SYMBOL[operation]
+  // Adapted per operation: all ask "how many times" in context of current op
+  const templates = {
+    addition: `${a} ${sym} ${b} = ${answer}. How many times do you add ${b} to get from 0 to ${answer}?`,
+    subtraction: `Starting at ${answer}, subtract ${b} repeatedly. How many steps to reach ${a}?`,
+    multiplication: `${a} ${sym} ${b} = ${answer}. If you add ${a} to itself, how many times to reach ${answer}?`,
+    division: `${answer} ÷ ${b} = ${a}. How many groups of ${b} fit in ${answer}?`,
+  }
   return {
-    text: `${a} + ${a} + ${a} repeated ${reps > 4 ? '...' : ''} = ${a} × ?`,
-    answer: reps, choiceType: 'number',
-    choices: shuffle([reps, reps + 1, reps - 1 > 0 ? reps - 1 : reps + 2, reps + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
+    text: templates[operation] || templates.addition,
+    answer: b, choiceType: 'number',
+    choices: shuffle([b, b + 1, b - 1 > 0 ? b - 1 : b + 2, b + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
     format: 'times_check', isTimed: false,
   }
 }
@@ -835,11 +839,11 @@ function q_times_check(operation, table, fact) {
 function q_opposite_trap(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
   const sym = SYMBOL[operation]
-  const invSym = operation === 'addition' ? '−' : operation === 'multiplication' ? '÷' : '+'
+  // Stay within the same operation — ask what happens if you swap the numbers
   return {
-    text: `${a} ${sym} ${b} = ${answer}. Now: ${answer} ${invSym} ${b} = ?`,
-    answer: a, choiceType: 'number',
-    choices: shuffle([a, ...smartDistractors(operation, table, fact, a)]),
+    text: `${a} ${sym} ${b} = ${answer}\nNow what is ${b} ${sym} ${a}?`,
+    answer: answer, choiceType: 'number',
+    choices: shuffle([answer, answer + 1, answer - 1 > 0 ? answer - 1 : answer + 3, answer + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
     format: 'opposite_trap', isTimed: false,
   }
 }
