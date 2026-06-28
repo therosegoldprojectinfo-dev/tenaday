@@ -531,7 +531,47 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       </div>
 
       {/* ── Scrollable content ── */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-hidden flex">
+
+        {/* ── Desktop-only: sticky chapter info card (left column) ── */}
+        <div className="hidden md:flex flex-col justify-start p-6 w-72 flex-shrink-0 border-r border-gray-100 overflow-y-auto">
+          <div style={{
+            backgroundColor: '#fff',
+            borderRadius: 20,
+            border: '2px solid #f0f0f0',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            padding: '20px',
+          }}>
+            <img
+              src={`/mascots/flower-${operation}.png`}
+              alt={operation}
+              style={{ width: 72, height: 72, objectFit: 'contain', marginBottom: 12 }}
+            />
+            <p className="font-display font-black text-xl text-gray-900" style={{ marginBottom: 6 }}>
+              {theme.operationLabel}
+            </p>
+            <p className="font-body text-sm text-gray-500" style={{ lineHeight: 1.5, marginBottom: 14 }}>
+              Master all tables 1–12 through daily practice sessions.
+            </p>
+            <div style={{ display: 'flex', gap: 16 }}>
+              <div style={{ textAlign: 'center' }}>
+                <p className="font-display font-black text-2xl" style={{ color: theme.colors?.primary || '#7C3AED' }}>72</p>
+                <p className="font-body text-xs text-gray-400">Units</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p className="font-display font-black text-2xl" style={{ color: theme.colors?.primary || '#7C3AED' }}>504</p>
+                <p className="font-body text-xs text-gray-400">Nodes</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <p className="font-display font-black text-2xl" style={{ color: theme.colors?.primary || '#7C3AED' }}>{visibleUnit}</p>
+                <p className="font-body text-xs text-gray-400">Current</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Right column: banner + scrollable path ── */}
+        <div className="flex-1 overflow-y-auto flex flex-col">
 
       {/* ── Alert banners ── */}
       {atDebtFloor && (
@@ -608,7 +648,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       )}
 
-      {/* ── Sticky unit banner + desktop chapter card ── */}
+      {/* ── Sticky unit banner ── */}
       {(() => {
         const u = allUnits.find(u => u.unitNumber === visibleUnit)
         const facts = u ? factsForBatch(u.batch) : []
@@ -624,10 +664,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         ]
         const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
         return (
-          <div style={{ position: 'sticky', top: 0, zIndex: 100, display: 'flex', gap: 16, padding: '10px 16px', alignItems: 'flex-start' }}>
-            {/* Banner — full width on mobile, left portion on desktop */}
+          <div style={{ position: 'sticky', top: 0, zIndex: 100, padding: '10px 16px' }}>
             <div style={{
-              flex: 1,
               backgroundColor: color.bg,
               borderRadius: 16,
               boxShadow: `0 5px 0 ${color.shadow}`,
@@ -644,35 +682,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                 fontWeight: 800, fontSize: 20, color: '#fff',
                 lineHeight: 1.2,
               }}>{factStr}</p>
-            </div>
-
-            {/* Desktop-only chapter info card */}
-            <div className="hidden md:flex" style={{
-              width: 220, flexShrink: 0,
-              backgroundColor: '#fff',
-              borderRadius: 16,
-              border: '2px solid #f0f0f0',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-              padding: '14px 16px',
-              flexDirection: 'column', gap: 6,
-            }}>
-              <img
-                src={`/mascots/flower-${operation}.png`}
-                alt={operation}
-                style={{ width: 48, height: 48, objectFit: 'contain' }}
-              />
-              <p style={{
-                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                fontWeight: 800, fontSize: 15, color: '#1f2937',
-                lineHeight: 1.2, marginTop: 4,
-              }}>{theme.operationLabel}</p>
-              <p style={{
-                fontFamily: 'var(--font-body, sans-serif)',
-                fontSize: 12, color: '#6b7280', lineHeight: 1.4,
-              }}>Tables 1–12 · 72 units · 504 nodes</p>
-              <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
-                <span style={{ fontSize: 11, color: '#9ca3af', fontWeight: 600 }}>📅 Unit {visibleUnit} / 72</span>
-              </div>
             </div>
           </div>
         )
@@ -810,7 +819,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           </div>
         </>
       )}
-      </div>{/* end scrollable content */}
+        </div>{/* end right column */}
+      </div>{/* end scrollable content flex */}
     </div>
   )
 }
