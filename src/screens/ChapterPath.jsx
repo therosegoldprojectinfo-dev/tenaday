@@ -329,8 +329,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   return (
     <div className="h-screen flex flex-col" style={{
       backgroundImage: 'url("/ChatGPT Image 27 juin 2026, 21_51_22.png")',
-      backgroundRepeat: 'repeat',
-      backgroundSize: '400px',
+      backgroundRepeat: 'no-repeat',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
       backgroundColor: '#ffffff',
     }}>
       <style>{`
@@ -341,7 +342,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         .node-current img { animation: pulse-glow 2s ease-in-out infinite; }
       `}</style>
 
-      {/* ── Fixed header ── */}
       <div className="flex-shrink-0 bg-white z-30 border-b border-gray-100">
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors duration-150 active:bg-gray-100" aria-label="Back">
