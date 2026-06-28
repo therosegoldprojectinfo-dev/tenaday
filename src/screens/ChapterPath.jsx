@@ -342,9 +342,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       }} />
       {/* ── Liquid glass overlay ── */}
       <div className="hidden md:block absolute inset-0 z-0 pointer-events-none" style={{
-        backdropFilter: 'blur(8px) saturate(1.4) brightness(1.05)',
-        WebkitBackdropFilter: 'blur(8px) saturate(1.4) brightness(1.05)',
-        backgroundColor: 'rgba(255,255,255,0.35)',
+        backdropFilter: 'blur(3px) saturate(1.2) brightness(1.02)',
+        WebkitBackdropFilter: 'blur(3px) saturate(1.2) brightness(1.02)',
+        backgroundColor: 'rgba(255,255,255,0.15)',
       }} />
       <style>{`@media (min-width: 768px) { .chapter-path-root { background-image: none !important; } }`}</style>
       <style>{`
