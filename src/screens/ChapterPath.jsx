@@ -141,8 +141,8 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
     }}>
       <button
         type="button"
-        disabled={disabled && !forceGold}
-        onClick={(!disabled || forceGold) ? onPress : undefined}
+        disabled={false}
+        onClick={onPress}
         style={{
           display: 'flex',
           flexDirection: 'row',
@@ -256,7 +256,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       : 0
 
   function handleTogglePopover(table, batch, node, status, isCurrent) {
-    if (status === 'locked' || status === 'day_locked') return
     setOpenNode(prev =>
       prev && prev.table === table && prev.batch === batch && prev.node === node
         ? null
@@ -528,10 +527,39 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           <div className="fixed z-50 bg-white anim-sheet-in bottom-0 left-0 right-0 rounded-t-3xl px-5 pt-5 pb-8 max-w-sm mx-auto md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto md:rounded-3xl md:max-w-md md:w-full md:px-6 md:pt-6 md:pb-7">
             <div className="w-10 h-1.5 rounded-full bg-gray-200 mx-auto mb-4 md:hidden" />
             <p className="font-display font-bold text-xl text-gray-900 mb-1">{nodeLabel(openNode.node)}</p>
-            <p className="font-body text-sm text-gray-400 mb-5">{openNode.status === 'completed' ? 'Tap to replay this node' : openNode.isCurrent ? nodePurpose(openNode.node) : 'Tap to play'}</p>
-            <button onClick={handleConfirmStart} className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
-              {openNode.status === 'completed' ? `REPLAY ${nodeLabel(openNode.node).toUpperCase()}` : openNode.node === 'learn' ? 'START LESSON' : openNode.node === 'review' ? 'START REVIEW' : `START ${nodeLabel(openNode.node).toUpperCase()}`}
-            </button>
+
+            {openNode.status === 'locked' ? (
+              <>
+                <p className="font-body text-sm text-gray-400 mb-5">Complete the previous nodes to unlock this one!</p>
+                <button
+                  disabled
+                  className="w-full py-4 rounded-2xl font-body font-bold text-base tracking-widest"
+                  style={{ backgroundColor: '#e5e7eb', color: '#9ca3af', boxShadow: '0 4px 0 #d1d5db', cursor: 'default' }}
+                >
+                  🔒 NOT YET UNLOCKED
+                </button>
+              </>
+            ) : openNode.status === 'day_locked' ? (
+              <>
+                <p className="font-body text-sm text-gray-400 mb-5">You've done enough for today — come back tomorrow to continue!</p>
+                <button
+                  disabled
+                  className="w-full py-4 rounded-2xl font-body font-bold text-base tracking-widest"
+                  style={{ backgroundColor: '#fef3c7', color: '#d97706', boxShadow: '0 4px 0 #fcd34d', cursor: 'default' }}
+                >
+                  ⏰ COME BACK TOMORROW
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="font-body text-sm text-gray-400 mb-5">
+                  {openNode.status === 'completed' ? 'Tap to replay this node' : openNode.isCurrent ? nodePurpose(openNode.node) : 'Tap to play'}
+                </p>
+                <button onClick={handleConfirmStart} className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
+                  {openNode.status === 'completed' ? `REPLAY ${nodeLabel(openNode.node).toUpperCase()}` : openNode.node === 'learn' ? 'START LESSON' : openNode.node === 'review' ? 'START REVIEW' : `START ${nodeLabel(openNode.node).toUpperCase()}`}
+                </button>
+              </>
+            )}
           </div>
         </>
       )}
