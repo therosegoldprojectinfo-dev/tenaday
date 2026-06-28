@@ -12,7 +12,7 @@ const DUO_GREEN_DARK = '#46a302'
 // consistent the way a real shop would.
 
 function CoinIcon({ size = 36 }) {
-  return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width={size} height={size} aria-hidden="true" alt="" />
+  return <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width={size} height={size} alt="" style={{objectFit:"contain"}} />
 }
 
 function TvIcon() {
@@ -200,7 +200,7 @@ export default function Rewards({ kidId, parentId }) {
 
         <div className="flex items-center justify-between mb-1">
           <h1 className="font-display font-bold text-2xl text-gray-900">Rewards</h1>
-          <div className="flex items-center gap-1.5 bg-amber-50 rounded-full px-3 py-2 border border-amber-100">
+          <div className="flex items-center gap-1.5">
             <CoinIcon />
             <span className="font-body font-bold text-base text-amber-700 leading-none tabular-nums">
               {kid.coin_balance}
