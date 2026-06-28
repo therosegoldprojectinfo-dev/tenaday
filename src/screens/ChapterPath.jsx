@@ -155,7 +155,13 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
           WebkitTapHighlightColor: 'transparent',
           transform: `translateX(${offset}px)`,
           maxWidth: 'calc(100vw - 32px)',
+          transition: 'transform 0.08s ease',
         }}
+        onMouseDown={e => { e.currentTarget.style.transform = `translateX(${offset}px) scale(0.88) translateY(5px)` }}
+        onMouseUp={e => { e.currentTarget.style.transform = `translateX(${offset}px)` }}
+        onMouseLeave={e => { e.currentTarget.style.transform = `translateX(${offset}px)` }}
+        onTouchStart={e => { e.currentTarget.style.transform = `translateX(${offset}px) scale(0.88) translateY(5px)` }}
+        onTouchEnd={e => { e.currentTarget.style.transform = `translateX(${offset}px)` }}
         aria-label={displayName}
       >
         {/* Disc image */}
