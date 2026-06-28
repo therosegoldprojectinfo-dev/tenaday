@@ -421,7 +421,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             {/* Streak */}
             <div className="relative">
               <button onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')} className="flex items-center gap-1.5 active:scale-95 transition-transform">
-                <span className="text-base leading-none">🔥</span>
+                <img src="/Cr%C3%A9ation%20sans%20titre%20(29).png" width="32" height="32" alt="" />
                 <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
               </button>
               {tooltip === 'streak' && (
