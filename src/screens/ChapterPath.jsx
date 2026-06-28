@@ -608,7 +608,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       )}
 
-      {/* ── Sticky unit banner (card with mascot + text) ── */}
+      {/* ── Sticky unit banner ── */}
       {(() => {
         const u = allUnits.find(u => u.unitNumber === visibleUnit)
         const facts = u ? factsForBatch(u.batch) : []
@@ -623,7 +623,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           { bg: '#ff86d0', shadow: '#cc5ca3' },
         ]
         const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
-        const mascotSrc = `/mascots/flower-${operation}.png`
         return (
           <div style={{
             position: 'sticky', top: 0, zIndex: 100,
@@ -635,35 +634,29 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               backgroundColor: color.bg,
               borderRadius: 16,
               boxShadow: `0 5px 0 ${color.shadow}`,
-              display: 'flex', alignItems: 'center',
-              overflow: 'hidden',
-              minHeight: 80,
+              padding: '12px 16px 14px',
+              position: 'relative',
             }}>
-              {/* Mascot */}
-              <img
-                src={mascotSrc}
-                alt="mascot"
-                style={{
-                  width: 90, height: 90,
-                  objectFit: 'contain',
-                  flexShrink: 0,
-                  marginLeft: 8,
-                }}
-              />
-              {/* Text */}
-              <div style={{ padding: '12px 16px 12px 8px', flex: 1 }}>
-                <p style={{
+              {/* Chapter tag top-left */}
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 5,
+                backgroundColor: 'rgba(0,0,0,0.15)',
+                borderRadius: 8, padding: '3px 8px',
+                marginBottom: 6,
+              }}>
+                <span style={{
                   fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                  fontWeight: 700, fontSize: 11,
-                  letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)',
-                  textTransform: 'uppercase', marginBottom: 3,
-                }}>Unit {visibleUnit}</p>
-                <p style={{
-                  fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
-                  fontWeight: 800, fontSize: 18, color: '#fff',
-                  lineHeight: 1.2,
-                }}>{factStr}</p>
+                  fontWeight: 800, fontSize: 10,
+                  color: 'rgba(255,255,255,0.9)',
+                  textTransform: 'uppercase', letterSpacing: '0.08em',
+                }}>{theme.operationLabel} · Unit {visibleUnit}</span>
               </div>
+              {/* Facts */}
+              <p style={{
+                fontFamily: 'var(--font-display, "Baloo 2", sans-serif)',
+                fontWeight: 800, fontSize: 20, color: '#fff',
+                lineHeight: 1.2,
+              }}>{factStr}</p>
             </div>
           </div>
         )
