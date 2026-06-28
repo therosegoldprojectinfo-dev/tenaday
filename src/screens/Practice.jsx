@@ -544,6 +544,8 @@ export default function Practice({
     const coinsDelta = result === 'passed' ? payout : 0
     const newBalance = result === 'passed' ? applyPayout(coinBalance, node) : coinBalance
 
+    console.log('[finalizeAttempt]', { result, correct, node, operation, table, batchNum, kidCurrentStep, kidId })
+
     try {
       if (kidId) {
         const attemptId = await logAttempt(kidId, {
@@ -569,13 +571,11 @@ export default function Practice({
 
         if (result === 'passed') {
           const next = nextStep(operation, table, batchNum, node)
-          // Regression guard: only advance if next step is strictly ahead
-          // of the kid's ACTUAL current DB position (passed in as kidCurrentStep).
-          // This prevents replaying an old node from moving the cursor backward.
           const kidCurrentIdx = kidCurrentStep
             ? stepIndex(kidCurrentStep.operation, kidCurrentStep.table, kidCurrentStep.batch, normalizeNode(kidCurrentStep.node))
             : stepIndex(operation, table, batchNum, node)
           const nextIdx = next ? stepIndex(next.operation, next.table, next.batch, next.node) : -1
+          console.log('[progression]', { next, kidCurrentIdx, nextIdx, willAdvance: next && nextIdx > kidCurrentIdx })
           if (next && nextIdx > kidCurrentIdx) {
             if (node === 'review') {
               await updateProgress(kidId, next)
@@ -587,6 +587,7 @@ export default function Practice({
             } else {
               await updateProgress(kidId, next)
             }
+            console.log('[progression] updateProgress done → next:', next)
           }
         }
       }
