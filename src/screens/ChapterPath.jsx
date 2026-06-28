@@ -333,24 +333,15 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       backgroundSize: '400px',
       backgroundColor: '#ffffff',
     }}>
-      {/* ── Mirrored background layer (desktop only) ── */}
-      <div className="hidden md:block absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} style={{
-            position: 'absolute',
-            left: 0, right: 0,
-            top: i * 500,
-            height: 500,
-            backgroundImage: 'url("/ChatGPT Image 27 juin 2026, 22_02_36.png")',
-            backgroundRepeat: 'repeat-x',
-            backgroundSize: '500px 500px',
-            transform: [
-              i % 2 === 1 ? 'scaleY(-1)' : '',
-              i % 4 >= 2 ? 'scaleX(-1)' : '',
-            ].filter(Boolean).join(' ') || 'none',
-          }} />
-        ))}
-      </div>
+      {/* ── Background layer (desktop only) ── */}
+      <div className="hidden md:block absolute inset-0 z-0 pointer-events-none" style={{
+        backgroundImage: 'url("/ChatGPT Image 27 juin 2026, 22_02_36.png")',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        filter: 'blur(0.5px)',
+        transform: 'scale(1.01)',
+      }} />
       <style>{`@media (min-width: 768px) { .chapter-path-root { background-image: none !important; } }`}</style>
       <style>{`
         @keyframes pulse-glow {
