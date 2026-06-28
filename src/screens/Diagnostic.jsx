@@ -70,12 +70,14 @@ function XIcon() {
 
 function HeartIcon({ filled = true }) {
   return (
-    <svg width="22" height="20" viewBox="0 0 22 20"
-      fill={filled ? '#ef4444' : '#fecaca'}
+    <img
+      src="/ChatGPT Image 28 juin 2026, 09_20_15.png"
+      width="22"
+      height="22"
+      style={{ opacity: filled ? 1 : 0.3 }}
       aria-hidden="true"
-    >
-      <path d="M11 18.5S1 12.3 1 6.5a5 5 0 0 1 10-1 5 5 0 0 1 10 1c0 5.8-10 12-10 12z" />
-    </svg>
+      alt=""
+    />
   )
 }
 
@@ -105,7 +107,7 @@ function DiedScreen({ onRetry }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
       <div className="h-screen md:h-auto md:min-h-[560px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
-        <span className="text-8xl select-none">💔</span>
+        <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="80" height="80" style={{opacity:0.4}} alt="heart" />
         <div className="flex gap-2">
           {Array.from({ length: LIVES_START }).map((_, i) => (
             <HeartIcon key={i} filled={false} />
