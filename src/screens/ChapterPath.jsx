@@ -147,7 +147,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
           display: 'flex',
           flexDirection: 'row',
           alignItems: 'center',
-          gap: 2,
+          gap: 0,
           background: 'none',
           border: 'none',
           padding: 0,
@@ -192,6 +192,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
           fontSize: 15,
           color: (disabled && !forceGold) ? '#9CA3AF' : '#1f2937',
           whiteSpace: 'nowrap',
+          marginLeft: -20,
         }}>{displayName}</span>
       </button>
     </div>
