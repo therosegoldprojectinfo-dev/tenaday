@@ -568,10 +568,26 @@ function q_before_after(operation, table, fact) {
 function q_missing_middle(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
   const sym = SYMBOL[operation]
-  const altA = a - 1
-  const missing = altA > 0 ? answer - altA : b + 1
+  // Always use a+1 on the left side so missing = b-1 (always > 0 since b >= 1)
+  const altA = a + 1
+  const missing = answer - altA  // = b - 1
+  if (missing <= 0) {
+    // fallback: use a-1 approach only if a > 1
+    if (a > 1) {
+      const altA2 = a - 1
+      const missing2 = answer - altA2 // = b + 1
+      return {
+        text: `${a} ${sym} ${b} = ${altA2} ${sym} ___`,
+        answer: missing2, choiceType: 'number',
+        choices: safeChoices(missing2, [missing2 + 1, missing2 + 2, missing2 - 1]),
+        format: 'missing_middle', isTimed: false,
+      }
+    }
+    // If a=1 and b=1, just ask equation_swap style
+    return q_equation_swap(operation, table, fact)
+  }
   return {
-    text: `${a} ${sym} ${b} = ${altA > 0 ? altA : a + 1} ${sym} ___`,
+    text: `${a} ${sym} ${b} = ${altA} ${sym} ___`,
     answer: missing, choiceType: 'number',
     choices: safeChoices(missing, [missing + 1, missing + 2, missing + 3]),
     format: 'missing_middle', isTimed: false,
@@ -583,17 +599,17 @@ function q_biggest_sum(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
   const sym = SYMBOL[operation]
   const main = `${a} ${sym} ${b}`
-  const alts = smartDistractors(operation, table, fact, answer, 3).map((w, i) => {
-    const offsets = [[-1, 0], [0, -1], [-1, -1]]
-    const [da, db] = offsets[i] || [-1, 0]
-    const na = Math.max(1, a + da), nb = Math.max(1, b + db)
-    return `${na} ${sym} ${nb}`
-  })
-  const choices = shuffle([main, ...alts])
+  // Always use smaller values for the wrong options so main is clearly biggest
+  const alt1 = `${Math.max(1, a - 1)} ${sym} ${b}`
+  const alt2 = `${a} ${sym} ${Math.max(1, b - 1)}`
+  const alt3 = `${Math.max(1, a - 1)} ${sym} ${Math.max(1, b - 1)}`
+  // Dedupe: if any alt equals main (when a=1 or b=1), offset differently
+  const safeAlt = (expr, fallbackOffset) => expr === main ? `${a} ${sym} ${b + fallbackOffset}` : expr
+  const choices = shuffle([main, safeAlt(alt1, 2), safeAlt(alt2, 3), safeAlt(alt3, 4)])
   return {
     text: `Which gives the biggest answer?`,
     answer: main, choiceType: 'expression',
-    choices,
+    choices: [...new Set(choices)].slice(0, 4), // dedupe just in case
     format: 'biggest_sum', isTimed: false,
   }
 }
@@ -657,21 +673,23 @@ function q_multistep(operation, table, fact) {
 function q_error_detection(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
   const sym = SYMBOL[operation]
-  const wrong = pick(smartDistractors(operation, table, fact, answer, 3))
-  // 4 equations, one wrong
+  // Build 4 distinct equations using different fact combos, one has wrong answer
   const wrongIdx = randInt(0, 3)
-  const makeEq = (isWrong, idx) => {
-    const offset = idx + 1
-    const na = a + (idx === 0 ? 1 : idx === 2 ? -1 : 0)
-    const nb = b + (idx === 1 ? 1 : idx === 3 ? -1 : 0)
-    if (na <= 0 || nb <= 0) return `${a} ${sym} ${b} = ${answer}`
+  const variants = [
+    { na: a, nb: b },
+    { na: a + 1, nb: b },
+    { na: a, nb: b + 1 },
+    { na: a + 1, nb: b + 1 },
+  ]
+  const options = variants.map(({ na, nb }, i) => {
     const correctAns = factValues(operation, na, nb).answer
-    return isWrong ? `${na} ${sym} ${nb} = ${correctAns + 1}` : `${na} ${sym} ${nb} = ${correctAns}`
-  }
-  const options = [0,1,2,3].map(i => makeEq(i === wrongIdx, i))
+    const displayAns = i === wrongIdx ? correctAns + 1 : correctAns
+    return `${na} ${sym} ${nb} = ${displayAns}`
+  })
+  const wrongAnswer = options[wrongIdx]
   return {
     text: `Which one is WRONG?`,
-    answer: options[wrongIdx], choiceType: 'expression',
+    answer: wrongAnswer, choiceType: 'expression',
     choices: options,
     format: 'error_detection', isTimed: false,
   }
@@ -843,17 +861,20 @@ function q_story_share(operation, table, fact) {
 function q_times_check(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
   const sym = SYMBOL[operation]
-  // Adapted per operation: all ask "how many times" in context of current op
+  // For addition: "how many times add b to reach answer?" = a (the table value)
+  // e.g. table=2, fact=3 → 2+3=5, add 3 twice → answer is a=2
+  // For multiplication: "how many groups of b in answer?" = a
+  const timesAnswer = a
   const templates = {
-    addition: `${a} ${sym} ${b} = ${answer}. How many times do you add ${b} to get from 0 to ${answer}?`,
-    subtraction: `Starting at ${answer}, subtract ${b} repeatedly. How many steps to reach ${a}?`,
-    multiplication: `${a} ${sym} ${b} = ${answer}. If you add ${a} to itself, how many times to reach ${answer}?`,
-    division: `${answer} ÷ ${b} = ${a}. How many groups of ${b} fit in ${answer}?`,
+    addition: `${a} ${sym} ${b} = ${answer}. How many times do you add ${b} to reach ${answer}?`,
+    subtraction: `Starting at ${answer}, subtract ${b} each time. How many steps to reach 0?`,
+    multiplication: `${answer} ÷ ${b} = ${a}. How many groups of ${b} fit in ${answer}?`,
+    division: `${answer} ÷ ${b} = ${a}. How many times does ${b} go into ${answer}?`,
   }
   return {
     text: templates[operation] || templates.addition,
-    answer: b, choiceType: 'number',
-    choices: safeChoices(b, [b + 1, b + 2, b - 1]),
+    answer: timesAnswer, choiceType: 'number',
+    choices: safeChoices(timesAnswer, [timesAnswer + 1, timesAnswer + 2, timesAnswer - 1 >= 0 ? timesAnswer - 1 : timesAnswer + 3]),
     format: 'times_check', isTimed: false,
   }
 }
@@ -866,7 +887,7 @@ function q_opposite_trap(operation, table, fact) {
   return {
     text: `${a} ${sym} ${b} = ${answer}\nNow what is ${b} ${sym} ${a}?`,
     answer: answer, choiceType: 'number',
-    choices: shuffle([answer, answer + 1, answer - 1 > 0 ? answer - 1 : answer + 3, answer + 2].filter((v,i,s) => s.indexOf(v) === i && v > 0).slice(0,4)),
+    choices: safeChoices(answer, [answer + 1, answer + 2, answer - 1]),
     format: 'opposite_trap', isTimed: false,
   }
 }
