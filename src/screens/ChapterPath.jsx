@@ -336,7 +336,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       <style>{`
         @media (min-width: 768px) {
           .chapter-path-root {
-            background-image: none !important;
+            background-image: url("/ChatGPT Image 27 juin 2026, 22_02_36.png") !important;
+            background-repeat: no-repeat !important;
+            background-size: cover !important;
+            background-position: center !important;
           }
         }
       `}</style>
