@@ -11,12 +11,12 @@ const APP_INTRO_SLIDES = [
     body: "Numio is your daily math adventure. Every day you learn 2 new math facts and practice them in 6 fun ways. It only takes about 10 minutes!",
   },
   {
-    emoji: '🪙',
+    emoji: '__COIN__',
     title: "Earn coins!",
     body: "Every time you finish a session you earn coins. Save them up and trade them for real prizes your parent set up — like screen time or a special treat!",
   },
   {
-    emoji: '❤️',
+    emoji: '__HEART__',
     title: "You have 4 lives",
     body: "Each session starts with 4 hearts. Get a wrong answer and you lose one. Lose all 4 and the session ends — but you can always try again!",
   },
@@ -47,7 +47,7 @@ function chapterSlides(operation, theme) {
       body: `Great job proving you're ready! ${info.hint} You'll start with the basics and work your way up — 2 new facts every day.`,
     },
     {
-      emoji: '🪙',
+      emoji: '__COIN__',
       title: "Same rules, new chapter",
       body: "Everything works the same way — 4 lives, coins to earn, and a new badge to unlock. Keep up your daily streak and you'll master this chapter too!",
     },
@@ -108,7 +108,11 @@ export default function ChapterIntro({ operation, table, batchNum, node, kidId, 
             className="text-8xl select-none"
             style={{ animation: 'correct-bounce 0.5s cubic-bezier(0.34,1.56,0.64,1) both' }}
           >
-            {slide.emoji}
+            {slide.emoji === '__HEART__'
+              ? <img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" width="80" height="80" alt="heart" style={{ display: 'inline' }} />
+              : slide.emoji === '__COIN__'
+              ? <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="80" height="80" alt="coin" style={{ display: 'inline' }} />
+              : slide.emoji}
           </span>
           <div>
             <h1 className="font-display font-bold text-2xl text-gray-900 mb-3">{slide.title}</h1>
