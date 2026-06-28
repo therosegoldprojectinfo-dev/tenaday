@@ -220,16 +220,6 @@ function FinishedScreen({ passed, correct, total, payout, isReview, saving, onEx
         {passed ? (
           <div className="flex flex-col items-center gap-2">
             <FlowerJump size={220} loop />
-            <div className="flex gap-2 mt-1">
-              {[0,1,2].map((i) => (
-                <span key={i} style={{
-                  display: 'inline-block',
-                  animation: `correct-bounce 0.5s ${0.1 + i * 0.13}s cubic-bezier(0.34,1.56,0.64,1) both`
-                }}>
-                  <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="80" height="80" alt="" />
-                </span>
-              ))}
-            </div>
           </div>
         ) : (
           <span className="text-8xl select-none">💪</span>
@@ -732,17 +722,9 @@ export default function Practice({
           {/* Streak badge replaces hearts when streak ≥ 2, hearts stay */}
           <div className="flex items-center gap-1.5">
             <StreakBadge streak={streak} />
-            <div className="flex items-center gap-0.5">
-              {Array.from({ length: LIVES_START }).map((_, i) => {
-                const filled = i < lives
-                return (
-                  <HeartIcon
-                    key={i}
-                    filled={filled}
-                    className={filled && i === lives - 1 && heartKey > 0 ? 'anim-heart-pulse' : ''}
-                  />
-                )
-              })}
+            <div className="flex items-center gap-1">
+              <HeartIcon filled={lives > 0} className={lives > 0 && heartKey > 0 ? 'anim-heart-pulse' : ''} />
+              <span className="font-display font-bold text-base" style={{ color: '#ef4444' }}>{lives}</span>
             </div>
           </div>
         </div>
