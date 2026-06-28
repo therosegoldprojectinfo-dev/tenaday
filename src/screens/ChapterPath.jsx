@@ -327,7 +327,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   ]
 
   return (
-    <div className="h-screen flex flex-col bg-white">
+    <div className="h-screen flex flex-col" style={{
+      backgroundImage: 'url("/ChatGPT Image 27 juin 2026, 21_51_22.png")',
+      backgroundRepeat: 'repeat',
+      backgroundSize: '400px',
+      backgroundColor: '#ffffff',
+    }}>
       <style>{`
         @keyframes pulse-glow {
           0%, 100% { filter: drop-shadow(0 0 8px rgba(124,58,237,0.4)); }
