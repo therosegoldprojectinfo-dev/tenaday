@@ -68,7 +68,7 @@ function HeartStatIcon() {
 }
 
 function CoinStatIcon() {
-  return <span style={{display:"inline-flex",width:40,height:40,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" style={{width:96,height:96,transform:"translateY(-3%)",flexShrink:0}} alt="" /></span>
+  return <span style={{display:"inline-flex",width:40,height:40,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" style={{height:64,width:"auto",transform:"translateY(5%)",flexShrink:0}} alt="" /></span>
 }
 
 // ── Node label mapping ────────────────────────────────────────────────────
@@ -459,7 +459,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               </button>
               {tooltip === 'coins' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><span style={{display:"inline-flex",width:56,height:56,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" style={{width:134,height:134,transform:"translateY(-3%)",flexShrink:0}} alt="" /></span></p>
+                  <p className="mb-1"><span style={{display:"inline-flex",width:56,height:56,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" style={{height:90,width:"auto",transform:"translateY(5%)",flexShrink:0}} alt="" /></span></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
                   <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>{kid.coin_balance}</p>
                   <p className="font-body text-xs text-gray-400 mt-1">{inDebt ? "You're in debt — keep playing!" : "Earn coins by completing activities."}</p>
