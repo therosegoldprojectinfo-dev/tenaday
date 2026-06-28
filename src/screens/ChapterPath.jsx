@@ -446,8 +446,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           const factStr = u ? facts.map(f => `${u.table} ${theme.symbol} ${f}`).join(', ') : ''
           const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
           return (
-            <div style={{ position: 'sticky', top: 0, zIndex: 100, padding: '10px 16px' }}>
+            <div style={{ position: 'sticky', top: 0, zIndex: 100, padding: '10px 16px', display: 'flex', justifyContent: 'center' }}>
               <div style={{
+                width: '100%', maxWidth: 340,
                 backgroundColor: color.bg,
                 borderRadius: 16,
                 boxShadow: `0 5px 0 ${color.shadow}`,
