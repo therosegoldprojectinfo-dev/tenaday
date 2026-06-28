@@ -600,16 +600,16 @@ function q_biggest_sum(operation, table, fact) {
   const sym = SYMBOL[operation]
   const main = `${a} ${sym} ${b}`
   // Always use smaller values for the wrong options so main is clearly biggest
-  const alt1 = `${Math.max(1, a - 1)} ${sym} ${b}`
-  const alt2 = `${a} ${sym} ${Math.max(1, b - 1)}`
-  const alt3 = `${Math.max(1, a - 1)} ${sym} ${Math.max(1, b - 1)}`
-  // Dedupe: if any alt equals main (when a=1 or b=1), offset differently
-  const safeAlt = (expr, fallbackOffset) => expr === main ? `${a} ${sym} ${b + fallbackOffset}` : expr
-  const choices = shuffle([main, safeAlt(alt1, 2), safeAlt(alt2, 3), safeAlt(alt3, 4)])
+  // Use expressions with smaller values so main is always biggest
+  // Offset by adding to b to guarantee different expressions
+  const alts = [`${a} ${sym} ${Math.max(1,b-1)}`, `${a} ${sym} ${Math.max(1,b-2) || 1}`, `${Math.max(1,a-1)} ${sym} ${b}`]
+  // Dedupe against main
+  const uniqueAlts = [...new Set(alts.map(e => e === main ? `${a} ${sym} ${b+1}` : e))]
+  const choices = shuffle([main, ...uniqueAlts.slice(0,3)])
   return {
     text: `Which gives the biggest answer?`,
     answer: main, choiceType: 'expression',
-    choices: [...new Set(choices)].slice(0, 4), // dedupe just in case
+    choices,
     format: 'biggest_sum', isTimed: false,
   }
 }
@@ -729,10 +729,12 @@ function q_odd_one_out(operation, table, fact) {
   const sym = SYMBOL[operation]
   // 3 equal results, 1 different
   const wrongAnswer = pick(smartDistractors(operation, table, fact, answer, 1))
+  // Build 3 correct expressions (same answer) + 1 wrong
   const eq1 = `${a} ${sym} ${b}`
-  const eq2 = a > 0 && b > 1 ? `${a+1} ${sym} ${b-1}` : `${a} ${sym} ${b}`
-  const eq3 = a > 1 ? `${a-1} ${sym} ${b+1}` : `${a} ${sym} ${b}`
-  const eqWrong = `${a+1} ${sym} ${b+1}`
+  const eq2 = `${a+1} ${sym} ${b-1 > 0 ? b-1 : b+1}` // different combo, same answer only if b>1
+  const eq3 = `${a+2} ${sym} ${b-2 > 0 ? b-2 : b+2}`
+  // The wrong one gives answer+1 or answer+2
+  const eqWrong = `${a+1} ${sym} ${b+1}` // always gives answer+2 for addition, always different
   const choices = shuffle([eq1, eq2, eq3, eqWrong])
   return {
     text: `Which does NOT equal ${answer}?`,
@@ -985,13 +987,14 @@ function q_which_faster(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
   const sym = SYMBOL[operation]
   const half = Math.floor(answer / 2)
-  const isDouble = half + half === answer
+  const isEven = half + half === answer
   const doubleExpr = `${half} ${sym} ${half}`
   const mainExpr = `${a} ${sym} ${b}`
-  const easierIsDouble = isDouble
+  // Fallback if both expressions are identical (e.g. table=1, fact=1, answer=2 → half=1 → 1+1 vs 1+1)
+  if (doubleExpr === mainExpr || !isEven) return q_speed_recall(operation, table, fact)
   return {
     text: `Which is easier to solve mentally?`,
-    answer: easierIsDouble ? doubleExpr : mainExpr,
+    answer: doubleExpr, // doubles are always easier
     choiceType: 'expression',
     choices: [mainExpr, doubleExpr],
     format: 'which_faster', isTimed: true,
