@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react'
+import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { generateBatch } from '../lib/problems'
 import { themeFor } from '../lib/eraTheme'
 import { nodeLabel, nextStep, stepIndex, normalizeNode, OPERATIONS } from '../lib/progression'
@@ -11,6 +11,7 @@ import {
   logCoinTransaction,
   logAttempt,
   setHeartBalance,
+  rechargeHeart,
 } from '../lib/kidData'
 
 const TOTAL       = 12  // default; review overrides to 24
@@ -184,23 +185,53 @@ function SpeedCountdown({ durationMs }) {
   )
 }
 
-function DiedScreen({ saving, onExit }) {
+function DiedScreen({ saving, onExit, heartBalance, coinBalance, kidId, onRecharge }) {
+  const [recharging, setRecharging] = React.useState(false)
+  const noHearts = (heartBalance ?? 0) <= 0
+
+  async function handleRecharge() {
+    if (!kidId || recharging) return
+    setRecharging(true)
+    try {
+      const { newHearts, newCoins } = await rechargeHeart(kidId, heartBalance ?? 0, coinBalance ?? 0)
+      onRecharge?.(newHearts, newCoins)
+    } catch (e) {
+      console.error('recharge failed', e)
+    } finally {
+      setRecharging(false)
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
       <div className="h-screen md:h-auto md:min-h-[560px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
         <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="160" height="160" style={{opacity:0.4}} alt="" />
-        <div className="flex gap-2" aria-label="No lives left">
-          {Array.from({ length: LIVES_START }).map((_, i) => (
-            <HeartIcon key={i} filled={false} style={{ opacity: 0.3 }} />
-          ))}
-        </div>
         <div className="text-center">
           <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">Out of lives!</h2>
           <p className="font-body text-gray-400 text-sm leading-relaxed">
-            That was a tough one. You can try again — it's free!
+            {noHearts ? 'You have no hearts left. Recharge to try again!' : 'That was a tough one. You can try again — it\'s free!'}
           </p>
         </div>
-        {onExit && (
+        {noHearts ? (
+          <div className="w-full flex flex-col gap-3">
+            {(coinBalance ?? 0) >= 10 ? (
+              <button onClick={handleRecharge} disabled={recharging}
+                className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
+                style={{ backgroundColor: '#ef4444', boxShadow: '0 4px 0 0 #b91c1c' }}>
+                {recharging ? 'Recharging…' : '♥ Recharge 1 heart — 10 coins'}
+              </button>
+            ) : (
+              <div className="rounded-2xl bg-red-50 border border-red-100 px-5 py-4 text-center">
+                <p className="font-display font-bold text-base text-red-700 mb-1">Not enough coins</p>
+                <p className="font-body text-sm text-red-400">You need 10 coins to recharge. Come back tomorrow — hearts refill at midnight!</p>
+              </div>
+            )}
+            <button onClick={onExit} disabled={saving}
+              className="w-full py-3 rounded-2xl font-body font-bold text-base text-gray-400 border border-gray-200">
+              Back to map
+            </button>
+          </div>
+        ) : (
           <button onClick={onExit} disabled={saving}
             className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
             {saving ? 'SAVING…' : 'TRY AGAIN'}
@@ -617,7 +648,7 @@ export default function Practice({
   }
 
   if (over === 'died') {
-    return <DiedScreen saving={saving} onExit={onExit} />
+    return <DiedScreen saving={saving} onExit={onExit} heartBalance={lives} coinBalance={coinBalance} kidId={kidId} onRecharge={(newHearts, newCoins) => { onHeartChange?.(newHearts); onBalanceChange?.(newCoins); onExit() }} />
   }
 
   if (over === 'finished') {
