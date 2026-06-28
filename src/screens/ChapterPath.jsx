@@ -396,7 +396,16 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         <div style={{position:'absolute',top:'55%',left:'2%',width:32,height:32,borderRadius:'50%',background:'#ef4444',opacity:.07,animation:'bg-bob 3.5s ease-in-out infinite'}}/>
         <div style={{position:'absolute',top:'40%',right:'2%',width:24,height:24,borderRadius:'50%',background:'#1CB0F6',opacity:.08,animation:'bg-floaty 2.6s ease-in-out infinite'}}/>
         <div style={{position:'absolute',top:'90%',left:'5%',width:28,height:28,borderRadius:'50%',background:'#ef4444',opacity:.07,animation:'bg-bob 4s ease-in-out infinite'}}/>
-        {/* Spinning rings */}
+        {/* Middle elements */}
+        <svg viewBox="0 0 24 24" width={16} height={16} style={{position:'absolute',top:'22%',left:'45%',opacity:.1,animation:'bg-twinkle 2.3s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#1CB0F6"/></svg>
+        <svg viewBox="0 0 24 24" width={20} height={20} style={{position:'absolute',top:'48%',left:'50%',opacity:.09,animation:'bg-twinkle 2.8s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#ef4444"/></svg>
+        <svg viewBox="0 0 24 24" width={14} height={14} style={{position:'absolute',top:'72%',left:'42%',opacity:.1,animation:'bg-twinkle 2.1s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#1CB0F6"/></svg>
+        <div style={{position:'absolute',top:'30%',left:'48%',width:10,height:10,borderRadius:3,background:'#ef4444',opacity:.09,transform:'rotate(25deg)',animation:'bg-confetti 2.3s ease-in-out infinite alternate'}}/>
+        <div style={{position:'absolute',top:'58%',left:'44%',width:12,height:12,borderRadius:'50%',background:'#1CB0F6',opacity:.09,animation:'bg-floaty 3.2s ease-in-out infinite'}}/>
+        <div style={{position:'absolute',top:'85%',left:'50%',width:9,height:9,borderRadius:3,background:'#ef4444',opacity:.09,transform:'rotate(-15deg)',animation:'bg-confetti 2.6s ease-in-out infinite alternate'}}/>
+        <svg width={36} height={36} viewBox="0 0 60 60" style={{position:'absolute',top:'38%',left:'43%',opacity:.06,animation:'bg-spinslow 30s linear infinite'}}>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="#1CB0F6" strokeWidth="4" strokeDasharray="10 10"/>
+        </svg>
         <svg width={60} height={60} viewBox="0 0 60 60" style={{position:'absolute',top:'5%',right:'15%',opacity:.07,animation:'bg-spinslow 20s linear infinite'}}>
           <circle cx="30" cy="30" r="26" fill="none" stroke="#1CB0F6" strokeWidth="4" strokeDasharray="12 8"/>
         </svg>
