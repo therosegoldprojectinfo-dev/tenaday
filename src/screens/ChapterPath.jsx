@@ -404,6 +404,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           <circle cx="30" cy="30" r="26" fill="none" stroke="#ef4444" strokeWidth="4" strokeDasharray="10 10"/>
         </svg>
       </div>
+
+      {/* ── Fixed header ── */}
+      <div className="flex-shrink-0 bg-white z-30 border-b border-gray-100">
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors duration-150 active:bg-gray-100" aria-label="Back">
             <BackIcon />
