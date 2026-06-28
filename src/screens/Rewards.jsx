@@ -19,8 +19,8 @@ function TvIcon() {
   return (
     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="6" width="36" height="26" rx="2" />
-      <path d="M8 21h8M12 19v2M7 6l3-3 3 3" />
+      <rect x="2" y="7" width="20" height="13" rx="2" />
+      <path d="M8 20h8M12 20v-1M8 7l4-4 4 4" />
     </svg>
   )
 }
@@ -56,8 +56,8 @@ function FilmIcon() {
   return (
     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="4" width="36" height="32" rx="2" />
-      <path d="M7 4v16M17 4v16M3 9h4M17 9h4M3 15h4M17 15h4" />
+      <rect x="2" y="4" width="20" height="16" rx="2" />
+      <path d="M7 4v16M17 4v16M2 9h5M17 9h5M2 15h5M17 15h5" />
     </svg>
   )
 }
@@ -66,8 +66,8 @@ function GiftIcon() {
   return (
     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="9" width="36" height="22" rx="1" />
-      <path d="M3 9h18M12 9v11M12 9C9 9 7 7 7 5.5A2.5 2.5 0 0 1 9.5 3C11.5 3 12 6 12 9ZM12 9c3 0 5-2 5-3.5A2.5 2.5 0 0 0 14.5 3C12.5 3 12 6 12 9Z" />
+      <rect x="2" y="9" width="20" height="13" rx="1" />
+      <path d="M2 9h20M12 9v13M12 9C9.5 9 8 7.5 8 6a2 2 0 0 1 4 0ZM12 9c2.5 0 4-1.5 4-3a2 2 0 0 0-4 0Z" />
     </svg>
   )
 }
