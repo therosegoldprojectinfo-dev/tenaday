@@ -342,7 +342,15 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           0%, 100% { filter: drop-shadow(0 0 8px rgba(124,58,237,0.4)); }
           50% { filter: drop-shadow(0 0 18px rgba(124,58,237,0.8)); }
         }
+        @keyframes gold-shimmer {
+          0%   { filter: drop-shadow(0 0 6px rgba(255,183,0,0.5)) brightness(1); }
+          25%  { filter: drop-shadow(0 0 22px rgba(255,220,50,1)) brightness(1.3); }
+          50%  { filter: drop-shadow(0 0 8px rgba(255,183,0,0.6)) brightness(1.05); }
+          75%  { filter: drop-shadow(0 0 26px rgba(255,200,0,0.95)) brightness(1.35); }
+          100% { filter: drop-shadow(0 0 6px rgba(255,183,0,0.5)) brightness(1); }
+        }
         .node-current img { animation: pulse-glow 2s ease-in-out infinite; }
+        .node-double-reward img { animation: gold-shimmer 2.5s ease-in-out infinite; }
       `}</style>
 
       <div className="flex-shrink-0 bg-white z-30 border-b border-gray-100">
@@ -509,7 +517,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                   const offset = ZIGZAG_OFFSETS[nodeIdx % ZIGZAG_OFFSETS.length]
 
                   return (
-                    <div key={node} className={isCurrent ? 'node-current' : ''}>
+                    <div key={node} className={isCurrent ? 'node-current' : node === 'double_reward' ? 'node-double-reward' : ''}>
                       <DiscNode
                         node={node}
                         status={status}
