@@ -439,11 +439,12 @@ export default function Practice({
 
   const q                = questions[idx]
   const isCorrect        = selected === q?.answer
-  const isEquationChoice = q?.choiceType === 'equation'
   const isTrueFalse      = q?.choiceType === 'truefalse'
-  const isComparison     = q?.choiceType === 'comparison'
+  const isExpression     = q?.choiceType === 'expression' || q?.choiceType === 'comparison'
   const isTimed          = q?.isTimed === true
-  const isWordProblem    = q?.format === 'word'
+  const isWordProblem    = q?.format === 'word' || q?.format === 'context_switch' ||
+                           q?.format === 'story_missing' || q?.format === 'story_compare' ||
+                           q?.format === 'story_share' || q?.format === 'story_leftover'
 
   const progressScale = (idx + (revealed ? 1 : 0)) / SESSION_TOTAL
 
@@ -751,12 +752,8 @@ export default function Practice({
         )}
 
         {/* ── Question text ────────────────────────────────────────── */}
-        <div className={`flex-shrink-0 px-6 pt-6 pb-2 ${(isWordProblem || !q.text.endsWith('= ?')) ? '' : 'flex items-center justify-center'}`}>
-          <p className={
-            (isWordProblem || !q.text.endsWith('= ?'))
-              ? 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto'
-              : 'text-5xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
-          }>
+        <div className="flex-shrink-0 px-6 pt-6 pb-2 flex items-center justify-center">
+          <p className="font-body font-semibold text-lg text-gray-900 text-center leading-snug max-w-[34ch] mx-auto whitespace-pre-line">
             {q.text}
           </p>
         </div>
@@ -782,29 +779,8 @@ export default function Practice({
 
         {/* ── Answer choices ───────────────────────────────────────── */}
         <div className="flex-1 flex flex-col justify-center px-4 gap-3">
-          {isEquationChoice ? (
-            // Equation choices: single column
-            <div className="flex flex-col gap-3">
-              {q.choices.map(choice => (
-                <button
-                  key={choice}
-                  disabled={revealed}
-                  onClick={() => !revealed && setSelected(choice)}
-                  aria-pressed={selected === choice}
-                  className={[
-                    'rounded-2xl border-2 font-display font-bold text-2xl card-answer',
-                    'flex items-center justify-center py-5 w-full select-none px-4 text-center',
-                    cardColorClass(choice, selected, revealed, q.answer),
-                    cardAnimClass(choice, selected, revealed, q.answer),
-                  ].join(' ')}
-                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}
-                >
-                  {choice}
-                </button>
-              ))}
-            </div>
-          ) : isTrueFalse ? (
-            // True / False: 2 wide buttons side by side
+          {isTrueFalse ? (
+            // True/False / Yes/No / More/Less: 2 wide buttons
             <div className="flex gap-3">
               {q.choices.map(choice => (
                 <button
@@ -824,8 +800,8 @@ export default function Practice({
                 </button>
               ))}
             </div>
-          ) : isComparison ? (
-            // Comparison: 2 expression buttons stacked
+          ) : isExpression ? (
+            // Expression choices: single column, smaller text
             <div className="flex flex-col gap-3">
               {q.choices.map(choice => (
                 <button
@@ -834,8 +810,8 @@ export default function Practice({
                   onClick={() => !revealed && setSelected(choice)}
                   aria-pressed={selected === choice}
                   className={[
-                    'rounded-2xl border-2 font-display font-bold text-2xl card-answer',
-                    'flex items-center justify-center py-6 w-full select-none',
+                    'rounded-2xl border-2 font-body font-semibold text-base card-answer',
+                    'flex items-center justify-center py-4 w-full select-none px-4 text-center',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
