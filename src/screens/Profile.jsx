@@ -23,16 +23,7 @@ function ZapIcon() {
 }
 
 function CoinIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <circle cx="10" cy="10" r="10" fill="#FFB700" />
-      <circle cx="10" cy="10" r="7" fill="#FFD700" />
-      <path
-        d="M10 5.5l1.1 3.4h3.6l-2.9 2.1 1.1 3.4L10 12.4 6.9 14.4l1.1-3.4-2.9-2.1h3.6z"
-        fill="#CC7700"
-      />
-    </svg>
-  )
+  return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="22" height="22" aria-hidden="true" alt="" />
 }
 
 function TargetIcon() {
