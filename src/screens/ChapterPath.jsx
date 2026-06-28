@@ -170,6 +170,8 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
           <img
             src={imgSrc}
             alt={displayName}
+            draggable={false}
+            onContextMenu={e => e.preventDefault()}
             style={{
               width: isSpecial ? 210 : 190,
               height: isSpecial ? 210 : 190,
@@ -178,9 +180,11 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
               transform: isCurrent ? 'scale(1.08)' : 'scale(1)',
               transition: 'transform 0.2s ease',
               display: 'block',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              pointerEvents: 'none',
               ...(isCurrent ? { filter: 'drop-shadow(0 0 10px rgba(124,58,237,0.5))' } : {}),
             }}
-            draggable={false}
           />
           {isDoubleReward && <div className="shine-sweep" />}
           {statusIcon}
