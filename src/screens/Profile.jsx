@@ -4,14 +4,7 @@ import { eraProgress, OPERATIONS } from '../lib/progression'
 import { themeFor } from '../lib/eraTheme'
 
 function FlameIcon() {
-  return (
-    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 2c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.3-2-1-3 2 1 3 3 3 5.5A6.5 6.5 0 0 1 13.5 18 6.5 6.5 0 0 1 7 11.5C7 7 12 6 12 2Z"
-        fill="#FF9600"
-      />
-    </svg>
-  )
+  return <img src="/Cr%C3%A9ation%20sans%20titre%20(29).png" width="44" height="44" alt="" />
 }
 
 function ZapIcon() {
