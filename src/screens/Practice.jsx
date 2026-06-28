@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react'
 import { generateBatch } from '../lib/problems'
 import { themeFor } from '../lib/eraTheme'
-import { nodeLabel, nextStep, stepIndex, OPERATIONS } from '../lib/progression'
+import { nodeLabel, nextStep, stepIndex, normalizeNode, OPERATIONS } from '../lib/progression'
 import { applyPayout, payoutForNode, passThresholdFor, NODE_PAYOUT, ENTRY_FEE, DEBT_FLOOR } from '../lib/economy'
 import FlowerJump from '../components/FlowerJump'
 import {
@@ -410,6 +410,7 @@ export default function Practice({
   reviewPool,
   unlockBatch,
   placementClaim = null,
+  kidCurrentStep = null,
   onExit,
   onBalanceChange,
   onHeartChange,
@@ -568,21 +569,14 @@ export default function Practice({
 
         if (result === 'passed') {
           const next = nextStep(operation, table, batchNum, node)
-          // Cursor regression guard: only write if next step is strictly
-          // ahead of where the kid already is. Replaying a completed node
-          // and passing must never move the cursor backward.
-          // stepIndex is exported from progression.js for this exact check.
-          // We pass the live kid position via the props that were captured
-          // when this Practice session started — those reflect the DB state
-          // at the moment the node was opened, which is safe to compare against.
-          const currentIdx = stepIndex(operation, table, batchNum, node)
-          const nextIdx    = next ? stepIndex(next.operation, next.table, next.batch, next.node) : -1
-          // kidCurrentIdx: the cursor the kid has in the DB right now.
-          // We don't have it as a live value here, so use the conservative
-          // check: only advance if next > the node we just completed.
-          // This protects against replay regression because a replay's
-          // next step will always be <= the kid's real current cursor.
-          if (next && nextIdx > currentIdx) {
+          // Regression guard: only advance if next step is strictly ahead
+          // of the kid's ACTUAL current DB position (passed in as kidCurrentStep).
+          // This prevents replaying an old node from moving the cursor backward.
+          const kidCurrentIdx = kidCurrentStep
+            ? stepIndex(kidCurrentStep.operation, kidCurrentStep.table, kidCurrentStep.batch, normalizeNode(kidCurrentStep.node))
+            : stepIndex(operation, table, batchNum, node)
+          const nextIdx = next ? stepIndex(next.operation, next.table, next.batch, next.node) : -1
+          if (next && nextIdx > kidCurrentIdx) {
             if (node === 'review') {
               await updateProgress(kidId, next)
               try {
