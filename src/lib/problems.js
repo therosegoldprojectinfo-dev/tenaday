@@ -951,11 +951,13 @@ function q_order_results(operation, table, fact) {
 function q_double_missing(operation, table, fact) {
   const { a, b, answer } = factValues(operation, table, fact)
   const sym = SYMBOL[operation]
-  const half = Math.floor(answer / 2)
+  // Only valid when answer is even (half + half = answer exactly)
+  if (answer % 2 !== 0) return q_speed_recall(operation, table, fact)
+  const half = answer / 2
   return {
     text: `___ ${sym} ___ = ${answer}\n(Both numbers are equal)`,
     answer: half, choiceType: 'number',
-    choices: safeChoices(half, [half + 1, half + 2, half - 1]),
+    choices: safeChoices(half, [half + 1, half + 2, half - 1 >= 0 ? half - 1 : half + 3]),
     format: 'double_missing', isTimed: true,
   }
 }
