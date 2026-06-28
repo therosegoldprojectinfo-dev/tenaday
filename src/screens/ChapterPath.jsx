@@ -63,12 +63,12 @@ function BackIcon() {
 
 function HeartStatIcon() {
   return (
-    <span style={{display:"inline-flex",width:36,height:36,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" style={{width:95,height:95,flexShrink:0}} alt="" /></span>
+    <img src="/Création sans titre (28).png" width="36" height="36" alt="" />
   )
 }
 
 function CoinStatIcon() {
-  return <span style={{display:"inline-flex",width:40,height:40,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" style={{height:64,width:"auto",transform:"translateY(5%)",flexShrink:0}} alt="" /></span>
+  return <img src="/Création sans titre (27).png" width="40" height="40" alt="" />
 }
 
 // ── Node label mapping ────────────────────────────────────────────────────
@@ -440,9 +440,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               </button>
               {tooltip === 'hearts' && (
                 <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><span style={{display:"inline-flex",width:56,height:56,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" style={{width:148,height:148,flexShrink:0}} alt="" /></span></p>
+                  <p className="mb-1"><img src="/Création sans titre (28).png" width="56" height="56" alt="" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
-                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><span style={{display:"inline-flex",width:36,height:36,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_20_15.png" style={{width:95,height:95,flexShrink:0}} alt="" /></span></span>)}</div>
+                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><img src="/Création sans titre (28).png" width="36" height="36" alt="" /></span>)}</div>
                   <p className="font-body text-xs text-gray-400 mb-3">Hearts are lost when you answer wrong. Recharge with coins.</p>
                   {(kid.heart_balance ?? 5) < 5 ? (
                     <>{rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
@@ -459,7 +459,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               </button>
               {tooltip === 'coins' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><span style={{display:"inline-flex",width:56,height:56,overflow:"hidden",alignItems:"center",justifyContent:"center",flexShrink:0}}><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" style={{height:90,width:"auto",transform:"translateY(5%)",flexShrink:0}} alt="" /></span></p>
+                  <p className="mb-1"><img src="/Création sans titre (27).png" width="56" height="56" alt="" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
                   <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>{kid.coin_balance}</p>
                   <p className="font-body text-xs text-gray-400 mt-1">{inDebt ? "You're in debt — keep playing!" : "Earn coins by completing activities."}</p>
