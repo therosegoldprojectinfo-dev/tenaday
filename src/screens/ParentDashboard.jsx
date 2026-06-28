@@ -23,14 +23,8 @@ function PlusIcon() {
     </svg>
   )
 }
-function CoinIcon({ size = 16 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 20 20" fill="none">
-      <circle cx="10" cy="10" r="10" fill="#FFB700" />
-      <circle cx="10" cy="10" r="7" fill="#FFD700" />
-      <path d="M10 5.5l1.1 3.4h3.6l-2.9 2.1 1.1 3.4L10 12.4 6.9 14.4l1.1-3.4-2.9-2.1h3.6z" fill="#CC7700" />
-    </svg>
-  )
+function CoinIcon({ size = 24 }) {
+  return <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width={size} height={size} alt="" />
 }
 function TrashIcon() {
   return (
@@ -132,7 +126,7 @@ function KidCard({ kid, stats, streak, onViewProgress }) {
       {stats && (
         <div className="flex gap-4 mt-3 pt-3 border-t border-gray-100">
           <div className="text-center">
-            <p className="font-display font-bold text-base text-gray-900">🔥 {streak ?? 0}</p>
+            <p className="font-display font-bold text-base text-gray-900 flex items-center gap-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(29).png" width="20" height="20" alt="" /> {streak ?? 0}</p>
             <p className="font-body text-xs text-gray-400">Day streak</p>
           </div>
           <div className="text-center">
@@ -598,7 +592,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
             {kidStats[viewingKid.id] ? (
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { label: 'Day streak', value: kidStreaks[viewingKid.id] ?? 0, emoji: '🔥' },
+                  { label: 'Day streak', value: kidStreaks[viewingKid.id] ?? 0, emoji: '__STREAK__' },
                   { label: 'Correct answers', value: kidStats[viewingKid.id].totalCorrect, emoji: '✅' },
                   { label: 'Sessions done', value: kidStats[viewingKid.id].nodesPassed, emoji: '⭐' },
                   { label: 'Coin balance', value: viewingKid.coin_balance, icon: <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="36" height="36" alt="" /> },
