@@ -11,7 +11,7 @@ const DUO_GREEN_DARK = '#46a302'
 // from this set, not freeform input, so the card list stays visually
 // consistent the way a real shop would.
 
-function CoinIcon({ size = 36 }) {
+function CoinIcon({ size = 24 }) {
   return <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width={size} height={size} alt="" style={{objectFit:"contain"}} />
 }
 
@@ -93,7 +93,7 @@ function RewardCard({ gift, affordable, locked, onBuy }) {
       <div className="flex-1 min-w-0">
         <p className="font-display font-bold text-base text-gray-900 leading-tight">{gift.name}</p>
         <div className="flex items-center gap-1 mt-1">
-          <CoinIcon size={30} />
+          <CoinIcon size={24} />
           <span className="font-body font-bold text-sm text-amber-700">{gift.coin_price}</span>
         </div>
       </div>
@@ -270,7 +270,7 @@ export default function Rewards({ kidId, parentId }) {
               <div>
                 <p className="font-display font-bold text-xl text-gray-900">{confirming.name}</p>
                 <div className="flex items-center gap-1 mt-0.5">
-                  <CoinIcon size={30} />
+                  <CoinIcon size={24} />
                   <span className="font-body font-bold text-sm text-amber-700">{confirming.coin_price} coins</span>
                 </div>
               </div>
