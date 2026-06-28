@@ -351,7 +351,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         .node-double-reward { position: relative; }
         .node-double-reward .shine-sweep {
           position: absolute;
-          top: 0; left: 0; right: 0;
+          top: 0; left: 0;
+          width: 60%;
           height: 75%;
           overflow: hidden;
           border-radius: 50%;
