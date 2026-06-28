@@ -426,7 +426,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       </div>
 
       {/* ── Fixed header ── */}
-      <div className="flex-shrink-0 bg-white z-50 border-b border-gray-100">
+      <div className="flex-shrink-0 bg-white border-b border-gray-100" style={{ position: 'sticky', top: 0, zIndex: 60 }}>
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors duration-150 active:bg-gray-100" aria-label="Back">
             <BackIcon />
@@ -501,10 +501,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           </div>
         )}
         {noHeartsBlocked && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 40, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
-            onClick={() => setNoHeartsBlocked(false)}>
-            <div onClick={e => e.stopPropagation()}
-              style={{ backgroundColor: 'white', borderRadius: 24, padding: 28, width: '100%', maxWidth: 360, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+          <div style={{ position: 'fixed', inset: 0, zIndex: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, pointerEvents: 'none' }}>
+            <div style={{ backgroundColor: 'white', borderRadius: 24, padding: 28, width: '100%', maxWidth: 360, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', pointerEvents: 'all' }}>
               <div style={{ textAlign: 'center', marginBottom: 20 }}>
                 <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="72" height="72" style={{ opacity: 0.4, margin: '0 auto 12px' }} alt="" />
                 <p className="font-display font-bold text-xl text-gray-900">No hearts left!</p>
