@@ -347,6 +347,11 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           0% { transform: translateX(-130%) skewX(-18deg); }
           100% { transform: translateX(230%) skewX(-18deg); }
         }
+        @keyframes bg-floaty { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+        @keyframes bg-twinkle { 0%,100%{opacity:.08;transform:scale(.7)} 50%{opacity:.18;transform:scale(1)} }
+        @keyframes bg-confetti { 0%{transform:translateY(0) rotate(0deg)} 100%{transform:translateY(18px) rotate(160deg)} }
+        @keyframes bg-spinslow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes bg-bob { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-10px) rotate(2deg)} }
         .node-current img { animation: pulse-glow 2s ease-in-out infinite; }
         .node-double-reward { position: relative; }
         .node-double-reward .shine-sweep {
@@ -370,7 +375,35 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         }
       `}</style>
 
-      <div className="flex-shrink-0 bg-white z-30 border-b border-gray-100">
+      {/* ── Animated background elements ── */}
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        {/* Stars */}
+        <svg viewBox="0 0 24 24" width={28} height={28} style={{position:'absolute',top:'8%',left:'6%',opacity:.12,animation:'bg-twinkle 2.1s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#1CB0F6"/></svg>
+        <svg viewBox="0 0 24 24" width={18} height={18} style={{position:'absolute',top:'15%',right:'8%',opacity:.1,animation:'bg-twinkle 1.8s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#ef4444"/></svg>
+        <svg viewBox="0 0 24 24" width={22} height={22} style={{position:'absolute',top:'35%',left:'4%',opacity:.1,animation:'bg-twinkle 2.5s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#1CB0F6"/></svg>
+        <svg viewBox="0 0 24 24" width={16} height={16} style={{position:'absolute',top:'50%',right:'5%',opacity:.1,animation:'bg-twinkle 2.3s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#ef4444"/></svg>
+        <svg viewBox="0 0 24 24" width={24} height={24} style={{position:'absolute',top:'70%',left:'7%',opacity:.1,animation:'bg-twinkle 1.9s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#1CB0F6"/></svg>
+        <svg viewBox="0 0 24 24" width={20} height={20} style={{position:'absolute',top:'82%',right:'9%',opacity:.1,animation:'bg-twinkle 2.7s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#ef4444"/></svg>
+        {/* Confetti */}
+        <div style={{position:'absolute',top:'12%',left:'15%',width:14,height:14,borderRadius:4,background:'#1CB0F6',opacity:.1,animation:'bg-confetti 2.2s ease-in-out infinite alternate'}}/>
+        <div style={{position:'absolute',top:'25%',right:'12%',width:12,height:12,borderRadius:4,background:'#ef4444',opacity:.1,transform:'rotate(20deg)',animation:'bg-confetti 2.6s ease-in-out infinite alternate'}}/>
+        <div style={{position:'absolute',top:'45%',left:'10%',width:10,height:10,borderRadius:'50%',background:'#1CB0F6',opacity:.12,animation:'bg-confetti 1.9s ease-in-out infinite alternate'}}/>
+        <div style={{position:'absolute',top:'60%',right:'14%',width:14,height:14,borderRadius:4,background:'#ef4444',opacity:.1,transform:'rotate(35deg)',animation:'bg-confetti 2.4s ease-in-out infinite alternate'}}/>
+        <div style={{position:'absolute',top:'75%',left:'12%',width:11,height:11,borderRadius:'50%',background:'#1CB0F6',opacity:.1,animation:'bg-confetti 2.1s ease-in-out infinite alternate'}}/>
+        <div style={{position:'absolute',top:'88%',right:'10%',width:13,height:13,borderRadius:4,background:'#ef4444',opacity:.1,transform:'rotate(-20deg)',animation:'bg-confetti 2.8s ease-in-out infinite alternate'}}/>
+        {/* Floating circles */}
+        <div style={{position:'absolute',top:'20%',right:'3%',width:40,height:40,borderRadius:'50%',background:'#1CB0F6',opacity:.07,animation:'bg-floaty 3s ease-in-out infinite'}}/>
+        <div style={{position:'absolute',top:'55%',left:'2%',width:32,height:32,borderRadius:'50%',background:'#ef4444',opacity:.07,animation:'bg-bob 3.5s ease-in-out infinite'}}/>
+        <div style={{position:'absolute',top:'40%',right:'2%',width:24,height:24,borderRadius:'50%',background:'#1CB0F6',opacity:.08,animation:'bg-floaty 2.6s ease-in-out infinite'}}/>
+        <div style={{position:'absolute',top:'90%',left:'5%',width:28,height:28,borderRadius:'50%',background:'#ef4444',opacity:.07,animation:'bg-bob 4s ease-in-out infinite'}}/>
+        {/* Spinning rings */}
+        <svg width={60} height={60} viewBox="0 0 60 60" style={{position:'absolute',top:'5%',right:'15%',opacity:.07,animation:'bg-spinslow 20s linear infinite'}}>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="#1CB0F6" strokeWidth="4" strokeDasharray="12 8"/>
+        </svg>
+        <svg width={44} height={44} viewBox="0 0 60 60" style={{position:'absolute',top:'65%',left:'3%',opacity:.07,animation:'bg-spinslow 25s linear infinite reverse'}}>
+          <circle cx="30" cy="30" r="26" fill="none" stroke="#ef4444" strokeWidth="4" strokeDasharray="10 10"/>
+        </svg>
+      </div>
         <div className="flex items-center justify-between px-3 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors duration-150 active:bg-gray-100" aria-label="Back">
             <BackIcon />
