@@ -11,15 +11,15 @@ const DUO_GREEN_DARK = '#46a302'
 // from this set, not freeform input, so the card list stays visually
 // consistent the way a real shop would.
 
-function CoinIcon({ size = 18 }) {
+function CoinIcon({ size = 36 }) {
   return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width={size} height={size} aria-hidden="true" alt="" />
 }
 
 function TvIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="6" width="18" height="13" rx="2" />
+      <rect x="3" y="6" width="36" height="26" rx="2" />
       <path d="M8 21h8M12 19v2M7 6l3-3 3 3" />
     </svg>
   )
@@ -27,7 +27,7 @@ function TvIcon() {
 
 function UtensilsIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M6 3v7a2 2 0 0 0 2 2v9M6 3v7M9 3v7M16 3c-1.5 0-3 2-3 5s1 5 3 5v9" />
     </svg>
@@ -36,7 +36,7 @@ function UtensilsIcon() {
 
 function MoonIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <path d="M21 12.5A9 9 0 1 1 11.5 3 7 7 0 0 0 21 12.5Z" />
     </svg>
   )
@@ -44,7 +44,7 @@ function MoonIcon() {
 
 function TreeIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 22v-7M8 15h8l-2.5-4h1.5L12 7l-2.5 4H11z" />
       <path d="M9 11 6.5 7H8l-2-3.5h12L16 7h1.5L15 11" />
@@ -54,9 +54,9 @@ function TreeIcon() {
 
 function FilmIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <rect x="3" y="4" width="36" height="32" rx="2" />
       <path d="M7 4v16M17 4v16M3 9h4M17 9h4M3 15h4M17 15h4" />
     </svg>
   )
@@ -64,9 +64,9 @@ function FilmIcon() {
 
 function GiftIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="9" width="18" height="11" rx="1" />
+      <rect x="3" y="9" width="36" height="22" rx="1" />
       <path d="M3 9h18M12 9v11M12 9C9 9 7 7 7 5.5A2.5 2.5 0 0 1 9.5 3C11.5 3 12 6 12 9ZM12 9c3 0 5-2 5-3.5A2.5 2.5 0 0 0 14.5 3C12.5 3 12 6 12 9Z" />
     </svg>
   )
@@ -93,7 +93,7 @@ function RewardCard({ gift, affordable, locked, onBuy }) {
       <div className="flex-1 min-w-0">
         <p className="font-display font-bold text-base text-gray-900 leading-tight">{gift.name}</p>
         <div className="flex items-center gap-1 mt-1">
-          <CoinIcon size={15} />
+          <CoinIcon size={30} />
           <span className="font-body font-bold text-sm text-amber-700">{gift.coin_price}</span>
         </div>
       </div>
@@ -270,7 +270,7 @@ export default function Rewards({ kidId, parentId }) {
               <div>
                 <p className="font-display font-bold text-xl text-gray-900">{confirming.name}</p>
                 <div className="flex items-center gap-1 mt-0.5">
-                  <CoinIcon size={15} />
+                  <CoinIcon size={30} />
                   <span className="font-body font-bold text-sm text-amber-700">{confirming.coin_price} coins</span>
                 </div>
               </div>
