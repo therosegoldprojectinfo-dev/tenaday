@@ -438,7 +438,10 @@ export default function Practice({
   const { speak, stop, speaking } = useSpeech()
 
   const q                = questions[idx]
-  const isCorrect        = selected === q?.answer
+  const isMultiSelect    = q?.format === 'two_truths'
+  const isCorrect        = isMultiSelect
+    ? (Array.isArray(selected) && q?.correctSet && selected.length === q.correctSet.length && selected.every(s => q.correctSet.includes(s)))
+    : selected === q?.answer
   const isTrueFalse      = q?.choiceType === 'truefalse'
   const isExpression     = q?.choiceType === 'expression' || q?.choiceType === 'comparison'
   const isTimed          = q?.isTimed === true
@@ -454,12 +457,15 @@ export default function Practice({
     if (revealed) return
     const choice = forcedChoice !== undefined ? forcedChoice : selected
     if (choice === null || choice === undefined) return
+    if (isMultiSelect && Array.isArray(choice) && choice.length < 2) return
 
     setRevealed(true)
-    if (choice === q.answer) {
+    const correct = isMultiSelect
+      ? (Array.isArray(choice) && q.correctSet && choice.length === q.correctSet.length && choice.every(s => q.correctSet.includes(s)))
+      : choice === q.answer
+    if (correct) {
       const newStreak = streak + 1
       setStreak(newStreak)
-      // Fire burst at streak milestones 3, 5, 7, 10+
       if (newStreak >= 3) setFireKey(k => k + 1)
     } else {
       setStreak(0)
@@ -779,7 +785,45 @@ export default function Practice({
 
         {/* ── Answer choices ───────────────────────────────────────── */}
         <div className="flex-1 flex flex-col justify-center px-4 gap-3">
-          {isTrueFalse ? (
+          {isMultiSelect ? (
+            // two_truths: pick 2, then CHECK button enables
+            <div className="flex flex-col gap-3">
+              <p className="text-center text-xs font-body text-gray-400 mb-1">Pick 2 correct answers</p>
+              {q.choices.map(choice => {
+                const selArr = Array.isArray(selected) ? selected : []
+                const isPicked = selArr.includes(choice)
+                const isCorrectChoice = revealed && q.correctSet?.includes(choice)
+                const isWrongChoice = revealed && isPicked && !q.correctSet?.includes(choice)
+                return (
+                  <button
+                    key={choice}
+                    disabled={revealed}
+                    onClick={() => {
+                      if (revealed) return
+                      const selArr = Array.isArray(selected) ? selected : []
+                      if (selArr.includes(choice)) {
+                        setSelected(selArr.filter(s => s !== choice))
+                      } else if (selArr.length < 2) {
+                        setSelected([...selArr, choice])
+                      }
+                    }}
+                    className={[
+                      'rounded-2xl border-2 font-body font-semibold text-base card-answer',
+                      'flex items-center justify-center py-4 w-full select-none px-4 text-center',
+                      revealed
+                        ? isCorrectChoice ? 'border-green-400 bg-green-50 text-green-700'
+                        : isWrongChoice ? 'border-red-400 bg-red-50 text-red-600'
+                        : 'border-gray-200 bg-white text-gray-400'
+                        : isPicked ? 'border-blue-400 bg-blue-50 text-blue-700'
+                        : 'border-gray-200 bg-white text-gray-700',
+                    ].join(' ')}
+                  >
+                    {choice}
+                  </button>
+                )
+              })}
+            </div>
+          ) : isTrueFalse ? (
             // True/False / Yes/No / More/Less: 2 wide buttons
             <div className="flex gap-3">
               {q.choices.map(choice => (
@@ -849,7 +893,7 @@ export default function Practice({
         <div className="flex-shrink-0 px-4 pb-8 pt-3">
           {!revealed ? (
             <button
-              disabled={selected === null}
+              disabled={isMultiSelect ? (!Array.isArray(selected) || selected.length < 2) : selected === null}
               onClick={() => handleCheck()}
               className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
             >
@@ -873,7 +917,7 @@ export default function Practice({
                   </p>
                   {!isCorrect && (
                     <p className="font-body text-sm text-red-400 leading-tight truncate">
-                      Answer: {q.answer}
+                      Answer: {isMultiSelect ? q.correctSet?.join(' and ') : q.answer}
                     </p>
                   )}
                 </div>
