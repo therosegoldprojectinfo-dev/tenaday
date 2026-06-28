@@ -504,7 +504,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
                 <p className="font-body text-gray-400 text-center py-8">Loading…</p>
               ) : coinHistory.length === 0 ? (
                 <div className="rounded-3xl bg-white border-2 border-dashed border-gray-200 py-10 text-center">
-                  <p className="mb-2"><img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="80" height="80" alt="coin" /></p>
+                  <p className="mb-2"><img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="80" height="80" alt="" /></p>
                   <p className="font-body text-sm text-gray-400">No transactions yet.</p>
                 </div>
               ) : (
@@ -601,7 +601,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
                   { label: 'Day streak', value: kidStreaks[viewingKid.id] ?? 0, emoji: '🔥' },
                   { label: 'Correct answers', value: kidStats[viewingKid.id].totalCorrect, emoji: '✅' },
                   { label: 'Sessions done', value: kidStats[viewingKid.id].nodesPassed, emoji: '⭐' },
-                  { label: 'Coin balance', value: viewingKid.coin_balance, icon: <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="36" height="36" alt="coin" /> },
+                  { label: 'Coin balance', value: viewingKid.coin_balance, icon: <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="36" height="36" alt="" /> },
                 ].map(({ label, value, emoji }) => (
                   <div key={label} className="rounded-2xl bg-gray-50 px-4 py-3">
                     <p className="text-2xl mb-1">{emoji}</p>
