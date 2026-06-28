@@ -420,7 +420,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           <div className="flex items-center gap-2">
             {/* Streak */}
             <div className="relative">
-              <button onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')} className="flex items-center gap-1.5 bg-orange-50 rounded-full px-3 py-2 border border-orange-200 active:scale-95 transition-transform">
+              <button onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')} className="flex items-center gap-1.5 active:scale-95 transition-transform">
                 <span className="text-base leading-none">🔥</span>
                 <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
               </button>
@@ -434,7 +434,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             </div>
             {/* Hearts */}
             <div className="relative">
-              <button onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }} className="flex items-center gap-1.5 bg-red-50 rounded-full px-3 py-2 border border-red-100 active:scale-95 transition-transform">
+              <button onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }} className="flex items-center gap-1.5 active:scale-95 transition-transform">
                 <HeartStatIcon />
                 <span className="font-body font-bold text-base text-red-400 leading-none tabular-nums">{kid.heart_balance ?? 5}</span>
               </button>
@@ -453,7 +453,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             </div>
             {/* Coins */}
             <div className="relative">
-              <button onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')} className={`flex items-center gap-1.5 rounded-full px-3 py-2 border active:scale-95 transition-transform ${inDebt ? 'border-red-200' : 'border-amber-200'}`} style={{ backgroundColor: inDebt ? 'rgba(239,68,68,0.06)' : 'rgba(255,183,0,0.08)' }}>
+              <button onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')} className="flex items-center gap-1.5 active:scale-95 transition-transform">
                 <CoinStatIcon />
                 <span className={`font-body font-bold text-base leading-none tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-700'}`}>{kid.coin_balance}</span>
               </button>
