@@ -23,7 +23,7 @@ function ZapIcon() {
 }
 
 function CoinIcon() {
-  return <img src="/ChatGPT Image 28 juin 2026, 09_27_20.png" width="44" height="44" aria-hidden="true" alt="" />
+  return <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="44" height="44" alt="" />
 }
 
 function TargetIcon() {
