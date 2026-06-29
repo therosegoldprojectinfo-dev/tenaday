@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { generateBatch } from '../lib/problems'
+import { generateHint } from '../lib/hints'
 import { themeFor } from '../lib/eraTheme'
 import { nodeLabel, nextStep, normalizeNode, OPERATIONS } from '../lib/progression'
 import { payoutForNode, NODE_PAYOUT } from '../lib/economy'
@@ -614,53 +615,21 @@ export default function Practice({
 
   const progressScale = (idx + (revealed ? 1 : 0)) / Math.max(questions.length, 1)
 
-  // Build hint text for popup
-  function buildHint(question) {
+  // Build smart personalized hint using the hint engine
+  function buildHint(question, wrongAnswer) {
     if (!question) return ''
-
-    // Bridge step1 — hint about picking the operation
     if (question.isBridgeStep1) {
-      return pick([
+      const opts = [
         'Read the question — are things being added or taken away? 🤔',
-        'Does the story say "more", "total", or "left"? That\'s your clue! 💡',
+        "Does the story say \"more\", \"total\", or \"left\"? That\'s your clue! 💡",
         'Think about what\'s happening in the story first! 📖',
-      ])
+      ]
+      return opts[Math.floor(Math.random() * opts.length)]
     }
-
-    // Hint based on operation
-    const op = question.bridgeOperation || operation
-    const hints = {
-      addition: [
-        'Start at the bigger number and count up! 🖐️',
-        'Use your fingers — count on from the first number! ✋',
-        'Think of it as putting two groups together! 🟡🟡',
-        'Count up slowly, one step at a time! 1... 2... 3...',
-      ],
-      subtraction: [
-        'Start at the big number and count backwards! 🔢',
-        'Use your fingers and take some away! ✋',
-        'Think: what\'s left if you remove some? 📦',
-        'Count down slowly from the first number! 10... 9... 8...',
-      ],
-      multiplication: [
-        'Think of it as groups! Count each group one by one! 🔵🔵🔵',
-        'Skip count! Like 2, 4, 6, 8... 🎵',
-        'Add the same number over and over! ➕➕➕',
-        'Draw the groups in your head! How many in each? 🧠',
-      ],
-      division: [
-        'How many times can you fit the small number into the big one? 📦',
-        'Think of sharing equally — deal them out one by one! 🃏',
-        'Count up in groups until you reach the big number! ➕',
-        'Multiplication can help — what times that number gives you this? 🔄',
-      ],
+    if (question.hintMeta) {
+      return generateHint({ ...question.hintMeta, wrongAnswer })
     }
-    const pool = hints[op] || hints.addition
-    return pick(pool)
-  }
-
-  function pick(arr) {
-    return arr[Math.floor(Math.random() * arr.length)]
+    return 'Take your time and try again! 💪'
   }
 
   // ── Answer handling ───────────────────────────────────────────────────
@@ -823,7 +792,7 @@ export default function Practice({
       {/* Numio wrong-answer popup */}
       <NumioPopup
         visible={showPopup}
-        hint={buildHint(q)}
+        hint={buildHint(q, selected)}
         answer={q?.answer}
         isSecondWrong={wrongAttempts >= 2}
         onRetry={handleRetry}
