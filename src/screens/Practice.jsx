@@ -650,7 +650,7 @@ export default function Practice({
       const newStreak = streak + 1
       setStreak(newStreak)
       if (newStreak >= 3) setFireKey(k => k + 1)
-      setEarnedCoins(c => c + Math.round((isRetry ? basePayout * 2 : basePayout) / (questions.length || 1)))
+      // coins awarded at session end via finalizeAttempt
 
       // If bridge step1 — no step2, just continue
       if (isBridge1) {
@@ -677,7 +677,7 @@ export default function Practice({
     setShowPopup(false)
     setRevealed(true)
     setIsRetry(false)
-    setEarnedCoins(c => c + Math.round((basePayout * 0.5) / (questions.length || 1)))
+    // half coins on give-up, awarded at session end
   }
 
   function handleTimerExpire() {
@@ -823,14 +823,14 @@ export default function Practice({
 
           <div className="flex items-center gap-2">
             <StreakBadge streak={streak} />
-            {/* Live coin display — ticks up after each correct answer */}
+            {/* Live coin display — shows total after session completes */}
             <div className="flex items-center gap-1">
               <CoinIcon size={28} />
               <span
-                key={coinBalance + earnedCoins}
+                key={coinBalance}
                 className="font-display font-bold text-base text-amber-500 anim-correct"
               >
-                {coinBalance + earnedCoins}
+                {coinBalance}
               </span>
             </div>
           </div>
