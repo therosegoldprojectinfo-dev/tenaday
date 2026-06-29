@@ -73,11 +73,11 @@ function CoinStatIcon() {
 
 // ── Node label mapping ────────────────────────────────────────────────────
 const NODE_DISPLAY_NAMES = {
-  unlock:        'Welcome',
+  welcome:       'Welcome',
   learn:         'Learn',
-  easy:          'Easy',
-  medium:        'Medium',
-  hard:          'Hard',
+  practice:      'Practice',
+  apply:         'Apply',
+  master:        'Master',
   double_reward: 'Double Reward',
   review:        'Review',
 }
@@ -288,7 +288,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
     const { table, batch, node } = openNode
     setOpenNode(null)
 
-    const targetUnlock = { operation, table, batch, node: 'unlock' }
+    const targetUnlock = { operation, table, batch, node: 'welcome' }
     const pos = chainPosition(currentPos, targetUnlock)
     if (pos === 'next_new_batch') {
       const allowed = await canStartNewUnit(kidId)
@@ -309,7 +309,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       } catch (err) { console.error('Failed to charge entry fee:', err) }
     }
 
-    const unlockBatch = node === 'unlock' ? previousBatch(operation, table, batch) : undefined
+    const unlockBatch = node === 'welcome' ? previousBatch(operation, table, batch) : undefined
     const reviewPool = node === 'review' ? reviewPoolFor(operation, table, batch) : undefined
 
     onStartNode({ operation, table, batchNum: batch, node, coinBalance: newBalance, heartBalance: kid.heart_balance ?? 5, reviewPool, unlockBatch, placementClaim: kid.placement_claim, kidCurrentStep: { operation: kid.current_operation, table: kid.current_table, batch: kid.current_batch || 1, node: normalizeNode(kid.current_node) } })
@@ -589,7 +589,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                   const unlockedInChain = unitStatus === 'completed' || (unitStatus === 'active' && isUnlocked(currentPos, targetPos))
                   const completedNode = unitStatus === 'completed' || (unitStatus === 'active' && isCompleted(currentPos, targetPos))
                   const isCurrent = unitStatus === 'active' && currentPos.table === table && currentPos.batch === batch && normalizeNode(currentPos.node) === node
-                  const isWelcome = node === 'unlock' && batch === 1 && table === 1 && (isCurrent || unlockedInChain)
+                  const isWelcome = node === 'welcome' && batch === 1 && table === 1 && (isCurrent || unlockedInChain)
                   const gateOpen = !kid.next_unlock_at || new Date(kid.next_unlock_at) <= new Date()
                   const isCurrentBatch = currentPos.operation === operation && currentPos.table === table && currentPos.batch === batch
                   const dayLocked = !gateOpen && isCurrentBatch && !completedNode
