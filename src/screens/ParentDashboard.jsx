@@ -338,6 +338,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
   }
 
   useEffect(() => { loadAll() }, [parentId])
+  useEffect(() => { if (!coinKidId && kids.length > 0) fetchCoinHistory(kids[0].id) }, [kids.length, coinKidId])
 
   async function handleDeleteReward(giftId) {
     await supabase.from('gifts').delete().eq('id', giftId)
@@ -455,7 +456,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
                 </div>
               )}
 
-              {/* Global starter rewards */}
+              {/* Global starter rewards — read only, parents cannot delete these */}
               <p className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide mb-2">Starter rewards</p>
               <div className="flex flex-col gap-2">
                 {gifts.filter(g => g.parent_id === null).map(gift => (
@@ -468,10 +469,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
                         <span className="font-body text-xs text-amber-700 font-bold">{gift.coin_price} coins</span>
                       </div>
                     </div>
-                    <button onClick={() => handleDeleteReward(gift.id)}
-                      className="w-8 h-8 rounded-xl flex items-center justify-center text-gray-400 active:bg-red-50 active:text-red-400 transition-colors">
-                      <TrashIcon />
-                    </button>
+                    <span className="font-body text-xs text-gray-300">Default</span>
                   </div>
                 ))}
               </div>
@@ -504,7 +502,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
                 </div>
               )}
               {/* Auto-load first kid */}
-              {!coinKidId && kids.length > 0 && (() => { fetchCoinHistory(kids[0].id); return null })()}
+              {/* auto-select first kid handled in useEffect */}
 
               {coinLoading ? (
                 <p className="font-body text-gray-400 text-center py-8">Loading…</p>
