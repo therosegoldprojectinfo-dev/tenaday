@@ -236,13 +236,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
     } else {
       setStreak(0)
       setWrong(w => w + 1)
-      setLives(l => l - 1)
-      setHeartKey(k => k + 1)
-    }
-  }
-
-  useEffect(() => {
-    if (!isTimed || over || revealed) return
+      setLives(l => Math.max(0, l - 1))
     timeoutRef.current = setTimeout(handleTimerExpire, 10000)
     return () => clearTimeout(timeoutRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -261,7 +255,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
     } else {
       setStreak(0)
       setWrong(w => w + 1)
-      setLives(l => l - 1)
+      setLives(l => Math.max(0, l - 1))
       setHeartKey(k => k + 1)
     }
   }
@@ -359,11 +353,8 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
           <div className="flex items-center gap-1.5">
             <StreakBadge streak={streak} />
             <div className="flex items-center gap-1">
-              {Array.from({ length: LIVES_START }).map((_, i) => (
-                <HeartIcon key={i} filled={i < lives}
-                  className={lives > 0 && i === lives - 1 && heartKey > 0 ? 'anim-heart-pulse' : ''}
-                />
-              ))}
+              <HeartIcon />
+              <span className="font-display font-bold text-base text-red-500">{lives}</span>
             </div>
           </div>
         </div>
