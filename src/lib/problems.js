@@ -10,7 +10,7 @@
 // DOUBLE REWARD   — mixed, timed (5s), typed answer only, current unit facts
 // REVIEW   (20 q) — mixed types, MC + typed mix, timed 1/3, all seen units
 
-import { factsForBatch } from './progression'
+import { factsForBatch, OPERATIONS } from './progression'
 
 // ── Utilities ──────────────────────────────────────────────────────────────
 
@@ -277,15 +277,28 @@ function generateReview(operation, table, batch, reviewPool) {
 }
 
 // ── Diagnostic generator ───────────────────────────────────────────────────
+// Like review but covers ALL operations up to and including the claimed one.
+// MC + typed mix, 1/3 timed, 25 questions.
 
 export function generateDiagnostic(claimedOperation, selectedTables) {
   const tables = (selectedTables && selectedTables.length > 0)
     ? selectedTables
     : Array.from({ length: 12 }, (_, i) => i + 1)
-  return Array.from({ length: 25 }, () => {
-    const table = pick(tables)
-    const fact  = randInt(1, 12)
-    return makeMixed(claimedOperation, table, fact, { isTimed: false, isTyped: false })
+
+  // All operations up to and including the claimed one
+  const claimedIdx = OPERATIONS.indexOf(claimedOperation)
+  const operations = claimedIdx >= 0
+    ? OPERATIONS.slice(0, claimedIdx + 1)
+    : [claimedOperation]
+
+  return Array.from({ length: 25 }, (_, i) => {
+    const operation = pick(operations)
+    const table     = pick(tables)
+    const fact      = randInt(1, 12)
+    // Every 3rd question is typed, 1/3 are timed (same pattern as review)
+    const isTyped = (i % 3 === 2)
+    const isTimed = (i % 3 === 1)
+    return makeMixed(operation, table, fact, { isTimed, isTyped })
   })
 }
 
