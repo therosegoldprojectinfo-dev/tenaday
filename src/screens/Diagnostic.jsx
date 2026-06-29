@@ -109,10 +109,20 @@ function DiedScreen({ onRetry }) {
   )
 }
 
-function ResultScreen({ passed, correct, claimedOperation, saving, onContinue }) {
-  const opLabel = claimedOperation.charAt(0).toUpperCase() + claimedOperation.slice(1)
-  const nextOp = OPERATIONS[OPERATIONS.indexOf(claimedOperation) + 1]
-  const nextLabel = nextOp ? nextOp.charAt(0).toUpperCase() + nextOp.slice(1) : null
+function ResultScreen({ passed, correct, claimedOperation, selectedTables, saving, onContinue }) {
+  const opLabel  = claimedOperation.charAt(0).toUpperCase() + claimedOperation.slice(1)
+  const maxTable = selectedTables && selectedTables.length > 0 ? Math.max(...selectedTables) : 12
+  const nextTable = maxTable + 1
+  const nextOp   = OPERATIONS[OPERATIONS.indexOf(claimedOperation) + 1]
+
+  let successMessage
+  if (nextTable <= 12) {
+    successMessage = `Amazing! You know ${opLabel} up to table ${maxTable}. Let's continue from table ${nextTable}!`
+  } else if (nextOp) {
+    successMessage = `You know all of ${opLabel}! Time to start ${nextOp.charAt(0).toUpperCase() + nextOp.slice(1)}!`
+  } else {
+    successMessage = 'Incredible — you know it all! 🏆'
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
@@ -124,8 +134,8 @@ function ResultScreen({ passed, correct, claimedOperation, saving, onContinue })
           </h2>
           <p className="font-body text-gray-500 leading-relaxed">
             {passed
-              ? `Amazing! You scored ${correct}/${SESSION_TOTAL}. ${nextLabel ? `Time to start ${nextLabel}!` : 'You know it all!'}`
-              : `You scored ${correct}/${SESSION_TOTAL} on ${opLabel}. No worries — you'll start from the beginning and build a solid foundation!`}
+              ? successMessage
+              : `No worries — you'll start from the beginning and build a solid foundation!`}
           </p>
         </div>
         <button onClick={onContinue} disabled={saving}
@@ -265,19 +275,41 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
     if (didPass && kidId) {
       setSaving(true)
       try {
-        // Pass = claimed chapter is done → start at the NEXT chapter
-        // e.g. claimed addition → starts at subtraction/table1/batch1/learn
-        const claimedIdx = OPERATIONS.indexOf(claimedOperation)
-        const nextOp = OPERATIONS[claimedIdx + 1]
-        if (nextOp) {
-          await updateProgress(kidId, {
-            operation: nextOp,
-            table: 1,
+        // Pass = kid proved they know claimed tables
+        // → start at the first table they did NOT claim within the same operation
+        // → if they claimed all 12, move to next operation table 1
+        const claimedIdx    = OPERATIONS.indexOf(claimedOperation)
+        const maxTable      = selectedTables && selectedTables.length > 0
+          ? Math.max(...selectedTables)
+          : 12
+        const nextTable     = maxTable + 1
+
+        let nextProgress
+        if (nextTable <= 12) {
+          // Still within the same operation — start at the next unclaimed table
+          nextProgress = {
+            operation: claimedOperation,
+            table: nextTable,
             batch: 1,
-            node: 'learn', // day 1 of new chapter shows welcome, cursor at learn
-          })
+            node: 'welcome',
+          }
+        } else {
+          // All 12 tables claimed for this operation → move to next operation
+          const nextOp = OPERATIONS[claimedIdx + 1]
+          if (nextOp) {
+            nextProgress = {
+              operation: nextOp,
+              table: 1,
+              batch: 1,
+              node: 'welcome',
+            }
+          }
+          // If division and all claimed → stay, nothing to advance to
         }
-        // If claimed division (last op), nothing to advance to — stays at division
+
+        if (nextProgress) {
+          await updateProgress(kidId, nextProgress)
+        }
       } catch (err) {
         console.error('Diagnostic: failed to set progress cursor:', err)
       } finally {
@@ -290,8 +322,8 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
 
   if (over === 'died') {
     return <DiedScreen onRetry={() => {
-      setIdx(0); setLives(LIVES_START); setSelected(null); setRevealed(false)
-      setWrong(0); setOver(null); setHeartKey(0); setStreak(0); setFireKey(0)
+      setIdx(0); setSelected(null); setRevealed(false)
+      setWrong(0); setOver(null); setStreak(0); setFireKey(0)
     }} />
   }
 
@@ -304,6 +336,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
           passed={passed}
           correct={correct}
           claimedOperation={claimedOperation}
+          selectedTables={selectedTables}
           saving={saving}
           onContinue={() => passed ? onPass() : onFail()}
         />
