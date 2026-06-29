@@ -209,21 +209,20 @@ function makeBridgeStep1(operation, table, fact) {
   const { a, b } = factValues(operation, table, fact)
   const sym = SYMBOL[operation]
   const correctExpr = `${a} ${sym} ${b}`
+  const wordText = wordProblem(operation, a, b)
 
-  // Kid types the formula — no choices
-  // We accept the formula with or without spaces, and handle − vs -
   return {
-    text: `${a} ${sym} ${b} = ?\n\nHow do we find the correct answer?\nType the formula:`,
+    text: `${wordText}\n\nHow do we find the answer?\nType the formula:`,
     answer: correctExpr,
     choiceType: 'formula',
     choices: [],
     isTimed: false,
     isTyped: true,
     isBridgeStep1: true,
+    // NO step2 — formula answer is the end
     bridgeOperation: operation,
     bridgeTable: table,
     bridgeFact: fact,
-    bridgeWordText: `${a} ${sym} ${b}`,
   }
 }
 
