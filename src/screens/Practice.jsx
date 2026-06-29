@@ -85,16 +85,17 @@ function useCoinTick(target, active) {
 
 function FireParticles({ streakKey, streak }) {
   if (streak < 3) return null
-  const count = Math.min(streak, 12)
-  const headCount = Math.min(Math.floor(streak / 3), 5)
+  // Chaos mode from streak 3 — feels like 10000 consecutive
+  const fireCount = Math.min(8 + streak * 4, 40)
+  const headCount = Math.min(3 + streak * 2, 20)
   return (
     <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden" key={streakKey}>
-      {/* Fire emojis */}
-      {Array.from({ length: count }).map((_, i) => {
-        const left = 10 + Math.random() * 80
-        const delay = Math.random() * 0.4
-        const duration = 1.2 + Math.random() * 0.6
-        const size = streak >= 7 ? 28 + Math.random() * 16 : 20 + Math.random() * 12
+      {/* Fire emojis — everywhere */}
+      {Array.from({ length: fireCount }).map((_, i) => {
+        const left = Math.random() * 100
+        const delay = Math.random() * 0.6
+        const duration = 0.8 + Math.random() * 1.0
+        const size = 24 + Math.random() * 36
         return (
           <div key={`fire-${i}`} style={{
             position: 'absolute', bottom: -40, left: `${left}%`,
@@ -102,16 +103,16 @@ function FireParticles({ streakKey, streak }) {
           }}>🔥</div>
         )
       })}
-      {/* Flying Numio heads */}
+      {/* Flying Numio heads — big, everywhere */}
       {Array.from({ length: headCount }).map((_, i) => {
-        const left = 5 + Math.random() * 90
-        const delay = 0.1 + Math.random() * 0.5
-        const duration = 1.4 + Math.random() * 0.8
-        const size = 32 + Math.random() * 20
-        const rotate = (Math.random() - 0.5) * 40
+        const left = Math.random() * 95
+        const delay = Math.random() * 0.7
+        const duration = 0.9 + Math.random() * 1.2
+        const size = 40 + Math.random() * 60
+        const rotate = (Math.random() - 0.5) * 60
         return (
           <div key={`head-${i}`} style={{
-            position: 'absolute', bottom: -50, left: `${left}%`,
+            position: 'absolute', bottom: -60, left: `${left}%`,
             width: size, height: size,
             animation: `fire-rise ${duration}s ${delay}s ease-out both`,
             transform: `rotate(${rotate}deg)`,
@@ -184,12 +185,6 @@ function SpeedCountdown({ durationMs }) {
 
 // ── 🌼 Numio wrong-answer mascot popup with typewriter bubble ─────────────
 
-const BUBBLE_MESSAGES = (hint) => [
-  'Not quite my friend... 🌸',
-  `For this question the correct way was ${hint}`,
-  'Retry my friend! You got this! 💪',
-]
-
 function useTypewriter(text, active, speed = 35) {
   const [displayed, setDisplayed] = useState('')
   useEffect(() => {
@@ -206,18 +201,33 @@ function useTypewriter(text, active, speed = 35) {
   return displayed
 }
 
-function NumioPopup({ visible, hint, onRetry, onGiveUp }) {
-  const [phase, setPhase] = useState(0) // 0,1,2
-  const messages = BUBBLE_MESSAGES(hint)
+// isSecondWrong = true → show answer + give up button
+// isSecondWrong = false → show hint + retry button
+function NumioPopup({ visible, hint, answer, isSecondWrong, onRetry, onGiveUp }) {
+  const [phase, setPhase] = useState(0)
+
+  // Messages differ based on whether this is first or second wrong
+  const messages = isSecondWrong
+    ? [
+        'Almost my friend! 🌸',
+        `The answer was ${answer} — remember it!`,
+        'Keep going, you\'re doing great! 💪',
+      ]
+    : [
+        'Not quite my friend... 🌸',
+        `Hint: think about ${hint}`,
+        'Retry my friend! You got this! 💪',
+      ]
+
   const displayed = useTypewriter(messages[phase], visible)
 
   useEffect(() => {
     if (!visible) { setPhase(0); return }
     setPhase(0)
-    const t1 = setTimeout(() => setPhase(1), messages[0].length * 35 + 1000)
-    const t2 = setTimeout(() => setPhase(2), messages[0].length * 35 + 1000 + messages[1].length * 35 + 800)
+    const t1 = setTimeout(() => setPhase(1), messages[0].length * 35 + 900)
+    const t2 = setTimeout(() => setPhase(2), messages[0].length * 35 + 900 + messages[1].length * 35 + 700)
     return () => { clearTimeout(t1); clearTimeout(t2) }
-  }, [visible])
+  }, [visible, isSecondWrong])
 
   if (!visible) return null
 
@@ -227,74 +237,58 @@ function NumioPopup({ visible, hint, onRetry, onGiveUp }) {
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'flex-end',
       paddingBottom: 0,
-      background: 'rgba(255,255,255,0.85)',
+      background: 'rgba(255,255,255,0.88)',
     }}>
       {/* Bubble */}
       <div style={{
-        background: 'white',
-        borderRadius: 24,
-        border: '2px solid #e5e7eb',
-        padding: '18px 24px',
-        maxWidth: 320,
-        marginBottom: 16,
+        background: 'white', borderRadius: 24,
+        border: '2px solid #e5e7eb', padding: '18px 24px',
+        maxWidth: 320, marginBottom: 16,
         boxShadow: '0 8px 32px rgba(0,0,0,0.10)',
-        position: 'relative',
-        animation: 'fadeUp 0.3s ease both',
-        minHeight: 64,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 14,
+        position: 'relative', animation: 'fadeUp 0.3s ease both',
+        minHeight: 64, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', gap: 14,
       }}>
         <p style={{
-          fontFamily: "'Baloo 2', sans-serif",
-          fontWeight: 700, fontSize: 17,
-          color: '#3c3c3c', textAlign: 'center',
-          lineHeight: 1.4, margin: 0,
-          minHeight: 48,
+          fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 17,
+          color: '#3c3c3c', textAlign: 'center', lineHeight: 1.4, margin: 0, minHeight: 48,
         }}>
           {displayed}
         </p>
 
-        {/* Retry button appears on phase 2 */}
         {phase === 2 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
-            <button
-              onClick={onRetry}
-              style={{
+            {!isSecondWrong ? (
+              <button onClick={onRetry} style={{
                 width: '100%', border: 'none', cursor: 'pointer',
                 padding: '14px 0', borderRadius: 14,
                 background: '#58cc02', boxShadow: '0 4px 0 #46a302',
                 color: '#fff', fontFamily: "'Baloo 2', sans-serif",
                 fontWeight: 800, fontSize: 16, letterSpacing: '0.05em',
-                textTransform: 'uppercase',
-                animation: 'fadeUp 0.3s ease both',
-              }}
-            >
-              RETRY 🔄
-            </button>
-            <button
-              onClick={onGiveUp}
-              style={{
+                textTransform: 'uppercase', animation: 'fadeUp 0.3s ease both',
+              }}>
+                RETRY 🔄
+              </button>
+            ) : (
+              <button onClick={onGiveUp} style={{
                 width: '100%', border: 'none', cursor: 'pointer',
-                padding: '10px 0', borderRadius: 14,
-                background: 'none', color: '#9ca3af',
-                fontFamily: "'Baloo 2', sans-serif",
-                fontWeight: 700, fontSize: 13,
-              }}
-            >
-              Show me the answer
-            </button>
+                padding: '14px 0', borderRadius: 14,
+                background: '#FF9600', boxShadow: '0 4px 0 #c97700',
+                color: '#fff', fontFamily: "'Baloo 2', sans-serif",
+                fontWeight: 800, fontSize: 16, letterSpacing: '0.05em',
+                textTransform: 'uppercase', animation: 'fadeUp 0.3s ease both',
+              }}>
+                CONTINUE →
+              </button>
+            )}
           </div>
         )}
 
         {/* Bubble tail */}
         <div style={{
           position: 'absolute', bottom: -14, left: '50%',
-          transform: 'translateX(-50%)',
-          width: 0, height: 0,
-          borderLeft: '12px solid transparent',
-          borderRight: '12px solid transparent',
+          transform: 'translateX(-50%)', width: 0, height: 0,
+          borderLeft: '12px solid transparent', borderRight: '12px solid transparent',
           borderTop: '14px solid white',
         }} />
       </div>
@@ -506,8 +500,9 @@ export default function Practice({
 
   // Wrong answer / retry state
   const [showPopup,    setShowPopup]    = useState(false)
-  const [isRetry,      setIsRetry]      = useState(false)   // true = this is a retry attempt
-  const [earnedCoins,  setEarnedCoins]  = useState(0)       // accumulates during session
+  const [isRetry,      setIsRetry]      = useState(false)
+  const [wrongAttempts, setWrongAttempts] = useState(0) // 0,1,2 per question
+  const [earnedCoins,  setEarnedCoins]  = useState(0)
 
   const timeoutRef = useRef(null)
   const { speak, stop, speaking } = useSpeech()
@@ -551,12 +546,9 @@ export default function Practice({
       const newStreak = streak + 1
       setStreak(newStreak)
       if (newStreak >= 3) setFireKey(k => k + 1)
+      setEarnedCoins(c => c + Math.round((isRetry ? basePayout * 2 : basePayout) / (questions.length || 1)))
 
-      // Award coins
-      const coins = isRetry ? basePayout * 2 : basePayout
-      setEarnedCoins(c => c + Math.round(coins / (questions.length || 1)))
-
-      // If this was bridge step1, inject step2 right after current idx
+      // If bridge step1 correct, inject step2
       if (isBridge1) {
         const step2 = makeBridgeStep2(q.bridgeOperation, q.bridgeTable, q.bridgeFact, q.bridgeWordText)
         setQuestions(qs => {
@@ -566,10 +558,12 @@ export default function Practice({
         })
       }
     } else {
-      // Wrong — show popup, don't reveal yet
-      setShowPopup(true)
+      // Wrong
       setStreak(0)
       setWrong(w => w + 1)
+      const newWrongAttempts = wrongAttempts + 1
+      setWrongAttempts(newWrongAttempts)
+      setShowPopup(true)
     }
   }
 
@@ -580,12 +574,11 @@ export default function Practice({
   }
 
   function handleGiveUp() {
-    // Show the answer, give half coins, move on
+    // Second wrong — show answer, give half coins, move on
     setShowPopup(false)
     setRevealed(true)
     setIsRetry(false)
-    const halfCoins = Math.round((basePayout * 0.5) / (questions.length || 1))
-    setEarnedCoins(c => c + halfCoins)
+    setEarnedCoins(c => c + Math.round((basePayout * 0.5) / (questions.length || 1)))
   }
 
   function handleTimerExpire() {
@@ -600,9 +593,10 @@ export default function Practice({
       setStreak(newStreak)
       if (newStreak >= 3) setFireKey(k => k + 1)
     } else {
-      setShowPopup(true)
       setStreak(0)
       setWrong(w => w + 1)
+      setWrongAttempts(w => w + 1)
+      setShowPopup(true)
     }
   }
 
@@ -615,6 +609,7 @@ export default function Practice({
 
   function handleContinue() {
     setIsRetry(false)
+    setWrongAttempts(0)
     const total = questions.length
     if (idx === total - 1) {
       const correct = total - wrong
@@ -705,6 +700,8 @@ export default function Practice({
       <NumioPopup
         visible={showPopup}
         hint={buildHint(q)}
+        answer={q?.answer}
+        isSecondWrong={wrongAttempts >= 2}
         onRetry={handleRetry}
         onGiveUp={handleGiveUp}
       />
