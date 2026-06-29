@@ -58,7 +58,7 @@ function DayCircle({ label, filled, isCurrent, delay }) {
 export default function StreakSlide({ dayStreak = 1, onContinue }) {
   const todayIdx = new Date().getDay() // 0=Su, 1=M, ...
 
-  // Show 2 days back + today + 2 ahead = 5 circles
+  // Show 2 days back + today + 2 ahead = 5 circles (fits mobile)
   const windowSize = 5
   const startOffset = -2
   const circleIndices = Array.from({ length: windowSize }, (_, i) => {
