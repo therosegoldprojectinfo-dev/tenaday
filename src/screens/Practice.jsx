@@ -1,20 +1,15 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
-import { generateBatch } from '../lib/problems'
+import { generateBatch, makeBridgeStep2 } from '../lib/problems'
 import { themeFor } from '../lib/eraTheme'
-import { nodeLabel, nextStep, stepIndex, normalizeNode, OPERATIONS } from '../lib/progression'
-import { applyPayout, payoutForNode, passThresholdFor, NODE_PAYOUT, ENTRY_FEE, DEBT_FLOOR } from '../lib/economy'
+import { nodeLabel, nextStep, normalizeNode, OPERATIONS } from '../lib/progression'
+import { applyPayout, payoutForNode, passThresholdFor, NODE_PAYOUT } from '../lib/economy'
 import FlowerJump from '../components/FlowerJump'
 import {
   updateProgress,
-  stampAdvanceDate,
   setCoinBalance,
   logCoinTransaction,
   logAttempt,
-  setHeartBalance,
-  rechargeHeart,
 } from '../lib/kidData'
-
-const LIVES_START = 5
 
 // Per-node question counts
 const NODE_TOTALS = {
@@ -27,7 +22,7 @@ const NODE_TOTALS = {
   review:        20,
 }
 
-// Per-node timer in ms (0 = no timer)
+// Per-node timer in ms
 const NODE_TIMER_MS = {
   master:        10000,
   double_reward:  5000,
@@ -44,12 +39,6 @@ function XIcon() {
   )
 }
 
-function HeartIcon({ filled = true, className = '', style }) {
-  return (
-    <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="44" height="44" alt="" />
-  )
-}
-
 function CoinIcon({ size = 36 }) {
   return <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width={size} height={size} alt="" />
 }
@@ -59,18 +48,17 @@ function CoinIcon({ size = 36 }) {
 function cardColorClass(choice, selected, revealed, answer) {
   if (!revealed) {
     return selected === choice
-      ? 'border-green-500 bg-green-50 text-green-600'
+      ? 'border-blue-400 bg-blue-50 text-blue-700'
       : 'border-gray-200 bg-white text-gray-800'
   }
   if (choice === answer)   return 'border-green-500 bg-green-50 text-green-700'
-  if (choice === selected) return 'border-red-400 bg-red-50 text-red-500'
+  if (choice === selected) return 'border-amber-300 bg-amber-50 text-amber-600'
   return 'border-gray-100 bg-white text-gray-300'
 }
 
 function cardAnimClass(choice, selected, revealed, answer) {
   if (!revealed) return ''
-  if (choice === answer)   return 'anim-correct'
-  if (choice === selected) return 'anim-wrong-shake'
+  if (choice === answer) return 'anim-correct'
   return ''
 }
 
@@ -93,31 +81,42 @@ function useCoinTick(target, active) {
   return displayed
 }
 
-// ── End screens ───────────────────────────────────────────────────────────
+// ── 🔥 Fire + flying Numio heads streak particles ─────────────────────────
 
-/** 🔥 Fire particles that rise from the bottom when streak hits milestones */
 function FireParticles({ streakKey, streak }) {
   if (streak < 3) return null
   const count = Math.min(streak, 12)
+  const headCount = Math.min(Math.floor(streak / 3), 5)
   return (
     <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden" key={streakKey}>
+      {/* Fire emojis */}
       {Array.from({ length: count }).map((_, i) => {
         const left = 10 + Math.random() * 80
         const delay = Math.random() * 0.4
         const duration = 1.2 + Math.random() * 0.6
         const size = streak >= 7 ? 28 + Math.random() * 16 : 20 + Math.random() * 12
         return (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              bottom: -40,
-              left: `${left}%`,
-              fontSize: size,
-              animation: `fire-rise ${duration}s ${delay}s ease-out both`,
-            }}
-          >
-            {streak >= 7 ? '🔥' : '🔥'}
+          <div key={`fire-${i}`} style={{
+            position: 'absolute', bottom: -40, left: `${left}%`,
+            fontSize: size, animation: `fire-rise ${duration}s ${delay}s ease-out both`,
+          }}>🔥</div>
+        )
+      })}
+      {/* Flying Numio heads */}
+      {Array.from({ length: headCount }).map((_, i) => {
+        const left = 5 + Math.random() * 90
+        const delay = 0.1 + Math.random() * 0.5
+        const duration = 1.4 + Math.random() * 0.8
+        const size = 32 + Math.random() * 20
+        const rotate = (Math.random() - 0.5) * 40
+        return (
+          <div key={`head-${i}`} style={{
+            position: 'absolute', bottom: -50, left: `${left}%`,
+            width: size, height: size,
+            animation: `fire-rise ${duration}s ${delay}s ease-out both`,
+            transform: `rotate(${rotate}deg)`,
+          }}>
+            <img src="/onboarding-mascot.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>
         )
       })}
@@ -125,7 +124,6 @@ function FireParticles({ streakKey, streak }) {
   )
 }
 
-/** 🎉 Confetti that bursts up from the bottom on session complete */
 function ConfettiBlast({ active }) {
   if (!active) return null
   const colors = ['#58cc02','#1CB0F6','#FF9600','#FF4B4B','#CE82FF','#FFD900','#FF6B6B','#4ECDC4']
@@ -139,47 +137,36 @@ function ConfettiBlast({ active }) {
         const color = colors[i % colors.length]
         const isCircle = i % 3 === 0
         return (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              bottom: -20,
-              left: `${left}%`,
-              width: size,
-              height: size,
-              borderRadius: isCircle ? '50%' : 2,
-              backgroundColor: color,
-              animation: `confetti-rise ${duration}s ${delay}s cubic-bezier(0.2,0.8,0.3,1) both`,
-              transform: `rotate(${Math.random() * 360}deg)`,
-            }}
-          />
+          <div key={i} style={{
+            position: 'absolute', bottom: -20, left: `${left}%`,
+            width: size, height: size,
+            borderRadius: isCircle ? '50%' : 2,
+            backgroundColor: color,
+            animation: `confetti-rise ${duration}s ${delay}s cubic-bezier(0.2,0.8,0.3,1) both`,
+            transform: `rotate(${Math.random() * 360}deg)`,
+          }} />
         )
       })}
     </div>
   )
 }
 
-/** 🔥 Streak badge shown in the header */
 function StreakBadge({ streak }) {
   if (streak < 2) return null
   const hot = streak >= 7
   const warm = streak >= 4
   return (
-    <div
-      key={streak}
-      className="flex items-center gap-1 px-2.5 py-1 rounded-full anim-correct"
+    <div key={streak} className="flex items-center gap-1 px-2.5 py-1 rounded-full anim-correct"
       style={{
         backgroundColor: hot ? '#FF4500' : warm ? '#FF9600' : '#FFB700',
         boxShadow: hot ? '0 0 12px rgba(255,69,0,0.6)' : 'none',
-      }}
-    >
+      }}>
       <span style={{ fontSize: hot ? 16 : 14 }}>🔥</span>
-      <span className="font-display font-extrabold text-white" style={{ fontSize: hot ? 15 : 13 }}>
-        {streak}
-      </span>
+      <span className="font-display font-extrabold text-white" style={{ fontSize: hot ? 15 : 13 }}>{streak}</span>
     </div>
   )
 }
+
 function SpeedCountdown({ durationMs }) {
   const total = Math.ceil(durationMs / 1000)
   const [count, setCount] = useState(total)
@@ -191,96 +178,166 @@ function SpeedCountdown({ durationMs }) {
   const color = count <= 2 ? '#EF4444' : count === 3 ? '#F97316' : '#9CA3AF'
   const size  = count <= 2 ? 'text-2xl' : count === 3 ? 'text-xl' : 'text-base'
   return (
-    <span key={count} className={`font-display font-extrabold ${size} anim-correct`} style={{ color }}>
-      {count}s
-    </span>
+    <span key={count} className={`font-display font-extrabold ${size} anim-correct`} style={{ color }}>{count}s</span>
   )
 }
 
-function DiedScreen({ saving, onExit, heartBalance, coinBalance, kidId, onRecharge }) {
-  const [recharging, setRecharging] = React.useState(false)
-  const noHearts = (heartBalance ?? 0) <= 0
+// ── 🌼 Numio wrong-answer mascot popup with typewriter bubble ─────────────
 
-  async function handleRecharge() {
-    if (!kidId || recharging) return
-    setRecharging(true)
-    try {
-      const { newHearts, newCoins } = await rechargeHeart(kidId, heartBalance ?? 0, coinBalance ?? 0)
-      onRecharge?.(newHearts, newCoins)
-    } catch (e) {
-      console.error('recharge failed', e)
-    } finally {
-      setRecharging(false)
-    }
-  }
+const BUBBLE_MESSAGES = (hint) => [
+  'Not quite my friend... 🌸',
+  `For this question the correct way was ${hint}`,
+  'Retry my friend! You got this! 💪',
+]
+
+function useTypewriter(text, active, speed = 35) {
+  const [displayed, setDisplayed] = useState('')
+  useEffect(() => {
+    if (!active) { setDisplayed(''); return }
+    setDisplayed('')
+    let i = 0
+    const id = setInterval(() => {
+      i++
+      setDisplayed(text.slice(0, i))
+      if (i >= text.length) clearInterval(id)
+    }, speed)
+    return () => clearInterval(id)
+  }, [text, active, speed])
+  return displayed
+}
+
+function NumioPopup({ visible, hint, onRetry, onGiveUp }) {
+  const [phase, setPhase] = useState(0) // 0,1,2
+  const messages = BUBBLE_MESSAGES(hint)
+  const displayed = useTypewriter(messages[phase], visible)
+
+  useEffect(() => {
+    if (!visible) { setPhase(0); return }
+    setPhase(0)
+    const t1 = setTimeout(() => setPhase(1), messages[0].length * 35 + 1000)
+    const t2 = setTimeout(() => setPhase(2), messages[0].length * 35 + 1000 + messages[1].length * 35 + 800)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [visible])
+
+  if (!visible) return null
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
-      <div className="h-screen md:h-auto md:min-h-[560px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
-        <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="160" height="160" style={{opacity:0.4}} alt="" />
-        <div className="text-center">
-          <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">Out of lives!</h2>
-          <p className="font-body text-gray-400 text-sm leading-relaxed">
-            {noHearts ? 'You have no hearts left. Recharge to try again!' : 'That was a tough one. You can try again — it\'s free!'}
-          </p>
-        </div>
-        {noHearts ? (
-          <div className="w-full flex flex-col gap-3">
-            {(coinBalance ?? 0) >= 10 ? (
-              <button onClick={handleRecharge} disabled={recharging}
-                className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
-                style={{ backgroundColor: '#ef4444', boxShadow: '0 4px 0 0 #b91c1c' }}>
-                {recharging ? 'Recharging…' : '♥ Recharge 1 heart — 10 coins'}
-              </button>
-            ) : (
-              <div className="rounded-2xl bg-red-50 border border-red-100 px-5 py-4 text-center">
-                <p className="font-display font-bold text-base text-red-700 mb-1">Not enough coins</p>
-                <p className="font-body text-sm text-red-400">You need 10 coins to recharge. Come back tomorrow — hearts refill at midnight!</p>
-              </div>
-            )}
-            <button onClick={onExit} disabled={saving}
-              className="w-full py-3 rounded-2xl font-body font-bold text-base text-gray-400 border border-gray-200">
-              Back to map
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 60,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'flex-end',
+      paddingBottom: 0,
+      background: 'rgba(255,255,255,0.85)',
+    }}>
+      {/* Bubble */}
+      <div style={{
+        background: 'white',
+        borderRadius: 24,
+        border: '2px solid #e5e7eb',
+        padding: '18px 24px',
+        maxWidth: 320,
+        marginBottom: 16,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.10)',
+        position: 'relative',
+        animation: 'fadeUp 0.3s ease both',
+        minHeight: 64,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 14,
+      }}>
+        <p style={{
+          fontFamily: "'Baloo 2', sans-serif",
+          fontWeight: 700, fontSize: 17,
+          color: '#3c3c3c', textAlign: 'center',
+          lineHeight: 1.4, margin: 0,
+          minHeight: 48,
+        }}>
+          {displayed}
+        </p>
+
+        {/* Retry button appears on phase 2 */}
+        {phase === 2 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+            <button
+              onClick={onRetry}
+              style={{
+                width: '100%', border: 'none', cursor: 'pointer',
+                padding: '14px 0', borderRadius: 14,
+                background: '#58cc02', boxShadow: '0 4px 0 #46a302',
+                color: '#fff', fontFamily: "'Baloo 2', sans-serif",
+                fontWeight: 800, fontSize: 16, letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                animation: 'fadeUp 0.3s ease both',
+              }}
+            >
+              RETRY 🔄
+            </button>
+            <button
+              onClick={onGiveUp}
+              style={{
+                width: '100%', border: 'none', cursor: 'pointer',
+                padding: '10px 0', borderRadius: 14,
+                background: 'none', color: '#9ca3af',
+                fontFamily: "'Baloo 2', sans-serif",
+                fontWeight: 700, fontSize: 13,
+              }}
+            >
+              Show me the answer
             </button>
           </div>
-        ) : (
-          <button onClick={onExit} disabled={saving}
-            className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
-            {saving ? 'SAVING…' : 'TRY AGAIN'}
-          </button>
         )}
+
+        {/* Bubble tail */}
+        <div style={{
+          position: 'absolute', bottom: -14, left: '50%',
+          transform: 'translateX(-50%)',
+          width: 0, height: 0,
+          borderLeft: '12px solid transparent',
+          borderRight: '12px solid transparent',
+          borderTop: '14px solid white',
+        }} />
       </div>
+
+      {/* Numio mascot floating */}
+      <div style={{ animation: 'mascot-float 1.8s ease-in-out infinite', marginBottom: 0 }}>
+        <img src="/onboarding-mascot.png" alt="Numio" style={{ width: 130, height: 'auto', display: 'block' }} />
+      </div>
+
+      <style>{`
+        @keyframes mascot-float {
+          0%,100% { transform: translateY(0px); }
+          50%      { transform: translateY(-10px); }
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   )
 }
 
-function FinishedScreen({ passed, correct, total, payout, isReview, saving, onExit }) {
-  const coinDisplayed = useCoinTick(payout, passed)
+// ── Finished screen ───────────────────────────────────────────────────────
 
+function FinishedScreen({ passed, correct, total, payout, isReview, saving, onExit, node }) {
+  const coinDisplayed = useCoinTick(payout, true)
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50 relative overflow-hidden">
+      <ConfettiBlast active={passed} />
       <div className="h-screen md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6 relative z-10">
         {passed ? (
-          <div className="flex flex-col items-center gap-2">
-            <FlowerJump size={220} loop />
-          </div>
+          <FlowerJump size={220} loop />
         ) : (
           <span className="text-8xl select-none">💪</span>
         )}
-
         <div className="text-center">
           <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">
-            {passed
-              ? (isReview ? '🎉 Review complete!' : '🎉 You passed!')
-              : 'Almost there!'}
+            {passed ? (isReview ? '🎉 Review complete!' : '🎉 You passed!') : 'Almost there!'}
           </h2>
-          <p className="font-body text-gray-400">
-            {correct} out of {total} correct
-          </p>
+          <p className="font-body text-gray-400">{correct} out of {total} correct</p>
           {!passed && (
-            <p className="font-body text-gray-400 text-sm mt-1">
-              Retry is free — you've got this!
-            </p>
+            <p className="font-body text-gray-400 text-sm mt-1">Retry is free — you've got this!</p>
           )}
           {passed && (
             <div className="flex items-center justify-center gap-2 mt-4 font-display font-extrabold text-3xl text-amber-500">
@@ -289,9 +346,8 @@ function FinishedScreen({ passed, correct, total, payout, isReview, saving, onEx
             </div>
           )}
         </div>
-
         {onExit && (
-          <button onClick={onExit} disabled={saving}
+          <button onClick={() => onExit(node)} disabled={saving}
             className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
             {saving ? 'SAVING…' : passed ? 'CONTINUE →' : 'TRY AGAIN'}
           </button>
@@ -301,12 +357,10 @@ function FinishedScreen({ passed, correct, total, payout, isReview, saving, onEx
   )
 }
 
-// ── Lesson screen (Learn node) ───────────────────────────────────────────
-// Pure display — shows today's 2 facts clearly, no questions, no lives.
-// Kid taps "Got it →" and we advance the cursor to the next node.
+// ── Lesson screen (Learn node) ────────────────────────────────────────────
+
 function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, coinBalance, onExit, onBalanceChange }) {
   const [saving, setSaving] = useState(false)
-  const [coins, setCoins]   = useState(0)
   const payout = NODE_PAYOUT
 
   async function handleGotIt() {
@@ -319,13 +373,12 @@ function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, c
         kidId ? setCoinBalance(kidId, newBalance) : Promise.resolve(),
         kidId ? logCoinTransaction(kidId, { amount: payout, reason: 'lesson_complete', balanceAfter: newBalance }) : Promise.resolve(),
       ])
-      setCoins(payout)
       onBalanceChange?.(newBalance)
     } catch (err) {
       console.error('Failed to advance after lesson:', err)
     } finally {
       setSaving(false)
-      onExit?.()
+      onExit?.('learn')
     }
   }
 
@@ -340,26 +393,18 @@ function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, c
             <h1 className="font-display font-bold text-2xl text-gray-900">Today's new facts</h1>
             <p className="font-body text-sm text-gray-400 mt-1">Memorize these — they'll come up a lot!</p>
           </div>
-
           <div className="w-full flex flex-col gap-4">
             {facts.map((f, i) => (
-              <div
-                key={i}
-                className="w-full rounded-2xl border-2 px-6 py-5 flex items-center justify-between"
-                style={{ borderColor: theme.colors.primary, backgroundColor: `${theme.colors.primary}0D` }}
-              >
+              <div key={i} className="w-full rounded-2xl border-2 px-6 py-5 flex items-center justify-between"
+                style={{ borderColor: theme.colors.primary, backgroundColor: `${theme.colors.primary}0D` }}>
                 <span className="font-display font-extrabold text-4xl text-gray-900">{f.equation}</span>
                 <span className="font-display font-extrabold text-4xl" style={{ color: theme.colors.primary }}>= {f.result}</span>
               </div>
             ))}
           </div>
         </div>
-
-        <button
-          onClick={handleGotIt}
-          disabled={saving}
-          className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest mt-6"
-        >
+        <button onClick={handleGotIt} disabled={saving}
+          className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest mt-6">
           {saving ? 'SAVING…' : 'GOT IT →'}
         </button>
       </div>
@@ -368,61 +413,41 @@ function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, c
 }
 
 // ── Speech hook ───────────────────────────────────────────────────────────
-// Uses the Web Speech API (built into every modern browser, free, no API key).
-// Picks a male-sounding voice — tries to find an English male voice first,
-// falls back to whatever is available.
+
 function useSpeech() {
   const [speaking, setSpeaking] = useState(false)
-
   function getVoice() {
     const voices = window.speechSynthesis?.getVoices?.() || []
-    // Prefer male English voices — common names across platforms
     const malePrefs = ['Daniel', 'David', 'Alex', 'Fred', 'Ralph', 'Junior',
-                       'Albert', 'Bruce', 'English Male', 'Google UK English Male',
-                       'Microsoft David', 'Microsoft Mark', 'Aaron', 'Arthur']
-    for (const name of malePrefs) {
-      const v = voices.find(v => v.name.includes(name))
+      'Google UK English Male', 'Microsoft David', 'Microsoft Mark']
+    for (const pref of malePrefs) {
+      const v = voices.find(v => v.name.includes(pref))
       if (v) return v
     }
-    // Fallback: any English voice
-    return voices.find(v => v.lang?.startsWith('en')) || voices[0] || null
+    return voices.find(v => /en/i.test(v.lang)) || voices[0] || null
   }
-
   function speak(text) {
     if (!window.speechSynthesis) return
     window.speechSynthesis.cancel()
     const utt = new SpeechSynthesisUtterance(text)
     utt.voice = getVoice()
-    utt.rate  = 0.9   // slightly slower — clearer for kids
-    utt.pitch = 0.95  // slightly lower — more teacher-like
-    utt.volume = 1
+    utt.rate = 0.92
     utt.onstart = () => setSpeaking(true)
-    utt.onend   = () => setSpeaking(false)
+    utt.onend = () => setSpeaking(false)
     utt.onerror = () => setSpeaking(false)
     window.speechSynthesis.speak(utt)
   }
-
-  function stop() {
-    window.speechSynthesis?.cancel()
-    setSpeaking(false)
-  }
-
-  // Clean up on unmount
-  useEffect(() => { return () => window.speechSynthesis?.cancel() }, [])
-
+  function stop() { window.speechSynthesis?.cancel(); setSpeaking(false) }
   return { speak, stop, speaking }
 }
 
 function SpeakerIcon({ active }) {
   return (
-    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" fill={active ? 'currentColor' : 'none'} />
       {active ? (
-        <>
-          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-        </>
+        <><path d="M19.07 4.93a10 10 0 0 1 0 14.14" /><path d="M15.54 8.46a5 5 0 0 1 0 7.07" /></>
       ) : (
         <path d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14" />
       )}
@@ -448,9 +473,9 @@ export default function Practice({
   onBalanceChange,
   onHeartChange,
 }) {
-  const theme         = themeFor(operation)
-  const isReview      = node === 'review'
-  const payout        = payoutForNode(node)
+  const theme    = themeFor(operation)
+  const isReview = node === 'review'
+  const basePayout = payoutForNode(node)
 
   const generated = useMemo(
     () => generateBatch(operation, table, batchNum, node, { unlockBatch, reviewPool }),
@@ -458,112 +483,143 @@ export default function Practice({
     [operation, table, batchNum, node]
   )
 
-  // Learn is a pure lesson — no game state needed
-  const isLesson  = generated?.isLesson === true
-  const questions = isLesson ? [] : generated
+  const isLesson = generated?.isLesson === true
+
+  // questions is a mutable array we can splice bridge step2 into
+  const [questions, setQuestions] = useState(() => isLesson ? [] : (generated || []))
+  useEffect(() => {
+    setQuestions(isLesson ? [] : (generated || []))
+  }, [generated, isLesson])
+
   const SESSION_TOTAL = NODE_TOTALS[node] ?? 10
   const passThreshold = passThresholdFor(operation, placementClaim, OPERATIONS, SESSION_TOTAL)
 
-  const [idx,      setIdx]      = useState(0)
-  const [lives,    setLives]    = useState(heartBalance ?? LIVES_START)
-  const [selected, setSelected] = useState(null)
-  const [revealed, setRevealed] = useState(false)
-  const [wrong,    setWrong]    = useState(0)
-  const [over,     setOver]     = useState(null)
-  const [saving,   setSaving]   = useState(false)
-  const [heartKey, setHeartKey] = useState(0)
-  const [showHeartLost, setShowHeartLost] = useState(false)
-  const [timerKey, setTimerKey] = useState(1)
-  const [streak,   setStreak]   = useState(0)
-  const [fireKey,  setFireKey]  = useState(0) // bumped to trigger fire burst
+  const [idx,          setIdx]          = useState(0)
+  const [selected,     setSelected]     = useState(null)
+  const [revealed,     setRevealed]     = useState(false)
+  const [wrong,        setWrong]        = useState(0)
+  const [over,         setOver]         = useState(null)
+  const [saving,       setSaving]       = useState(false)
+  const [timerKey,     setTimerKey]     = useState(1)
+  const [streak,       setStreak]       = useState(0)
+  const [fireKey,      setFireKey]      = useState(0)
+
+  // Wrong answer / retry state
+  const [showPopup,    setShowPopup]    = useState(false)
+  const [isRetry,      setIsRetry]      = useState(false)   // true = this is a retry attempt
+  const [earnedCoins,  setEarnedCoins]  = useState(0)       // accumulates during session
+
   const timeoutRef = useRef(null)
   const { speak, stop, speaking } = useSpeech()
 
-  const q                = questions[idx]
-  const isTyped          = q?.isTyped === true
-  const isCorrect        = isTyped
-    ? String(selected).trim() === String(q?.answer)
+  const q         = questions[idx]
+  const isTyped   = q?.isTyped === true
+  const isTrueFalse = q?.choiceType === 'truefalse'
+  const isExpression = q?.choiceType === 'expression' || q?.choiceType === 'comparison'
+  const isTimed   = q?.isTimed === true
+  const timerMs   = NODE_TIMER_MS[node] ?? 10000
+  const isBridge1 = q?.isBridgeStep1 === true
+
+  const isCorrect = isTyped
+    ? String(selected ?? '').trim() === String(q?.answer)
     : selected === q?.answer
-  const isTrueFalse      = q?.choiceType === 'truefalse'
-  const isExpression     = q?.choiceType === 'expression' || q?.choiceType === 'comparison'
-  const isTimed          = q?.isTimed === true
-  const timerMs          = NODE_TIMER_MS[node] ?? 10000
 
-  const progressScale = (idx + (revealed ? 1 : 0)) / SESSION_TOTAL
+  const progressScale = (idx + (revealed ? 1 : 0)) / Math.max(questions.length, 1)
 
-  // ── Answer handling ─────────────────────────────────────────────────────
+  // Build hint text for popup
+  function buildHint(question) {
+    if (!question) return ''
+    // For bridge step1, show the correct equation
+    if (question.isBridgeStep1) return question.answer
+    // For typed/number questions show the equation
+    return `${question.answer}`
+  }
 
-  function handleCheck(forcedChoice) {
-    if (revealed) return
-    const choice = forcedChoice !== undefined ? forcedChoice : selected
+  // ── Answer handling ───────────────────────────────────────────────────
+
+  function handleCheck() {
+    if (revealed || showPopup) return
+    const choice = selected
     if (choice === null || choice === undefined || choice === '') return
 
-    setRevealed(true)
     const correct = isTyped
       ? String(choice).trim() === String(q.answer)
       : choice === q.answer
+
     if (correct) {
+      setRevealed(true)
+      const newStreak = streak + 1
+      setStreak(newStreak)
+      if (newStreak >= 3) setFireKey(k => k + 1)
+
+      // Award coins
+      const coins = isRetry ? basePayout * 2 : basePayout
+      setEarnedCoins(c => c + Math.round(coins / (questions.length || 1)))
+
+      // If this was bridge step1, inject step2 right after current idx
+      if (isBridge1) {
+        const step2 = makeBridgeStep2(q.bridgeOperation, q.bridgeTable, q.bridgeFact, q.bridgeWordText)
+        setQuestions(qs => {
+          const next = [...qs]
+          next.splice(idx + 1, 0, step2)
+          return next
+        })
+      }
+    } else {
+      // Wrong — show popup, don't reveal yet
+      setShowPopup(true)
+      setStreak(0)
+      setWrong(w => w + 1)
+    }
+  }
+
+  function handleRetry() {
+    setShowPopup(false)
+    setSelected(null)
+    setIsRetry(true)
+  }
+
+  function handleGiveUp() {
+    // Show the answer, give half coins, move on
+    setShowPopup(false)
+    setRevealed(true)
+    setIsRetry(false)
+    const halfCoins = Math.round((basePayout * 0.5) / (questions.length || 1))
+    setEarnedCoins(c => c + halfCoins)
+  }
+
+  function handleTimerExpire() {
+    if (revealed || over || showPopup) return
+    const choice = selected
+    const correct = choice !== null && choice !== undefined && choice !== ''
+      ? (isTyped ? String(choice).trim() === String(q.answer) : choice === q.answer)
+      : false
+    if (correct) {
+      setRevealed(true)
       const newStreak = streak + 1
       setStreak(newStreak)
       if (newStreak >= 3) setFireKey(k => k + 1)
     } else {
+      setShowPopup(true)
       setStreak(0)
       setWrong(w => w + 1)
-      setLives(l => {
-        const next = l - 1
-        if (kidId) setHeartBalance(kidId, next).catch(console.error)
-        onHeartChange?.(next)
-        return next
-      })
-      setHeartKey(k => k + 1)
-      setShowHeartLost(true)
-      setTimeout(() => setShowHeartLost(false), 1500)
     }
-  }
-
-  function handleTimerExpire() {
-    if (revealed || over) return
-    if (selected !== null) { handleCheck(selected); return }
-    setRevealed(true)
-    setStreak(0)
-    setWrong(w => w + 1)
-    setLives(l => {
-      const next = l - 1
-      if (kidId) setHeartBalance(kidId, next).catch(console.error)
-      onHeartChange?.(next)
-      return next
-    })
-    setHeartKey(k => k + 1)
-    setShowHeartLost(true)
-    setTimeout(() => setShowHeartLost(false), 1500)
   }
 
   useEffect(() => {
-    if (!isTimed || over || revealed) return
+    if (!isTimed || over || revealed || showPopup) return
     timeoutRef.current = setTimeout(handleTimerExpire, timerMs)
     return () => clearTimeout(timeoutRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx, isTimed, over, revealed])
+  }, [idx, isTimed, over, revealed, showPopup])
 
   function handleContinue() {
-    // Check last question FIRST — if the kid answered all questions,
-    // evaluate their score regardless of lives remaining. A 4th wrong
-    // answer on Q12 should still trigger the finished screen if they
-    // passed the threshold, not the died screen.
-    if (idx === SESSION_TOTAL - 1) {
-      const correct = SESSION_TOTAL - wrong
-      if (lives === 0 && correct < passThreshold) {
-        setOver('died')
-        finalizeAttempt('died')
-      } else {
-        setOver('finished')
-        finalizeAttempt(correct >= passThreshold ? 'passed' : 'retry')
-      }
-      return
-    }
-    if (lives === 0) {
-      setOver('died')
-      finalizeAttempt('died')
+    setIsRetry(false)
+    const total = questions.length
+    if (idx === total - 1) {
+      const correct = total - wrong
+      setOver('finished')
+      finalizeAttempt(correct >= passThreshold ? 'passed' : 'retry')
       return
     }
     setIdx(i => i + 1)
@@ -572,73 +628,39 @@ export default function Practice({
     setTimerKey(k => k + 1)
   }
 
-  // ── Persistence ─────────────────────────────────────────────────────────
+  // ── Persistence ──────────────────────────────────────────────────────
 
   async function finalizeAttempt(result) {
     setSaving(true)
-    const correct    = SESSION_TOTAL - wrong
-    const coinsDelta = result === 'passed' ? payout : 0
-    const newBalance = result === 'passed' ? applyPayout(coinBalance, node) : coinBalance
-
-    console.log('[finalizeAttempt]', { result, correct, node, operation, table, batchNum, kidCurrentStep, kidId })
+    const correct    = questions.length - wrong
+    const coinsDelta = result === 'passed' ? basePayout : Math.round(basePayout * 0.5)
+    const newBalance = coinBalance + coinsDelta
 
     try {
-      if (kidId) {
-        const attemptId = await logAttempt(kidId, {
-          operation, table, batch: batchNum, node,
-          questionsSeen: idx + 1,
-          correctCount:  correct,
-          wrongCount:    wrong,
-          livesUsed:     LIVES_START - lives,
-          result,
-          coinsDelta,
-        })
-
-        if (coinsDelta > 0) {
-          await setCoinBalance(kidId, newBalance)
-          await logCoinTransaction(kidId, {
-            attemptId,
-            amount:       coinsDelta,
-            reason:       isReview ? 'review_node_pass' : 'node_pass',
-            balanceAfter: newBalance,
-          })
-          onBalanceChange?.(newBalance)
-        }
-
-        if (result === 'passed') {
-          const next = nextStep(operation, table, batchNum, node)
-          const kidCurrentIdx = kidCurrentStep
-            ? stepIndex(kidCurrentStep.operation, kidCurrentStep.table, kidCurrentStep.batch, normalizeNode(kidCurrentStep.node))
-            : stepIndex(operation, table, batchNum, node)
-          const nextIdx = next ? stepIndex(next.operation, next.table, next.batch, next.node) : -1
-          console.log('[progression]', { next, kidCurrentIdx, nextIdx, willAdvance: next && nextIdx > kidCurrentIdx })
-          if (next && nextIdx > kidCurrentIdx) {
-            if (node === 'review') {
-              await updateProgress(kidId, next)
-              try {
-                await stampAdvanceDate(kidId)
-              } catch (gateErr) {
-                console.error('stampAdvanceDate failed (gate will be open, cursor advanced):', gateErr)
-              }
-            } else {
-              await updateProgress(kidId, next)
-            }
-            console.log('[progression] updateProgress done → next:', next)
-          }
-        }
+      if (result === 'passed') {
+        const next = nextStep(operation, table, batchNum, node)
+        await Promise.all([
+          next && kidId ? updateProgress(kidId, next) : Promise.resolve(),
+          kidId ? setCoinBalance(kidId, newBalance) : Promise.resolve(),
+          kidId ? logCoinTransaction(kidId, { amount: coinsDelta, reason: 'node_pass', balanceAfter: newBalance }) : Promise.resolve(),
+          kidId ? logAttempt(kidId, { operation, tableNumber: table, node, questionsSeen: questions.length, correctCount: correct, wrongCount: wrong, livesUsed: 0, result: 'passed', coinsDelta }) : Promise.resolve(),
+        ])
+      } else {
+        await Promise.all([
+          kidId ? logAttempt(kidId, { operation, tableNumber: table, node, questionsSeen: questions.length, correctCount: correct, wrongCount: wrong, livesUsed: 0, result, coinsDelta: 0 }) : Promise.resolve(),
+        ])
       }
+      onBalanceChange?.(newBalance)
     } catch (err) {
-      console.error('Failed to save attempt (gameplay continues regardless):', err)
+      console.error('finalizeAttempt failed:', err)
     } finally {
       setSaving(false)
     }
   }
 
-  // ── End screens ─────────────────────────────────────────────────────────
+  // ── Render guard ─────────────────────────────────────────────────────
 
-  // Learn is a pure lesson screen — show today's 2 facts clearly,
-  // no questions, no lives, no coins. Kid taps "Got it" and advances.
-  if (isLesson) {
+  if (isLesson && generated?.isLesson) {
     return (
       <LessonScreen
         facts={generated.facts}
@@ -655,107 +677,51 @@ export default function Practice({
     )
   }
 
-  if (over === 'died') {
-    return <DiedScreen saving={saving} onExit={onExit} heartBalance={lives} coinBalance={coinBalance} kidId={kidId} onRecharge={(newHearts, newCoins) => { onHeartChange?.(newHearts); onBalanceChange?.(newCoins); onExit() }} />
-  }
-
   if (over === 'finished') {
-    const correct = SESSION_TOTAL - wrong
-    const passed  = correct >= passThreshold
+    const correct = questions.length - wrong
     return (
-      <>
-        <ConfettiBlast active={passed} />
-        <FinishedScreen
-          passed={passed}
-          correct={correct}
-          total={SESSION_TOTAL}
-          payout={payout}
-          isReview={isReview}
-          saving={saving}
-          onExit={onExit}
-        />
-      </>
+      <FinishedScreen
+        passed={correct >= passThreshold}
+        correct={correct}
+        total={questions.length}
+        payout={correct >= passThreshold ? basePayout : 0}
+        isReview={isReview}
+        saving={saving}
+        node={node}
+        onExit={onExit}
+      />
     )
   }
 
-  // ── Game screen ──────────────────────────────────────────────────────────
+  if (!q) return null
+
+  // ── Game screen ──────────────────────────────────────────────────────
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
-      {/* Fire particles — rise from bottom when streak ≥ 3 */}
       <FireParticles streakKey={fireKey} streak={streak} />
 
-      <div className="relative h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md">
+      {/* Numio wrong-answer popup */}
+      <NumioPopup
+        visible={showPopup}
+        hint={buildHint(q)}
+        onRetry={handleRetry}
+        onGiveUp={handleGiveUp}
+      />
 
-        {/* Heart lost flash overlay */}
-        {showHeartLost && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none"
-            style={{ animation: 'fadeInOut 1.5s ease forwards' }}>
-            <div className="bg-red-500 text-white rounded-3xl px-8 py-5 flex flex-col items-center gap-2 shadow-2xl"
-              style={{ animation: 'correct-bounce 0.4s cubic-bezier(0.34,1.56,0.64,1) both' }}>
-              <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="80" height="80" style={{opacity:0.6}} alt="" />
-              <p className="font-display font-bold text-2xl">-1 Heart!</p>
-            </div>
-          </div>
-        )}
+      <div className="h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md">
 
-        {/* ── Top bar ─────────────────────────────────────────────── */}
+        {/* ── Top bar ─────────────────────────────────────────── */}
         <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-5 pb-3">
-          <button
-            onClick={async () => {
-              // Log the attempt as abandoned and refund entry fee so
-              // mid-session exits don't silently drain coins
-              try {
-                await logAttempt(kidId, {
-                  operation, table, batch: batchNum, node,
-                  questionsSeen: idx,
-                  correctCount: idx - wrong,
-                  wrongCount: wrong,
-                  livesUsed: LIVES_START - lives,
-                  result: 'retry',
-                  coinsDelta: 0,
-                })
-                // Refund entry fee on exit — but only if the kid wasn't
-                // already at the debt floor when they entered. At the floor,
-                // applyEntryFee charged nothing (Math.max kept them at -10),
-                // so there's nothing to refund. Refunding anyway gives free coins.
-                if (coinBalance > DEBT_FLOOR) {
-                  // Refund the entry fee. If kid was in debt, cap the refund
-                  // so they don't go above 0 (they paid nothing at the floor).
-                  // If kid had positive coins, just add the fee back normally.
-                  const refunded = coinBalance < 0
-                    ? Math.min(coinBalance + ENTRY_FEE, 0)
-                    : coinBalance + ENTRY_FEE
-                  await setCoinBalance(kidId, refunded)
-                  await logCoinTransaction(kidId, {
-                    amount: ENTRY_FEE,
-                    reason: 'exit_refund',
-                    balanceAfter: refunded,
-                  })
-                }
-              } catch (err) {
-                console.error('Exit cleanup failed (non-blocking):', err)
-              }
-              onExit?.()
-            }}
-            className="w-11 h-11 flex items-center justify-center rounded-full text-gray-400 transition-colors duration-150 active:bg-gray-100"
-            aria-label="Exit practice"
-          >
+          <button onClick={() => { stop(); onExit?.(node) }}
+            className="w-11 h-11 flex items-center justify-center rounded-full text-gray-300 transition-colors duration-150 active:bg-gray-100">
             <XIcon />
           </button>
 
-          <div
-            className="flex-1 h-5 rounded-full overflow-hidden"
-            style={{
-              backgroundColor: streak >= 3 ? '#FFE0B2' : '#F3F4F6',
-              transition: 'background-color 0.4s',
-            }}
-            role="progressbar"
-            aria-valuenow={idx}
-            aria-valuemax={SESSION_TOTAL}
-          >
-            <div
-              className="h-full rounded-full origin-left"
+          <div className="flex-1 h-5 rounded-full overflow-hidden"
+            style={{ backgroundColor: streak >= 3 ? '#FFE0B2' : '#F3F4F6', transition: 'background-color 0.4s' }}
+            role="progressbar" aria-valuenow={idx} aria-valuemax={questions.length}>
+            <div className="h-full rounded-full origin-left"
               style={{
                 backgroundColor: streak >= 7 ? '#FF4500' : streak >= 4 ? '#FF9600' : '#58cc02',
                 transform: `scaleX(${progressScale})`,
@@ -765,38 +731,46 @@ export default function Practice({
             />
           </div>
 
-          {/* Streak badge replaces hearts when streak ≥ 2, hearts stay */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <StreakBadge streak={streak} />
+            {/* Coin display */}
             <div className="flex items-center gap-1">
-              <HeartIcon filled={lives > 0} className={lives > 0 && heartKey > 0 ? 'anim-heart-pulse' : ''} />
-              <span className="font-display font-bold text-base" style={{ color: '#ef4444' }}>{lives}</span>
+              <CoinIcon size={28} />
+              <span className="font-display font-bold text-base text-amber-500">{coinBalance}</span>
             </div>
           </div>
         </div>
 
-        {/* ── Node label + speed countdown ────────────────────────── */}
+        {/* ── Node label + timer ──────────────────────────────── */}
         <div className="flex-shrink-0 px-5 flex items-center justify-between">
           <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.dark }}>
             {theme.era} · Table {table} · {nodeLabel(node)}
           </p>
-          {isTimed && (
-            <SpeedCountdown key={timerKey} durationMs={timerMs} />
-          )}
+          {isTimed && <SpeedCountdown key={timerKey} durationMs={timerMs} />}
         </div>
 
-        {/* Speed countdown bar */}
+        {/* ── Timer bar ───────────────────────────────────────── */}
         {isTimed && (
           <div className="flex-shrink-0 mx-5 mt-1.5 h-2 rounded-full bg-gray-100 overflow-hidden">
-            <div
-              key={timerKey}
-              className="h-full bg-red-400 rounded-full anim-speed-countdown"
-              style={{ animationDuration: `${timerMs}ms` }}
-            />
+            <div key={timerKey} className="h-full bg-red-400 rounded-full anim-speed-countdown"
+              style={{ animationDuration: `${timerMs}ms` }} />
           </div>
         )}
 
-        {/* ── Question text ────────────────────────────────────────── */}
+        {/* ── Bridge step 1 label ─────────────────────────────── */}
+        {isBridge1 && (
+          <div className="flex-shrink-0 px-5 mt-2">
+            <div className="rounded-xl px-3 py-1.5 inline-flex items-center gap-1.5"
+              style={{ backgroundColor: `${theme.colors.primary}18` }}>
+              <span className="text-sm">🧩</span>
+              <span className="font-body font-bold text-xs" style={{ color: theme.colors.dark }}>
+                Choose the right operation
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* ── Question text ───────────────────────────────────── */}
         <div className={`flex-shrink-0 px-6 pt-6 pb-2 ${q.text.endsWith('= ?') ? 'flex items-center justify-center' : ''}`}>
           <p className={
             q.text.endsWith('= ?')
@@ -807,145 +781,113 @@ export default function Practice({
           </p>
         </div>
 
-        {/* ── Read aloud button ─────────────────────────────────────── */}
+        {/* ── Retry badge ─────────────────────────────────────── */}
+        {isRetry && !revealed && (
+          <div className="flex-shrink-0 flex justify-center pb-1">
+            <span className="font-body font-bold text-xs px-3 py-1 rounded-full"
+              style={{ backgroundColor: '#FEF3C7', color: '#D97706' }}>
+              🔄 Retry — double coins if correct!
+            </span>
+          </div>
+        )}
+
+        {/* ── Read aloud button ───────────────────────────────── */}
         <div className="flex-shrink-0 flex justify-center pb-2">
-          <button
-            onClick={() => speaking ? stop() : speak(q.text)}
+          <button onClick={() => speaking ? stop() : speak(q.text)}
             className="flex items-center gap-2 px-4 py-2 rounded-full transition-all active:scale-90"
             style={{
               backgroundColor: speaking ? '#1CB0F6' : '#F3F4F6',
               color: speaking ? '#FFFFFF' : '#9CA3AF',
               boxShadow: speaking ? '0 0 8px rgba(28,176,246,0.4)' : 'none',
-            }}
-            aria-label={speaking ? 'Stop reading' : 'Read question aloud'}
-          >
+            }}>
             <SpeakerIcon active={speaking} />
-            <span className="font-body font-bold text-xs">
-              {speaking ? 'Stop' : 'Read aloud'}
-            </span>
+            <span className="font-body font-bold text-xs">{speaking ? 'Stop' : 'Read aloud'}</span>
           </button>
         </div>
 
-        {/* ── Answer choices ───────────────────────────────────────── */}
-        <div key={`choices-${idx}`} className="flex-1 flex flex-col justify-center px-4 gap-3">
+        {/* ── Answer choices ──────────────────────────────────── */}
+        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col justify-center px-4 gap-3">
           {isTyped ? (
-            // Typed answer — number keyboard input
             <div className="flex flex-col items-center gap-4">
               <div className={[
                 'w-40 h-20 rounded-2xl border-2 flex items-center justify-center',
                 revealed
                   ? String(selected).trim() === String(q.answer)
                     ? 'border-green-400 bg-green-50'
-                    : 'border-red-400 bg-red-50'
-                  : selected
-                    ? 'border-blue-400 bg-blue-50'
-                    : 'border-gray-200 bg-white',
+                    : 'border-amber-300 bg-amber-50'
+                  : selected !== null ? 'border-blue-400 bg-blue-50' : 'border-gray-200 bg-white',
               ].join(' ')}>
-                <span className="font-display font-extrabold text-5xl text-gray-900">
-                  {selected ?? '?'}
-                </span>
+                <span className="font-display font-extrabold text-5xl text-gray-900">{selected ?? '?'}</span>
               </div>
-              {revealed && String(selected).trim() !== String(q.answer) && (
-                <p className="font-body text-sm text-red-500 font-semibold">
+              {revealed && String(selected ?? '').trim() !== String(q.answer) && (
+                <p className="font-body text-sm text-amber-600 font-semibold">
                   Answer: <span className="font-display font-bold text-lg">{q.answer}</span>
                 </p>
               )}
               {!revealed && (
                 <div className="grid grid-cols-3 gap-2 w-full max-w-xs">
                   {[1,2,3,4,5,6,7,8,9,null,0,'⌫'].map((key, ki) => (
-                    <button
-                      key={ki}
-                      disabled={key === null}
+                    <button key={ki} disabled={key === null}
                       onClick={() => {
                         if (key === null) return
                         if (key === '⌫') {
-                          setSelected(s => {
-                            const str = String(s ?? '')
-                            return str.length <= 1 ? null : Number(str.slice(0, -1))
-                          })
+                          setSelected(s => { const str = String(s ?? ''); return str.length <= 1 ? null : Number(str.slice(0, -1)) })
                         } else {
-                          setSelected(s => {
-                            const str = String(s ?? '').replace('null', '')
-                            const next = str + String(key)
-                            return next.length > 4 ? s : Number(next)
-                          })
+                          setSelected(s => { const str = String(s ?? '').replace('null',''); const next = str + String(key); return next.length > 4 ? s : Number(next) })
                         }
                       }}
                       className={[
-                        'h-14 rounded-2xl font-display font-bold text-2xl',
-                        'flex items-center justify-center select-none',
-                        key === null
-                          ? 'opacity-0 pointer-events-none'
-                          : key === '⌫'
-                            ? 'bg-red-50 text-red-400 border-2 border-red-100 active:bg-red-100'
-                            : 'bg-gray-50 text-gray-800 border-2 border-gray-200 active:bg-gray-100',
+                        'h-14 rounded-2xl font-display font-bold text-2xl flex items-center justify-center select-none',
+                        key === null ? 'opacity-0 pointer-events-none'
+                          : key === '⌫' ? 'bg-red-50 text-red-400 border-2 border-red-100 active:bg-red-100'
+                          : 'bg-gray-50 text-gray-800 border-2 border-gray-200 active:bg-gray-100',
                       ].join(' ')}
-                    >
-                      {key}
-                    </button>
+                    >{key}</button>
                   ))}
                 </div>
               )}
             </div>
           ) : isTrueFalse ? (
-            // True/False / Yes/No / More/Less: 2 wide buttons
             <div className="flex gap-3">
               {q.choices.map(choice => (
-                <button
-                  key={choice}
-                  disabled={revealed}
+                <button key={choice} disabled={revealed}
                   onClick={() => !revealed && setSelected(choice)}
-                  aria-pressed={selected === choice}
-                  className={[
-                    'flex-1 rounded-2xl border-2 font-display font-bold text-2xl card-answer',
+                  className={['flex-1 rounded-2xl border-2 font-display font-bold text-2xl card-answer',
                     'flex items-center justify-center h-28 select-none',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
-                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}
-                >
+                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}>
                   {choice}
                 </button>
               ))}
             </div>
           ) : isExpression ? (
-            // Expression choices: single column, smaller text
             <div className="flex flex-col gap-3">
               {q.choices.map(choice => (
-                <button
-                  key={choice}
-                  disabled={revealed}
+                <button key={choice} disabled={revealed}
                   onClick={() => !revealed && setSelected(choice)}
-                  aria-pressed={selected === choice}
-                  className={[
-                    'rounded-2xl border-2 font-body font-semibold text-base card-answer',
+                  className={['rounded-2xl border-2 font-body font-semibold text-base card-answer',
                     'flex items-center justify-center py-4 w-full select-none px-4 text-center',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
-                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}
-                >
+                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}>
                   {choice}
                 </button>
               ))}
             </div>
           ) : (
-            // Number choices: 2×2 grid
             <div className="grid grid-cols-2 gap-3">
               {q.choices.map(choice => (
-                <button
-                  key={choice}
-                  disabled={revealed}
+                <button key={choice} disabled={revealed}
                   onClick={() => !revealed && setSelected(choice)}
-                  aria-pressed={selected === choice}
-                  className={[
-                    'rounded-2xl border-2 font-display font-bold text-4xl card-answer',
+                  className={['rounded-2xl border-2 font-display font-bold text-4xl card-answer',
                     'flex items-center justify-center h-28 w-full select-none',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
-                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}
-                >
+                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}>
                   {choice}
                 </button>
               ))}
@@ -953,51 +895,37 @@ export default function Practice({
           )}
         </div>
 
-        {/* ── Bottom action ────────────────────────────────────────── */}
+        {/* ── Bottom action ───────────────────────────────────── */}
         <div className="flex-shrink-0 px-4 pb-8 pt-3">
           {!revealed ? (
             <button
               disabled={selected === null || selected === undefined || selected === ''}
-              onClick={() => handleCheck()}
-              className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
-            >
+              onClick={handleCheck}
+              className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
               CHECK
             </button>
           ) : (
-            <div className={`rounded-2xl overflow-hidden border-2 ${
-              isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
-            }`}>
-              <div className={`flex items-center gap-3 px-4 py-4 ${
-                isCorrect ? 'text-green-700' : 'text-red-500'
-              }`}>
-                <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xl ${
-                  isCorrect ? 'bg-green-500 text-white' : 'bg-red-400 text-white'
-                }`}>
-                  {isCorrect ? '✓' : '✗'}
-                </div>
-                <div className="min-w-0">
+            <div className={`rounded-2xl overflow-hidden border-2 ${isCorrect ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
+              <div className="flex items-center gap-3 px-4 py-3">
+                <span className="text-2xl">{isCorrect ? '🎉' : '💪'}</span>
+                <div className="flex-1 min-w-0">
                   <p className="font-body font-bold text-base leading-tight">
-                    {isCorrect ? 'Correct!' : 'Not quite'}
+                    {isCorrect ? (isRetry ? '🌟 Amazing! Double coins!' : 'Correct!') : 'Keep going!'}
                   </p>
                   {!isCorrect && (
-                    <p className="font-body text-sm text-red-400 leading-tight truncate">
+                    <p className="font-body text-sm text-amber-600 leading-tight truncate">
                       Answer: {q.answer}
                     </p>
                   )}
                 </div>
               </div>
-              <button
-                onClick={handleContinue}
-                className={`w-full py-4 font-body font-bold text-xl tracking-widest ${
-                  isCorrect ? 'btn-duo' : 'btn-duo-red'
-                }`}
-              >
-                CONTINUE
+              <button onClick={handleContinue}
+                className={`w-full py-4 font-body font-bold text-xl tracking-widest ${isCorrect ? 'btn-duo' : 'btn-duo-yellow'}`}>
+                CONTINUE →
               </button>
             </div>
           )}
         </div>
-
       </div>
     </div>
   )
