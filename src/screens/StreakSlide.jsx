@@ -1,6 +1,4 @@
-// StreakSlide.jsx
-// Shown after Welcome is completed every day.
-// Displays the kid's day streak with lightning bolt circles.
+// StreakSlide.jsx — shown after Welcome every day
 
 const DAYS = ['Su', 'M', 'T', 'W', 'Th', 'F', 'Sa']
 
@@ -20,13 +18,12 @@ const ANIM = `
   }
 `
 
-function LightningIcon({ filled, size = 48 }) {
+function LightningIcon({ filled, size = 28 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       <path
         d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z"
         fill={filled ? '#1a1a1a' : '#d1d5db'}
-        stroke="none"
       />
     </svg>
   )
@@ -34,21 +31,22 @@ function LightningIcon({ filled, size = 48 }) {
 
 function DayCircle({ label, filled, isCurrent, delay }) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
       <div style={{
-        width: 52, height: 52, borderRadius: '50%',
+        width: 40, height: 40, borderRadius: '50%',
         backgroundColor: filled ? '#d4f000' : '#f3f4f6',
         border: isCurrent ? '3px solid #d4f000' : '3px solid transparent',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         animation: filled ? `lightning-pop 0.4s ${delay}s ease both` : 'none',
-        boxShadow: filled ? '0 2px 8px rgba(212,240,0,0.4)' : 'none',
+        boxShadow: filled ? '0 2px 8px rgba(212,240,0,0.5)' : 'none',
+        flexShrink: 0,
       }}>
-        <LightningIcon filled={filled} size={28} />
+        <LightningIcon filled={filled} size={20} />
       </div>
       <span style={{
         fontFamily: "'Baloo 2', sans-serif",
         fontWeight: isCurrent ? 800 : 600,
-        fontSize: 13,
+        fontSize: 11,
         color: isCurrent ? '#1a1a1a' : '#9ca3af',
       }}>
         {label}
@@ -58,23 +56,24 @@ function DayCircle({ label, filled, isCurrent, delay }) {
 }
 
 export default function StreakSlide({ dayStreak = 1, onContinue }) {
-  // Figure out which day of week today is (0=Su)
-  const todayIdx = new Date().getDay()
+  const todayIdx = new Date().getDay() // 0=Su, 1=M, ...
 
-  // Build 7 day circles — filled for days up to and including today based on streak
-  // Streak tells us how many consecutive days. We show today + previous streak-1 days filled.
-  const circles = DAYS.map((label, i) => {
-    // Days that are "filled" = today and the streak-1 days before it (wrapping)
-    const daysBack = (todayIdx - i + 7) % 7
-    const filled = daysBack < dayStreak
-    const isCurrent = i === todayIdx
-    return { label, filled, isCurrent }
+  // Show 2 days back + today + 2 ahead = 5 circles
+  const windowSize = 5
+  const startOffset = -2
+  const circleIndices = Array.from({ length: windowSize }, (_, i) => {
+    const offset = startOffset + i // -2, -1, 0, 1, 2
+    const dayIdx = ((todayIdx + offset) % 7 + 7) % 7
+    const isCurrent = offset === 0
+    const daysBack = -offset
+    const filled = offset <= 0 && daysBack < dayStreak
+    return { label: DAYS[dayIdx], filled, isCurrent, offset }
   })
 
   const isDay1 = dayStreak <= 1
   const headlineText = isDay1
-    ? "Your streak has started! ⚡"
-    : `Your streak is on fire! ${dayStreak} days! 🔥`
+    ? 'Your streak has started! ⚡'
+    : `${dayStreak} days in a row! 🔥`
 
   return (
     <div style={{
@@ -85,9 +84,10 @@ export default function StreakSlide({ dayStreak = 1, onContinue }) {
       justifyContent: 'center',
       background: '#fff',
       fontFamily: "'Baloo 2', sans-serif",
-      padding: '40px 24px',
+      padding: '40px 20px',
       maxWidth: 390,
       margin: '0 auto',
+      boxSizing: 'border-box',
     }}>
       <style>{ANIM}</style>
 
@@ -115,17 +115,18 @@ export default function StreakSlide({ dayStreak = 1, onContinue }) {
         color: '#6b7280', textAlign: 'center',
         animation: 'fadeUp 0.5s 0.2s ease both',
       }}>
-        {isDay1 ? 'Come back tomorrow to keep it going!' : 'Amazing work — keep showing up!'}
+        {isDay1 ? 'Come back tomorrow to keep it going!' : 'Amazing — keep showing up!'}
       </p>
 
-      {/* Day circles */}
+      {/* Day circles — 3 back + today + 2 ahead, small, fits on mobile */}
       <div style={{
-        display: 'flex', gap: 10, marginBottom: 48,
+        display: 'flex', gap: 8, marginBottom: 48,
         animation: 'fadeUp 0.5s 0.3s ease both',
+        width: '100%', justifyContent: 'center',
       }}>
-        {circles.map((c, i) => (
+        {circleIndices.map((c, i) => (
           <DayCircle
-            key={c.label}
+            key={i}
             label={c.label}
             filled={c.filled}
             isCurrent={c.isCurrent}
