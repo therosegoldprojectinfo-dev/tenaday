@@ -132,6 +132,19 @@ body {
   box-shadow: none;
 }
 
+.btn-duo-yellow {
+  background: #FF9600;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 4px 0 0 #c97700;
+  transition: transform 80ms cubic-bezier(0.23, 1, 0.32, 1),
+              box-shadow 80ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn-duo-yellow:not(:disabled):active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+
 /* ── Answer card: card-puck variant ─────────────────────────── */
 /* Same press mechanic as btn-era but with a neutral default shadow.
    Pass --card-shadow on selected cards to use the era tint. */
