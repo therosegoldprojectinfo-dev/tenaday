@@ -977,7 +977,7 @@ export default function Practice({
                   </p>
                   {!isCorrect && (
                     <p className="font-body text-sm text-red-400 leading-tight truncate">
-                      Answer: {isMultiSelect ? q.correctSet?.join(' and ') : q.answer}
+                      Answer: {q.answer}
                     </p>
                   )}
                 </div>
