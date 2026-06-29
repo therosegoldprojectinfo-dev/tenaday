@@ -242,7 +242,9 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
         {OPERATIONS.map(operation => {
           const status = eraStatus(currentPos, operation)
           const progress = eraProgress(currentPos, operation)
-          const resumeLabel = status === 'active' ? `Unit ${currentPos.table}` : null
+          const resumeLabel = status === 'active'
+            ? `Unit ${(currentPos.table - 1) * 6 + (currentPos.batch || 1)}`
+            : null
           return (
             <ChapterCard key={operation} operation={operation} status={status} progress={progress} resumeLabel={resumeLabel} onPress={() => handleCardPress(operation)} />
           )
