@@ -249,7 +249,7 @@ export default function App() {
     // Day 1 of any chapter (batch 1, unlock node) → show chapter intro
     // instead of the unlock exercise (nothing to test yet on day 1).
     // isFirstEver = true only for the very first session (addition/table1/batch1)
-    const isChapterDay1 = activeNode.node === 'unlock' && activeNode.batchNum === 1 && activeNode.table === 1
+    const isChapterDay1 = activeNode.node === 'welcome' && activeNode.batchNum === 1 && activeNode.table === 1
     if (isChapterDay1) {
       const isFirstEver = activeNode.operation === 'addition'
       return (
