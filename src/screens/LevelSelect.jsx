@@ -165,7 +165,7 @@ export default function LevelSelect({ onDone, onBack }) {
   const [selected, setSelected] = useState(null)
 
   function handleConfirm() {
-    if (selected === null && selected !== 0) return
+    if (selected === null) return
     const level = LEVELS[selected]
     onDone(level.claim)
   }
