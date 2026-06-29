@@ -40,7 +40,7 @@ alter table if exists attempts drop column if exists node;
 
 drop type if exists node_type;
 
-create type node_type as enum ('unlock', 'learn', 'what_happened', 'practice', 'real_life', 'speed', 'review');
+create type node_type as enum ('welcome', 'learn', 'practice', 'apply', 'master', 'double_reward', 'review');
 
 -- ── parents ──────────────────────────────────────────────────────────────
 -- Phone + 4-digit PIN, no email (per spec §3). PIN is stored as a bcrypt-style
