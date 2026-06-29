@@ -337,8 +337,7 @@ function FinishedScreen({ payout, node, saving, onExit }) {
         </div>
 
         {/* Coin count */}
-        <div className="flex items-center justify-center gap-3 px-8 py-5 rounded-3xl"
-          style={{ backgroundColor: '#FFFBEB', border: '2px solid #FCD34D' }}>
+        <div className="flex items-center justify-center gap-3">
           <CoinIcon size={56} />
           <div className="text-left">
             <p className="font-body text-xs text-amber-600 font-bold tracking-widest uppercase">Coins earned</p>
