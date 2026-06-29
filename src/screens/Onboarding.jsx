@@ -154,13 +154,13 @@ function Slide3() {
   )
 }
 
-/* ── Slide 4 — Protect hearts ── */
+/* ── Slide 4 — Never get stuck ── */
 function Slide4() {
   return (
     <div style={{height:380,display:'flex',alignItems:'center',justifyContent:'center',position:'relative'}}>
-      {/* spinning rays in red */}
+      {/* spinning rays in green */}
       <svg width={260} height={260} viewBox="0 0 320 320" style={{position:'absolute',top:40,animation:'spinslow 26s linear infinite'}}>
-        <g fill="#fecaca">
+        <g fill="#bbf7d0">
           <rect x={154} y={14} width={12} height={42} rx={6}/>
           <rect x={154} y={264} width={12} height={42} rx={6}/>
           <rect x={14} y={154} width={42} height={12} rx={6}/>
@@ -171,24 +171,23 @@ function Slide4() {
           <rect x={256} y={228} width={12} height={40} rx={6} transform="rotate(-45 262 248)"/>
         </g>
       </svg>
-      {/* big heart */}
-      <svg width={160} height={150} viewBox="0 0 200 185" style={{position:'absolute',top:90,animation:'pulse 2.4s ease-in-out infinite'}}>
-        <path d="M100 178 C20 130 4 88 4 60 C4 28 26 8 52 8 C72 8 88 20 100 36 C112 20 128 8 148 8 C174 8 196 28 196 60 C196 88 180 130 100 178 Z" fill="#c0392b" transform="translate(0,8)"/>
-        <path d="M100 178 C20 130 4 88 4 60 C4 28 26 8 52 8 C72 8 88 20 100 36 C112 20 128 8 148 8 C174 8 196 28 196 60 C196 88 180 130 100 178 Z" fill="#ef4444"/>
-        <path d="M52 28 q14 -16 34 -12" stroke="#fff" strokeWidth="7" fill="none" strokeLinecap="round" opacity={0.45}/>
-      </svg>
-      {/* small heart bottom-left */}
-      <svg width={62} height={58} viewBox="0 0 100 92" style={{position:'absolute',bottom:60,left:46,animation:'floaty 2.8s ease-in-out infinite'}}>
-        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#c0392b" transform="translate(0,4)"/>
-        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#ef4444"/>
-      </svg>
-      {/* small heart bottom-right */}
-      <svg width={44} height={40} viewBox="0 0 100 92" style={{position:'absolute',bottom:120,right:48,animation:'floaty 2.3s ease-in-out infinite'}}>
-        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#c0392b" transform="translate(0,4)"/>
-        <path d="M50 88 C10 64 2 44 2 30 C2 14 13 4 26 4 C36 4 44 10 50 18 C56 10 64 4 74 4 C87 4 98 14 98 30 C98 44 90 64 50 88 Z" fill="#ef4444"/>
-      </svg>
-      <svg viewBox="0 0 24 24" width={20} height={20} style={{position:'absolute',bottom:80,right:120,animation:'twinkle 2s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#ef4444"/></svg>
-      <svg viewBox="0 0 24 24" width={15} height={15} style={{position:'absolute',bottom:40,left:130,animation:'twinkle 2.5s ease-in-out infinite'}}><path d="M12 0 l2.6 7.4 7.4 .6 -5.6 4.8 1.8 7.2 -6.2 -4 -6.2 4 1.8 -7.2 -5.6 -4.8 7.4 -.6 Z" fill="#fecaca"/></svg>
+      {/* Mascot */}
+      <div style={{position:'absolute',top:60,animation:'pulse 2.4s ease-in-out infinite'}}>
+        <img src="/onboarding-mascot.png" alt="Numio" style={{width:160,height:'auto'}} />
+      </div>
+      {/* speech bubble */}
+      <div style={{
+        position:'absolute',bottom:60,
+        background:'white',borderRadius:16,border:'2px solid #e5e7eb',
+        padding:'12px 20px',boxShadow:'0 4px 16px rgba(0,0,0,0.08)',
+        fontFamily:"'Baloo 2', sans-serif",fontWeight:700,fontSize:14,
+        color:'#3c3c3c',textAlign:'center',maxWidth:220,
+      }}>
+        Not quite my friend! 🌸 Try again — you got this! 💪
+        <div style={{position:'absolute',top:-12,left:'50%',transform:'translateX(-50%)',
+          width:0,height:0,borderLeft:'10px solid transparent',borderRight:'10px solid transparent',
+          borderBottom:'12px solid white'}}/>
+      </div>
     </div>
   )
 }
@@ -320,9 +319,9 @@ const SLIDES = [
   },
   {
     component: Slide4,
-    title: 'Protect your hearts ❤️',
-    sub: 'Wrong answers cost a heart. Recharge with coins!',
-    dotColor: '#ef4444',
+    title: 'Never get stuck! 🌸',
+    sub: 'Get something wrong? Numio helps you figure it out and try again!',
+    dotColor: '#22c55e',
     btnLabel: 'CONTINUE →',
     isLast: false,
   },
