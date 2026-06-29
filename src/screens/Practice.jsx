@@ -14,12 +14,24 @@ import {
   rechargeHeart,
 } from '../lib/kidData'
 
-const TOTAL       = 12  // default; review overrides to 24
 const LIVES_START = 5
-const TIMED_MS    = 5000
 
-const TIMED_NODES        = new Set(['speed', 'double_reward'])
-const WORD_PROBLEM_NODES = new Set(['what_happened', 'real_life'])
+// Per-node question counts
+const NODE_TOTALS = {
+  welcome:       20,
+  learn:         0,
+  practice:      8,
+  apply:         10,
+  master:        10,
+  double_reward: 10,
+  review:        20,
+}
+
+// Per-node timer in ms (0 = no timer)
+const NODE_TIMER_MS = {
+  master:        10000,
+  double_reward:  5000,
+}
 
 // ── Icons ─────────────────────────────────────────────────────────────────
 
@@ -449,8 +461,7 @@ export default function Practice({
   // Learn is a pure lesson — no game state needed
   const isLesson  = generated?.isLesson === true
   const questions = isLesson ? [] : generated
-  // Review has 24 questions; all others have 12
-  const SESSION_TOTAL = isReview ? 24 : TOTAL
+  const SESSION_TOTAL = NODE_TOTALS[node] ?? 10
   const passThreshold = passThresholdFor(operation, placementClaim, OPERATIONS, SESSION_TOTAL)
 
   const [idx,      setIdx]      = useState(0)
@@ -469,16 +480,14 @@ export default function Practice({
   const { speak, stop, speaking } = useSpeech()
 
   const q                = questions[idx]
-  const isMultiSelect    = q?.format === 'two_truths'
-  const isCorrect        = isMultiSelect
-    ? (Array.isArray(selected) && q?.correctSet && selected.length === q.correctSet.length && selected.every(s => q.correctSet.includes(s)))
+  const isTyped          = q?.isTyped === true
+  const isCorrect        = isTyped
+    ? String(selected).trim() === String(q?.answer)
     : selected === q?.answer
   const isTrueFalse      = q?.choiceType === 'truefalse'
   const isExpression     = q?.choiceType === 'expression' || q?.choiceType === 'comparison'
   const isTimed          = q?.isTimed === true
-  const isWordProblem    = q?.format === 'word' || q?.format === 'context_switch' ||
-                           q?.format === 'story_missing' || q?.format === 'story_compare' ||
-                           q?.format === 'story_share' || q?.format === 'story_leftover'
+  const timerMs          = NODE_TIMER_MS[node] ?? 10000
 
   const progressScale = (idx + (revealed ? 1 : 0)) / SESSION_TOTAL
 
@@ -487,12 +496,11 @@ export default function Practice({
   function handleCheck(forcedChoice) {
     if (revealed) return
     const choice = forcedChoice !== undefined ? forcedChoice : selected
-    if (choice === null || choice === undefined) return
-    if (isMultiSelect && Array.isArray(choice) && choice.length < 2) return
+    if (choice === null || choice === undefined || choice === '') return
 
     setRevealed(true)
-    const correct = isMultiSelect
-      ? (Array.isArray(choice) && q.correctSet && choice.length === q.correctSet.length && choice.every(s => q.correctSet.includes(s)))
+    const correct = isTyped
+      ? String(choice).trim() === String(q.answer)
       : choice === q.answer
     if (correct) {
       const newStreak = streak + 1
@@ -532,7 +540,7 @@ export default function Practice({
 
   useEffect(() => {
     if (!isTimed || over || revealed) return
-    timeoutRef.current = setTimeout(handleTimerExpire, TIMED_MS)
+    timeoutRef.current = setTimeout(handleTimerExpire, timerMs)
     return () => clearTimeout(timeoutRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, isTimed, over, revealed])
@@ -773,7 +781,7 @@ export default function Practice({
             {theme.era} · Table {table} · {nodeLabel(node)}
           </p>
           {isTimed && (
-            <SpeedCountdown key={timerKey} durationMs={TIMED_MS} />
+            <SpeedCountdown key={timerKey} durationMs={timerMs} />
           )}
         </div>
 
@@ -783,7 +791,7 @@ export default function Practice({
             <div
               key={timerKey}
               className="h-full bg-red-400 rounded-full anim-speed-countdown"
-              style={{ animationDuration: `${TIMED_MS}ms` }}
+              style={{ animationDuration: `${timerMs}ms` }}
             />
           </div>
         )}
@@ -816,43 +824,64 @@ export default function Practice({
 
         {/* ── Answer choices ───────────────────────────────────────── */}
         <div key={`choices-${idx}`} className="flex-1 flex flex-col justify-center px-4 gap-3">
-          {isMultiSelect ? (
-            // two_truths: pick 2, then CHECK button enables
-            <div className="flex flex-col gap-3">
-              <p className="text-center text-xs font-body text-gray-400 mb-1">Pick 2 correct answers</p>
-              {q.choices.map(choice => {
-                const selArr = Array.isArray(selected) ? selected : []
-                const isPicked = selArr.includes(choice)
-                const isCorrectChoice = revealed && q.correctSet?.includes(choice)
-                const isWrongChoice = revealed && isPicked && !q.correctSet?.includes(choice)
-                return (
-                  <button
-                    key={choice}
-                    disabled={revealed}
-                    onClick={() => {
-                      if (revealed) return
-                      const selArr = Array.isArray(selected) ? selected : []
-                      if (selArr.includes(choice)) {
-                        setSelected(selArr.filter(s => s !== choice))
-                      } else if (selArr.length < 2) {
-                        setSelected([...selArr, choice])
-                      }
-                    }}
-                    className={[
-                      'rounded-2xl border-2 font-body font-semibold text-base card-answer',
-                      'flex items-center justify-center py-4 w-full select-none px-4 text-center',
-                      revealed
-                        ? isCorrectChoice ? 'border-green-400 bg-green-50 text-green-700'
-                        : isWrongChoice ? 'border-red-400 bg-red-50 text-red-600'
-                        : 'border-gray-200 bg-white text-gray-400'
-                        : isPicked ? 'border-blue-400 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 bg-white text-gray-700',
-                    ].join(' ')}
-                  >
-                    {choice}
-                  </button>
-                )
-              })}
+          {isTyped ? (
+            // Typed answer — number keyboard input
+            <div className="flex flex-col items-center gap-4">
+              <div className={[
+                'w-40 h-20 rounded-2xl border-2 flex items-center justify-center',
+                revealed
+                  ? String(selected).trim() === String(q.answer)
+                    ? 'border-green-400 bg-green-50'
+                    : 'border-red-400 bg-red-50'
+                  : selected
+                    ? 'border-blue-400 bg-blue-50'
+                    : 'border-gray-200 bg-white',
+              ].join(' ')}>
+                <span className="font-display font-extrabold text-5xl text-gray-900">
+                  {selected ?? '?'}
+                </span>
+              </div>
+              {revealed && String(selected).trim() !== String(q.answer) && (
+                <p className="font-body text-sm text-red-500 font-semibold">
+                  Answer: <span className="font-display font-bold text-lg">{q.answer}</span>
+                </p>
+              )}
+              {!revealed && (
+                <div className="grid grid-cols-3 gap-2 w-full max-w-xs">
+                  {[1,2,3,4,5,6,7,8,9,null,0,'⌫'].map((key, ki) => (
+                    <button
+                      key={ki}
+                      disabled={key === null}
+                      onClick={() => {
+                        if (key === null) return
+                        if (key === '⌫') {
+                          setSelected(s => {
+                            const str = String(s ?? '')
+                            return str.length <= 1 ? null : Number(str.slice(0, -1))
+                          })
+                        } else {
+                          setSelected(s => {
+                            const str = String(s ?? '').replace('null', '')
+                            const next = str + String(key)
+                            return next.length > 4 ? s : Number(next)
+                          })
+                        }
+                      }}
+                      className={[
+                        'h-14 rounded-2xl font-display font-bold text-2xl',
+                        'flex items-center justify-center select-none',
+                        key === null
+                          ? 'opacity-0 pointer-events-none'
+                          : key === '⌫'
+                            ? 'bg-red-50 text-red-400 border-2 border-red-100 active:bg-red-100'
+                            : 'bg-gray-50 text-gray-800 border-2 border-gray-200 active:bg-gray-100',
+                      ].join(' ')}
+                    >
+                      {key}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           ) : isTrueFalse ? (
             // True/False / Yes/No / More/Less: 2 wide buttons
@@ -924,7 +953,7 @@ export default function Practice({
         <div className="flex-shrink-0 px-4 pb-8 pt-3">
           {!revealed ? (
             <button
-              disabled={isMultiSelect ? (!Array.isArray(selected) || selected.length < 2) : selected === null}
+              disabled={selected === null || selected === undefined || selected === ''}
               onClick={() => handleCheck()}
               className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
             >
