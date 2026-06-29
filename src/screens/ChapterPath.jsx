@@ -17,7 +17,7 @@ import {
   normalizeNode,
 } from '../lib/progression'
 import { canStartNewUnit, nextUnlockMessage } from '../lib/dayGate'
-import { fetchKid, fetchStreak, setCoinBalance, logCoinTransaction, rechargeHeart, DEMO_KID_ID } from '../lib/kidData'
+import { fetchKid, fetchStreak, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
 import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
 
 const DUO_GREEN = '#58cc02'
@@ -61,11 +61,6 @@ function BackIcon() {
   )
 }
 
-function HeartStatIcon() {
-  return (
-    <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="36" height="36" alt="" />
-  )
-}
 
 function CoinStatIcon() {
   return <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="40" height="40" alt="" />
@@ -195,9 +190,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   const [openNode, setOpenNode] = useState(null)
   const [dayGateBlocked, setDayGateBlocked] = useState(false)
   const [tooltip, setTooltip] = useState(null)
-  const [noHeartsBlocked, setNoHeartsBlocked] = useState(false)
-  const [recharging, setRecharging] = useState(false)
-  const [rechargeError, setRechargeError] = useState(null)
   const [visibleUnit, setVisibleUnit] = useState(1)
   const unitRefs = useRef({})
   const hasScrolled = useRef(false)
@@ -287,7 +279,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
     const isLearnNode = node === 'learn'
     const targetPos = { operation, table, batch, node }
     const isReplayNode = !isLearnNode && isCompleted(currentPos, targetPos)
-    if (!isLearnNode && !isReplayNode && (kid.heart_balance ?? 5) === 0) { setNoHeartsBlocked(true); return }
     const newBalance = (isLearnNode || isReplayNode) ? kid.coin_balance : applyEntryFee(kid.coin_balance)
 
     if (!isLearnNode && !isReplayNode) {
@@ -301,19 +292,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
     const unlockBatch = node === 'welcome' ? previousBatch(operation, table, batch) : undefined
     const reviewPool = node === 'review' ? reviewPoolFor(operation, table, batch) : undefined
 
-    onStartNode({ operation, table, batchNum: batch, node, coinBalance: newBalance, heartBalance: kid.heart_balance ?? 5, reviewPool, unlockBatch, placementClaim: kid.placement_claim, kidCurrentStep: { operation: kid.current_operation, table: kid.current_table, batch: kid.current_batch || 1, node: normalizeNode(kid.current_node) } })
+    onStartNode({ operation, table, batchNum: batch, node, coinBalance: newBalance, reviewPool, unlockBatch, placementClaim: kid.placement_claim, kidCurrentStep: { operation: kid.current_operation, table: kid.current_table, batch: kid.current_batch || 1, node: normalizeNode(kid.current_node) } })
   }
 
-  async function handleRechargeHeart() {
-    if (recharging) return
-    setRechargeError(null)
-    setRecharging(true)
-    try {
-      const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 5, kid.coin_balance)
-      setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins }))
-    } catch (err) { setRechargeError(err.message) }
-    finally { setRecharging(false) }
-  }
 
   const inDebt = kid.coin_balance < 0
   const atDebtFloor = kid.coin_balance <= DEBT_FLOOR
@@ -436,25 +417,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                 </div>
               )}
             </div>
-            {/* Hearts */}
-            <div className="relative">
-              <button onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }} className="flex items-center gap-1.5 active:scale-95 transition-transform">
-                <HeartStatIcon />
-                <span className="font-body font-bold text-base text-red-400 leading-none tabular-nums">{kid.heart_balance ?? 5}</span>
-              </button>
-              {tooltip === 'hearts' && (
-                <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="56" height="56" alt="" /></p>
-                  <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
-                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="36" height="36" alt="" /></span>)}</div>
-                  <p className="font-body text-xs text-gray-400 mb-3">Hearts are lost when you answer wrong. Recharge with coins.</p>
-                  {(kid.heart_balance ?? 5) < 5 ? (
-                    <>{rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
-                    <button onClick={handleRechargeHeart} disabled={recharging || kid.coin_balance < 10} className="w-full py-2.5 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95" style={{ backgroundColor: kid.coin_balance >= 10 ? '#ef4444' : '#F3F4F6', color: kid.coin_balance >= 10 ? '#fff' : '#9CA3AF', boxShadow: kid.coin_balance >= 10 ? '0 3px 0 0 #b91c1c' : '0 3px 0 0 #D1D5DB' }}>{recharging ? 'Recharging…' : '♥ +1 for 10 coins'}</button></>
-                  ) : <p className="font-body text-xs text-green-500 font-bold">Full hearts! ✨</p>}
-                </div>
-              )}
-            </div>
             {/* Coins */}
             <div className="relative">
               <button onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')} className="flex items-center gap-1.5 active:scale-95 transition-transform">
@@ -489,40 +451,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             <button onClick={() => setDayGateBlocked(false)} className="flex-shrink-0 font-body font-bold text-xs text-amber-600 active:opacity-70">OK</button>
           </div>
         )}
-        {noHeartsBlocked && (
-          <div style={{ position: 'fixed', inset: 0, zIndex: 40, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, pointerEvents: 'none' }}>
-            <div style={{ backgroundColor: 'white', borderRadius: 24, padding: 28, width: '100%', maxWidth: 360, boxShadow: '0 20px 60px rgba(0,0,0,0.3)', pointerEvents: 'all' }}>
-              <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="72" height="72" style={{ opacity: 0.4, margin: '0 auto 12px' }} alt="" />
-                <p className="font-display font-bold text-xl text-gray-900">No hearts left!</p>
-                <p className="font-body text-sm text-gray-400 mt-1">
-                  {kid.coin_balance >= 10 ? 'Recharge a heart to keep playing.' : 'Not enough coins — hearts refill at midnight!'}
-                </p>
-              </div>
-              {rechargeError && <p className="font-body text-xs text-red-400 mb-3 text-center">{rechargeError}</p>}
-              {kid.coin_balance >= 10 ? (
-                <button
-                  onClick={async () => { setRechargeError(null); setRecharging(true); try { const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 0, kid.coin_balance); setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins })); setNoHeartsBlocked(false) } catch (err) { setRechargeError(err.message) } finally { setRecharging(false) } }}
-                  disabled={recharging}
-                  className="w-full py-4 rounded-2xl font-body font-bold text-base text-white transition-all active:scale-95"
-                  style={{ backgroundColor: '#ef4444', boxShadow: '0 4px 0 0 #b91c1c' }}>
-                  {recharging ? 'Recharging…' : '♥ Recharge 1 heart — 10 coins'}
-                </button>
-              ) : (
-                <div className="rounded-2xl bg-orange-50 border border-orange-100 px-4 py-3 text-center">
-                  <p className="text-2xl mb-1">🌙</p>
-                  <p className="font-display font-bold text-sm text-gray-900">Come back tomorrow!</p>
-                  <p className="font-body text-xs text-gray-400 mt-1">Hearts refill at midnight.</p>
-                </div>
-              )}
-              <button onClick={() => setNoHeartsBlocked(false)}
-                className="w-full mt-3 py-3 rounded-2xl font-body font-bold text-sm text-gray-400 border border-gray-200 active:bg-gray-50">
-                Close
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* ── Sticky unit banner ── */}
         {(() => {
           const u = allUnits.find(u => u.unitNumber === visibleUnit)
