@@ -2,8 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { generateBatch, makeBridgeStep2 } from '../lib/problems'
 import { themeFor } from '../lib/eraTheme'
 import { nodeLabel, nextStep, normalizeNode, OPERATIONS } from '../lib/progression'
-import { applyPayout, payoutForNode, passThresholdFor, NODE_PAYOUT } from '../lib/economy'
-import FlowerJump from '../components/FlowerJump'
+import { payoutForNode, NODE_PAYOUT } from '../lib/economy'
 import {
   updateProgress,
   setCoinBalance,
@@ -314,38 +313,52 @@ function NumioPopup({ visible, hint, answer, isSecondWrong, onRetry, onGiveUp })
 
 // ── Finished screen ───────────────────────────────────────────────────────
 
-function FinishedScreen({ passed, correct, total, payout, isReview, saving, onExit, node }) {
+function FinishedScreen({ payout, node, saving, onExit }) {
   const coinDisplayed = useCoinTick(payout, true)
+  const isReview = node === 'review'
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50 relative overflow-hidden">
-      <ConfettiBlast active={passed} />
+      <ConfettiBlast active />
       <div className="h-screen md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6 relative z-10">
-        {passed ? (
-          <FlowerJump size={220} loop />
-        ) : (
-          <span className="text-8xl select-none">💪</span>
-        )}
-        <div className="text-center">
-          <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">
-            {passed ? (isReview ? '🎉 Review complete!' : '🎉 You passed!') : 'Almost there!'}
-          </h2>
-          <p className="font-body text-gray-400">{correct} out of {total} correct</p>
-          {!passed && (
-            <p className="font-body text-gray-400 text-sm mt-1">Retry is free — you've got this!</p>
-          )}
-          {passed && (
-            <div className="flex items-center justify-center gap-2 mt-4 font-display font-extrabold text-3xl text-amber-500">
-              <CoinIcon size={60} />
-              <span className="tabular-nums">+{coinDisplayed}</span>
-            </div>
-          )}
+
+        {/* Floating mascot */}
+        <div style={{ animation: 'mascot-float 2s ease-in-out infinite' }}>
+          <img src="/onboarding-mascot.png" alt="Numio" style={{ width: 160, height: 'auto', display: 'block' }} />
         </div>
+
+        <div className="text-center">
+          <h2 className="font-display font-bold text-4xl text-gray-900 mb-2">
+            Perfect! 🎉
+          </h2>
+          <p className="font-body text-gray-500 text-lg">
+            {isReview ? 'You finished the review!' : 'You finished the activity!'}
+          </p>
+        </div>
+
+        {/* Coin count */}
+        <div className="flex items-center justify-center gap-3 px-8 py-5 rounded-3xl"
+          style={{ backgroundColor: '#FFFBEB', border: '2px solid #FCD34D' }}>
+          <CoinIcon size={56} />
+          <div className="text-left">
+            <p className="font-body text-xs text-amber-600 font-bold tracking-widest uppercase">Coins earned</p>
+            <p className="font-display font-extrabold text-4xl text-amber-500 tabular-nums">+{coinDisplayed}</p>
+          </div>
+        </div>
+
         {onExit && (
           <button onClick={() => onExit(node)} disabled={saving}
             className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
-            {saving ? 'SAVING…' : passed ? 'CONTINUE →' : 'TRY AGAIN'}
+            {saving ? 'SAVING…' : 'CONTINUE →'}
           </button>
         )}
+
+        <style>{`
+          @keyframes mascot-float {
+            0%,100% { transform: translateY(0px); }
+            50%      { transform: translateY(-12px); }
+          }
+        `}</style>
       </div>
     </div>
   )
@@ -486,7 +499,6 @@ export default function Practice({
   }, [generated, isLesson])
 
   const SESSION_TOTAL = NODE_TOTALS[node] ?? 10
-  const passThreshold = passThresholdFor(operation, placementClaim, OPERATIONS, SESSION_TOTAL)
 
   const [idx,          setIdx]          = useState(0)
   const [selected,     setSelected]     = useState(null)
@@ -650,11 +662,9 @@ export default function Practice({
   function handleContinue() {
     setIsRetry(false)
     setWrongAttempts(0)
-    const total = questions.length
-    if (idx === total - 1) {
-      const correct = total - wrong
+    if (idx === questions.length - 1) {
       setOver('finished')
-      finalizeAttempt(correct >= passThreshold ? 'passed' : 'retry')
+      finalizeAttempt()
       return
     }
     setIdx(i => i + 1)
@@ -665,26 +675,17 @@ export default function Practice({
 
   // ── Persistence ──────────────────────────────────────────────────────
 
-  async function finalizeAttempt(result) {
+  async function finalizeAttempt() {
     setSaving(true)
-    const correct    = questions.length - wrong
-    const coinsDelta = result === 'passed' ? basePayout : Math.round(basePayout * 0.5)
-    const newBalance = coinBalance + coinsDelta
-
+    const newBalance = coinBalance + basePayout
     try {
-      if (result === 'passed') {
-        const next = nextStep(operation, table, batchNum, node)
-        await Promise.all([
-          next && kidId ? updateProgress(kidId, next) : Promise.resolve(),
-          kidId ? setCoinBalance(kidId, newBalance) : Promise.resolve(),
-          kidId ? logCoinTransaction(kidId, { amount: coinsDelta, reason: 'node_pass', balanceAfter: newBalance }) : Promise.resolve(),
-          kidId ? logAttempt(kidId, { operation, tableNumber: table, node, questionsSeen: questions.length, correctCount: correct, wrongCount: wrong, livesUsed: 0, result: 'passed', coinsDelta }) : Promise.resolve(),
-        ])
-      } else {
-        await Promise.all([
-          kidId ? logAttempt(kidId, { operation, tableNumber: table, node, questionsSeen: questions.length, correctCount: correct, wrongCount: wrong, livesUsed: 0, result, coinsDelta: 0 }) : Promise.resolve(),
-        ])
-      }
+      const next = nextStep(operation, table, batchNum, node)
+      await Promise.all([
+        next && kidId ? updateProgress(kidId, next) : Promise.resolve(),
+        kidId ? setCoinBalance(kidId, newBalance) : Promise.resolve(),
+        kidId ? logCoinTransaction(kidId, { amount: basePayout, reason: 'node_pass', balanceAfter: newBalance }) : Promise.resolve(),
+        kidId ? logAttempt(kidId, { operation, tableNumber: table, node, questionsSeen: questions.length, correctCount: questions.length - wrong, wrongCount: wrong, livesUsed: 0, result: 'passed', coinsDelta: basePayout }) : Promise.resolve(),
+      ])
       onBalanceChange?.(newBalance)
     } catch (err) {
       console.error('finalizeAttempt failed:', err)
@@ -716,13 +717,9 @@ export default function Practice({
     const correct = questions.length - wrong
     return (
       <FinishedScreen
-        passed={correct >= passThreshold}
-        correct={correct}
-        total={questions.length}
-        payout={correct >= passThreshold ? basePayout : 0}
-        isReview={isReview}
-        saving={saving}
+        payout={basePayout}
         node={node}
+        saving={saving}
         onExit={onExit}
       />
     )
