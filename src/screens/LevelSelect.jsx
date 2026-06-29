@@ -161,7 +161,7 @@ function LevelButton({ symbol, label, selected, onClick, delay }) {
 }
 
 /* ── Main LevelSelect screen ── */
-export default function LevelSelect({ onDone }) {
+export default function LevelSelect({ onDone, onBack }) {
   const [selected, setSelected] = useState(null)
 
   function handleConfirm() {
@@ -181,6 +181,22 @@ export default function LevelSelect({ onDone }) {
       margin: '0 auto',
     }}>
       <style>{ANIM}</style>
+
+      {/* Back button */}
+      <div style={{ padding: '16px 20px 0' }}>
+        <button
+          onClick={onBack}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
+            fontFamily: "'Baloo 2', sans-serif", fontWeight: 800,
+            fontSize: 14, color: '#afafaf', letterSpacing: '0.04em',
+            padding: '8px 4px', WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          ← BACK
+        </button>
+      </div>
 
       {/* Mascot + bubble */}
       <div style={{
