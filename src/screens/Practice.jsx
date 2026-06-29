@@ -310,7 +310,77 @@ function NumioPopup({ visible, hint, answer, isSecondWrong, onRetry, onGiveUp })
   )
 }
 
-// ── Finished screen ───────────────────────────────────────────────────────
+// ── 🚪 Quit confirmation popup ────────────────────────────────────────────
+
+function QuitPopup({ visible, onLeave, onStay }) {
+  if (!visible) return null
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 70,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'flex-end',
+      background: 'rgba(255,255,255,0.92)',
+    }}>
+      {/* Bubble */}
+      <div style={{
+        background: 'white', borderRadius: 24,
+        border: '2px solid #e5e7eb', padding: '20px 24px',
+        maxWidth: 320, marginBottom: 16,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.10)',
+        position: 'relative', animation: 'fadeUp 0.3s ease both',
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'center', gap: 16,
+      }}>
+        <p style={{
+          fontFamily: "'Baloo 2', sans-serif",
+          fontWeight: 700, fontSize: 18,
+          color: '#3c3c3c', textAlign: 'center',
+          lineHeight: 1.4, margin: 0,
+        }}>
+          No don't leave me! 😢<br />Are you sure you want to leave?
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+          <button onClick={onStay} style={{
+            width: '100%', border: 'none', cursor: 'pointer',
+            padding: '14px 0', borderRadius: 14,
+            background: '#58cc02', boxShadow: '0 4px 0 #46a302',
+            color: '#fff', fontFamily: "'Baloo 2', sans-serif",
+            fontWeight: 800, fontSize: 16, letterSpacing: '0.05em',
+            textTransform: 'uppercase',
+          }}>
+            CONTINUE PLAYING 💪
+          </button>
+          <button onClick={onLeave} style={{
+            width: '100%', border: 'none', cursor: 'pointer',
+            padding: '12px 0', borderRadius: 14,
+            background: 'none', color: '#9ca3af',
+            fontFamily: "'Baloo 2', sans-serif",
+            fontWeight: 700, fontSize: 14,
+          }}>
+            Yes, leave
+          </button>
+        </div>
+
+        {/* Bubble tail */}
+        <div style={{
+          position: 'absolute', bottom: -14, left: '50%',
+          transform: 'translateX(-50%)', width: 0, height: 0,
+          borderLeft: '12px solid transparent', borderRight: '12px solid transparent',
+          borderTop: '14px solid white',
+        }} />
+      </div>
+
+      {/* Floating mascot */}
+      <div style={{ animation: 'mascot-float 1.8s ease-in-out infinite' }}>
+        <img src="/onboarding-mascot.png" alt="Numio"
+          style={{ width: 130, height: 'auto', display: 'block' }} />
+      </div>
+    </div>
+  )
+}
+
+
 
 function FinishedScreen({ payout, node, saving, onExit }) {
   const coinDisplayed = useCoinTick(payout, true)
@@ -509,7 +579,7 @@ export default function Practice({
   const [fireKey,      setFireKey]      = useState(0)
 
   // Wrong answer / retry state
-  const [showPopup,    setShowPopup]    = useState(false)
+  const [showQuitPopup,  setShowQuitPopup]  = useState(false)
   const [isRetry,      setIsRetry]      = useState(false)
   const [wrongAttempts, setWrongAttempts] = useState(0) // 0,1,2 per question
   const [earnedCoins,  setEarnedCoins]  = useState(0)
@@ -739,6 +809,13 @@ export default function Practice({
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
       <FireParticles streakKey={fireKey} streak={streak} />
 
+      {/* Quit confirmation popup */}
+      <QuitPopup
+        visible={showQuitPopup}
+        onStay={() => setShowQuitPopup(false)}
+        onLeave={() => { setShowQuitPopup(false); onExit?.(null) }}
+      />
+
       {/* Numio wrong-answer popup */}
       <NumioPopup
         visible={showPopup}
@@ -753,7 +830,7 @@ export default function Practice({
 
         {/* ── Top bar ─────────────────────────────────────────── */}
         <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-5 pb-3">
-          <button onClick={() => { stop(); onExit?.(node) }}
+          <button onClick={() => { stop(); setShowQuitPopup(true) }}
             className="w-11 h-11 flex items-center justify-center rounded-full text-gray-300 transition-colors duration-150 active:bg-gray-100">
             <XIcon />
           </button>
