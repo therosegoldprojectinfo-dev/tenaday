@@ -184,7 +184,7 @@ function SpeedCountdown({ durationMs }) {
 
 // ── 🌼 Numio wrong-answer mascot popup with typewriter bubble ─────────────
 
-function useTypewriter(text, active, speed = 35) {
+function useTypewriter(text, active, speed = 70) {
   const [displayed, setDisplayed] = useState('')
   useEffect(() => {
     if (!active) { setDisplayed(''); return }
@@ -205,7 +205,6 @@ function useTypewriter(text, active, speed = 35) {
 function NumioPopup({ visible, hint, answer, isSecondWrong, onRetry, onGiveUp }) {
   const [phase, setPhase] = useState(0)
 
-  // Messages differ based on whether this is first or second wrong
   const messages = isSecondWrong
     ? [
         'Almost my friend! 🌸',
@@ -223,8 +222,8 @@ function NumioPopup({ visible, hint, answer, isSecondWrong, onRetry, onGiveUp })
   useEffect(() => {
     if (!visible) { setPhase(0); return }
     setPhase(0)
-    const t1 = setTimeout(() => setPhase(1), messages[0].length * 35 + 900)
-    const t2 = setTimeout(() => setPhase(2), messages[0].length * 35 + 900 + messages[1].length * 35 + 700)
+    const t1 = setTimeout(() => setPhase(1), messages[0].length * 70 + 1800)
+    const t2 = setTimeout(() => setPhase(2), messages[0].length * 70 + 1800 + messages[1].length * 70 + 1400)
     return () => { clearTimeout(t1); clearTimeout(t2) }
   }, [visible, isSecondWrong])
 
@@ -520,15 +519,26 @@ export default function Practice({
 
   const q         = questions[idx]
   const isTyped   = q?.isTyped === true
+  const isFormula = q?.choiceType === 'formula'
   const isTrueFalse = q?.choiceType === 'truefalse'
   const isExpression = q?.choiceType === 'expression' || q?.choiceType === 'comparison'
   const isTimed   = q?.isTimed === true
   const timerMs   = NODE_TIMER_MS[node] ?? 10000
   const isBridge1 = q?.isBridgeStep1 === true
 
-  const isCorrect = isTyped
-    ? String(selected ?? '').trim() === String(q?.answer)
-    : selected === q?.answer
+  function normalizeFormula(s) {
+    return String(s ?? '').trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[-–—]/g, '−')   // normalize minus variants
+      .replace(/[×x\*]/g, '×')  // normalize multiply
+      .replace(/[÷/]/g, '÷')    // normalize divide
+  }
+
+  const isCorrect = isFormula
+    ? normalizeFormula(selected) === normalizeFormula(q?.answer)
+    : isTyped
+      ? String(selected ?? '').trim() === String(q?.answer)
+      : selected === q?.answer
 
   const progressScale = (idx + (revealed ? 1 : 0)) / Math.max(questions.length, 1)
 
@@ -588,9 +598,11 @@ export default function Practice({
     const choice = selected
     if (choice === null || choice === undefined || choice === '') return
 
-    const correct = isTyped
-      ? String(choice).trim() === String(q.answer)
-      : choice === q.answer
+    const correct = isFormula
+      ? normalizeFormula(choice) === normalizeFormula(q.answer)
+      : isTyped
+        ? String(choice).trim() === String(q.answer)
+        : choice === q.answer
 
     if (correct) {
       setRevealed(true)
@@ -802,7 +814,7 @@ export default function Practice({
               style={{ backgroundColor: `${theme.colors.primary}18` }}>
               <span className="text-sm">🧩</span>
               <span className="font-body font-bold text-xs" style={{ color: theme.colors.dark }}>
-                Choose the right operation
+                Type the formula to solve it!
               </span>
             </div>
           </div>
@@ -845,7 +857,86 @@ export default function Practice({
 
         {/* ── Answer choices ──────────────────────────────────── */}
         <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col justify-center px-4 gap-3">
-          {isTyped ? (
+          {isFormula ? (
+            // Formula keyboard — kid types e.g. "3 + 4"
+            <div className="flex flex-col items-center gap-4">
+              {/* Display box */}
+              <div className={[
+                'w-64 h-16 rounded-2xl border-2 flex items-center justify-center px-4',
+                revealed
+                  ? normalizeFormula(selected) === normalizeFormula(q.answer)
+                    ? 'border-green-400 bg-green-50'
+                    : 'border-amber-300 bg-amber-50'
+                  : selected ? 'border-blue-400 bg-blue-50' : 'border-gray-200 bg-white',
+              ].join(' ')}>
+                <span className="font-display font-bold text-2xl text-gray-900 tracking-wide">
+                  {selected || <span className="text-gray-300">e.g. 3 + 4</span>}
+                </span>
+              </div>
+              {revealed && normalizeFormula(selected) !== normalizeFormula(q.answer) && (
+                <p className="font-body text-sm text-amber-600 font-semibold">
+                  Answer: <span className="font-display font-bold text-lg">{q.answer}</span>
+                </p>
+              )}
+              {!revealed && (
+                <div className="w-full max-w-xs flex flex-col gap-2">
+                  {/* Number row */}
+                  <div className="grid grid-cols-5 gap-2">
+                    {[1,2,3,4,5,6,7,8,9,0].map(n => (
+                      <button key={n}
+                        onClick={() => setSelected(s => ((s || '') + String(n)).slice(0, 8))}
+                        className="h-12 rounded-xl font-display font-bold text-xl bg-gray-50 text-gray-800 border-2 border-gray-200 active:bg-gray-100 flex items-center justify-center">
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Operator row */}
+                  <div className="grid grid-cols-5 gap-2">
+                    {['+', '−', '×', '÷', '⌫'].map(op => (
+                      <button key={op}
+                        onClick={() => {
+                          if (op === '⌫') {
+                            setSelected(s => {
+                              const str = s || ''
+                              const trimmed = str.trimEnd()
+                              // Remove last char or last " op " block
+                              if (trimmed.endsWith(' ')) return trimmed.slice(0, -1)
+                              const parts = trimmed.split('')
+                              parts.pop()
+                              const result = parts.join('').trimEnd()
+                              return result || null
+                            })
+                          } else {
+                            setSelected(s => {
+                              const str = (s || '').trimEnd()
+                              if (!str) return null
+                              // Don't add operator if last char is already an operator
+                              const last = str[str.length - 1]
+                              if (['+','−','×','÷'].includes(last)) return str.slice(0, -1) + op + ' '
+                              return str + ' ' + op + ' '
+                            })
+                          }
+                        }}
+                        className={[
+                          'h-12 rounded-xl font-display font-bold text-xl flex items-center justify-center border-2',
+                          op === '⌫'
+                            ? 'bg-red-50 text-red-400 border-red-100 active:bg-red-100'
+                            : 'bg-amber-50 text-amber-600 border-amber-200 active:bg-amber-100',
+                        ].join(' ')}>
+                        {op}
+                      </button>
+                    ))}
+                  </div>
+                  {/* Space/clear */}
+                  <button
+                    onClick={() => setSelected(null)}
+                    className="w-full h-10 rounded-xl font-body font-bold text-sm text-gray-400 border-2 border-gray-200 bg-white active:bg-gray-50">
+                    Clear
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : isTyped ? (
             <div className="flex flex-col items-center gap-4">
               <div className={[
                 'w-40 h-20 rounded-2xl border-2 flex items-center justify-center',
@@ -940,7 +1031,7 @@ export default function Practice({
               disabled={selected === null || selected === undefined || selected === ''}
               onClick={handleCheck}
               className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
-              CHECK
+              {isFormula ? 'CHECK FORMULA' : 'CHECK'}
             </button>
           ) : (
             <div className={`rounded-2xl overflow-hidden border-2 ${isCorrect ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
