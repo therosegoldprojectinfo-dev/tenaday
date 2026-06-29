@@ -198,15 +198,74 @@ function generateLesson(operation, table, batch) {
   }
 }
 
+// ── Bridge question builder ───────────────────────────────────────────────
+// Two-step word problem bridge used in the last 3 Practice questions.
+// Step 1: "How do we find the correct answer?" → pick the right equation
+// Step 2: (triggered by Practice.jsx after step 1 correct) → solve the number
+
+const ALL_OPERATIONS = ['addition', 'subtraction', 'multiplication', 'division']
+
+function makeBridgeStep1(operation, table, fact) {
+  const { a, b, answer } = factValues(operation, table, fact)
+  const sym = SYMBOL[operation]
+  const correctExpr = `${a} ${sym} ${b}`
+
+  // 3 distractors: different operations AND different numbers
+  const otherOps = ALL_OPERATIONS.filter(op => op !== operation)
+  const distractors = otherOps.map(op => {
+    const da = randInt(2, 9)
+    const db = randInt(1, da - 1 || 1)
+    return `${da} ${SYMBOL[op]} ${db}`
+  })
+
+  const wordText = wordProblem(operation, a, b)
+
+  return {
+    text: `${wordText}\n\nHow do we find the correct answer?`,
+    answer: correctExpr,
+    choiceType: 'expression',
+    choices: shuffle([correctExpr, ...distractors]),
+    isTimed: false,
+    isTyped: false,
+    isBridgeStep1: true,
+    // carry these so step 2 can be generated
+    bridgeOperation: operation,
+    bridgeTable: table,
+    bridgeFact: fact,
+    bridgeWordText: wordText,
+  }
+}
+
+export function makeBridgeStep2(operation, table, fact, wordText) {
+  const { answer } = factValues(operation, table, fact)
+  return {
+    text: `${wordText}\n\nNow solve it! What is the answer?`,
+    answer,
+    choiceType: 'number',
+    choices: safeChoices(answer, smartDistractors(operation, table, fact, answer)),
+    isTimed: false,
+    isTyped: false,
+    isBridgeStep2: true,
+  }
+}
+
 // ── Practice generator (8 q) ───────────────────────────────────────────────
-// Simple equations only, MC, no timer, current unit facts
+// Q1-5: simple equations, MC, no timer
+// Q6-8: two-step bridge (step1 only — step2 injected by Practice.jsx after correct)
 
 function generatePractice(operation, table, batch) {
   const [f1, f2] = factsForBatch(batch)
   const facts = [f1, f2]
-  return Array.from({ length: 8 }, (_, i) =>
+
+  const equations = Array.from({ length: 5 }, (_, i) =>
     makeEquation(operation, table, facts[i % 2], { isTimed: false, isTyped: false })
   )
+
+  const bridges = Array.from({ length: 3 }, (_, i) =>
+    makeBridgeStep1(operation, table, facts[i % 2])
+  )
+
+  return [...equations, ...bridges]
 }
 
 // ── Apply generator (10 q) ────────────────────────────────────────────────
