@@ -119,18 +119,6 @@ body {
 
 /* Red variant — same mechanic, used only for the "wrong answer" Continue
    button state so the feedback color (red) still reads correctly. */
-.btn-duo-red {
-  background: #ff4b4b;
-  color: #ffffff;
-  border: none;
-  box-shadow: 0 4px 0 0 #d93333;
-  transition: transform 80ms cubic-bezier(0.23, 1, 0.32, 1),
-              box-shadow 80ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-.btn-duo-red:not(:disabled):active {
-  transform: translateY(4px);
-  box-shadow: none;
-}
 
 .btn-duo-yellow {
   background: #FF9600;
