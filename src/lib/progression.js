@@ -18,7 +18,7 @@
 // Per chapter: 12 tables × 6 batches = 72 day-sessions
 
 export const OPERATIONS = ['addition', 'subtraction', 'multiplication', 'division']
-export const NODES = ['unlock', 'learn', 'easy', 'medium', 'hard', 'double_reward', 'review']
+export const NODES = ['welcome', 'learn', 'practice', 'apply', 'master', 'double_reward', 'review']
 export const TABLE_COUNT = 12
 export const BATCH_COUNT = 6
 export const FACTS_PER_BATCH = 2 // always 2; 2 × 6 batches = 12 facts per table
@@ -62,9 +62,14 @@ export function shouldSkipUnlock(operation, table, batch, hasEverAdvanced) {
 
 // Legacy node name migration — old DB values map to new node names
 const LEGACY_NODE_MAP = {
-  practice:      'easy',
-  what_happened: 'medium',
-  real_life:     'hard',
+  // v3 → v4 renames
+  unlock:        'welcome',
+  easy:          'practice',
+  medium:        'apply',
+  hard:          'master',
+  // v2 → v4 renames (older DB rows)
+  what_happened: 'apply',
+  real_life:     'master',
   speed:         'double_reward',
 }
 
@@ -228,27 +233,30 @@ export function tablesForOperation() {
 }
 
 export function nodeLabel(node) {
-  if (node === 'unlock')        return 'Welcome!'
+  if (node === 'welcome')       return 'Welcome!'
   if (node === 'learn')         return 'Learn'
-  if (node === 'easy')          return 'Easy'
-  if (node === 'medium')        return 'Medium'
-  if (node === 'hard')          return 'Hard'
+  if (node === 'practice')      return 'Practice'
+  if (node === 'apply')         return 'Apply'
+  if (node === 'master')        return 'Master'
   if (node === 'double_reward') return 'Double Reward'
   if (node === 'review')        return 'Review'
   // legacy fallbacks
-  if (node === 'practice')      return 'Practice'
-  if (node === 'what_happened') return 'What Happened?'
-  if (node === 'real_life')     return 'Real Life'
-  if (node === 'speed')         return 'Speed'
+  if (node === 'unlock')        return 'Welcome!'
+  if (node === 'easy')          return 'Practice'
+  if (node === 'medium')        return 'Apply'
+  if (node === 'hard')          return 'Master'
+  if (node === 'what_happened') return 'Apply'
+  if (node === 'real_life')     return 'Master'
+  if (node === 'speed')         return 'Double Reward'
   return node
 }
 
 export function nodePurpose(node) {
-  if (node === 'unlock')        return 'Unlock today\'s lesson'
+  if (node === 'welcome')       return 'Warm up with yesterday\'s facts'
   if (node === 'learn')         return 'Today\'s new facts'
-  if (node === 'easy')          return 'Warm up your brain'
-  if (node === 'medium')        return 'Level up'
-  if (node === 'hard')          return 'Push yourself'
+  if (node === 'practice')      return 'Build confidence'
+  if (node === 'apply')         return 'Real-life situations'
+  if (node === 'master')        return 'Push yourself'
   if (node === 'double_reward') return '2× coins tonight!'
   if (node === 'review')        return 'Remember it all'
   return ''
