@@ -137,8 +137,15 @@ export default function App() {
   }
 
   async function handleExitPractice(completedNode) {
+    // null = quit midway (X button) → no streak slide, just back to path
+    if (completedNode === null) {
+      setActiveNode(null)
+      setScreen('path')
+      setRefreshKey(k => k + 1)
+      return
+    }
     if (completedNode === 'welcome') {
-      // Fetch current streak to show on slide
+      // Fully completed Welcome → show streak slide
       try {
         const { fetchStreak } = await import('./lib/kidData')
         const streak = await fetchStreak(kidId)
@@ -312,7 +319,7 @@ export default function App() {
         unlockBatch={activeNode.unlockBatch}
         placementClaim={activeNode.placementClaim}
         kidCurrentStep={activeNode.kidCurrentStep}
-        onExit={(completedNode) => handleExitPractice(completedNode || activeNode.node)}
+        onExit={(completedNode) => handleExitPractice(completedNode)}
         onBalanceChange={(newBal) => setActiveNode(n => n ? { ...n, coinBalance: newBal } : n)}
       />
     )
