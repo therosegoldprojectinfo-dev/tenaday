@@ -212,16 +212,40 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
   const { speak, stop, speaking } = useSpeech()
 
   const q                = questions[idx]
-  const isCorrect        = selected === q?.answer
-  const isEquationChoice = q?.choiceType === 'equation'
+  const isTyped          = q?.isTyped === true
+  const isTimed          = q?.isTimed === true
+  const isCorrect        = isTyped
+    ? String(selected).trim() === String(q?.answer)
+    : selected === q?.answer
   const isTrueFalse      = q?.choiceType === 'truefalse'
-  const isComparison     = q?.choiceType === 'comparison'
   const progressScale    = (idx + (revealed ? 1 : 0)) / SESSION_TOTAL
+  const [timerKey, setTimerKey] = useState(0)
+  const timeoutRef = useRef(null)
+
+  function handleTimerExpire() {
+    if (revealed || over) return
+    if (selected !== null) { handleCheck(); return }
+    setRevealed(true)
+    setStreak(0)
+    setWrong(w => w + 1)
+    setLives(l => l - 1)
+    setHeartKey(k => k + 1)
+  }
+
+  useEffect(() => {
+    if (!isTimed || over || revealed) return
+    timeoutRef.current = setTimeout(handleTimerExpire, 10000)
+    return () => clearTimeout(timeoutRef.current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, isTimed, over, revealed])
 
   function handleCheck() {
-    if (revealed || selected === null) return
+    if (revealed || selected === null || selected === undefined || selected === '') return
     setRevealed(true)
-    if (selected === q.answer) {
+    const correct = isTyped
+      ? String(selected).trim() === String(q.answer)
+      : selected === q.answer
+    if (correct) {
       const newStreak = streak + 1
       setStreak(newStreak)
       if (newStreak >= 3) setFireKey(k => k + 1)
@@ -239,6 +263,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
     setIdx(i => i + 1)
     setSelected(null)
     setRevealed(false)
+    setTimerKey(k => k + 1)
   }
 
   async function finalize() {
@@ -371,25 +396,76 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
           </button>
         </div>
 
+        {/* ── Timer bar ─────────────────────────────────────────────── */}
+        {isTimed && (
+          <div className="flex-shrink-0 mx-5 mt-1.5 h-2 rounded-full bg-gray-100 overflow-hidden">
+            <div
+              key={timerKey}
+              className="h-full bg-red-400 rounded-full anim-speed-countdown"
+              style={{ animationDuration: '10000ms' }}
+            />
+          </div>
+        )}
+
         {/* ── Answer choices ────────────────────────────────────────── */}
         <div className="flex-1 flex flex-col justify-center px-4 gap-3">
-          {isEquationChoice ? (
-            <div className="flex flex-col gap-3">
-              {q.choices.map(choice => (
-                <button key={choice} disabled={revealed}
-                  onClick={() => !revealed && setSelected(choice)}
-                  aria-pressed={selected === choice}
-                  className={[
-                    'rounded-2xl border-2 font-display font-bold text-2xl card-answer',
-                    'flex items-center justify-center py-5 w-full select-none px-4 text-center',
-                    cardColorClass(choice, selected, revealed, q.answer),
-                    cardAnimClass(choice, selected, revealed, q.answer),
-                  ].join(' ')}
-                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}
-                >
-                  {choice}
-                </button>
-              ))}
+          {isTyped ? (
+            <div className="flex flex-col items-center gap-4">
+              <div className={[
+                'w-40 h-20 rounded-2xl border-2 flex items-center justify-center',
+                revealed
+                  ? String(selected).trim() === String(q.answer)
+                    ? 'border-green-400 bg-green-50'
+                    : 'border-red-400 bg-red-50'
+                  : selected !== null
+                    ? 'border-blue-400 bg-blue-50'
+                    : 'border-gray-200 bg-white',
+              ].join(' ')}>
+                <span className="font-display font-extrabold text-5xl text-gray-900">
+                  {selected ?? '?'}
+                </span>
+              </div>
+              {revealed && String(selected).trim() !== String(q.answer) && (
+                <p className="font-body text-sm text-red-500 font-semibold">
+                  Answer: <span className="font-display font-bold text-lg">{q.answer}</span>
+                </p>
+              )}
+              {!revealed && (
+                <div className="grid grid-cols-3 gap-2 w-full max-w-xs">
+                  {[1,2,3,4,5,6,7,8,9,null,0,'⌫'].map((key, ki) => (
+                    <button
+                      key={ki}
+                      disabled={key === null}
+                      onClick={() => {
+                        if (key === null) return
+                        if (key === '⌫') {
+                          setSelected(s => {
+                            const str = String(s ?? '')
+                            return str.length <= 1 ? null : Number(str.slice(0, -1))
+                          })
+                        } else {
+                          setSelected(s => {
+                            const str = String(s ?? '').replace('null', '')
+                            const next = str + String(key)
+                            return next.length > 4 ? s : Number(next)
+                          })
+                        }
+                      }}
+                      className={[
+                        'h-14 rounded-2xl font-display font-bold text-2xl',
+                        'flex items-center justify-center select-none',
+                        key === null
+                          ? 'opacity-0 pointer-events-none'
+                          : key === '⌫'
+                            ? 'bg-red-50 text-red-400 border-2 border-red-100 active:bg-red-100'
+                            : 'bg-gray-50 text-gray-800 border-2 border-gray-200 active:bg-gray-100',
+                      ].join(' ')}
+                    >
+                      {key}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           ) : isTrueFalse ? (
             <div className="flex gap-3">
@@ -400,24 +476,6 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
                   className={[
                     'flex-1 rounded-2xl border-2 font-display font-bold text-2xl card-answer',
                     'flex items-center justify-center h-28 select-none',
-                    cardColorClass(choice, selected, revealed, q.answer),
-                    cardAnimClass(choice, selected, revealed, q.answer),
-                  ].join(' ')}
-                  style={!revealed && selected === choice ? { '--card-shadow': '#22c55e' } : {}}
-                >
-                  {choice}
-                </button>
-              ))}
-            </div>
-          ) : isComparison ? (
-            <div className="flex flex-col gap-3">
-              {q.choices.map(choice => (
-                <button key={choice} disabled={revealed}
-                  onClick={() => !revealed && setSelected(choice)}
-                  aria-pressed={selected === choice}
-                  className={[
-                    'rounded-2xl border-2 font-display font-bold text-2xl card-answer',
-                    'flex items-center justify-center py-6 w-full select-none',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
@@ -451,7 +509,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
         {/* ── Bottom action ─────────────────────────────────────────── */}
         <div className="flex-shrink-0 px-4 pb-8 pt-3">
           {!revealed ? (
-            <button disabled={selected === null} onClick={handleCheck}
+            <button disabled={selected === null || selected === undefined || selected === ''} onClick={handleCheck}
               className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
               CHECK
             </button>
