@@ -401,7 +401,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           <button onClick={onBack} className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors duration-150 active:bg-gray-100" aria-label="Back">
             <BackIcon />
           </button>
-          {tooltip && <div className="fixed inset-0 z-40" onClick={() => { setTooltip(null); setRechargeError(null) }} />}
+          {tooltip && <div className="fixed inset-0 z-40" onClick={() => setTooltip(null)} />}
           <div className="flex items-center gap-2">
             {/* Streak */}
             <div className="relative">
