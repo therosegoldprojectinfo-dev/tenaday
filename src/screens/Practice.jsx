@@ -8,6 +8,7 @@ import {
   setCoinBalance,
   logCoinTransaction,
   logAttempt,
+  stampAdvanceDate,
 } from '../lib/kidData'
 
 // Per-node question counts
@@ -762,6 +763,8 @@ export default function Practice({
         kidId ? setCoinBalance(kidId, newBalance) : Promise.resolve(),
         kidId ? logCoinTransaction(kidId, { amount: basePayout, reason: 'node_pass', balanceAfter: newBalance }) : Promise.resolve(),
         kidId ? logAttempt(kidId, { operation, tableNumber: table, node, questionsSeen: questions.length, correctCount: questions.length - wrong, wrongCount: wrong, livesUsed: 0, result: 'passed', coinsDelta: basePayout }) : Promise.resolve(),
+        // 🔑 Stamp the day gate when Review completes — sets next_unlock_at to next midnight
+        (node === 'review' && kidId) ? stampAdvanceDate(kidId) : Promise.resolve(),
       ])
       onBalanceChange?.(newBalance)
     } catch (err) {
