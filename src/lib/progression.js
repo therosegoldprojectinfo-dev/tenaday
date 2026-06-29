@@ -213,7 +213,7 @@ export function batchStatus(currentPos, operation, table, batch) {
 export function batchesCompletedForTable(currentPos, operation, table) {
   const tStatus = tableStatus(currentPos, operation, table)
   if (tStatus === 'locked') return 0
-  if (tStatus === 'completed') return BATCH_COUNT // all 4 done
+  if (tStatus === 'completed') return BATCH_COUNT // all 6 batches done
 
   // tStatus === 'active': count how many batches are fully completed
   // (the current batch is not yet complete unless cursor is past it)
