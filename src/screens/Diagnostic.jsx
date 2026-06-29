@@ -5,7 +5,6 @@ import { OPERATIONS } from '../lib/progression'
 
 const SESSION_TOTAL  = 25
 const PASS_THRESHOLD = 20
-const LIVES_START    = 4
 
 function FireParticles({ streakKey, streak }) {
   if (streak < 3) return null
@@ -68,12 +67,6 @@ function XIcon() {
   )
 }
 
-function HeartIcon({ filled = true }) {
-  return (
-    <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="44" height="44" alt="" />
-  )
-}
-
 // ── Choice card helpers ────────────────────────────────────────────────────
 
 function cardColorClass(choice, selected, revealed, answer) {
@@ -83,14 +76,14 @@ function cardColorClass(choice, selected, revealed, answer) {
       : 'border-gray-200 bg-white text-gray-800'
   }
   if (choice === answer)   return 'border-green-500 bg-green-50 text-green-700'
-  if (choice === selected) return 'border-red-400 bg-red-50 text-red-500'
+  if (choice === selected) return 'border-amber-300 bg-amber-50 text-amber-600'
   return 'border-gray-100 bg-white text-gray-300'
 }
 
 function cardAnimClass(choice, selected, revealed, answer) {
   if (!revealed) return ''
   if (choice === answer)   return 'anim-correct'
-  if (choice === selected) return 'anim-wrong-shake'
+
   return ''
 }
 
@@ -100,14 +93,9 @@ function DiedScreen({ onRetry }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
       <div className="h-screen md:h-auto md:min-h-[560px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
-        <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="160" height="160" style={{opacity:0.4}} alt="" />
-        <div className="flex gap-2">
-          {Array.from({ length: LIVES_START }).map((_, i) => (
-            <HeartIcon key={i} filled={false} />
-          ))}
-        </div>
+        <span className="text-8xl">💪</span>
         <div className="text-center">
-          <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">Out of lives!</h2>
+          <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">Almost there!</h2>
           <p className="font-body text-gray-400 text-sm leading-relaxed">
             No worries — you can retake the placement test for free.
           </p>
@@ -199,14 +187,12 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
   const SESSION_TOTAL = questions.length
 
   const [idx,      setIdx]      = useState(0)
-  const [lives,    setLives]    = useState(LIVES_START)
   const [selected, setSelected] = useState(null)
   const [revealed, setRevealed] = useState(false)
   const [wrong,    setWrong]    = useState(0)
   const [over,     setOver]     = useState(null)
   const [passed,   setPassed]   = useState(false)
   const [saving,   setSaving]   = useState(false)
-  const [heartKey, setHeartKey] = useState(0)
   const [streak,   setStreak]   = useState(0)
   const [fireKey,  setFireKey]  = useState(0)
   const { speak, stop, speaking } = useSpeech()
@@ -236,8 +222,6 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
     } else {
       setStreak(0)
       setWrong(w => w + 1)
-      setLives(l => Math.max(0, l - 1))
-      setHeartKey(k => k + 1)
     }
   }
 
@@ -261,14 +245,11 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
     } else {
       setStreak(0)
       setWrong(w => w + 1)
-      setLives(l => Math.max(0, l - 1))
-      setHeartKey(k => k + 1)
     }
   }
 
   function handleContinue() {
     if (idx === SESSION_TOTAL - 1) { finalize(); return }
-    if (lives === 0) { setOver('died'); return }
     setIdx(i => i + 1)
     setSelected(null)
     setRevealed(false)
@@ -358,10 +339,6 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
 
           <div className="flex items-center gap-1.5">
             <StreakBadge streak={streak} />
-            <div className="flex items-center gap-1">
-              <HeartIcon />
-              <span className="font-display font-bold text-base text-red-500">{lives}</span>
-            </div>
           </div>
         </div>
 
