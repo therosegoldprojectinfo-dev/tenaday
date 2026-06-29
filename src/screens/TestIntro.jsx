@@ -9,7 +9,7 @@ const ANIM = `
   }
 `
 
-export default function TestIntro({ onStart, onSkip }) {
+export default function TestIntro({ onStart, onSkip, onBack }) {
   return (
     <div style={{
       minHeight: '100dvh',
@@ -22,7 +22,21 @@ export default function TestIntro({ onStart, onSkip }) {
     }}>
       <style>{ANIM}</style>
 
-      {/* Main content — centered */}
+      {/* Back button */}
+      <div style={{ padding: '16px 20px 0' }}>
+        <button
+          onClick={onBack}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
+            fontFamily: "'Baloo 2', sans-serif", fontWeight: 800,
+            fontSize: 14, color: '#afafaf', letterSpacing: '0.04em',
+            padding: '8px 4px', WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          ← BACK
+        </button>
+      </div>
       <div style={{
         flex: 1,
         display: 'flex',
