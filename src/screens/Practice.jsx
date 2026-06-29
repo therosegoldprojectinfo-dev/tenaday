@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react'
-import { generateBatch, makeBridgeStep2 } from '../lib/problems'
+import { generateBatch } from '../lib/problems'
 import { themeFor } from '../lib/eraTheme'
 import { nodeLabel, nextStep, normalizeNode, OPERATIONS } from '../lib/progression'
 import { payoutForNode, NODE_PAYOUT } from '../lib/economy'
@@ -611,14 +611,9 @@ export default function Practice({
       if (newStreak >= 3) setFireKey(k => k + 1)
       setEarnedCoins(c => c + Math.round((isRetry ? basePayout * 2 : basePayout) / (questions.length || 1)))
 
-      // If bridge step1 correct, inject step2
+      // If bridge step1 — no step2, just continue
       if (isBridge1) {
-        const step2 = makeBridgeStep2(q.bridgeOperation, q.bridgeTable, q.bridgeFact, q.bridgeWordText)
-        setQuestions(qs => {
-          const next = [...qs]
-          next.splice(idx + 1, 0, step2)
-          return next
-        })
+        // nothing to inject
       }
     } else {
       // Wrong
