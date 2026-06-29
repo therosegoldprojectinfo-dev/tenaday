@@ -149,7 +149,7 @@ export default function App() {
       try {
         const { fetchStreak } = await import('./lib/kidData')
         const streak = await fetchStreak(kidId)
-        setStreakCount(Math.max(1, streak))
+        setStreakCount(Math.max(0, streak))
       } catch {
         setStreakCount(1)
       }
@@ -215,9 +215,16 @@ export default function App() {
     return (
       <LevelSelect
         onBack={() => setAuthPhase('onboarding')}
-        onDone={(claim) => {
+        onDone={async (claim) => {
           if (claim) {
             setPendingClaim(claim)
+            // Persist the claim to DB so passThresholdFor works correctly
+            if (kidId) {
+              try {
+                const { updatePlacementClaim } = await import('./lib/kidData')
+                await updatePlacementClaim(kidId, claim)
+              } catch (err) { console.error('Failed to save placement claim:', err) }
+            }
             setAuthPhase('tablePicker')
           } else {
             setAuthPhase('game')
