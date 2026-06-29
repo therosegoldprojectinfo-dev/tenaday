@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { generateDiagnostic } from '../lib/problems'
 import { updateProgress } from '../lib/kidData'
 import { OPERATIONS } from '../lib/progression'
+import { generateHint } from '../lib/hints'
 
 const SESSION_TOTAL  = 25
 const PASS_THRESHOLD = 20
@@ -321,17 +322,12 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
   const timeoutRef = useRef(null)
 
   // Build pedagogical hint based on operation
-  function buildHint() {
+  function buildHint(wrongAnswer) {
     if (!q) return ''
-    const op = q.operation || 'addition'
-    const hints = {
-      addition:       ['Start at the bigger number and count up! 🖐️', 'Use your fingers — count on! ✋', 'Think of putting two groups together! 🟡'],
-      subtraction:    ['Start at the big number and count back! 🔢', 'Use your fingers and take some away! ✋', 'Think: what\'s left? 📦'],
-      multiplication: ['Think of groups! Skip count! 🔵', 'Add the same number over and over! ➕', 'Draw the groups in your head! 🧠'],
-      division:       ['How many times does it fit? 📦', 'Think of sharing equally! 🃏', 'Count up in groups! ➕'],
+    if (q.hintMeta) {
+      return generateHint({ ...q.hintMeta, wrongAnswer })
     }
-    const pool = hints[op] || hints.addition
-    return pool[Math.floor(Math.random() * pool.length)]
+    return 'Take your time and try again! 💪'
   }
 
   function handleTimerExpire() {
@@ -484,7 +480,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
       {/* Numio wrong-answer popup */}
       <DiagnosticNumioPopup
         visible={showPopup}
-        hint={buildHint()}
+        hint={buildHint(selected)}
         answer={q?.answer}
         isSecondWrong={wrongAttempts >= 2}
         onRetry={handleRetry}
