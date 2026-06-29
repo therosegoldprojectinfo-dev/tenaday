@@ -71,7 +71,7 @@ export default function TestIntro({ onStart, onSkip, onBack }) {
           textAlign: 'center',
           animation: 'fadeUp 0.5s 0.1s ease both',
         }}>
-          Get <span style={{ color: '#58cc02' }}>25 good answers</span> in this test to confirm your level!
+          Get <span style={{ color: '#58cc02' }}>20 out of 25</span> right to confirm your level!
         </p>
       </div>
 
