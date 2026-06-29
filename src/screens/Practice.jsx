@@ -215,7 +215,7 @@ function NumioPopup({ visible, hint, answer, isSecondWrong, onRetry, onGiveUp })
       ]
     : [
         'Not quite my friend... 🌸',
-        `Hint: think about ${hint}`,
+        hint,
         'Retry my friend! You got this! 💪',
       ]
 
@@ -524,10 +524,50 @@ export default function Practice({
   // Build hint text for popup
   function buildHint(question) {
     if (!question) return ''
-    // For bridge step1, show the correct equation
-    if (question.isBridgeStep1) return question.answer
-    // For typed/number questions show the equation
-    return `${question.answer}`
+
+    // Bridge step1 — hint about picking the operation
+    if (question.isBridgeStep1) {
+      return pick([
+        'Read the question — are things being added or taken away? 🤔',
+        'Does the story say "more", "total", or "left"? That\'s your clue! 💡',
+        'Think about what\'s happening in the story first! 📖',
+      ])
+    }
+
+    // Hint based on operation
+    const op = question.bridgeOperation || operation
+    const hints = {
+      addition: [
+        'Start at the bigger number and count up! 🖐️',
+        'Use your fingers — count on from the first number! ✋',
+        'Think of it as putting two groups together! 🟡🟡',
+        'Count up slowly, one step at a time! 1... 2... 3...',
+      ],
+      subtraction: [
+        'Start at the big number and count backwards! 🔢',
+        'Use your fingers and take some away! ✋',
+        'Think: what\'s left if you remove some? 📦',
+        'Count down slowly from the first number! 10... 9... 8...',
+      ],
+      multiplication: [
+        'Think of it as groups! Count each group one by one! 🔵🔵🔵',
+        'Skip count! Like 2, 4, 6, 8... 🎵',
+        'Add the same number over and over! ➕➕➕',
+        'Draw the groups in your head! How many in each? 🧠',
+      ],
+      division: [
+        'How many times can you fit the small number into the big one? 📦',
+        'Think of sharing equally — deal them out one by one! 🃏',
+        'Count up in groups until you reach the big number! ➕',
+        'Multiplication can help — what times that number gives you this? 🔄',
+      ],
+    }
+    const pool = hints[op] || hints.addition
+    return pick(pool)
+  }
+
+  function pick(arr) {
+    return arr[Math.floor(Math.random() * arr.length)]
   }
 
   // ── Answer handling ───────────────────────────────────────────────────
@@ -730,10 +770,15 @@ export default function Practice({
 
           <div className="flex items-center gap-2">
             <StreakBadge streak={streak} />
-            {/* Coin display */}
+            {/* Live coin display — ticks up after each correct answer */}
             <div className="flex items-center gap-1">
               <CoinIcon size={28} />
-              <span className="font-display font-bold text-base text-amber-500">{coinBalance}</span>
+              <span
+                key={coinBalance + earnedCoins}
+                className="font-display font-bold text-base text-amber-500 anim-correct"
+              >
+                {coinBalance + earnedCoins}
+              </span>
             </div>
           </div>
         </div>
