@@ -16,9 +16,9 @@ const APP_INTRO_SLIDES = [
     body: "Every time you finish a session you earn coins. Save them up and trade them for real prizes your parent set up — like screen time or a special treat!",
   },
   {
-    emoji: '__HEART__',
-    title: "You have 4 lives",
-    body: "Each session starts with 4 hearts. Get a wrong answer and you lose one. Lose all 4 and the session ends — but you can always try again!",
+    emoji: '🌸',
+    title: "Never get stuck!",
+    body: "Get something wrong? Numio's guide pops up with a hint and lets you try again. You always finish feeling great!",
   },
   {
     emoji: '🔓',
@@ -49,7 +49,7 @@ function chapterSlides(operation, theme) {
     {
       emoji: '__COIN__',
       title: "Same rules, new chapter",
-      body: "Everything works the same way — 4 lives, coins to earn, and a new badge to unlock. Keep up your daily streak and you'll master this chapter too!",
+      body: "Everything works the same way — coins to earn, hints when you need them, and a new badge to unlock. Keep up your daily streak and you'll master this chapter too!",
     },
     {
       emoji: '🚀',
