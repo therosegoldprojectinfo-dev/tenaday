@@ -185,6 +185,106 @@ function SpeakerIcon({ active }) {
   )
 }
 
+// ── Numio wrong-answer popup (same as Practice) ───────────────────────────
+
+function useTypewriterD(text, active, speed = 70) {
+  const [displayed, setDisplayed] = useState('')
+  useEffect(() => {
+    if (!active) { setDisplayed(''); return }
+    setDisplayed('')
+    let i = 0
+    const id = setInterval(() => {
+      i++
+      setDisplayed(text.slice(0, i))
+      if (i >= text.length) clearInterval(id)
+    }, speed)
+    return () => clearInterval(id)
+  }, [text, active, speed])
+  return displayed
+}
+
+function DiagnosticNumioPopup({ visible, hint, answer, isSecondWrong, onRetry, onGiveUp }) {
+  const [phase, setPhase] = useState(0)
+
+  const messages = isSecondWrong
+    ? ['Almost my friend! 🌸', `The answer was ${answer} — remember it!`, 'Keep going! 💪']
+    : ['Not quite my friend... 🌸', hint, 'Retry my friend! You got this! 💪']
+
+  const displayed = useTypewriterD(messages[phase], visible)
+
+  useEffect(() => {
+    if (!visible) { setPhase(0); return }
+    setPhase(0)
+    const t1 = setTimeout(() => setPhase(1), messages[0].length * 70 + 1800)
+    const t2 = setTimeout(() => setPhase(2), messages[0].length * 70 + 1800 + messages[1].length * 70 + 1400)
+    return () => { clearTimeout(t1); clearTimeout(t2) }
+  }, [visible, isSecondWrong])
+
+  if (!visible) return null
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, zIndex: 60,
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'flex-end',
+      background: 'rgba(255,255,255,0.88)',
+    }}>
+      <div style={{
+        background: 'white', borderRadius: 24,
+        border: '2px solid #e5e7eb', padding: '18px 24px',
+        maxWidth: 320, marginBottom: 16,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.10)',
+        position: 'relative', animation: 'fadeUp 0.3s ease both',
+        minHeight: 64, display: 'flex', flexDirection: 'column',
+        alignItems: 'center', gap: 14,
+      }}>
+        <p style={{
+          fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 17,
+          color: '#3c3c3c', textAlign: 'center', lineHeight: 1.4, margin: 0, minHeight: 48,
+        }}>{displayed}</p>
+
+        {phase === 2 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
+            {!isSecondWrong ? (
+              <button onClick={onRetry} style={{
+                width: '100%', border: 'none', cursor: 'pointer',
+                padding: '14px 0', borderRadius: 14,
+                background: '#58cc02', boxShadow: '0 4px 0 #46a302',
+                color: '#fff', fontFamily: "'Baloo 2', sans-serif",
+                fontWeight: 800, fontSize: 16, letterSpacing: '0.05em', textTransform: 'uppercase',
+              }}>RETRY 🔄</button>
+            ) : (
+              <button onClick={onGiveUp} style={{
+                width: '100%', border: 'none', cursor: 'pointer',
+                padding: '14px 0', borderRadius: 14,
+                background: '#FF9600', boxShadow: '0 4px 0 #c97700',
+                color: '#fff', fontFamily: "'Baloo 2', sans-serif",
+                fontWeight: 800, fontSize: 16, letterSpacing: '0.05em', textTransform: 'uppercase',
+              }}>CONTINUE →</button>
+            )}
+          </div>
+        )}
+
+        <div style={{
+          position: 'absolute', bottom: -14, left: '50%',
+          transform: 'translateX(-50%)', width: 0, height: 0,
+          borderLeft: '12px solid transparent', borderRight: '12px solid transparent',
+          borderTop: '14px solid white',
+        }} />
+      </div>
+
+      <div style={{ animation: 'mascot-float 1.8s ease-in-out infinite' }}>
+        <img src="/onboarding-mascot.png" alt="Numio" style={{ width: 130, height: 'auto', display: 'block' }} />
+      </div>
+
+      <style>{`
+        @keyframes mascot-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+      `}</style>
+    </div>
+  )
+}
+
 // ── Main Diagnostic component ─────────────────────────────────────────────
 
 export default function Diagnostic({ kidId, claimedOperation, selectedTables, onPass, onFail }) {
@@ -196,69 +296,100 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
 
   const SESSION_TOTAL = questions.length
 
-  const [idx,      setIdx]      = useState(0)
-  const [selected, setSelected] = useState(null)
-  const [revealed, setRevealed] = useState(false)
-  const [wrong,    setWrong]    = useState(0)
-  const [over,     setOver]     = useState(null)
-  const [passed,   setPassed]   = useState(false)
-  const [saving,   setSaving]   = useState(false)
-  const [streak,   setStreak]   = useState(0)
-  const [fireKey,  setFireKey]  = useState(0)
+  const [idx,          setIdx]          = useState(0)
+  const [selected,     setSelected]     = useState(null)
+  const [revealed,     setRevealed]     = useState(false)
+  const [wrong,        setWrong]        = useState(0)
+  const [over,         setOver]         = useState(null)
+  const [passed,       setPassed]       = useState(false)
+  const [saving,       setSaving]       = useState(false)
+  const [streak,       setStreak]       = useState(0)
+  const [fireKey,      setFireKey]      = useState(0)
+  const [showPopup,    setShowPopup]    = useState(false)
+  const [wrongAttempts, setWrongAttempts] = useState(0)
   const { speak, stop, speaking } = useSpeech()
 
   const q                = questions[idx]
   const isTyped          = q?.isTyped === true
   const isTimed          = q?.isTimed === true
   const isCorrect        = isTyped
-    ? String(selected).trim() === String(q?.answer)
+    ? String(selected ?? '').trim() === String(q?.answer)
     : selected === q?.answer
   const isTrueFalse      = q?.choiceType === 'truefalse'
   const progressScale    = (idx + (revealed ? 1 : 0)) / SESSION_TOTAL
   const [timerKey, setTimerKey] = useState(0)
   const timeoutRef = useRef(null)
 
+  // Build pedagogical hint based on operation
+  function buildHint() {
+    if (!q) return ''
+    const op = q.operation || 'addition'
+    const hints = {
+      addition:       ['Start at the bigger number and count up! 🖐️', 'Use your fingers — count on! ✋', 'Think of putting two groups together! 🟡'],
+      subtraction:    ['Start at the big number and count back! 🔢', 'Use your fingers and take some away! ✋', 'Think: what\'s left? 📦'],
+      multiplication: ['Think of groups! Skip count! 🔵', 'Add the same number over and over! ➕', 'Draw the groups in your head! 🧠'],
+      division:       ['How many times does it fit? 📦', 'Think of sharing equally! 🃏', 'Count up in groups! ➕'],
+    }
+    const pool = hints[op] || hints.addition
+    return pool[Math.floor(Math.random() * pool.length)]
+  }
+
   function handleTimerExpire() {
-    if (revealed || over) return
-    setRevealed(true)
+    if (revealed || over || showPopup) return
     const choice = selected
     const correct = choice !== null && choice !== undefined && choice !== ''
       ? (isTyped ? String(choice).trim() === String(q.answer) : choice === q.answer)
       : false
     if (correct) {
+      setRevealed(true)
       const newStreak = streak + 1
       setStreak(newStreak)
       if (newStreak >= 3) setFireKey(k => k + 1)
     } else {
       setStreak(0)
       setWrong(w => w + 1)
+      setWrongAttempts(w => w + 1)
+      setShowPopup(true)
     }
   }
 
   useEffect(() => {
-    if (!isTimed || over || revealed) return
+    if (!isTimed || over || revealed || showPopup) return
     timeoutRef.current = setTimeout(handleTimerExpire, 10000)
     return () => clearTimeout(timeoutRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx, isTimed, over, revealed])
+  }, [idx, isTimed, over, revealed, showPopup])
 
   function handleCheck() {
-    if (revealed || selected === null || selected === undefined || selected === '') return
-    setRevealed(true)
+    if (revealed || showPopup || selected === null || selected === undefined || selected === '') return
     const correct = isTyped
       ? String(selected).trim() === String(q.answer)
       : selected === q.answer
     if (correct) {
+      setRevealed(true)
       const newStreak = streak + 1
       setStreak(newStreak)
       if (newStreak >= 3) setFireKey(k => k + 1)
     } else {
       setStreak(0)
       setWrong(w => w + 1)
+      setWrongAttempts(w => w + 1)
+      setShowPopup(true)
     }
   }
 
+  function handleRetry() {
+    setShowPopup(false)
+    setSelected(null)
+  }
+
+  function handleGiveUp() {
+    setShowPopup(false)
+    setRevealed(true)
+  }
+
   function handleContinue() {
+    setWrongAttempts(0)
     if (idx === SESSION_TOTAL - 1) { finalize(); return }
     setIdx(i => i + 1)
     setSelected(null)
@@ -349,6 +480,17 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
       <FireParticles streakKey={fireKey} streak={streak} />
+
+      {/* Numio wrong-answer popup */}
+      <DiagnosticNumioPopup
+        visible={showPopup}
+        hint={buildHint()}
+        answer={q?.answer}
+        isSecondWrong={wrongAttempts >= 2}
+        onRetry={handleRetry}
+        onGiveUp={handleGiveUp}
+      />
+
       <div className="h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md">
 
         {/* ── Top bar ───────────────────────────────────────────────── */}
@@ -432,7 +574,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
                 revealed
                   ? String(selected).trim() === String(q.answer)
                     ? 'border-green-400 bg-green-50'
-                    : 'border-red-400 bg-red-50'
+                    : 'border-amber-300 bg-amber-50'
                   : selected !== null
                     ? 'border-blue-400 bg-blue-50'
                     : 'border-gray-200 bg-white',
@@ -441,8 +583,8 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
                   {selected ?? '?'}
                 </span>
               </div>
-              {revealed && String(selected).trim() !== String(q.answer) && (
-                <p className="font-body text-sm text-red-500 font-semibold">
+              {revealed && String(selected ?? '').trim() !== String(q.answer) && (
+                <p className="font-body text-sm text-amber-600 font-semibold">
                   Answer: <span className="font-display font-bold text-lg">{q.answer}</span>
                 </p>
               )}
@@ -531,20 +673,16 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
             </button>
           ) : (
             <div className={`rounded-2xl overflow-hidden border-2 ${
-              isCorrect ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'
+              isCorrect ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'
             }`}>
-              <div className={`flex items-center gap-3 px-4 py-4 ${isCorrect ? 'text-green-700' : 'text-red-500'}`}>
-                <div className={`w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center font-bold text-xl ${
-                  isCorrect ? 'bg-green-500 text-white' : 'bg-red-400 text-white'
-                }`}>
-                  {isCorrect ? '✓' : '✗'}
-                </div>
-                <div className="min-w-0">
+              <div className="flex items-center gap-3 px-4 py-3">
+                <span className="text-2xl">{isCorrect ? '🎉' : '💪'}</span>
+                <div className="flex-1 min-w-0">
                   <p className="font-body font-bold text-base leading-tight">
-                    {isCorrect ? 'Correct!' : 'Not quite'}
+                    {isCorrect ? 'Correct! Keep going!' : 'Almost there!'}
                   </p>
                   {!isCorrect && (
-                    <p className="font-body text-sm text-red-400 leading-tight truncate">
+                    <p className="font-body text-sm text-amber-600 leading-tight truncate">
                       Answer: {q.answer}
                     </p>
                   )}
@@ -552,9 +690,9 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
               </div>
               <button onClick={handleContinue}
                 className={`w-full py-4 font-body font-bold text-xl tracking-widest ${
-                  isCorrect ? 'btn-duo' : 'btn-duo-red'
+                  isCorrect ? 'btn-duo' : 'btn-duo-yellow'
                 }`}>
-                CONTINUE
+                CONTINUE →
               </button>
             </div>
           )}
