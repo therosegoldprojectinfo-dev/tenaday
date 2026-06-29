@@ -579,6 +579,7 @@ export default function Practice({
   const [fireKey,      setFireKey]      = useState(0)
 
   // Wrong answer / retry state
+  const [showPopup,      setShowPopup]      = useState(false)
   const [showQuitPopup,  setShowQuitPopup]  = useState(false)
   const [isRetry,      setIsRetry]      = useState(false)
   const [wrongAttempts, setWrongAttempts] = useState(0) // 0,1,2 per question
