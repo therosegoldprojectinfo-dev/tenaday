@@ -112,18 +112,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
       ? '/ChatGPT Image 27 juin 2026, 18_29_52.png'
       : '/ChatGPT Image 27 juin 2026, 18_28_19.png'
 
-  const statusIcon = dayLocked
-    ? <div style={{
-        position: 'absolute', bottom: -4, right: -4,
-        width: 28, height: 28, borderRadius: '50%',
-        backgroundColor: '#FEF3C7',
-        border: '2px solid #FCD34D',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        color: '#D97706',
-      }}>
-        <ClockLockIcon size={14} />
-      </div>
-    : null
+  const statusIcon = null
 
   return (
     <div style={{
@@ -619,7 +608,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       {/* ── Node popover ── */}
       {openNode && (
         <>
-          <div className="fixed inset-0 bg-black/30 z-40" onClick={() => setOpenNode(null)} />
+          <div className="fixed inset-0 z-40" onClick={() => setOpenNode(null)} />
           <div className="fixed z-50 bg-white anim-sheet-in bottom-0 left-0 right-0 rounded-t-3xl px-5 pt-5 pb-8 max-w-sm mx-auto md:bottom-auto md:top-1/2 md:left-1/2 md:right-auto md:rounded-3xl md:max-w-md md:w-full md:px-6 md:pt-6 md:pb-7">
             <div className="w-10 h-1.5 rounded-full bg-gray-200 mx-auto mb-4 md:hidden" />
             <p className="font-display font-bold text-xl text-gray-900 mb-1">{nodeLabel(openNode.node)}</p>
