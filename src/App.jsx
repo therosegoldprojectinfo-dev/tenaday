@@ -15,6 +15,7 @@ import TablePicker from './screens/TablePicker'
 import TestIntro from './screens/TestIntro'
 import ParentPinEntry from './screens/ParentPinEntry'
 import ParentDashboard from './screens/ParentDashboard'
+import StreakSlide from './screens/StreakSlide'
 import NavShell from './components/NavShell'
 import { getSession, logOut as authLogOut } from './lib/parentAuth'
 
@@ -47,6 +48,8 @@ export default function App() {
   const [activeChapter, setActiveChapter] = useState(null)
   const [activeNode, setActiveNode] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [showStreakSlide, setShowStreakSlide] = useState(false)
+  const [streakCount, setStreakCount] = useState(1)
 
   // On first mount, check for a saved session and skip straight to the
   // kid picker if one exists — avoids forcing a returning parent to log
@@ -133,10 +136,22 @@ export default function App() {
     setScreen('play')
   }
 
-  function handleExitPractice() {
-    setActiveNode(null)
-    setScreen('path')
-    setRefreshKey(k => k + 1)
+  async function handleExitPractice(completedNode) {
+    if (completedNode === 'welcome') {
+      // Fetch current streak to show on slide
+      try {
+        const { fetchStreak } = await import('./lib/kidData')
+        const streak = await fetchStreak(kidId)
+        setStreakCount(Math.max(1, streak))
+      } catch {
+        setStreakCount(1)
+      }
+      setShowStreakSlide(true)
+    } else {
+      setActiveNode(null)
+      setScreen('path')
+      setRefreshKey(k => k + 1)
+    }
   }
 
   function handleBackToList() {
@@ -246,6 +261,21 @@ export default function App() {
     )
   }
 
+  // ── Streak slide (after Welcome) ────────────────────────────────────────
+  if (showStreakSlide) {
+    return (
+      <StreakSlide
+        dayStreak={streakCount}
+        onContinue={() => {
+          setShowStreakSlide(false)
+          setActiveNode(null)
+          setScreen('path')
+          setRefreshKey(k => k + 1)
+        }}
+      />
+    )
+  }
+
   // ── Game phase ───────────────────────────────────────────────────────
 
   if (navTab === 'home' && screen === 'play' && activeNode) {
@@ -283,7 +313,8 @@ export default function App() {
         unlockBatch={activeNode.unlockBatch}
         placementClaim={activeNode.placementClaim}
         kidCurrentStep={activeNode.kidCurrentStep}
-        onExit={handleExitPractice}
+        onExit={(completedNode) => handleExitPractice(completedNode || activeNode.node)}
+        onBalanceChange={(newBal) => setActiveNode(n => n ? { ...n, coinBalance: newBal } : n)}
       />
     )
   }
