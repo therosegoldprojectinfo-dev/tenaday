@@ -797,8 +797,12 @@ export default function Practice({
         )}
 
         {/* ── Question text ────────────────────────────────────────── */}
-        <div className="flex-shrink-0 px-6 pt-6 pb-2 flex items-center justify-center">
-          <p className="font-body font-semibold text-lg text-gray-900 text-center leading-snug max-w-[34ch] mx-auto whitespace-pre-line">
+        <div className={`flex-shrink-0 px-6 pt-6 pb-2 ${q.text.endsWith('= ?') ? 'flex items-center justify-center' : ''}`}>
+          <p className={
+            q.text.endsWith('= ?')
+              ? 'text-5xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
+              : 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto whitespace-pre-line'
+          }>
             {q.text}
           </p>
         </div>
