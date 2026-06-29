@@ -307,18 +307,29 @@ function generateWelcome(operation, table, batch, unlockBatch) {
 }
 
 // ── Review generator (20 q) ───────────────────────────────────────────────
-// Mixed types, MC + typed mix, 1/3 timed (10s), all seen units
+// Weighted: 70% today's facts, 30% previous units
+// MC + typed mix, 1/3 timed
 
 function generateReview(operation, table, batch, reviewPool) {
-  const pool = reviewPool && reviewPool.length > 0
-    ? reviewPool
-    : [{ operation, table, batch }]
+  const todaySource = { operation, table, batch }
+  const [f1, f2] = factsForBatch(batch)
+
+  const prevPool = reviewPool && reviewPool.length > 0
+    ? reviewPool.filter(s => !(s.operation === operation && s.table === table && s.batch === batch))
+    : []
 
   return Array.from({ length: 20 }, (_, i) => {
-    const src = pick(pool)
-    const [f1, f2] = factsForBatch(src.batch)
-    const fact = Math.random() < 0.5 ? f1 : f2
-    // Every 3rd question is typed, 1/3 are timed
+    // 70% today, 30% previous — if no previous pool, all today
+    const useToday = prevPool.length === 0 || Math.random() < 0.7
+    let src, fact
+    if (useToday) {
+      src = todaySource
+      fact = Math.random() < 0.5 ? f1 : f2
+    } else {
+      src = pick(prevPool)
+      const [pf1, pf2] = factsForBatch(src.batch)
+      fact = Math.random() < 0.5 ? pf1 : pf2
+    }
     const isTyped = (i % 3 === 2)
     const isTimed = (i % 3 === 1)
     return makeMixed(src.operation, src.table, fact, { isTimed, isTyped })
