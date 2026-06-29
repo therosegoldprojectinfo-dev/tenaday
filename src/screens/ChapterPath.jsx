@@ -197,7 +197,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   // Cleanup all IntersectionObservers on unmount
   useEffect(() => {
     return () => {
-      Object.values(unitRefs.current).forEach(obs => obs.disconnect())
+      Object.values(unitRefs.current).forEach(obs => obs && obs.disconnect())
       unitRefs.current = {}
     }
   }, [])
