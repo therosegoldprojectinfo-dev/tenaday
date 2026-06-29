@@ -237,6 +237,12 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
       setStreak(0)
       setWrong(w => w + 1)
       setLives(l => Math.max(0, l - 1))
+      setHeartKey(k => k + 1)
+    }
+  }
+
+  useEffect(() => {
+    if (!isTimed || over || revealed) return
     timeoutRef.current = setTimeout(handleTimerExpire, 10000)
     return () => clearTimeout(timeoutRef.current)
     // eslint-disable-next-line react-hooks/exhaustive-deps
