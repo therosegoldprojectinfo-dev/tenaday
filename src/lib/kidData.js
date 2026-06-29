@@ -28,6 +28,14 @@ export async function fetchKid(kidId) {
  *  lib/dayGate.js checks against to decide if the NEXT batch can unlock
  *  yet. Every actual advance (not replay) goes through this function, so
  *  the stamp only moves forward when real progress happens. */
+export async function updatePlacementClaim(kidId, claim) {
+  const { error } = await supabase
+    .from('kids')
+    .update({ placement_claim: claim })
+    .eq('id', kidId)
+  if (error) throw error
+}
+
 export async function updateProgress(kidId, { operation, table, batch, node }) {
   const { error } = await supabase
     .from('kids')
@@ -240,25 +248,33 @@ export async function fetchStreak(kidId) {
 
   if (error || !data || data.length === 0) return 0
 
-  // Collect distinct local-date strings where kid completed a full unit
-  const completedDays = new Set(
-    data.map(a => {
-      const d = new Date(a.created_at)
-      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-    })
-  )
+  // Use the DB timestamp in UTC, then convert to kid's local date string
+  // by fetching the kid's timezone from the DB
+  const { data: kidRow } = await supabase
+    .from('kids')
+    .select('timezone')
+    .eq('id', kidId)
+    .single()
+  const tz = kidRow?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
 
-  // Walk backwards from today counting consecutive days with a completed unit
+  function toLocalDate(isoString) {
+    return new Date(isoString).toLocaleDateString('en-CA', { timeZone: tz }) // YYYY-MM-DD
+  }
+
+  // Collect distinct local-date strings where kid completed a full unit
+  const completedDays = new Set(data.map(a => toLocalDate(a.created_at)))
+
+  // Walk backwards from today (in kid's timezone) counting consecutive completed days
   let streak = 0
-  const today = new Date()
+  const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: tz })
+  const today = new Date(todayStr)
   for (let i = 0; i < 365; i++) {
     const d = new Date(today)
     d.setDate(today.getDate() - i)
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const key = d.toLocaleDateString('en-CA', { timeZone: tz })
     if (completedDays.has(key)) {
       streak++
     } else {
-      // Allow today to be incomplete (don't break if i===0 and today not done yet)
       if (i > 0) break
     }
   }
