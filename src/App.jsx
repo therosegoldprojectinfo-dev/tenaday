@@ -192,6 +192,7 @@ export default function App() {
   if (authPhase === 'levelSelect') {
     return (
       <LevelSelect
+        onBack={() => setAuthPhase('onboarding')}
         onDone={(claim) => {
           if (claim) {
             setPendingClaim(claim)
@@ -210,6 +211,7 @@ export default function App() {
     return (
       <TablePicker
         operation={pendingClaim}
+        onBack={() => setAuthPhase('levelSelect')}
         onDone={(tables) => {
           setSelectedTables(tables)
           setAuthPhase('testIntro')
@@ -221,6 +223,7 @@ export default function App() {
   if (authPhase === 'testIntro') {
     return (
       <TestIntro
+        onBack={() => setAuthPhase('tablePicker')}
         onStart={() => setAuthPhase('diagnostic')}
         onSkip={() => {
           setAuthPhase('game')
