@@ -160,6 +160,8 @@ function makeEquation(operation, table, fact, { isTimed = false, isTyped = false
     choices: isTyped ? [] : safeChoices(answer, smartDistractors(operation, table, fact, answer)),
     isTimed,
     isTyped,
+    // Hint engine metadata
+    hintMeta: { operation, a, b, answer, isWordProblem: false },
   }
 }
 
@@ -173,6 +175,8 @@ function makeWord(operation, table, fact, { isTimed = false, isTyped = false } =
     choices: isTyped ? [] : safeChoices(answer, smartDistractors(operation, table, fact, answer)),
     isTimed,
     isTyped,
+    // Hint engine metadata
+    hintMeta: { operation, a, b, answer, isWordProblem: true },
   }
 }
 
