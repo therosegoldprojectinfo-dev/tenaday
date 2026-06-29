@@ -224,12 +224,21 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
 
   function handleTimerExpire() {
     if (revealed || over) return
-    if (selected !== null) { handleCheck(); return }
     setRevealed(true)
-    setStreak(0)
-    setWrong(w => w + 1)
-    setLives(l => l - 1)
-    setHeartKey(k => k + 1)
+    const choice = selected
+    const correct = choice !== null && choice !== undefined && choice !== ''
+      ? (isTyped ? String(choice).trim() === String(q.answer) : choice === q.answer)
+      : false
+    if (correct) {
+      const newStreak = streak + 1
+      setStreak(newStreak)
+      if (newStreak >= 3) setFireKey(k => k + 1)
+    } else {
+      setStreak(0)
+      setWrong(w => w + 1)
+      setLives(l => l - 1)
+      setHeartKey(k => k + 1)
+    }
   }
 
   useEffect(() => {
