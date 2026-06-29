@@ -206,33 +206,24 @@ function generateLesson(operation, table, batch) {
 const ALL_OPERATIONS = ['addition', 'subtraction', 'multiplication', 'division']
 
 function makeBridgeStep1(operation, table, fact) {
-  const { a, b, answer } = factValues(operation, table, fact)
+  const { a, b } = factValues(operation, table, fact)
   const sym = SYMBOL[operation]
   const correctExpr = `${a} ${sym} ${b}`
 
-  // 3 distractors: different operations AND different numbers
-  const otherOps = ALL_OPERATIONS.filter(op => op !== operation)
-  const distractors = otherOps.map(op => {
-    const da = randInt(2, 9)
-    const db = randInt(1, da - 1 || 1)
-    return `${da} ${SYMBOL[op]} ${db}`
-  })
-
-  const wordText = wordProblem(operation, a, b)
-
+  // Kid types the formula — no choices
+  // We accept the formula with or without spaces, and handle − vs -
   return {
-    text: `${wordText}\n\nHow do we find the correct answer?`,
+    text: `${a} ${sym} ${b} = ?\n\nHow do we find the correct answer?\nType the formula:`,
     answer: correctExpr,
-    choiceType: 'expression',
-    choices: shuffle([correctExpr, ...distractors]),
+    choiceType: 'formula',
+    choices: [],
     isTimed: false,
-    isTyped: false,
+    isTyped: true,
     isBridgeStep1: true,
-    // carry these so step 2 can be generated
     bridgeOperation: operation,
     bridgeTable: table,
     bridgeFact: fact,
-    bridgeWordText: wordText,
+    bridgeWordText: `${a} ${sym} ${b}`,
   }
 }
 
