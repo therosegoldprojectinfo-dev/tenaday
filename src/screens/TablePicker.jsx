@@ -136,7 +136,7 @@ function TableTile({ n, selected, onToggle, delay }) {
 }
 
 /* ── Main TablePicker screen ── */
-export default function TablePicker({ operation, onDone }) {
+export default function TablePicker({ operation, onDone, onBack }) {
   const [selected, setSelected] = useState(new Set())
 
   function toggle(n) {
@@ -165,6 +165,22 @@ export default function TablePicker({ operation, onDone }) {
       margin: '0 auto',
     }}>
       <style>{ANIM}</style>
+
+      {/* Back button */}
+      <div style={{ padding: '16px 20px 0' }}>
+        <button
+          onClick={onBack}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
+            fontFamily: "'Baloo 2', sans-serif", fontWeight: 800,
+            fontSize: 14, color: '#afafaf', letterSpacing: '0.04em',
+            padding: '8px 4px', WebkitTapHighlightColor: 'transparent',
+          }}
+        >
+          ← BACK
+        </button>
+      </div>
 
       {/* Mascot + bubble */}
       <div style={{
