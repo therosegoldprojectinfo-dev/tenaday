@@ -36,7 +36,7 @@ function LockIcon({ size = 20 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="5" y="11" width="28" height="18" rx="2" />
+      <rect x="5" y="11" width="14" height="13" rx="2" />
       <path d="M8 11V7a4 4 0 0 1 8 0v4" />
     </svg>
   )
@@ -193,6 +193,14 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   const [visibleUnit, setVisibleUnit] = useState(1)
   const unitRefs = useRef({})
   const hasScrolled = useRef(false)
+
+  // Cleanup all IntersectionObservers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(unitRefs.current).forEach(obs => obs.disconnect())
+      unitRefs.current = {}
+    }
+  }, [])
 
   // Auto-scroll to current unit once after load
   useEffect(() => {
@@ -494,11 +502,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
 
                 {/* Invisible sentinel for IntersectionObserver */}
                 <div style={{ height: 1 }} ref={el => {
-                  if (!el) return
+                  if (!el || unitRefs.current[unitNumber]) return
                   const obs = new IntersectionObserver(([entry]) => {
                     if (entry.isIntersecting) setVisibleUnit(unitNumber)
                   }, { threshold: 0, rootMargin: '-10% 0px -80% 0px' })
                   obs.observe(el)
+                  unitRefs.current[unitNumber] = obs
                 }} />
 
                 {NODES.map((node, nodeIdx) => {
