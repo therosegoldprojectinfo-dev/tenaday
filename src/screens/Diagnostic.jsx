@@ -90,25 +90,6 @@ function cardAnimClass(choice, selected, revealed, answer) {
 
 // ── End screens ───────────────────────────────────────────────────────────
 
-function DiedScreen({ onRetry }) {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
-      <div className="h-screen md:h-auto md:min-h-[560px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
-        <span className="text-8xl">💪</span>
-        <div className="text-center">
-          <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">Almost there!</h2>
-          <p className="font-body text-gray-400 text-sm leading-relaxed">
-            No worries — you can retake the placement test for free.
-          </p>
-        </div>
-        <button onClick={onRetry}
-          className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
-          TRY AGAIN
-        </button>
-      </div>
-    </div>
-  )
-}
 
 function ResultScreen({ passed, correct, claimedOperation, selectedTables, saving, onContinue }) {
   const opLabel  = claimedOperation.charAt(0).toUpperCase() + claimedOperation.slice(1)
@@ -446,13 +427,6 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
   }
 
   // ── End screens ─────────────────────────────────────────────────────────
-
-  if (over === 'died') {
-    return <DiedScreen onRetry={() => {
-      setIdx(0); setSelected(null); setRevealed(false)
-      setWrong(0); setOver(null); setStreak(0); setFireKey(0)
-    }} />
-  }
 
   if (over === 'finished') {
     const correct = SESSION_TOTAL - wrong
