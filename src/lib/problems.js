@@ -40,7 +40,7 @@ const SYMBOL = {
   division:       '÷',
 }
 
-function factValues(operation, table, fact) {
+export function factValues(operation, table, fact) {
   switch (operation) {
     case 'addition':       return { a: table, b: fact, answer: table + fact }
     case 'subtraction':    return { a: table + fact, b: table, answer: fact }
