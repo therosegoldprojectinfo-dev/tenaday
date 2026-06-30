@@ -51,6 +51,21 @@ export default function App() {
   const [showStreakSlide, setShowStreakSlide] = useState(false)
   const [streakCount, setStreakCount] = useState(1)
 
+  // Persist kidId + current phase to sessionStorage so page refresh
+  // brings you back to where you were instead of dropping you to kidPicker.
+  // sessionStorage is cleared when the tab/browser closes — intentional.
+  useEffect(() => {
+    if (kidId && authPhase === 'game') {
+      try {
+        sessionStorage.setItem('numio_kid', JSON.stringify({ kidId, navTab, screen, phase: 'game' }))
+      } catch {}
+    } else if (kidId && authPhase === 'diagnostic') {
+      try {
+        sessionStorage.setItem('numio_kid', JSON.stringify({ kidId, phase: 'diagnostic', pendingClaim, selectedTables }))
+      } catch {}
+    }
+  }, [kidId, authPhase, navTab, screen, pendingClaim, selectedTables])
+
   // On first mount, check for a saved session and skip straight to the
   // kid picker if one exists — avoids forcing a returning parent to log
   // in again every single time they open the app.
@@ -58,6 +73,30 @@ export default function App() {
     const saved = getSession()
     if (saved) {
       setParentId(saved)
+      // Also restore kid session if available
+      try {
+        const kidSession = sessionStorage.getItem('numio_kid')
+        if (kidSession) {
+          const parsed = JSON.parse(kidSession)
+          const { kidId: savedKidId, phase } = parsed
+          if (savedKidId) {
+            setKidId(savedKidId)
+            setParentId(saved)
+            if (phase === 'diagnostic') {
+              // Restore to diagnostic — questions regenerated fresh but kid stays in flow
+              if (parsed.pendingClaim) setPendingClaim(parsed.pendingClaim)
+              if (parsed.selectedTables) setSelectedTables(parsed.selectedTables)
+              setAuthPhase('diagnostic')
+            } else {
+              // Restore to game — if was mid-play, go back to path safely
+              setNavTab(parsed.navTab || 'home')
+              setScreen(parsed.screen === 'play' ? 'path' : (parsed.screen || 'list'))
+              setAuthPhase('game')
+            }
+            return
+          }
+        }
+      } catch {}
       setAuthPhase('kidPicker')
     } else {
       setAuthPhase('auth')
@@ -102,18 +141,16 @@ export default function App() {
 
   function handleLogOut() {
     authLogOut()
+    try { sessionStorage.removeItem('numio_kid') } catch {}
     setParentId(null)
     setKidId(null)
     setAuthPhase('auth')
   }
 
   function handleSwitchProfile() {
+    try { sessionStorage.removeItem('numio_kid') } catch {}
     setKidId(null)
     setAuthPhase('kidPicker')
-    // Bumping refreshKey forces KidPicker to remount and re-fetch the
-    // kid list, so any changes (coin balance, progress) made during this
-    // session show up immediately rather than a stale snapshot from
-    // whenever the picker last loaded.
     setRefreshKey(k => k + 1)
   }
 
