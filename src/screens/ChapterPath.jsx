@@ -191,14 +191,15 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   const [dayGateBlocked, setDayGateBlocked] = useState(false)
   const [tooltip, setTooltip] = useState(null)
   const [visibleUnit, setVisibleUnit] = useState(1)
-  const unitRefs = useRef({})
+  const unitRefs = useRef({})       // DOM elements, used for scrollIntoView
+  const unitObservers = useRef({})  // IntersectionObserver instances, used for cleanup
   const hasScrolled = useRef(false)
 
   // Cleanup all IntersectionObservers on unmount
   useEffect(() => {
     return () => {
-      Object.values(unitRefs.current).forEach(obs => obs && obs.disconnect())
-      unitRefs.current = {}
+      Object.values(unitObservers.current).forEach(obs => obs && obs.disconnect())
+      unitObservers.current = {}
     }
   }, [])
 
@@ -502,12 +503,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
 
                 {/* Invisible sentinel for IntersectionObserver */}
                 <div style={{ height: 1 }} ref={el => {
-                  if (!el || unitRefs.current[unitNumber]) return
+                  if (!el || unitObservers.current[unitNumber]) return
                   const obs = new IntersectionObserver(([entry]) => {
                     if (entry.isIntersecting) setVisibleUnit(unitNumber)
                   }, { threshold: 0, rootMargin: '-10% 0px -80% 0px' })
                   obs.observe(el)
-                  unitRefs.current[unitNumber] = obs
+                  unitObservers.current[unitNumber] = obs
                 }} />
 
                 {NODES.map((node, nodeIdx) => {
