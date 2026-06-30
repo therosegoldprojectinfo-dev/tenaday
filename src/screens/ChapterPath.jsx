@@ -456,7 +456,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       </div>
 
-      {/* ── Unit banner — absolute over scroll, transparent bg, colored pill ── */}
+      {/* ── Unit banner — fixed in place, transparent bg, colored pill ── */}
       {(() => {
         const u = allUnits.find(u => u.unitNumber === visibleUnit)
         const facts = u ? factsForBatch(u.batch) : []
@@ -464,7 +464,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
         return (
           <div style={{
-            position: 'absolute', top: 64, left: 0, right: 0,
+            position: 'fixed', top: 64, left: 0, right: 0,
             zIndex: 50, padding: '10px 16px',
             display: 'flex', justifyContent: 'center',
             pointerEvents: 'none',
@@ -500,7 +500,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           </div>
         )}
         {/* ── Node path ── */}
-        <div className="max-w-sm md:max-w-md mx-auto pt-6 pb-24 overflow-x-hidden" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="max-w-sm md:max-w-md mx-auto pb-24 overflow-x-hidden" style={{ position: 'relative', zIndex: 1, paddingTop: 100 }}>
           {allUnits.map(({ table, batch, unitNumber }) => {
             const unitStatus = tableStatus(currentPos, operation, table)
             const facts = factsForBatch(batch)
