@@ -70,10 +70,13 @@ export default function StreakSlide({ dayStreak = 1, onContinue }) {
     return { label: DAYS[dayIdx], filled, isCurrent, offset }
   })
 
-  const isDay1 = dayStreak <= 1
-  const headlineText = isDay1
-    ? 'Your streak has started! ⚡'
-    : `${dayStreak} days in a row! 🔥`
+  const isDay1 = dayStreak === 1
+  const isFreshStart = dayStreak < 1
+  const headlineText = isFreshStart
+    ? "Let's build a streak! ⚡"
+    : isDay1
+      ? 'Your streak has started! ⚡'
+      : `${dayStreak} days in a row! 🔥`
 
   return (
     <div style={{
@@ -115,7 +118,7 @@ export default function StreakSlide({ dayStreak = 1, onContinue }) {
         color: '#6b7280', textAlign: 'center',
         animation: 'fadeUp 0.5s 0.2s ease both',
       }}>
-        {isDay1 ? 'Come back tomorrow to keep it going!' : 'Amazing — keep showing up!'}
+        {isFreshStart ? 'Finish a full day to start your streak!' : isDay1 ? 'Come back tomorrow to keep it going!' : 'Amazing — keep showing up!'}
       </p>
 
       {/* Day circles — 3 back + today + 2 ahead, small, fits on mobile */}
