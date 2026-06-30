@@ -45,7 +45,7 @@ function factValues(operation, table, fact) {
     case 'addition':       return { a: table, b: fact, answer: table + fact }
     case 'subtraction':    return { a: table + fact, b: table, answer: fact }
     case 'multiplication': return { a: table, b: fact, answer: table * fact }
-    case 'division':       return { a: Math.max(2, table) * fact, b: Math.max(2, table), answer: fact }
+    case 'division':       return { a: table * fact, b: table, answer: fact }
     default:               return { a: table, b: fact, answer: table + fact }
   }
 }
