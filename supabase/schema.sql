@@ -94,7 +94,7 @@ create table if not exists kids (
   current_operation    operation_type not null default 'addition',
   current_table        int  not null default 1 check (current_table between 1 and 12),
   current_batch        int  not null default 1 check (current_batch between 1 and 6),
-  current_node         node_type not null default 'learn',
+  current_node         node_type not null default 'welcome',
 
   last_advance_date    date,  -- null until the kid passes their very first node
   seen_chapter_intros  operation_type[] not null default '{}',
@@ -107,7 +107,7 @@ create table if not exists kids (
 
 -- If `kids` already existed from an earlier schema version, these add the
 -- new columns back after the drop/recreate above.
-alter table kids add column if not exists current_node node_type not null default 'learn';
+alter table kids add column if not exists current_node node_type not null default 'welcome';
 alter table kids add column if not exists current_batch int not null default 1 check (current_batch between 1 and 6);
 alter table kids drop constraint if exists kids_current_batch_check;
 alter table kids add constraint kids_current_batch_check check (current_batch >= 1 and current_batch <= 6);
@@ -258,7 +258,7 @@ create policy "dev_open_gift_claims" on gift_claims for all using (true) with ch
 -- since there is no "yesterday" to test on table 1 of Addition.
 
 insert into kids (id, parent_id, name, current_operation, current_table, current_batch, current_node, last_advance_date, seen_chapter_intros, coin_balance)
-values ('00000000-0000-0000-0000-000000000001', null, 'Demo Kid', 'addition', 1, 1, 'learn', null, '{}', 50)
+values ('00000000-0000-0000-0000-000000000001', null, 'Demo Kid', 'addition', 1, 1, 'welcome', null, '{}', 50)
 on conflict (id) do update set
   current_operation = excluded.current_operation,
   current_table = excluded.current_table,
