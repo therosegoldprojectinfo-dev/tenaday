@@ -341,7 +341,10 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
   useEffect(() => { if (!coinKidId && kids.length > 0) fetchCoinHistory(kids[0].id) }, [kids.length, coinKidId])
 
   async function handleDeleteReward(giftId) {
-    await supabase.from('gifts').delete().eq('id', giftId)
+    // Defense in depth: only ever delete rewards owned by this parent.
+    // The RLS policy also blocks deleting global (parent_id is null) gifts,
+    // but this client-side constraint prevents the request from being sent at all.
+    await supabase.from('gifts').delete().eq('id', giftId).eq('parent_id', parentId)
     setGifts(gs => gs.filter(g => g.id !== giftId))
   }
 
@@ -516,12 +519,12 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
                   {coinHistory.map(tx => {
                     const isPositive = tx.amount > 0
                     const reasonLabels = {
-                      node_pass:      '✅ Node passed',
-                      review_pass:    '✅ Review passed',
-                      entry_fee:      '🎮 Started activity',
-                      exit_refund:    '↩️ Exited activity',
-                      heart_recharge: '♥ Recharged heart',
-                      gift_purchase:  '🎁 Bought reward',
+                      node_pass:       '✅ Node passed',
+                      review_pass:     '✅ Review passed',
+                      lesson_complete: '📖 Completed lesson',
+                      entry_fee:       '🎮 Started activity',
+                      exit_refund:     '↩️ Exited activity',
+                      gift_purchase:   '🎁 Bought reward',
                     }
                     const label = reasonLabels[tx.reason] || tx.reason
                     const date  = new Date(tx.created_at)
