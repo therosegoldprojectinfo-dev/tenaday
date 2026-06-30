@@ -650,7 +650,12 @@ export default function Practice({
       const newStreak = streak + 1
       setStreak(newStreak)
       if (newStreak >= 3) setFireKey(k => k + 1)
-      // coins awarded at session end via finalizeAttempt
+
+      // Live coin tick — evenly split basePayout across all questions,
+      // capped so it never exceeds basePayout (matches the flat DB write
+      // in finalizeAttempt exactly, just shown incrementally as you play)
+      const perQuestion = basePayout / (questions.length || 1)
+      setEarnedCoins(c => Math.min(basePayout, Math.round(c + perQuestion)))
 
       // If bridge step1 — no step2, just continue
       if (isBridge1) {
@@ -673,11 +678,12 @@ export default function Practice({
   }
 
   function handleGiveUp() {
-    // Second wrong — show answer, give half coins, move on
+    // Second wrong — show answer, give half this question's coin share, move on
     setShowPopup(false)
     setRevealed(true)
     setIsRetry(false)
-    // half coins on give-up, awarded at session end
+    const perQuestion = basePayout / (questions.length || 1)
+    setEarnedCoins(c => Math.min(basePayout, Math.round(c + perQuestion * 0.5)))
   }
 
   function handleTimerExpire() {
@@ -691,6 +697,8 @@ export default function Practice({
       const newStreak = streak + 1
       setStreak(newStreak)
       if (newStreak >= 3) setFireKey(k => k + 1)
+      const perQuestion = basePayout / (questions.length || 1)
+      setEarnedCoins(c => Math.min(basePayout, Math.round(c + perQuestion)))
     } else {
       setStreak(0)
       setWrong(w => w + 1)
@@ -823,14 +831,14 @@ export default function Practice({
 
           <div className="flex items-center gap-2">
             <StreakBadge streak={streak} />
-            {/* Live coin display — shows total after session completes */}
+            {/* Live coin display — ticks up after each correct answer, capped at session payout */}
             <div className="flex items-center gap-1">
               <CoinIcon size={28} />
               <span
-                key={coinBalance}
+                key={coinBalance + earnedCoins}
                 className="font-display font-bold text-base text-amber-500 anim-correct"
               >
-                {coinBalance}
+                {coinBalance + earnedCoins}
               </span>
             </div>
           </div>
