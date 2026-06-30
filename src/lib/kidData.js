@@ -239,12 +239,14 @@ export async function purchaseGift(kidId, gift, currentBalance) {
  *  Returns an integer ≥ 0.
  */
 export async function fetchStreak(kidId) {
+  // Streak = consecutive days the kid played at all (any passed node),
+  // not just days with a Welcome node — Day 1 has no Welcome exercise
+  // (it's replaced by the ChapterIntro), so it must still count as day 1.
   const { data, error } = await supabase
     .from('attempts')
     .select('created_at, result, node')
     .eq('kid_id', kidId)
     .eq('result', 'passed')
-    .eq('node', 'welcome')
 
   if (error || !data || data.length === 0) return 0
 
