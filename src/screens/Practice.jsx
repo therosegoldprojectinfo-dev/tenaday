@@ -84,8 +84,25 @@ function useCoinTick(target, active) {
 
 // ── 🔥 Fire + flying Numio heads streak particles ─────────────────────────
 
+// Respects the OS-level "reduce motion" accessibility setting.
+// Kids with vestibular disorders or motion sensitivity won't get the
+// full-screen particle chaos — they still get the streak badge, coins,
+// and text celebration, just without the flying animation overload.
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReduced(mq.matches)
+    const handler = e => setReduced(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+  return reduced
+}
+
 function FireParticles({ streakKey, streak }) {
-  if (streak < 3) return null
+  const reducedMotion = usePrefersReducedMotion()
+  if (streak < 3 || reducedMotion) return null
   // Chaos mode from streak 3 — feels like 10000 consecutive
   const fireCount = Math.min(8 + streak * 4, 40)
   const headCount = Math.min(3 + streak * 2, 20)
@@ -127,7 +144,8 @@ function FireParticles({ streakKey, streak }) {
 }
 
 function ConfettiBlast({ active }) {
-  if (!active) return null
+  const reducedMotion = usePrefersReducedMotion()
+  if (!active || reducedMotion) return null
   const colors = ['#58cc02','#1CB0F6','#FF9600','#FF4B4B','#CE82FF','#FFD900','#FF6B6B','#4ECDC4']
   return (
     <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
@@ -889,7 +907,7 @@ export default function Practice({
           <div className="flex-shrink-0 flex justify-center pb-1">
             <span className="font-body font-bold text-xs px-3 py-1 rounded-full"
               style={{ backgroundColor: '#FEF3C7', color: '#D97706' }}>
-              🔄 Retry — double coins if correct!
+              🔄 Retry — you've got this!
             </span>
           </div>
         )}
@@ -1092,7 +1110,7 @@ export default function Practice({
                 <span className="text-2xl">{isCorrect ? '🎉' : '💪'}</span>
                 <div className="flex-1 min-w-0">
                   <p className="font-body font-bold text-base leading-tight">
-                    {isCorrect ? (isRetry ? '🌟 Amazing! Double coins!' : 'Correct!') : 'Keep going!'}
+                    {isCorrect ? (isRetry ? '🌟 Nice recovery!' : 'Correct!') : 'Keep going!'}
                   </p>
                   {!isCorrect && (
                     <p className="font-body text-sm text-amber-600 leading-tight truncate">
