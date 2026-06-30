@@ -1,6 +1,6 @@
 {
-  "name": "Ten a Day",
-  "short_name": "Ten a Day",
+  "name": "Numio",
+  "short_name": "Numio",
   "description": "Two minutes of math, every day.",
   "start_url": "/",
   "display": "standalone",
@@ -8,12 +8,12 @@
   "theme_color": "#58cc02",
   "icons": [
     {
-      "src": "/icon-192.png",
+      "src": "/onboarding-mascot.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/icon-512.png",
+      "src": "/onboarding-mascot.png",
       "sizes": "512x512",
       "type": "image/png"
     }
