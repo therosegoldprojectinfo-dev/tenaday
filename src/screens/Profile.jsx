@@ -30,12 +30,9 @@ function TargetIcon() {
   )
 }
 
-function StatCard({ icon, value, label, accent }) {
+function StatCard({ icon, value, label }) {
   return (
-    <div
-      className="flex-1 rounded-2xl px-4 py-4 flex items-center gap-3"
-      style={{ backgroundColor: accent ? `${accent}14` : '#F9FAFB' }}
-    >
+    <div className="flex-1 px-4 py-4 flex items-center gap-3">
       <div className="flex-shrink-0">{icon}</div>
       <div className="min-w-0">
         <p className="font-display font-bold text-xl text-gray-900 leading-none tabular-nums">{value}</p>
@@ -143,10 +140,9 @@ export default function Profile({ kidId, onSwitchProfile }) {
         <div className="flex flex-col gap-2.5">
           <div className="flex gap-2.5">
             <StatCard icon={<FlameIcon />} value={streak} label="Day streak" />
-            <StatCard icon={<ZapIcon />} value={stats.totalCorrect} label="Correct answers" />
+            <StatCard icon={<CoinIcon />} value={kid.coin_balance} label="Coin balance" />
           </div>
           <div className="flex gap-2.5">
-            <StatCard icon={<CoinIcon />} value={kid.coin_balance} label="Coin balance" />
             <StatCard icon={<TargetIcon />} value={stats.nodesPassed} label="Nodes passed" />
           </div>
         </div>
