@@ -300,7 +300,9 @@ where not exists (select 1 from gifts where parent_id is null);
 
 alter table kids add column if not exists timezone text not null default 'America/Toronto';
 alter table kids add column if not exists next_unlock_at timestamptz;
-alter table kids add column if not exists heart_balance int not null default 5;
+-- heart_balance column removed in v4 — hearts mechanic was fully removed.
+-- (Existing DBs: run `alter table kids drop column if exists heart_balance;`
+--  via migrate_node_rename.sql if you haven't already.)
 
 -- Called after a kid finishes all 7 nodes of a batch (Review node passes).
 -- Stamps last_advance_date and pre-computes next midnight in their timezone.
@@ -312,9 +314,8 @@ as $$
 declare
   kid_tz text;
   next_midnight timestamptz;
-  current_hearts int;
 begin
-  select timezone, heart_balance into kid_tz, current_hearts from kids where id = kid_id;
+  select timezone into kid_tz from kids where id = kid_id;
 
   -- Correctly compute next midnight in kid's local timezone.
   next_midnight := (date_trunc('day', now() at time zone kid_tz) + interval '1 day') at time zone kid_tz;
@@ -322,10 +323,7 @@ begin
   update kids
   set
     last_advance_date = now(),
-    next_unlock_at    = next_midnight,
-    -- Only refill hearts if kid is completely out (0 hearts).
-    -- Partial hearts are kept — no free refill for kids who still have some.
-    heart_balance     = case when heart_balance = 0 then 5 else heart_balance end
+    next_unlock_at    = next_midnight
   where id = kid_id;
 
   return next_midnight;
