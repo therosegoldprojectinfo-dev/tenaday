@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { themeFor } from '../lib/eraTheme'
+import { factValues } from '../lib/problems'
 import {
   NODES,
   TABLE_COUNT,
@@ -50,6 +51,16 @@ function ClockLockIcon({ size = 20 }) {
       <path d="M12 7v5l3.5 2" />
     </svg>
   )
+}
+
+// Builds the equation label exactly as factValues() computes it, so the
+// unit banner / separator label always matches the actual questions
+// generated for that table+batch (was previously just "table OP fact",
+// which is correct for addition/multiplication but wrong for
+// subtraction/division since their a/b are derived differently).
+function factLabel(operation, table, fact, symbol) {
+  const { a, b } = factValues(operation, table, fact)
+  return `${a} ${symbol} ${b}`
 }
 
 function BackIcon() {
@@ -464,7 +475,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         {(() => {
           const u = allUnits.find(u => u.unitNumber === visibleUnit)
           const facts = u ? factsForBatch(u.batch) : []
-          const factStr = u ? facts.map(f => `${u.table} ${theme.symbol} ${f}`).join(', ') : ''
+          const factStr = u ? facts.map(f => factLabel(operation, u.table, f, theme.symbol)).join(', ') : ''
           const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
           return (
             <div style={{ position: 'sticky', top: 0, zIndex: 100, padding: '10px 16px', display: 'flex', justifyContent: 'center' }}>
@@ -495,7 +506,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '16px 24px 8px' }}>
                     <div style={{ flex: 1, height: 1.5, backgroundColor: '#e5e7eb', borderRadius: 2 }} />
                     <span style={{ fontFamily: 'var(--font-display, "Baloo 2", sans-serif)', fontWeight: 700, fontSize: 12, color: '#9ca3af', whiteSpace: 'nowrap' }}>
-                      {facts.map(f => `${table} ${theme.symbol} ${f}`).join(', ')}
+                      {facts.map(f => factLabel(operation, table, f, theme.symbol)).join(', ')}
                     </span>
                     <div style={{ flex: 1, height: 1.5, backgroundColor: '#e5e7eb', borderRadius: 2 }} />
                   </div>
