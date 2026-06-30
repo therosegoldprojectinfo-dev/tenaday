@@ -15,7 +15,7 @@ export const DEMO_KID_ID = '00000000-0000-0000-0000-000000000001'
 export async function fetchKid(kidId) {
   const { data, error } = await supabase
     .from('kids')
-    .select('id, name, age, placement_claim, current_operation, current_table, current_batch, current_node, last_advance_date, next_unlock_at, timezone, seen_chapter_intros, coin_balance, heart_balance')
+    .select('id, name, age, placement_claim, current_operation, current_table, current_batch, current_node, last_advance_date, next_unlock_at, timezone, seen_chapter_intros, coin_balance')
     .eq('id', kidId)
     .single()
 
@@ -280,33 +280,4 @@ export async function fetchStreak(kidId) {
   }
 
   return streak
-}
-
-/** Sets the kid's heart balance. Clamped between 0 and 5. */
-export async function setHeartBalance(kidId, newBalance) {
-  const clamped = Math.max(0, Math.min(5, newBalance))
-  const { error } = await supabase
-    .from('kids')
-    .update({ heart_balance: clamped })
-    .eq('id', kidId)
-  if (error) throw error
-  return clamped
-}
-
-/** Recharges 1 heart for 10 coins. Returns { newHearts, newCoins }.
- *  Throws if kid can't afford it or already at max hearts. */
-export async function rechargeHeart(kidId, currentHearts, currentCoins) {
-  const HEART_COST = 10
-  if (currentHearts >= 5) throw new Error('Already at max hearts.')
-  if (currentCoins < HEART_COST) throw new Error('Not enough coins.')
-  const newCoins  = currentCoins - HEART_COST
-  const newHearts = currentHearts + 1
-  await setCoinBalance(kidId, newCoins)
-  await setHeartBalance(kidId, newHearts)
-  await logCoinTransaction(kidId, {
-    amount: -HEART_COST,
-    reason: 'heart_recharge',
-    balanceAfter: newCoins,
-  })
-  return { newHearts, newCoins }
 }
