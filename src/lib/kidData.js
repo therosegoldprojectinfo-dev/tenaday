@@ -244,7 +244,7 @@ export async function fetchStreak(kidId) {
     .select('created_at, result, node')
     .eq('kid_id', kidId)
     .eq('result', 'passed')
-    .eq('node', 'review')
+    .eq('node', 'welcome')
 
   if (error || !data || data.length === 0) return 0
 
