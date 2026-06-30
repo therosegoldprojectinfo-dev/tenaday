@@ -136,7 +136,7 @@ export default function App() {
     setScreen('play')
   }
 
-  async function handleExitPractice(completedNode) {
+  async function handleExitPractice(completedNode, table, batchNum) {
     // null = quit midway (X button) → no streak slide, just back to path
     if (completedNode === null) {
       setActiveNode(null)
@@ -144,8 +144,16 @@ export default function App() {
       setRefreshKey(k => k + 1)
       return
     }
-    if (completedNode === 'welcome') {
-      // Fully completed Welcome → show streak slide
+
+    const isVeryFirstUnit = table === 1 && batchNum === 1
+    // Day 1 has no Welcome exercise (replaced by ChapterIntro), so the
+    // streak celebration happens at the end of Review instead.
+    // Day 2+ always has a real Welcome warm-up, so it happens there.
+    const shouldShowStreak =
+      (isVeryFirstUnit && completedNode === 'review') ||
+      (!isVeryFirstUnit && completedNode === 'welcome')
+
+    if (shouldShowStreak) {
       try {
         const { fetchStreak } = await import('./lib/kidData')
         const streak = await fetchStreak(kidId)
@@ -326,7 +334,7 @@ export default function App() {
         unlockBatch={activeNode.unlockBatch}
         placementClaim={activeNode.placementClaim}
         kidCurrentStep={activeNode.kidCurrentStep}
-        onExit={(completedNode) => handleExitPractice(completedNode)}
+        onExit={(completedNode) => handleExitPractice(completedNode, activeNode.table, activeNode.batchNum)}
         onBalanceChange={(newBal) => setActiveNode(n => n ? { ...n, coinBalance: newBal } : n)}
       />
     )
