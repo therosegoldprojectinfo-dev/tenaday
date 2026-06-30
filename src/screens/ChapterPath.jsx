@@ -456,6 +456,28 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       </div>
 
+      {/* ── Unit banner — lives OUTSIDE the scroll area so it never moves ── */}
+      {(() => {
+        const u = allUnits.find(u => u.unitNumber === visibleUnit)
+        const facts = u ? factsForBatch(u.batch) : []
+        const factStr = u ? facts.map(f => factLabel(operation, u.table, f, theme.symbol)).join(', ') : ''
+        const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
+        return (
+          <div className="flex-shrink-0" style={{ padding: '10px 16px', display: 'flex', justifyContent: 'center', zIndex: 50 }}>
+            <div style={{
+              width: '100%', maxWidth: 340,
+              backgroundColor: color.bg,
+              borderRadius: 16,
+              boxShadow: `0 5px 0 ${color.shadow}`,
+              padding: '12px 16px 14px',
+            }}>
+              <p style={{ fontFamily: 'var(--font-display, "Baloo 2", sans-serif)', fontWeight: 700, fontSize: 11, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', marginBottom: 3 }}>Unit {visibleUnit}</p>
+              <p style={{ fontFamily: 'var(--font-display, "Baloo 2", sans-serif)', fontWeight: 800, fontSize: 20, color: '#fff', lineHeight: 1.2 }}>{factStr}</p>
+            </div>
+          </div>
+        )
+      })()}
+
       {/* ── Scrollable content ── */}
       <div className="flex-1 overflow-y-auto relative z-10">
 
@@ -471,28 +493,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             <button onClick={() => setDayGateBlocked(false)} className="flex-shrink-0 font-body font-bold text-xs text-amber-600 active:opacity-70">OK</button>
           </div>
         )}
-        {/* ── Sticky unit banner ── */}
-        {(() => {
-          const u = allUnits.find(u => u.unitNumber === visibleUnit)
-          const facts = u ? factsForBatch(u.batch) : []
-          const factStr = u ? facts.map(f => factLabel(operation, u.table, f, theme.symbol)).join(', ') : ''
-          const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
-          return (
-            <div style={{ position: 'sticky', top: 0, zIndex: 100, padding: '10px 16px', display: 'flex', justifyContent: 'center' }}>
-              <div style={{
-                width: '100%', maxWidth: 340,
-                backgroundColor: color.bg,
-                borderRadius: 16,
-                boxShadow: `0 5px 0 ${color.shadow}`,
-                padding: '12px 16px 14px',
-              }}>
-                <p style={{ fontFamily: 'var(--font-display, "Baloo 2", sans-serif)', fontWeight: 700, fontSize: 11, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', marginBottom: 3 }}>Unit {visibleUnit}</p>
-                <p style={{ fontFamily: 'var(--font-display, "Baloo 2", sans-serif)', fontWeight: 800, fontSize: 20, color: '#fff', lineHeight: 1.2 }}>{factStr}</p>
-              </div>
-            </div>
-          )
-        })()}
-
         {/* ── Node path ── */}
         <div className="max-w-sm md:max-w-md mx-auto pt-6 pb-24 overflow-x-hidden" style={{ position: 'relative', zIndex: 1 }}>
           {allUnits.map(({ table, batch, unitNumber }) => {
