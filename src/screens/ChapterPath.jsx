@@ -456,20 +456,26 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </div>
       </div>
 
-      {/* ── Unit banner — lives OUTSIDE the scroll area so it never moves ── */}
+      {/* ── Unit banner — absolute over scroll, transparent bg, colored pill ── */}
       {(() => {
         const u = allUnits.find(u => u.unitNumber === visibleUnit)
         const facts = u ? factsForBatch(u.batch) : []
         const factStr = u ? facts.map(f => factLabel(operation, u.table, f, theme.symbol)).join(', ') : ''
         const color = UNIT_COLORS[(visibleUnit - 1) % UNIT_COLORS.length]
         return (
-          <div className="flex-shrink-0" style={{ padding: '10px 16px', display: 'flex', justifyContent: 'center', zIndex: 50 }}>
+          <div style={{
+            position: 'absolute', top: 64, left: 0, right: 0,
+            zIndex: 50, padding: '10px 16px',
+            display: 'flex', justifyContent: 'center',
+            pointerEvents: 'none',
+          }}>
             <div style={{
               width: '100%', maxWidth: 340,
               backgroundColor: color.bg,
               borderRadius: 16,
               boxShadow: `0 5px 0 ${color.shadow}`,
               padding: '12px 16px 14px',
+              pointerEvents: 'auto',
             }}>
               <p style={{ fontFamily: 'var(--font-display, "Baloo 2", sans-serif)', fontWeight: 700, fontSize: 11, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', marginBottom: 3 }}>Unit {visibleUnit}</p>
               <p style={{ fontFamily: 'var(--font-display, "Baloo 2", sans-serif)', fontWeight: 800, fontSize: 20, color: '#fff', lineHeight: 1.2 }}>{factStr}</p>
