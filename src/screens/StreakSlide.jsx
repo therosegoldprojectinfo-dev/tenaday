@@ -66,7 +66,11 @@ export default function StreakSlide({ dayStreak = 1, onContinue }) {
     const dayIdx = ((todayIdx + offset) % 7 + 7) % 7
     const isCurrent = offset === 0
     const daysBack = -offset
-    const filled = offset <= 0 && daysBack < dayStreak
+    // StreakSlide is shown right after Welcome completes — today's Review
+    // hasn't happened yet, so today is never "filled" even if dayStreak > 0.
+    // Only days strictly before today (offset < 0) can be filled, and only
+    // up to how many consecutive days back the streak actually covers.
+    const filled = offset < 0 && (-offset) <= dayStreak
     return { label: DAYS[dayIdx], filled, isCurrent, offset }
   })
 
