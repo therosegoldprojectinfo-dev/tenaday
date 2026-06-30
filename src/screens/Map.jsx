@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { OPERATIONS, eraStatus, eraProgress } from '../lib/progression'
 import { fetchKid, fetchStreak } from '../lib/kidData'
-import { DEBT_FLOOR, ENTRY_FEE } from '../lib/economy'
+import { DEBT_FLOOR } from '../lib/economy'
 
 const CARD_BLUE  = '#DDF0FB'
 
@@ -119,7 +119,7 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
   )
 }
 
-export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
+export default function Map({ onOpenChapter, kidId }) {
   const [kid, setKid] = useState(null)
   const [streak, setStreak] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -159,7 +159,7 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
   return (
     <div className="min-h-screen bg-white">
       <div className="sticky top-0 bg-white z-20 border-b border-gray-100">
-        {tooltip && <div className="fixed inset-0 z-40" onClick={() => { setTooltip(null); setRechargeError(null) }} />}
+        {tooltip && <div className="fixed inset-0 z-40" onClick={() => setTooltip(null)} />}
         <div className="flex items-center justify-between px-5 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto">
           <div className="relative">
             <button onClick={() => setTooltip(t => t === 'streak' ? null : 'streak')} className="flex items-center gap-1.5 active:scale-95 transition-transform">
