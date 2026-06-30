@@ -1,14 +1,15 @@
 // ── Coin economy ─────────────────────────────────────────────────────────
 // v4: No entry fee, no debt, no hearts. Kids only ever earn coins.
-// Wrong answers give half coins. Retries give double coins.
+// A node always pays out its flat payoutForNode() amount on completion,
+// regardless of retries or wrong answers along the way — the live coin
+// ticker in Practice.jsx just shows that flat amount incrementally as
+// the kid plays, so what they see during play always matches the DB.
 
 export const STARTING_BALANCE  = 50
 export const ENTRY_FEE         = 0   // removed — playing is always free
 export const NODE_PAYOUT       = 20
 export const REVIEW_PAYOUT     = 40
 export const DEBT_FLOOR        = 0   // can never go below 0
-export const RETRY_MULT        = 2   // correct on retry → double coins
-export const WRONG_MULT        = 0.5 // wrong twice → half coins
 
 /** Entry fee is 0 — kept for API compatibility, always a no-op. */
 export function applyEntryFee(balance) {
