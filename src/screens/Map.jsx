@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { OPERATIONS, eraStatus, eraProgress } from '../lib/progression'
-import { fetchKid, fetchStreak, rechargeHeart, DEMO_KID_ID } from '../lib/kidData'
+import { fetchKid, fetchStreak } from '../lib/kidData'
 import { DEBT_FLOOR, ENTRY_FEE } from '../lib/economy'
 
 const CARD_BLUE  = '#DDF0FB'
@@ -19,11 +19,6 @@ const CHAPTER_LABEL = {
   division: 'Chapter 4 · Division',
 }
 
-function HeartStatIcon() {
-  return (
-    <img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="36" height="36" alt="" />
-  )
-}
 
 function CoinStatIcon() {
   return <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="40" height="40" alt="" />
@@ -130,8 +125,6 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [tooltip, setTooltip] = useState(null)
-  const [recharging, setRecharging] = useState(false)
-  const [rechargeError, setRechargeError] = useState(null)
 
   useEffect(() => {
     let cancelled = false
@@ -159,15 +152,6 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
     onOpenChapter(operation)
   }
 
-  async function handleRechargeHeart() {
-    if (recharging) return
-    setRechargeError(null); setRecharging(true)
-    try {
-      const { newHearts, newCoins } = await rechargeHeart(kidId, kid.heart_balance ?? 5, kid.coin_balance)
-      setKid(k => ({ ...k, heart_balance: newHearts, coin_balance: newCoins }))
-    } catch (err) { setRechargeError(err.message) }
-    finally { setRecharging(false) }
-  }
 
   const inDebt = kid.coin_balance < 0
   const atDebtFloor = kid.coin_balance <= DEBT_FLOOR
@@ -191,29 +175,6 @@ export default function Map({ onOpenChapter, kidId = DEMO_KID_ID }) {
             )}
           </div>
           <div className="flex items-center gap-2">
-            <div className="relative">
-              <button onClick={() => { setTooltip(t => t === 'hearts' ? null : 'hearts'); setRechargeError(null) }} className="flex items-center gap-1.5 active:scale-95 transition-transform">
-                <HeartStatIcon />
-                <span className="font-body font-bold text-base text-red-500 leading-none tabular-nums">{kid.heart_balance ?? 5}</span>
-              </button>
-              {tooltip === 'hearts' && (
-                <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-52 text-center" onClick={e => e.stopPropagation()}>
-                  <p className="mb-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="56" height="56" alt="" /></p>
-                  <p className="font-display font-bold text-gray-900 text-sm">Hearts</p>
-                  <div className="flex justify-center gap-1 my-2">{Array.from({ length: 5 }).map((_, i) => <span key={i} style={{ opacity: i < (kid.heart_balance ?? 5) ? 1 : 0.25, fontSize: 18 }}><img src="/Cr%C3%A9ation%20sans%20titre%20(28).png" width="36" height="36" alt="" /></span>)}</div>
-                  <p className="font-body text-xs text-gray-400 mb-3">Hearts are lost when you answer wrong. Recharge with coins.</p>
-                  {(kid.heart_balance ?? 5) < 5 ? (
-                    <>
-                      {rechargeError && <p className="font-body text-xs text-red-400 mb-2">{rechargeError}</p>}
-                      <button onClick={handleRechargeHeart} disabled={recharging || kid.coin_balance < 10} className="w-full py-2.5 rounded-xl font-body font-bold text-sm tracking-wide transition-all active:scale-95"
-                        style={{ backgroundColor: kid.coin_balance >= 10 ? '#ef4444' : '#F3F4F6', color: kid.coin_balance >= 10 ? '#fff' : '#9CA3AF', boxShadow: kid.coin_balance >= 10 ? '0 3px 0 0 #b91c1c' : '0 3px 0 0 #D1D5DB' }}>
-                        {recharging ? 'Recharging…' : '♥ +1 for 10 coins'}
-                      </button>
-                    </>
-                  ) : <p className="font-body text-xs text-green-500 font-bold">Full hearts! ✨</p>}
-                </div>
-              )}
-            </div>
             <div className="relative">
               <button onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')} className="flex items-center gap-1.5 active:scale-95 transition-transform">
                 <CoinStatIcon />
