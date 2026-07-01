@@ -1,4 +1,7 @@
-// StreakSlide.jsx — shown after Welcome every day
+// StreakSlide.jsx
+// trigger = 'welcome' → shown after Welcome (Day 2+) — today partial
+// trigger = 'review'  → shown after Review — today fully complete
+// trigger = 'review_day1' → shown after Review on Day 1 — streak just started
 
 const DAYS = ['Su', 'M', 'T', 'W', 'Th', 'F', 'Sa']
 
@@ -16,32 +19,50 @@ const ANIM = `
     from { opacity: 0; transform: translateY(20px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+  @keyframes half-pulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+  }
 `
 
-function LightningIcon({ filled, size = 28 }) {
+function LightningIcon({ filled, half, size = 28 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <defs>
+        <linearGradient id="half-grad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="50%" stopColor="#1a1a1a" />
+          <stop offset="50%" stopColor="#d1d5db" />
+        </linearGradient>
+      </defs>
       <path
         d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z"
-        fill={filled ? '#1a1a1a' : '#d1d5db'}
+        fill={filled ? '#1a1a1a' : half ? 'url(#half-grad)' : '#d1d5db'}
       />
     </svg>
   )
 }
 
-function DayCircle({ label, filled, isCurrent, delay }) {
+function DayCircle({ label, filled, half, isCurrent, delay }) {
+  const bg = filled ? '#d4f000' : half ? '#f0f0a0' : '#f3f4f6'
+  const shadow = filled ? '0 2px 8px rgba(212,240,0,0.5)' : half ? '0 2px 8px rgba(212,240,0,0.2)' : 'none'
+  const anim = filled
+    ? `lightning-pop 0.4s ${delay}s ease both`
+    : half
+      ? `lightning-pop 0.4s ${delay}s ease both, half-pulse 1.8s ${delay + 0.4}s ease-in-out infinite`
+      : 'none'
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5 }}>
       <div style={{
         width: 40, height: 40, borderRadius: '50%',
-        backgroundColor: filled ? '#d4f000' : '#f3f4f6',
+        backgroundColor: bg,
         border: isCurrent ? '3px solid #d4f000' : '3px solid transparent',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        animation: filled ? `lightning-pop 0.4s ${delay}s ease both` : 'none',
-        boxShadow: filled ? '0 2px 8px rgba(212,240,0,0.5)' : 'none',
+        animation: anim,
+        boxShadow: shadow,
         flexShrink: 0,
       }}>
-        <LightningIcon filled={filled} size={20} />
+        <LightningIcon filled={filled} half={half} size={20} />
       </div>
       <span style={{
         fontFamily: "'Baloo 2', sans-serif",
@@ -55,32 +76,50 @@ function DayCircle({ label, filled, isCurrent, delay }) {
   )
 }
 
-export default function StreakSlide({ dayStreak = 1, onContinue }) {
-  const todayIdx = new Date().getDay() // 0=Su, 1=M, ...
+export default function StreakSlide({ dayStreak = 1, trigger = 'welcome', onContinue }) {
+  const todayIdx = new Date().getDay()
+  const todayComplete = trigger === 'review' || trigger === 'review_day1'
+  const isDay1Review = trigger === 'review_day1'
 
-  // Show 2 days back + today + 2 ahead = 5 circles (fits mobile)
-  const windowSize = 5
-  const startOffset = -2
-  const circleIndices = Array.from({ length: windowSize }, (_, i) => {
-    const offset = startOffset + i // -2, -1, 0, 1, 2
+  // Build 5 circles: 2 back + today + 2 ahead
+  const circleIndices = Array.from({ length: 5 }, (_, i) => {
+    const offset = -2 + i // -2, -1, 0, 1, 2
     const dayIdx = ((todayIdx + offset) % 7 + 7) % 7
     const isCurrent = offset === 0
     const daysBack = -offset
-    // StreakSlide is shown right after Welcome completes — today's Review
-    // hasn't happened yet, so today is never "filled" even if dayStreak > 0.
-    // Only days strictly before today (offset < 0) can be filled, and only
-    // up to how many consecutive days back the streak actually covers.
-    const filled = offset < 0 && (-offset) <= dayStreak
-    return { label: DAYS[dayIdx], filled, isCurrent, offset }
+
+    let filled = false
+    let half = false
+
+    if (offset < 0) {
+      // Past days — filled if within streak
+      filled = daysBack <= dayStreak
+    } else if (offset === 0) {
+      // Today
+      if (todayComplete) {
+        filled = true  // Review done — full day complete
+      } else {
+        half = dayStreak > 0  // Welcome done — partial day
+      }
+    }
+    // Future days always empty
+
+    return { label: DAYS[dayIdx], filled, half, isCurrent, offset }
   })
 
-  const isDay1 = dayStreak === 1
-  const isFreshStart = dayStreak < 1
-  const headlineText = isFreshStart
-    ? "Let's build a streak! ⚡"
-    : isDay1
-      ? 'Your streak has started! ⚡'
-      : `${dayStreak} days in a row! 🔥`
+  // Headline and subtext based on trigger
+  let headline, subtext
+  if (isDay1Review) {
+    headline = 'Your streak has started! ⚡'
+    subtext  = 'You completed your first full day! Come back tomorrow to keep it going! 🔥'
+  } else if (trigger === 'review') {
+    headline = `${dayStreak} day streak completed! 🔥`
+    subtext  = 'Amazing — you finished the full day! See you tomorrow! 🌟'
+  } else {
+    // welcome trigger — Day 2+
+    headline = 'Your streak continues! 🔥'
+    subtext  = `Finish today's activities to complete your ${dayStreak} day streak!`
+  }
 
   return (
     <div style={{
@@ -112,7 +151,7 @@ export default function StreakSlide({ dayStreak = 1, onContinue }) {
         color: '#1a1a1a', textAlign: 'center',
         animation: 'fadeUp 0.5s 0.1s ease both',
       }}>
-        {headlineText}
+        {headline}
       </h1>
 
       <p style={{
@@ -122,10 +161,10 @@ export default function StreakSlide({ dayStreak = 1, onContinue }) {
         color: '#6b7280', textAlign: 'center',
         animation: 'fadeUp 0.5s 0.2s ease both',
       }}>
-        {isFreshStart ? 'Finish a full day to start your streak!' : isDay1 ? 'Come back tomorrow to keep it going!' : 'Amazing — keep showing up!'}
+        {subtext}
       </p>
 
-      {/* Day circles — 3 back + today + 2 ahead, small, fits on mobile */}
+      {/* Day circles */}
       <div style={{
         display: 'flex', gap: 8, marginBottom: 48,
         animation: 'fadeUp 0.5s 0.3s ease both',
@@ -136,6 +175,7 @@ export default function StreakSlide({ dayStreak = 1, onContinue }) {
             key={i}
             label={c.label}
             filled={c.filled}
+            half={c.half}
             isCurrent={c.isCurrent}
             delay={0.3 + i * 0.07}
           />
