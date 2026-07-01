@@ -192,6 +192,9 @@ export default function App() {
     if (shouldShowStreak) {
       try {
         const { fetchStreak } = await import('./lib/kidData')
+        // Small delay to ensure the attempt DB write from Practice.jsx
+        // finalizeAttempt() has committed before we query the streak count
+        await new Promise(r => setTimeout(r, 500))
         const streak = await fetchStreak(kidId)
         setStreakCount(Math.max(0, streak))
       } catch {
