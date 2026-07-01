@@ -92,8 +92,9 @@ export default function StreakSlide({ dayStreak = 1, trigger = 'welcome', onCont
     let half = false
 
     if (offset < 0) {
-      // Past days — filled if within streak
-      filled = daysBack <= dayStreak
+      // Past days — filled if within streak (today counts as one streak day
+      // so past days fill for daysBack strictly less than dayStreak)
+      filled = daysBack < dayStreak
     } else if (offset === 0) {
       // Today
       if (todayComplete) {
