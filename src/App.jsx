@@ -49,7 +49,8 @@ export default function App() {
   const [activeNode, setActiveNode] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const [showStreakSlide, setShowStreakSlide] = useState(false)
-  const [streakCount, setStreakCount] = useState(1)
+  const [streakCount,    setStreakCount]    = useState(1)
+  const [streakTrigger,  setStreakTrigger]  = useState('welcome')
 
   // Persist kidId + current phase to sessionStorage so page refresh
   // brings you back to where you were instead of dropping you to kidPicker.
@@ -183,12 +184,10 @@ export default function App() {
     }
 
     const isVeryFirstUnit = table === 1 && batchNum === 1
-    // Day 1 has no Welcome exercise (replaced by ChapterIntro), so the
-    // streak celebration happens at the end of Review instead.
-    // Day 2+ always has a real Welcome warm-up, so it happens there.
     const shouldShowStreak =
-      (isVeryFirstUnit && completedNode === 'review') ||
-      (!isVeryFirstUnit && completedNode === 'welcome')
+      (isVeryFirstUnit && completedNode === 'review') ||       // Day 1 — after Review
+      (!isVeryFirstUnit && completedNode === 'welcome') ||     // Day 2+ — after Welcome
+      (!isVeryFirstUnit && completedNode === 'review')         // Day 2+ — after Review too
 
     if (shouldShowStreak) {
       try {
@@ -197,6 +196,14 @@ export default function App() {
         setStreakCount(Math.max(0, streak))
       } catch {
         setStreakCount(1)
+      }
+      // Set the right trigger so StreakSlide shows correct messaging + circles
+      if (isVeryFirstUnit && completedNode === 'review') {
+        setStreakTrigger('review_day1')
+      } else if (completedNode === 'review') {
+        setStreakTrigger('review')
+      } else {
+        setStreakTrigger('welcome')
       }
       setShowStreakSlide(true)
     } else {
@@ -325,6 +332,7 @@ export default function App() {
     return (
       <StreakSlide
         dayStreak={streakCount}
+        trigger={streakTrigger}
         onContinue={() => {
           setShowStreakSlide(false)
           setActiveNode(null)
