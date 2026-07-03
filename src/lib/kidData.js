@@ -268,11 +268,10 @@ export async function fetchStreak(kidId) {
 
   // Walk backwards from today (in kid's timezone) counting consecutive completed days
   let streak = 0
-  const todayStr = new Date().toLocaleDateString('en-CA', { timeZone: tz })
-  const today = new Date(todayStr)
   for (let i = 0; i < 365; i++) {
-    const d = new Date(today)
-    d.setDate(today.getDate() - i)
+    // Subtract i days from now in UTC, then convert to local date string
+    const d = new Date()
+    d.setUTCDate(d.getUTCDate() - i)
     const key = d.toLocaleDateString('en-CA', { timeZone: tz })
     if (completedDays.has(key)) {
       streak++
