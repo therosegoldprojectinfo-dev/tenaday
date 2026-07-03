@@ -132,10 +132,10 @@ function StreakTooltip({ streak }) {
   })
   return (
     <div style={{
-      position: 'absolute', top: '100%', marginTop: 8, left: '50%', transform: 'translateX(-50%)',
-      zIndex: 50, background: 'white', borderRadius: 20,
+      position: 'fixed', top: 60, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 999, background: 'white', borderRadius: 20,
       boxShadow: '0 8px 32px rgba(0,0,0,0.12)', border: '1px solid #f3f4f6',
-      padding: '16px 16px 12px', minWidth: 200, textAlign: 'center',
+      padding: '16px 16px 12px', width: 200, textAlign: 'center',
     }} onClick={e => e.stopPropagation()}>
       <p style={{ fontFamily: "\'Baloo 2\', sans-serif", fontWeight: 800, fontSize: 28, color: '#1a1a1a', margin: '0 0 2px' }}>{streak}</p>
       <p style={{ fontFamily: "\'Baloo 2\', sans-serif", fontWeight: 600, fontSize: 12, color: '#9ca3af', margin: '0 0 12px' }}>
