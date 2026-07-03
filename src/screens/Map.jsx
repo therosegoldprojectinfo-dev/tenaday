@@ -132,7 +132,7 @@ function StreakTooltip({ streak }) {
   })
   return (
     <div style={{
-      position: 'fixed', top: 60, left: '50%', transform: 'translateX(-50%)',
+      position: 'absolute', top: '100%', marginTop: 8, left: 0,
       zIndex: 999, background: 'white', borderRadius: 20,
       boxShadow: '0 8px 32px rgba(0,0,0,0.12)', border: '1px solid #f3f4f6',
       padding: '16px 16px 12px', width: 200, textAlign: 'center',
