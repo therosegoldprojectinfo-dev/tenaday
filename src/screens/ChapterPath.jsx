@@ -191,7 +191,7 @@ function DiscNode({ node, status, isCurrent, isWelcome, onPress, offset, nextUnl
   )
 }
 
-function StreakTooltip({ streak }) {
+function StreakTooltip({ streak, align = 'left' }) {
   const DAYS = ['Su', 'M', 'T', 'W', 'Th', 'F', 'Sa']
   const todayIdx = new Date().getDay()
   const circles = Array.from({ length: 5 }, (_, i) => {
@@ -204,7 +204,7 @@ function StreakTooltip({ streak }) {
   })
   return (
     <div style={{
-      position: 'absolute', top: '100%', marginTop: 8, left: 0,
+      position: 'absolute', top: '100%', marginTop: 8, ...(align === 'right' ? { right: 0 } : { left: 0 }),
       zIndex: 999, background: 'white', borderRadius: 20,
       boxShadow: '0 8px 32px rgba(0,0,0,0.12)', border: '1px solid #f3f4f6',
       padding: '16px 16px 12px', width: 200, textAlign: 'center',
@@ -473,7 +473,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                 <img src="/Cr%C3%A9ation%20sans%20titre%20(29).png" width="32" height="32" alt="" />
                 <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
               </button>
-              {tooltip === 'streak' && <StreakTooltip streak={streak} />}
+              {tooltip === 'streak' && <StreakTooltip streak={streak} align='right' />}
             </div>
             {/* Coins */}
             <div className="relative">
