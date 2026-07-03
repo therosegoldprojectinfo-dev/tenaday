@@ -311,7 +311,7 @@ function generateWelcome(operation, table, batch, unlockBatch) {
 }
 
 // ── Review generator (20 q) ───────────────────────────────────────────────
-// Weighted: 70% today's facts, 30% previous units
+// Weighted: 70% previous units (spaced repetition), 30% today's facts
 // MC + typed mix, 1/3 timed
 
 function generateReview(operation, table, batch, reviewPool) {
@@ -323,8 +323,8 @@ function generateReview(operation, table, batch, reviewPool) {
     : []
 
   return Array.from({ length: 20 }, (_, i) => {
-    // 70% today, 30% previous — if no previous pool, all today
-    const useToday = prevPool.length === 0 || Math.random() < 0.7
+    // 30% today, 70% previous — if no previous pool, all today
+    const useToday = prevPool.length === 0 || Math.random() < 0.3
     let src, fact
     if (useToday) {
       src = todaySource
