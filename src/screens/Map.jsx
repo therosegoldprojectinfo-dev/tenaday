@@ -119,6 +119,50 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
   )
 }
 
+function StreakTooltip({ streak }) {
+  const DAYS = ['Su', 'M', 'T', 'W', 'Th', 'F', 'Sa']
+  const todayIdx = new Date().getDay()
+  const circles = Array.from({ length: 5 }, (_, i) => {
+    const offset = -2 + i
+    const dayIdx = ((todayIdx + offset) % 7 + 7) % 7
+    const isCurrent = offset === 0
+    const daysBack = -offset
+    const filled = offset < 0 ? daysBack < streak : offset === 0 ? streak > 0 : false
+    return { label: DAYS[dayIdx], filled, isCurrent }
+  })
+  return (
+    <div style={{
+      position: 'absolute', top: '100%', marginTop: 8, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 50, background: 'white', borderRadius: 20,
+      boxShadow: '0 8px 32px rgba(0,0,0,0.12)', border: '1px solid #f3f4f6',
+      padding: '16px 16px 12px', minWidth: 200, textAlign: 'center',
+    }} onClick={e => e.stopPropagation()}>
+      <p style={{ fontFamily: "\'Baloo 2\', sans-serif", fontWeight: 800, fontSize: 28, color: '#1a1a1a', margin: '0 0 2px' }}>{streak}</p>
+      <p style={{ fontFamily: "\'Baloo 2\', sans-serif", fontWeight: 600, fontSize: 12, color: '#9ca3af', margin: '0 0 12px' }}>
+        {streak === 0 ? 'Play today to start a streak!' : `day${streak === 1 ? '' : 's'} in a row`}
+      </p>
+      <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+        {circles.map((c, i) => (
+          <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              backgroundColor: c.filled ? '#d4f000' : '#f3f4f6',
+              border: c.isCurrent ? '2px solid #d4f000' : '2px solid transparent',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: c.filled ? '0 2px 6px rgba(212,240,0,0.4)' : 'none',
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                <path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z" fill={c.filled ? '#1a1a1a' : '#d1d5db'} />
+              </svg>
+            </div>
+            <span style={{ fontFamily: "\'Baloo 2\', sans-serif", fontWeight: c.isCurrent ? 800 : 600, fontSize: 10, color: c.isCurrent ? '#1a1a1a' : '#9ca3af' }}>{c.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Map({ onOpenChapter, kidId }) {
   const [kid, setKid] = useState(null)
   const [streak, setStreak] = useState(0)
@@ -166,13 +210,7 @@ export default function Map({ onOpenChapter, kidId }) {
               <img src="/Cr%C3%A9ation%20sans%20titre%20(29).png" width="32" height="32" alt="" />
               <span className="font-body font-bold text-base text-orange-500 leading-none tabular-nums">{streak}</span>
             </button>
-            {tooltip === 'streak' && (
-              <div className="absolute top-full mt-2 left-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center">
-                <p className="mb-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(29).png" width="40" height="40" alt="" /></p>
-                <p className="font-display font-bold text-gray-900 text-sm">Day Streak</p>
-                <p className="font-body text-xs text-gray-400 mt-1">{streak === 0 ? 'No streak yet — play today!' : `${streak} day${streak === 1 ? '' : 's'} in a row!`}</p>
-              </div>
-            )}
+            {tooltip === 'streak' && <StreakTooltip streak={streak} />}
           </div>
           <div className="flex items-center gap-2">
             <div className="relative">
