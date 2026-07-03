@@ -191,12 +191,16 @@ export default function App() {
 
     if (shouldShowStreak) {
       try {
-        const { fetchStreak } = await import('./lib/kidData')
-        // Small delay to ensure the attempt DB write from Practice.jsx
-        // finalizeAttempt() has committed before we query the streak count
-        await new Promise(r => setTimeout(r, 500))
-        const streak = await fetchStreak(kidId)
-        setStreakCount(Math.max(0, streak))
+        // For Day 1 Review, streak is always 1 — no need to query DB
+        // (the attempt was just written and may not be committed yet)
+        if (isVeryFirstUnit && completedNode === 'review') {
+          setStreakCount(1)
+        } else {
+          const { fetchStreak } = await import('./lib/kidData')
+          await new Promise(r => setTimeout(r, 500))
+          const streak = await fetchStreak(kidId)
+          setStreakCount(Math.max(1, streak))
+        }
       } catch {
         setStreakCount(1)
       }
