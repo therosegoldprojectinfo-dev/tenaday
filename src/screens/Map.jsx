@@ -119,7 +119,7 @@ function ChapterCard({ operation, status, progress, resumeLabel, onPress }) {
   )
 }
 
-function StreakTooltip({ streak }) {
+function StreakTooltip({ streak, align = 'left' }) {
   const DAYS = ['Su', 'M', 'T', 'W', 'Th', 'F', 'Sa']
   const todayIdx = new Date().getDay()
   const circles = Array.from({ length: 5 }, (_, i) => {
@@ -132,7 +132,7 @@ function StreakTooltip({ streak }) {
   })
   return (
     <div style={{
-      position: 'absolute', top: '100%', marginTop: 8, left: 0,
+      position: 'absolute', top: '100%', marginTop: 8, ...(align === 'right' ? { right: 0 } : { left: 0 }),
       zIndex: 999, background: 'white', borderRadius: 20,
       boxShadow: '0 8px 32px rgba(0,0,0,0.12)', border: '1px solid #f3f4f6',
       padding: '16px 16px 12px', width: 200, textAlign: 'center',
