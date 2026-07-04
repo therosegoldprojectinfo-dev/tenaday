@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { themeFor } from '../lib/eraTheme'
-import { nextStep } from '../lib/progression'
+import { nextStep, stepIndex, normalizeNode } from '../lib/progression'
 import { updateProgress } from '../lib/kidData'
 
 // ── Full app intro (very first session — Addition, Table 1, Batch 1) ─────
@@ -59,7 +59,7 @@ function chapterSlides(operation, theme) {
   ]
 }
 
-export default function ChapterIntro({ operation, table, batchNum, node, kidId, isFirstEver, onDone }) {
+export default function ChapterIntro({ operation, table, batchNum, node, kidId, isFirstEver, kidCurrentStep, onDone }) {
   const theme = themeFor(operation)
   const slides = isFirstEver ? APP_INTRO_SLIDES : chapterSlides(operation, theme)
   const [idx, setIdx] = useState(0)
@@ -72,9 +72,11 @@ export default function ChapterIntro({ operation, table, batchNum, node, kidId, 
     if (!isLast) { setIdx(i => i + 1); return }
     setSaving(true)
     try {
-      // Advance cursor to the next node (learn) — the intro replaced unlock
       const next = nextStep(operation, table, batchNum, node)
-      if (next && kidId) await updateProgress(kidId, next)
+      const isForward = !next || !kidCurrentStep ||
+        stepIndex(next.operation, next.table, next.batch, next.node) >
+        stepIndex(kidCurrentStep.operation, kidCurrentStep.table, kidCurrentStep.batch, normalizeNode(kidCurrentStep.node))
+      if (next && kidId && isForward) await updateProgress(kidId, next)
     } catch (err) {
       console.error('Failed to advance after chapter intro:', err)
     } finally {
