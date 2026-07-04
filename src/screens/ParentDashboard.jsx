@@ -510,8 +510,8 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
               {coinLoading ? (
                 <p className="font-body text-gray-400 text-center py-8">Loading…</p>
               ) : coinHistory.length === 0 ? (
-                <div className="rounded-3xl bg-white border-2 border-dashed border-gray-200 py-10 text-center">
-                  <p className="mb-2"><img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="80" height="80" alt="" /></p>
+                <div className="rounded-3xl bg-white border-2 border-dashed border-gray-200 py-10 flex flex-col items-center justify-center text-center">
+                  <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="80" height="80" alt="" className="mb-2" />
                   <p className="font-body text-sm text-gray-400">No transactions yet.</p>
                 </div>
               ) : (
