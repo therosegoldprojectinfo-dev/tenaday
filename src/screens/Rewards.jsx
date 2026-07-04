@@ -116,13 +116,14 @@ function RewardCard({ gift, affordable, locked, onBuy }) {
   )
 }
 
-export default function Rewards({ kidId, parentId }) {
+export default function Rewards({ kidId, parentId, onGoToParent }) {
   const [kid, setKid] = useState(null)
   const [gifts, setGifts] = useState(null)
   const [error, setError] = useState(null)
   const [confirming, setConfirming] = useState(null)
   const [purchasing, setPurchasing] = useState(false)
   const [unlockedReward, setUnlockedReward] = useState(null) // full celebration screen
+  const [showParentPopup, setShowParentPopup] = useState(false)
 
   async function loadAll() {
     try {
@@ -190,6 +191,7 @@ export default function Rewards({ kidId, parentId }) {
       }}>
         <style>{`
           @keyframes float-up { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+          @keyframes mascot-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
           @keyframes pop-in { 0% { opacity:0; transform: scale(0.7); } 60% { transform: scale(1.1); } 100% { opacity:1; transform: scale(1); } }
           @keyframes fade-up { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
           @keyframes sparkle { 0%,100% { opacity:0; transform: scale(0); } 50% { opacity:1; transform: scale(1); } }
@@ -245,7 +247,7 @@ export default function Rewards({ kidId, parentId }) {
 
         {/* Golden button */}
         <button
-          onClick={() => setUnlockedReward(null)}
+          onClick={() => setShowParentPopup(true)}
           style={{
             zIndex: 3,
             width: '100%', maxWidth: 340,
@@ -260,6 +262,55 @@ export default function Rewards({ kidId, parentId }) {
         >
           Show to your parent! →
         </button>
+
+        {/* Small X to close celebration */}
+        <button onClick={() => setUnlockedReward(null)} style={{
+          position: 'absolute', top: 16, right: 16, zIndex: 10,
+          width: 36, height: 36, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.12)', border: 'none',
+          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'rgba(255,255,255,0.6)', fontSize: 18, fontWeight: 800,
+        }}>✕</button>
+
+        {/* Are you the parent? popup */}
+        {showParentPopup && (
+          <div style={{
+            position: 'fixed', inset: 0, zIndex: 70,
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'flex-end',
+            background: 'rgba(0,0,0,0.5)',
+          }}>
+            <div style={{
+              background: 'white', borderRadius: '24px 24px 0 0',
+              padding: '24px 24px 40px', width: '100%', maxWidth: 480,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+              position: 'relative',
+            }}>
+              <div style={{ animation: 'mascot-float 1.8s ease-in-out infinite' }}>
+                <img src="/onboarding-mascot.png" alt="Numio" style={{ width: 80, height: 'auto' }} />
+              </div>
+              <p style={{
+                fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 20,
+                color: '#1a1a1a', textAlign: 'center', margin: 0,
+              }}>Are you the parent? 👋</p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+                <button onClick={() => { setShowParentPopup(false); onGoToParent?.() }} style={{
+                  width: '100%', border: 'none', cursor: 'pointer',
+                  padding: '16px 0', borderRadius: 14,
+                  background: '#58cc02', boxShadow: '0 4px 0 #46a302',
+                  color: '#fff', fontFamily: "'Baloo 2', sans-serif",
+                  fontWeight: 800, fontSize: 16, letterSpacing: '0.05em', textTransform: 'uppercase',
+                }}>Yes, I'm the parent ✅</button>
+                <button onClick={() => setShowParentPopup(false)} style={{
+                  width: '100%', border: 'none', cursor: 'pointer',
+                  padding: '12px 0', borderRadius: 14,
+                  background: 'none', color: '#9ca3af',
+                  fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 14,
+                }}>No, go back</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     )
   }
