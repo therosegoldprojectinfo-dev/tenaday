@@ -213,3 +213,19 @@ end;
 $$;
 
 grant execute on function get_parent_salt_by_id(uuid) to anon;
+
+-- ── Fix: allow anon to DELETE own gifts and gift_claims ───────────────────────
+-- ParentDashboard needs to delete rewards (parent's own) and approve claims
+-- (delete from gift_claims). Without these, deletes silently fail (0 rows matched)
+-- and the UI looks like it worked but the data reappears on reload.
+
+drop policy if exists "gifts_anon_delete_own" on gifts;
+create policy "gifts_anon_delete_own" on gifts
+  for delete to anon
+  using (parent_id is not null);
+-- Global gifts (parent_id is null) still cannot be deleted via anon ✅
+
+drop policy if exists "gift_claims_anon_delete" on gift_claims;
+create policy "gift_claims_anon_delete" on gift_claims
+  for delete to anon
+  using (true);
