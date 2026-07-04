@@ -1,6 +1,11 @@
 -- ============================================================================
 -- Ten a Day — Supabase schema (v3: Numio Daily Loop)
 -- ============================================================================
+-- ⚠️  SECURITY: After running this file on a fresh DB, you MUST also run
+--     supabase/rls_security.sql to apply RLS policies and server-side auth RPCs.
+--     Running schema.sql alone leaves the parents table wide open (dev_open_*
+--     policies). The security layer lives in rls_security.sql — don't skip it.
+-- ============================================================================
 -- Supersedes the 5-node-per-unit model with the 6-node daily loop per
 -- table (spec §6.5):
 --   Chapter (operation) -> Table (1-12) -> Node (6 per table):
