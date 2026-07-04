@@ -322,6 +322,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       : 0
 
   function handleTogglePopover(table, batch, node, status, isCurrent) {
+    if (status === 'day_locked') {
+      setShowDayGateScreen(true)
+      return
+    }
     setOpenNode(prev =>
       prev && prev.table === table && prev.batch === batch && prev.node === node
         ? null
@@ -597,16 +601,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                   🔒 NOT YET UNLOCKED
                 </button>
               </>
-            ) : openNode.status === 'day_locked' ? (
-              <>
-                <p className="font-body text-sm text-gray-400 mb-5">You've crushed today's session! Come back tomorrow to keep going.</p>
-                <button
-                  onClick={() => { setOpenNode(null); setShowDayGateScreen(true) }}
-                  className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
-                >
-                  🎉 SEE YOUR PROGRESS
-                </button>
-              </>
             ) : (
               <>
                 <p className="font-body text-sm text-gray-400 mb-5">
@@ -625,7 +619,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       {showDayGateScreen && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 100,
-          backgroundColor: '#FFD000',
+          backgroundColor: '#FFF5B0',
           display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'space-between',
           padding: '48px 24px 40px',
@@ -639,7 +633,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             }}>You crushed it today! 🎉</h1>
             <p style={{
               fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 17,
-              color: 'rgba(0,0,0,0.6)', margin: 0,
+              color: 'rgba(0,0,0,0.55)', margin: 0,
             }}>Come back tomorrow to keep your streak going!</p>
           </div>
 
@@ -647,11 +641,11 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
           <img
             src="/24hlockdaygate.png"
             alt="Numio celebrating"
-            style={{ width: '100%', maxWidth: 340, objectFit: 'contain', flex: 1, maxHeight: 420 }}
+            style={{ width: '100%', maxWidth: 340, objectFit: 'contain', flex: 1, maxHeight: 440 }}
           />
 
-          {/* Buttons */}
-          <div style={{ width: '100%', maxWidth: 340, display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {/* Single button */}
+          <div style={{ width: '100%', maxWidth: 340 }}>
             <button
               onClick={() => setShowDayGateScreen(false)}
               style={{
@@ -664,17 +658,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               }}
             >
               Go enjoy your rewards! 🎁
-            </button>
-            <button
-              onClick={() => setShowDayGateScreen(false)}
-              style={{
-                width: '100%', border: 'none', cursor: 'pointer',
-                padding: '14px 0', borderRadius: 16,
-                background: 'rgba(0,0,0,0.1)', color: 'rgba(0,0,0,0.6)',
-                fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 15,
-              }}
-            >
-              Back to my path
             </button>
           </div>
         </div>
