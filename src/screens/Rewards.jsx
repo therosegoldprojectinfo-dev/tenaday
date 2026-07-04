@@ -188,17 +188,7 @@ export default function Rewards({ kidId, parentId }) {
         background: 'radial-gradient(ellipse at 50% 35%, #3d2800 0%, #1a1000 50%, #0a0800 100%)',
         padding: '40px 24px', boxSizing: 'border-box', position: 'relative', overflow: 'hidden',
       }}>
-        {/* Golden rays background */}
-        <div style={{
-          position: 'absolute', top: '20%', left: '50%', transform: 'translateX(-50%)',
-          width: 340, height: 340, borderRadius: '50%',
-          background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255,200,0,0.07) 10deg, transparent 20deg, rgba(255,200,0,0.07) 30deg, transparent 40deg, rgba(255,200,0,0.07) 50deg, transparent 60deg, rgba(255,200,0,0.07) 70deg, transparent 80deg, rgba(255,200,0,0.07) 90deg, transparent 100deg, rgba(255,200,0,0.07) 110deg, transparent 120deg, rgba(255,200,0,0.07) 130deg, transparent 140deg, rgba(255,200,0,0.07) 150deg, transparent 160deg, rgba(255,200,0,0.07) 170deg, transparent 180deg, rgba(255,200,0,0.07) 190deg, transparent 200deg, rgba(255,200,0,0.07) 210deg, transparent 220deg, rgba(255,200,0,0.07) 230deg, transparent 240deg, rgba(255,200,0,0.07) 250deg, transparent 260deg, rgba(255,200,0,0.07) 270deg, transparent 280deg, rgba(255,200,0,0.07) 290deg, transparent 300deg, rgba(255,200,0,0.07) 310deg, transparent 320deg, rgba(255,200,0,0.07) 330deg, transparent 340deg, rgba(255,200,0,0.07) 350deg, transparent 360deg)',
-          animation: 'spin-rays 12s linear infinite',
-          zIndex: 0,
-        }} />
-
         <style>{`
-          @keyframes spin-rays { from { transform: translateX(-50%) rotate(0deg); } to { transform: translateX(-50%) rotate(360deg); } }
           @keyframes float-up { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
           @keyframes pop-in { 0% { opacity:0; transform: scale(0.7); } 60% { transform: scale(1.1); } 100% { opacity:1; transform: scale(1); } }
           @keyframes fade-up { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
