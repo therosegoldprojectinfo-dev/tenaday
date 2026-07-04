@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { verifyPin } from '../lib/pinAuth'
+import { hashPinWithSalt } from '../lib/pinAuth'
 import { supabase } from '../lib/supabaseClient'
 
 function BackIcon() {
@@ -38,14 +38,19 @@ export default function ParentPinEntry({ parentId, onSuccess, onBack }) {
     if (newPin.length === 4) {
       setChecking(true)
       try {
-        const { data, error: dbErr } = await supabase
-          .from('parents')
-          .select('pin_hash')
-          .eq('id', parentId)
-          .single()
+        // Step 1: get the salt for this parent (safe RPC — doesn't expose hash)
+        const { data: saltHex, error: saltErr } = await supabase
+          .rpc('get_parent_salt_by_id', { p_parent_id: parentId })
+        if (saltErr) throw saltErr
 
-        if (dbErr) throw dbErr
-        const valid = await verifyPin(newPin, data.pin_hash)
+        // Step 2: recompute hash client-side with stored salt
+        const pinHash = await hashPinWithSalt(newPin, saltHex)
+
+        // Step 3: verify server-side
+        const { data: valid, error: verifyErr } = await supabase
+          .rpc('parent_verify_pin', { p_parent_id: parentId, p_pin_hash: pinHash })
+        if (verifyErr) throw verifyErr
+
         if (valid) {
           onSuccess()
         } else {
