@@ -183,7 +183,7 @@ export default function App() {
       return
     }
 
-    const isVeryFirstUnit = table === 1 && batchNum === 1
+    const isVeryFirstUnit = table === 1 && batchNum === 1 && activeNode?.operation === 'addition'
     const shouldShowStreak =
       (isVeryFirstUnit && completedNode === 'review') ||       // Day 1 — after Review
       (!isVeryFirstUnit && completedNode === 'welcome') ||     // Day 2+ — after Welcome
