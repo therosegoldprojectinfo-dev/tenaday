@@ -244,6 +244,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   const [selectedDay, setSelectedDay] = useState(null)
   const [openNode, setOpenNode] = useState(null)
   const [dayGateBlocked, setDayGateBlocked] = useState(false)
+  const [showDayGateScreen, setShowDayGateScreen] = useState(false)
   const [tooltip, setTooltip] = useState(null)
   const [visibleUnit, setVisibleUnit] = useState(1)
   const unitRefs = useRef({})       // DOM elements, used for scrollIntoView
@@ -598,13 +599,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
               </>
             ) : openNode.status === 'day_locked' ? (
               <>
-                <p className="font-body text-sm text-gray-400 mb-5">You've done enough for today — come back tomorrow to continue!</p>
+                <p className="font-body text-sm text-gray-400 mb-5">You've crushed today's session! Come back tomorrow to keep going.</p>
                 <button
-                  disabled
-                  className="w-full py-4 rounded-2xl font-body font-bold text-base tracking-widest"
-                  style={{ backgroundColor: '#fef3c7', color: '#d97706', boxShadow: '0 4px 0 #fcd34d', cursor: 'default' }}
+                  onClick={() => { setOpenNode(null); setShowDayGateScreen(true) }}
+                  className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest"
                 >
-                  ⏰ COME BACK TOMORROW
+                  🎉 SEE YOUR PROGRESS
                 </button>
               </>
             ) : (
@@ -619,6 +619,65 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             )}
           </div>
         </>
+      )}
+
+      {/* ── Day gate celebration screen ── */}
+      {showDayGateScreen && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          backgroundColor: '#FFD000',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'space-between',
+          padding: '48px 24px 40px',
+          boxSizing: 'border-box',
+        }}>
+          {/* Top text */}
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{
+              fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 32,
+              color: '#1a1a1a', margin: '0 0 8px',
+            }}>You crushed it today! 🎉</h1>
+            <p style={{
+              fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 17,
+              color: 'rgba(0,0,0,0.6)', margin: 0,
+            }}>Come back tomorrow to keep your streak going!</p>
+          </div>
+
+          {/* Mascot image */}
+          <img
+            src="/24hlockdaygate.png"
+            alt="Numio celebrating"
+            style={{ width: '100%', maxWidth: 340, objectFit: 'contain', flex: 1, maxHeight: 420 }}
+          />
+
+          {/* Buttons */}
+          <div style={{ width: '100%', maxWidth: 340, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <button
+              onClick={() => setShowDayGateScreen(false)}
+              style={{
+                width: '100%', border: 'none', cursor: 'pointer',
+                padding: '18px 0', borderRadius: 16,
+                background: '#58cc02', boxShadow: '0 5px 0 #46a302',
+                color: '#fff', fontFamily: "'Baloo 2', sans-serif",
+                fontWeight: 800, fontSize: 18, letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Go enjoy your rewards! 🎁
+            </button>
+            <button
+              onClick={() => setShowDayGateScreen(false)}
+              style={{
+                width: '100%', border: 'none', cursor: 'pointer',
+                padding: '14px 0', borderRadius: 16,
+                background: 'rgba(0,0,0,0.1)', color: 'rgba(0,0,0,0.6)',
+                fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 15,
+              }}
+            >
+              Back to my path
+            </button>
+          </div>
+        </div>
       )}
     </div>
   )
