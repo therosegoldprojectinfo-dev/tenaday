@@ -454,7 +454,7 @@ function FinishedScreen({ payout, node, saving, onExit }) {
 
 // ── Lesson screen (Learn node) ────────────────────────────────────────────
 
-function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, coinBalance, onExit, onBalanceChange }) {
+function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, coinBalance, kidCurrentStep, onExit, onBalanceChange }) {
   const [saving, setSaving] = useState(false)
   const payout = NODE_PAYOUT
 
@@ -463,8 +463,11 @@ function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, c
     try {
       const next = nextStep(operation, table, batchNum, node)
       const newBalance = coinBalance + payout
+      const isForward = !next || !kidCurrentStep ||
+        stepIndex(next.operation, next.table, next.batch, next.node) >
+        stepIndex(kidCurrentStep.operation, kidCurrentStep.table, kidCurrentStep.batch, normalizeNode(kidCurrentStep.node))
       await Promise.all([
-        next && kidId ? updateProgress(kidId, next) : Promise.resolve(),
+        (next && kidId && isForward) ? updateProgress(kidId, next) : Promise.resolve(),
         kidId ? setCoinBalance(kidId, newBalance) : Promise.resolve(),
         kidId ? logCoinTransaction(kidId, { amount: payout, reason: 'lesson_complete', balanceAfter: newBalance }) : Promise.resolve(),
       ])
@@ -789,6 +792,7 @@ export default function Practice({
         node={node}
         kidId={kidId}
         coinBalance={coinBalance}
+        kidCurrentStep={kidCurrentStep}
         onExit={onExit}
         onBalanceChange={onBalanceChange}
       />
