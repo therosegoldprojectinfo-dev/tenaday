@@ -244,7 +244,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   const [selectedDay, setSelectedDay] = useState(null)
   const [openNode, setOpenNode] = useState(null)
   const [dayGateBlocked, setDayGateBlocked] = useState(false)
-  const [showDayGateScreen, setShowDayGateScreen] = useState(false)
   const [tooltip, setTooltip] = useState(null)
   const [visibleUnit, setVisibleUnit] = useState(1)
   const unitRefs = useRef({})       // DOM elements, used for scrollIntoView
@@ -322,10 +321,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       : 0
 
   function handleTogglePopover(table, batch, node, status, isCurrent) {
-    if (status === 'day_locked') {
-      setShowDayGateScreen(true)
-      return
-    }
     setOpenNode(prev =>
       prev && prev.table === table && prev.batch === batch && prev.node === node
         ? null
@@ -599,6 +594,17 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
                   style={{ backgroundColor: '#e5e7eb', color: '#9ca3af', boxShadow: '0 4px 0 #d1d5db', cursor: 'default' }}
                 >
                   🔒 NOT YET UNLOCKED
+                </button>
+              </>
+            ) : openNode.status === 'day_locked' ? (
+              <>
+                <p className="font-body text-sm text-gray-400 mb-5">You've done enough for today — come back tomorrow to continue!</p>
+                <button
+                  disabled
+                  className="w-full py-4 rounded-2xl font-body font-bold text-base tracking-widest"
+                  style={{ backgroundColor: '#fef3c7', color: '#d97706', boxShadow: '0 4px 0 #fcd34d', cursor: 'default' }}
+                >
+                  ⏰ COME BACK TOMORROW
                 </button>
               </>
             ) : (
