@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { OPERATIONS, eraStatus, eraProgress } from '../lib/progression'
 import { fetchKid, fetchStreak } from '../lib/kidData'
-import { DEBT_FLOOR } from '../lib/economy'
+
 
 const CARD_BLUE  = '#DDF0FB'
 
@@ -197,8 +197,6 @@ export default function Map({ onOpenChapter, kidId }) {
   }
 
 
-  const inDebt = kid.coin_balance < 0
-  const atDebtFloor = kid.coin_balance <= DEBT_FLOOR
 
   return (
     <div className="min-h-screen bg-white">
@@ -216,26 +214,20 @@ export default function Map({ onOpenChapter, kidId }) {
             <div className="relative">
               <button onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')} className="flex items-center gap-1.5 active:scale-95 transition-transform">
                 <CoinStatIcon />
-                <span className={`font-body font-bold text-base leading-none tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-700'}`}>{kid.coin_balance}</span>
+                <span className={'font-body font-bold text-base leading-none tabular-nums text-amber-700'}>{kid.coin_balance}</span>
               </button>
               {tooltip === 'coins' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
                   <p className="mb-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="56" height="56" alt="" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
-                  <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>{kid.coin_balance}</p>
-                  <p className="font-body text-xs text-gray-400 mt-1">{inDebt ? "You're in debt — keep playing to earn coins back!" : 'Earn coins by completing activities.'}</p>
+                  <p className={'font-body font-bold text-lg mt-1 tabular-nums text-amber-600'}>{kid.coin_balance}</p>
+                  <p className="font-body text-xs text-gray-400 mt-1">Earn coins by completing activities.</p>
                 </div>
               )}
             </div>
           </div>
         </div>
       </div>
-
-      {atDebtFloor && (
-        <div className="mx-4 mt-3 rounded-xl bg-red-50 border border-red-100 px-3 py-2 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
-          <p className="font-body text-xs text-red-500 font-semibold">Coins are low — retries are free until you earn some back. Keep playing!</p>
-        </div>
-      )}
 
       <div className="max-w-sm md:max-w-3xl lg:max-w-5xl mx-auto px-4 py-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {OPERATIONS.map(operation => {
