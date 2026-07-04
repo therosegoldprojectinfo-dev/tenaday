@@ -621,26 +621,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </>
       )}
 
-          />
-
-          {/* Single button */}
-          <div style={{ width: '100%', maxWidth: 340 }}>
-            <button
-              onClick={() => setShowDayGateScreen(false)}
-              style={{
-                width: '100%', border: 'none', cursor: 'pointer',
-                padding: '18px 0', borderRadius: 16,
-                background: '#58cc02', boxShadow: '0 5px 0 #46a302',
-                color: '#fff', fontFamily: "'Baloo 2', sans-serif",
-                fontWeight: 800, fontSize: 18, letterSpacing: '0.05em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Go enjoy your rewards! 🎁
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
