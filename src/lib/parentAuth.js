@@ -1,50 +1,24 @@
 import { supabase } from './supabaseClient'
-import { hashPin, verifyPin } from './pinAuth'
+import { hashPin, hashPinWithSalt } from './pinAuth'
 
 // ── Session persistence ──────────────────────────────────────────────────
-// This is the real deployed app (not a Claude.ai artifact), so plain
-// localStorage is the correct, normal tool here — artifacts specifically
-// can't use it, but a standalone Vite/React app has no such restriction.
-// Stores only the parent's id (not the PIN, not the hash) — session
-// "security" here is intentionally light: this app has no sensitive data
-// beyond a kid's math progress, and the actual PIN check already happened
-// once at login. Re-authenticating on every page load would be bad UX for
-// a kid's app that may stay open on a shared family tablet for weeks.
-
 const SESSION_KEY = 'tenaday_parent_id'
 
 export function saveSession(parentId) {
-  try {
-    localStorage.setItem(SESSION_KEY, parentId)
-  } catch (err) {
-    // localStorage can throw in rare cases (private browsing, storage
-    // quota) — non-fatal, just means the parent has to log in again next
-    // visit instead of staying signed in.
+  try { localStorage.setItem(SESSION_KEY, parentId) } catch (err) {
     console.error('Failed to persist session (login still succeeded):', err)
   }
 }
 
 export function getSession() {
-  try {
-    return localStorage.getItem(SESSION_KEY)
-  } catch {
-    return null
-  }
+  try { return localStorage.getItem(SESSION_KEY) } catch { return null }
 }
 
 export function clearSession() {
-  try {
-    localStorage.removeItem(SESSION_KEY)
-  } catch {
-    // ignore — nothing meaningful to do if this fails
-  }
+  try { localStorage.removeItem(SESSION_KEY) } catch {}
 }
 
 // ── Phone number normalization ──────────────────────────────────────────
-// Strips everything except digits and a leading +, so "555-123-4567",
-// "(555) 123-4567", and "5551234567" all match the same stored value
-// instead of silently creating duplicate accounts for the same person.
-
 export function normalizePhone(raw) {
   const trimmed = raw.trim()
   const hasPlus = trimmed.startsWith('+')
@@ -52,73 +26,70 @@ export function normalizePhone(raw) {
   return hasPlus ? `+${digitsOnly}` : digitsOnly
 }
 
-// ── Parent signup / login ───────────────────────────────────────────────
-
+// ── Auth errors ──────────────────────────────────────────────────────────
 export class AuthError extends Error {}
 
-/** Creates a new parent account. Throws AuthError with a user-facing
- *  message for expected failure cases (phone already registered, bad PIN
- *  format) — anything else (network/Supabase errors) throws the raw error
- *  so it isn't silently mislabeled as a validation problem. */
+// ── Parent signup ────────────────────────────────────────────────────────
+// PIN hashing still happens client-side (PBKDF2 via WebCrypto).
+// The resulting hash is sent to the server-side RPC — the anon key
+// never reads the parents table directly anymore.
+
 export async function signUp(phoneRaw, pin) {
   const phone = normalizePhone(phoneRaw)
-  if (phone.length < 7) {
-    throw new AuthError('Enter a valid phone number.')
-  }
-  if (!/^\d{4}$/.test(pin)) {
-    throw new AuthError('PIN must be exactly 4 digits.')
-  }
-
-  const { data: existing, error: checkError } = await supabase
-    .from('parents')
-    .select('id')
-    .eq('phone', phone)
-    .maybeSingle()
-
-  if (checkError) throw checkError
-  if (existing) {
-    throw new AuthError('An account with this phone number already exists. Try logging in instead.')
-  }
+  if (phone.length < 7) throw new AuthError('Enter a valid phone number.')
+  if (!/^\d{4}$/.test(pin)) throw new AuthError('PIN must be exactly 4 digits.')
 
   const pinHash = await hashPin(pin)
 
-  const { data, error } = await supabase
-    .from('parents')
-    .insert({ phone, pin_hash: pinHash })
-    .select('id')
-    .single()
+  const { data, error } = await supabase.rpc('parent_sign_up', {
+    p_phone: phone,
+    p_pin_hash: pinHash,
+  })
 
-  if (error) throw error
+  if (error) {
+    if (error.message?.includes('PHONE_EXISTS')) {
+      throw new AuthError('An account with this phone number already exists. Try logging in instead.')
+    }
+    throw error
+  }
 
-  saveSession(data.id)
-  return data.id
+  saveSession(data)
+  return data
 }
 
-/** Logs in an existing parent. Throws AuthError for wrong phone/PIN
- *  (intentionally the SAME generic message for "no such phone" and "wrong
- *  PIN" — distinguishing them would let an attacker enumerate which phone
- *  numbers have accounts). */
+// ── Parent login ─────────────────────────────────────────────────────────
+// To verify the PIN server-side without sending the raw PIN over the wire,
+// we need the stored salt to recompute the PBKDF2 hash client-side first.
+// Step 1: fetch only the salt (not the full hash) via a safe RPC.
+// Step 2: recompute the hash client-side using the salt.
+// Step 3: send the computed hash to the server for comparison.
+// The full pin_hash never leaves the server — anon key can't read parents table.
+
 export async function logIn(phoneRaw, pin) {
   const phone = normalizePhone(phoneRaw)
 
-  const { data, error } = await supabase
-    .from('parents')
-    .select('id, pin_hash')
-    .eq('phone', phone)
-    .maybeSingle()
+  // Step 1: get salt for this phone (safe — returns fake salt if phone not found)
+  const { data: saltHex, error: saltError } = await supabase.rpc('get_parent_salt', {
+    p_phone: phone,
+  })
+  if (saltError) throw saltError
 
-  if (error) throw error
-  if (!data) {
+  // Step 2: recompute hash client-side using the stored salt
+  const pinHash = await hashPinWithSalt(pin, saltHex)
+
+  // Step 3: verify server-side — returns parent_id or null
+  const { data: parentId, error: loginError } = await supabase.rpc('parent_log_in', {
+    p_phone: phone,
+    p_pin_hash: pinHash,
+  })
+  if (loginError) throw loginError
+
+  if (!parentId) {
     throw new AuthError('Incorrect phone number or PIN.')
   }
 
-  const valid = await verifyPin(pin, data.pin_hash)
-  if (!valid) {
-    throw new AuthError('Incorrect phone number or PIN.')
-  }
-
-  saveSession(data.id)
-  return data.id
+  saveSession(parentId)
+  return parentId
 }
 
 export function logOut() {
@@ -126,32 +97,18 @@ export function logOut() {
 }
 
 // ── Kid profile CRUD ─────────────────────────────────────────────────────
-
-/** Lists every kid profile belonging to a parent, for the Netflix-style
- *  "who's playing" picker. Ordered by creation date so new profiles
- *  appear at the end, not in a confusing random order. */
 export async function listKidsForParent(parentId) {
   const { data, error } = await supabase
     .from('kids')
     .select('id, name, age, coin_balance, current_operation, current_table')
     .eq('parent_id', parentId)
     .order('created_at', { ascending: true })
-
   if (error) throw error
   return data
 }
 
-/** Creates a new kid profile under a parent. Every kid always starts at
- *  the very beginning of the ladder (Addition, table 1, node 'learn',
- *  Unlock skipped) regardless of placementClaim — see
- *  lib/progression.js's firstEverNode()/shouldSkipUnlock() docs for why
- *  this is a deliberate product decision, not a missing feature.
- *  placementClaim only affects the PASS THRESHOLD later (lib/economy.js),
- *  never where a kid starts playing. */
 export async function createKid(parentId, { name, age, placementClaim, timezone }) {
-  if (!name || !name.trim()) {
-    throw new AuthError('Enter a name for your kid.')
-  }
+  if (!name || !name.trim()) throw new AuthError('Enter a name for your kid.')
 
   const { data, error } = await supabase
     .from('kids')
@@ -169,7 +126,6 @@ export async function createKid(parentId, { name, age, placementClaim, timezone 
     })
     .select('id')
     .single()
-
   if (error) throw error
   return data.id
 }
