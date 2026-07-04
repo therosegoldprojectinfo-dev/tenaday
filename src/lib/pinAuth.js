@@ -97,3 +97,20 @@ export async function verifyPin(pin, storedHash) {
   }
   return diff === 0
 }
+
+/** Recomputes a PBKDF2 hash using a KNOWN salt (hex string).
+ *  Used during login: we fetch the salt from the server, recompute the hash
+ *  client-side, then send only the hash (never the raw PIN) for comparison.
+ *  Returns the full stored-hash-format string: "pbkdf2$<saltHex>$<hashHex>" */
+export async function hashPinWithSalt(pin, saltHex) {
+  if (!/^\d{4}$/.test(pin)) throw new Error('PIN must be exactly 4 digits')
+  if (saltHex === 'not_found') {
+    // Phone not found — generate fake hash to prevent timing attacks
+    const fakeSalt = crypto.getRandomValues(new Uint8Array(16))
+    const fakeHash = await pbkdf2(pin, fakeSalt)
+    return `pbkdf2$${bufferToHex(fakeSalt)}$${fakeHash}`
+  }
+  const saltBytes = hexToBuffer(saltHex)
+  const hashHex = await pbkdf2(pin, saltBytes)
+  return `pbkdf2$${saltHex}$${hashHex}`
+}
