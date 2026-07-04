@@ -120,9 +120,9 @@ export default function Rewards({ kidId, parentId }) {
   const [kid, setKid] = useState(null)
   const [gifts, setGifts] = useState(null)
   const [error, setError] = useState(null)
-  const [confirming, setConfirming] = useState(null) // the gift pending purchase confirmation
+  const [confirming, setConfirming] = useState(null)
   const [purchasing, setPurchasing] = useState(false)
-  const [justBought, setJustBought] = useState(null) // gift name, for a brief success toast
+  const [unlockedReward, setUnlockedReward] = useState(null) // full celebration screen
 
   async function loadAll() {
     try {
@@ -147,15 +147,10 @@ export default function Rewards({ kidId, parentId }) {
     if (!confirming || !kid) return
     setPurchasing(true)
     try {
-      // Re-fetch the kid's CURRENT balance right before purchasing rather
-      // than trusting the balance already in state — it could have
-      // changed (e.g. the kid played a node in another tab) since this
-      // screen first loaded. purchaseGift() also re-validates server-side.
       const freshKid = await fetchKid(kidId)
       const newBalance = await purchaseGift(kidId, confirming, freshKid.coin_balance)
       setKid(k => ({ ...k, coin_balance: newBalance }))
-      setJustBought(confirming.name)
-      setTimeout(() => setJustBought(null), 2500)
+      setUnlockedReward(confirming) // show celebration screen
     } catch (err) {
       console.error('Purchase failed:', err)
       setError(err)
@@ -180,6 +175,101 @@ export default function Rewards({ kidId, parentId }) {
             RETRY
           </button>
         </div>
+      </div>
+    )
+  }
+
+  // ── Reward unlocked celebration screen ───────────────────────────────
+  if (unlockedReward) {
+    return (
+      <div style={{
+        minHeight: '100dvh', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center',
+        background: 'radial-gradient(ellipse at 50% 35%, #3d2800 0%, #1a1000 50%, #0a0800 100%)',
+        padding: '40px 24px', boxSizing: 'border-box', position: 'relative', overflow: 'hidden',
+      }}>
+        {/* Golden rays background */}
+        <div style={{
+          position: 'absolute', top: '20%', left: '50%', transform: 'translateX(-50%)',
+          width: 340, height: 340, borderRadius: '50%',
+          background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255,200,0,0.07) 10deg, transparent 20deg, rgba(255,200,0,0.07) 30deg, transparent 40deg, rgba(255,200,0,0.07) 50deg, transparent 60deg, rgba(255,200,0,0.07) 70deg, transparent 80deg, rgba(255,200,0,0.07) 90deg, transparent 100deg, rgba(255,200,0,0.07) 110deg, transparent 120deg, rgba(255,200,0,0.07) 130deg, transparent 140deg, rgba(255,200,0,0.07) 150deg, transparent 160deg, rgba(255,200,0,0.07) 170deg, transparent 180deg, rgba(255,200,0,0.07) 190deg, transparent 200deg, rgba(255,200,0,0.07) 210deg, transparent 220deg, rgba(255,200,0,0.07) 230deg, transparent 240deg, rgba(255,200,0,0.07) 250deg, transparent 260deg, rgba(255,200,0,0.07) 270deg, transparent 280deg, rgba(255,200,0,0.07) 290deg, transparent 300deg, rgba(255,200,0,0.07) 310deg, transparent 320deg, rgba(255,200,0,0.07) 330deg, transparent 340deg, rgba(255,200,0,0.07) 350deg, transparent 360deg)',
+          animation: 'spin-rays 12s linear infinite',
+          zIndex: 0,
+        }} />
+
+        <style>{`
+          @keyframes spin-rays { from { transform: translateX(-50%) rotate(0deg); } to { transform: translateX(-50%) rotate(360deg); } }
+          @keyframes float-up { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+          @keyframes pop-in { 0% { opacity:0; transform: scale(0.7); } 60% { transform: scale(1.1); } 100% { opacity:1; transform: scale(1); } }
+          @keyframes fade-up { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: translateY(0); } }
+          @keyframes sparkle { 0%,100% { opacity:0; transform: scale(0); } 50% { opacity:1; transform: scale(1); } }
+        `}</style>
+
+        {/* Sparkles */}
+        {[
+          { top: '12%', left: '18%', delay: '0s', size: 18 },
+          { top: '8%',  left: '72%', delay: '0.4s', size: 14 },
+          { top: '28%', left: '82%', delay: '0.7s', size: 16 },
+          { top: '32%', left: '10%', delay: '0.3s', size: 12 },
+        ].map((s, i) => (
+          <div key={i} style={{
+            position: 'absolute', top: s.top, left: s.left, zIndex: 2,
+            animation: `sparkle 2s ${s.delay} ease-in-out infinite`,
+          }}>
+            <svg width={s.size} height={s.size} viewBox="0 0 24 24">
+              <path d="M12 0 L13.5 10.5 L24 12 L13.5 13.5 L12 24 L10.5 13.5 L0 12 L10.5 10.5 Z" fill="#FFD700"/>
+            </svg>
+          </div>
+        ))}
+
+        {/* Celebration image */}
+        <div style={{ position: 'relative', zIndex: 3, animation: 'float-up 2.5s ease-in-out infinite', marginBottom: 32 }}>
+          <img
+            src="/reward-celebration.png"
+            alt="Reward"
+            style={{ width: 280, height: 'auto', display: 'block', animation: 'pop-in 0.5s ease both' }}
+          />
+        </div>
+
+        {/* Text */}
+        <div style={{ textAlign: 'center', zIndex: 3, animation: 'fade-up 0.5s 0.3s ease both', opacity: 0 }}>
+          <h1 style={{
+            fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 28,
+            color: '#FFD700', margin: '0 0 10px', textShadow: '0 0 20px rgba(255,215,0,0.5)',
+          }}>
+            Congrats! 🎉
+          </h1>
+          <p style={{
+            fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 18,
+            color: '#fff', margin: '0 0 6px',
+          }}>
+            You unlocked
+          </p>
+          <p style={{
+            fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 22,
+            color: '#FFD700', margin: '0 0 40px',
+          }}>
+            {unlockedReward.name}
+          </p>
+        </div>
+
+        {/* Golden button */}
+        <button
+          onClick={() => setUnlockedReward(null)}
+          style={{
+            zIndex: 3,
+            width: '100%', maxWidth: 340,
+            border: 'none', cursor: 'pointer',
+            padding: '18px 0', borderRadius: 16,
+            background: '#FFD700', boxShadow: '0 5px 0 #b8970a',
+            color: '#5c3d00', fontFamily: "'Baloo 2', sans-serif",
+            fontWeight: 800, fontSize: 18,
+            letterSpacing: '0.05em', textTransform: 'uppercase',
+            animation: 'fade-up 0.5s 0.5s ease both', opacity: 0,
+          }}
+        >
+          Show to your parent! →
+        </button>
       </div>
     )
   }
