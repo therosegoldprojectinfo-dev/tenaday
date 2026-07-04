@@ -19,7 +19,7 @@ import {
 } from '../lib/progression'
 import { canStartNewUnit, nextUnlockMessage } from '../lib/dayGate'
 import { fetchKid, fetchStreak, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
-import { applyEntryFee, DEBT_FLOOR } from '../lib/economy'
+
 
 const DUO_GREEN = '#58cc02'
 const DUO_GREEN_DARK = '#46a302'
@@ -340,28 +340,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       if (!allowed) { setDayGateBlocked(true); return }
     }
 
-    const isLearnNode = node === 'learn'
-    const targetPos = { operation, table, batch, node }
-    const isReplayNode = !isLearnNode && isCompleted(currentPos, targetPos)
-    const newBalance = (isLearnNode || isReplayNode) ? kid.coin_balance : applyEntryFee(kid.coin_balance)
-
-    if (!isLearnNode && !isReplayNode) {
-      try {
-        await setCoinBalance(kidId, newBalance)
-        await logCoinTransaction(kidId, { amount: newBalance - kid.coin_balance, reason: 'entry_fee', balanceAfter: newBalance })
-        setKid(k => ({ ...k, coin_balance: newBalance }))
-      } catch (err) { console.error('Failed to charge entry fee:', err) }
-    }
-
     const unlockBatch = node === 'welcome' ? previousBatch(operation, table, batch) : undefined
     const reviewPool = node === 'review' ? reviewPoolFor(operation, table, batch) : undefined
 
-    onStartNode({ operation, table, batchNum: batch, node, coinBalance: newBalance, reviewPool, unlockBatch, placementClaim: kid.placement_claim, kidCurrentStep: { operation: kid.current_operation, table: kid.current_table, batch: kid.current_batch || 1, node: normalizeNode(kid.current_node) } })
+    onStartNode({ operation, table, batchNum: batch, node, coinBalance: kid.coin_balance, reviewPool, unlockBatch, placementClaim: kid.placement_claim, kidCurrentStep: { operation: kid.current_operation, table: kid.current_table, batch: kid.current_batch || 1, node: normalizeNode(kid.current_node) } })
   }
 
-
-  const inDebt = kid.coin_balance < 0
-  const atDebtFloor = kid.coin_balance <= DEBT_FLOOR
 
   const allUnits = []
   for (let t = 1; t <= TABLE_COUNT; t++) {
@@ -479,14 +463,14 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             <div className="relative">
               <button onClick={() => setTooltip(t => t === 'coins' ? null : 'coins')} className="flex items-center gap-1.5 active:scale-95 transition-transform">
                 <CoinStatIcon />
-                <span className={`font-body font-bold text-base leading-none tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-700'}`}>{kid.coin_balance}</span>
+                <span className={'font-body font-bold text-base leading-none tabular-nums text-amber-700'}>{kid.coin_balance}</span>
               </button>
               {tooltip === 'coins' && (
                 <div className="absolute top-full mt-2 right-0 z-50 bg-white rounded-2xl shadow-xl border border-gray-100 px-4 py-3 w-44 text-center" onClick={e => e.stopPropagation()}>
                   <p className="mb-1"><img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="56" height="56" alt="" /></p>
                   <p className="font-display font-bold text-gray-900 text-sm">Coins</p>
-                  <p className={`font-body font-bold text-lg mt-1 tabular-nums ${inDebt ? 'text-red-500' : 'text-amber-600'}`}>{kid.coin_balance}</p>
-                  <p className="font-body text-xs text-gray-400 mt-1">{inDebt ? "You're in debt — keep playing!" : "Earn coins by completing activities."}</p>
+                  <p className={'font-body font-bold text-lg mt-1 tabular-nums text-amber-600'}>{kid.coin_balance}</p>
+                  <p className="font-body text-xs text-gray-400 mt-1">Earn coins by completing activities.</p>
                 </div>
               )}
             </div>
@@ -526,11 +510,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       <div className="flex-1 overflow-y-auto relative z-10">
 
         {/* Alerts */}
-        {atDebtFloor && (
-          <div className="mx-4 mt-3 rounded-xl bg-red-50 border border-red-100 px-3 py-2 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto">
-            <p className="font-body text-xs text-red-500 font-semibold">Coins are low — retries are free until you earn some back. Keep playing!</p>
-          </div>
-        )}
         {dayGateBlocked && (
           <div className="mx-4 mt-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 max-w-sm md:max-w-3xl lg:max-w-5xl md:mx-auto flex items-start justify-between gap-3">
             <p className="font-body text-sm text-amber-800 font-semibold leading-snug">{nextUnlockMessage(kid.next_unlock_at)}</p>
