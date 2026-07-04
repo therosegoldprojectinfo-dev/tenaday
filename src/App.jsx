@@ -394,7 +394,7 @@ export default function App() {
 
   let content
   if (navTab === 'rewards') {
-    content = <Rewards kidId={kidId} parentId={parentId} />
+    content = <Rewards kidId={kidId} parentId={parentId} onGoToParent={() => setShowParentPin(true)} />
   } else if (navTab === 'profile') {
     content = <Profile kidId={kidId} onSwitchProfile={handleSwitchProfile} />
   } else if (screen === 'path' && activeChapter) {
