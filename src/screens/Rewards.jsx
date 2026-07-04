@@ -313,13 +313,6 @@ export default function Rewards({ kidId, parentId }) {
           </div>
         )}
 
-        {justBought && (
-          <div className="rounded-2xl bg-green-50 border border-green-100 px-4 py-3 mb-5">
-            <p className="font-body text-sm text-green-700 font-semibold">
-              You got "{justBought}"! Ask your parent to make it happen.
-            </p>
-          </div>
-        )}
 
         {gifts.length === 0 ? (
           <div className="rounded-2xl bg-gray-50 border border-gray-100 px-4 py-8 text-center">
