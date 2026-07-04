@@ -621,33 +621,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
         </>
       )}
 
-      {/* ── Day gate celebration screen ── */}
-      {showDayGateScreen && (
-        <div style={{
-          position: 'fixed', inset: 0, zIndex: 100,
-          backgroundColor: '#FFF5B0',
-          display: 'flex', flexDirection: 'column',
-          alignItems: 'center', justifyContent: 'space-between',
-          padding: '48px 24px 40px',
-          boxSizing: 'border-box',
-        }}>
-          {/* Top text */}
-          <div style={{ textAlign: 'center' }}>
-            <h1 style={{
-              fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 32,
-              color: '#1a1a1a', margin: '0 0 8px',
-            }}>You crushed it today! 🎉</h1>
-            <p style={{
-              fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 17,
-              color: 'rgba(0,0,0,0.55)', margin: 0,
-            }}>Come back tomorrow to keep your streak going!</p>
-          </div>
-
-          {/* Mascot image */}
-          <img
-            src="/24hlockdaygate.png"
-            alt="Numio celebrating"
-            style={{ width: '100%', maxWidth: 340, objectFit: 'contain', flex: 1, maxHeight: 440 }}
           />
 
           {/* Single button */}
