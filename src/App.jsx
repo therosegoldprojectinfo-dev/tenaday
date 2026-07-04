@@ -368,6 +368,7 @@ export default function App() {
           node={activeNode.node}
           kidId={kidId}
           isFirstEver={isFirstEver}
+          kidCurrentStep={activeNode.kidCurrentStep}
           onDone={handleExitPractice}
         />
       )
