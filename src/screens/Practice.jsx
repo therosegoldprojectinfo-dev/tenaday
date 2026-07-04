@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect, useRef } from 'react'
 import { generateBatch } from '../lib/problems'
 import { generateHint } from '../lib/hints'
 import { themeFor } from '../lib/eraTheme'
-import { nodeLabel, nextStep, normalizeNode, OPERATIONS } from '../lib/progression'
+import { nodeLabel, nextStep, normalizeNode, OPERATIONS, stepIndex } from '../lib/progression'
 import { payoutForNode, NODE_PAYOUT } from '../lib/economy'
 import {
   updateProgress,
@@ -753,12 +753,19 @@ export default function Practice({
     const newBalance = coinBalance + basePayout
     try {
       const next = nextStep(operation, table, batchNum, node)
+
+      // 🔑 Forward-only guard — never move the cursor backwards.
+      // If a kid replays a completed node, kidCurrentStep is ahead of next,
+      // so we skip updateProgress entirely to protect their real progress.
+      const isForward = !next || !kidCurrentStep ||
+        stepIndex(next.operation, next.table, next.batch, next.node) >
+        stepIndex(kidCurrentStep.operation, kidCurrentStep.table, kidCurrentStep.batch, normalizeNode(kidCurrentStep.node))
+
       await Promise.all([
-        next && kidId ? updateProgress(kidId, next) : Promise.resolve(),
+        (next && kidId && isForward) ? updateProgress(kidId, next) : Promise.resolve(),
         kidId ? setCoinBalance(kidId, newBalance) : Promise.resolve(),
         kidId ? logCoinTransaction(kidId, { amount: basePayout, reason: 'node_pass', balanceAfter: newBalance }) : Promise.resolve(),
         kidId ? logAttempt(kidId, { operation, table, node, questionsSeen: questions.length, correctCount: questions.length - wrong, wrongCount: wrong, livesUsed: 0, result: 'passed', coinsDelta: basePayout }) : Promise.resolve(),
-        // 🔑 Stamp the day gate when Review completes — sets next_unlock_at to next midnight
         (node === 'review' && kidId) ? stampAdvanceDate(kidId) : Promise.resolve(),
       ])
       onBalanceChange?.(newBalance)
