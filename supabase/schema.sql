@@ -270,32 +270,6 @@ on conflict (id) do update set
   current_batch = excluded.current_batch,
   current_node = excluded.current_node;
 
--- ── Seed: starter rewards (spec §8), global (parent_id null) ────────────
--- A small placeholder list so the Rewards screen has real content before
--- a parent-management UI exists to let each parent build their own list.
--- Prices are example values, same "tune during build" spirit as the
--- economy constants in lib/economy.js — easy to adjust once real kids are
--- actually playing and the numbers can be balanced against real coin
--- earn rates.
---
--- Guarded by "only insert if no global gifts exist yet" rather than an
--- ON CONFLICT clause, since gifts has no unique constraint for ON
--- CONFLICT to target (its only unique column is the auto-generated id,
--- which is different on every insert and so can never conflict) — without
--- this guard, re-running schema.sql would silently duplicate the seed
--- rewards on every run.
-
-insert into gifts (name, coin_price, icon)
-select * from (values
-  ('20 minutes of TV',        120, 'tv'),
-  ('Pick tonight''s dinner',  150, 'utensils'),
-  ('Stay up 30 minutes late', 200, 'moon'),
-  ('A trip to the park',      250, 'tree'),
-  ('Choose a movie night',    300, 'film'),
-  ('A small toy',             500, 'gift')
-) as starter_gifts(name, coin_price, icon)
-where not exists (select 1 from gifts where parent_id is null);
-
 -- ── Server-time day gate (replaces device-clock last_advance_date check) ──
 -- timezone: IANA timezone string detected from the kid's device at profile
 -- creation, used to compute "next midnight" server-side so the gate never
