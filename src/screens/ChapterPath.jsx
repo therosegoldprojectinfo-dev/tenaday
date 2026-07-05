@@ -235,7 +235,7 @@ function StreakTooltip({ streak, align = 'left' }) {
   )
 }
 
-export default function ChapterPath({ operation, onStartNode, onBack, kidId, parentId, onGoToParent }) {
+export default function ChapterPath({ operation, onStartNode, onBack, kidId, parentId, onGoToParent, onGoToRewards }) {
   if (!kidId) throw new Error('ChapterPath: kidId is required')
   const [kid, setKid] = useState(null)
   const [streak, setStreak] = useState(0)
@@ -383,7 +383,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
           0%,100% { transform: translateY(0px); }
           50%      { transform: translateY(-10px); }
         }
-        @keyframes confetti-rise {
+        @keyframes daygate-confetti {
           0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
           100% { transform: translateY(-110vh) rotate(720deg); opacity: 0.2; }
         }
@@ -611,17 +611,6 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
                   🔒 NOT YET UNLOCKED
                 </button>
               </>
-            ) : openNode.status === 'day_locked' ? (
-              <>
-                <p className="font-body text-sm text-gray-400 mb-5">You've done enough for today — come back tomorrow to continue!</p>
-                <button
-                  disabled
-                  className="w-full py-4 rounded-2xl font-body font-bold text-base tracking-widest"
-                  style={{ backgroundColor: '#fef3c7', color: '#d97706', boxShadow: '0 4px 0 #fcd34d', cursor: 'default' }}
-                >
-                  ⏰ COME BACK TOMORROW
-                </button>
-              </>
             ) : (
               <>
                 <p className="font-body text-sm text-gray-400 mb-5">
@@ -664,7 +653,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
               width: c.size, height: c.size,
               borderRadius: i % 2 === 0 ? '50%' : 3,
               backgroundColor: c.color,
-              animation: `confetti-rise ${c.dur} ${c.delay} linear infinite`,
+              animation: `daygate-confetti ${c.dur} ${c.delay} linear infinite`,
               zIndex: 0,
             }} />
           ))}
@@ -695,7 +684,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
           {/* Button */}
           <div style={{ width: '100%', maxWidth: 340, zIndex: 1 }}>
             <button
-              onClick={() => setShowDayGateScreen(false)}
+              onClick={() => { setShowDayGateScreen(false); onGoToRewards?.() }}
               style={{
                 width: '100%', border: 'none', cursor: 'pointer',
                 padding: '18px 0', borderRadius: 16,
