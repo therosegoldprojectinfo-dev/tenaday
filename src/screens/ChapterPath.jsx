@@ -246,9 +246,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
   const [dayGateBlocked, setDayGateBlocked] = useState(false)
   const [tooltip, setTooltip] = useState(null)
   const [visibleUnit, setVisibleUnit] = useState(1)
-  const [hasRewards, setHasRewards] = useState(true) // optimistic — assume true until checked
+  const [hasRewards, setHasRewards] = useState(true)
   const [showNoRewards, setShowNoRewards] = useState(false)
   const [showParentPopup, setShowParentPopup] = useState(false)
+  const [showDayGateScreen, setShowDayGateScreen] = useState(false)
   const unitRefs = useRef({})       // DOM elements, used for scrollIntoView
   const unitObservers = useRef({})  // IntersectionObserver instances, used for cleanup
   const hasScrolled = useRef(false)
@@ -325,11 +326,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
       : 0
 
   function handleTogglePopover(table, batch, node, status, isCurrent) {
-    // If no rewards set up, block ALL node taps
-    if (!hasRewards) {
-      setShowNoRewards(true)
-      return
-    }
+    if (!hasRewards) { setShowNoRewards(true); return }
+    if (status === 'day_locked') { setShowDayGateScreen(true); return }
     setOpenNode(prev =>
       prev && prev.table === table && prev.batch === batch && prev.node === node
         ? null
@@ -384,6 +382,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
         @keyframes mascot-float {
           0%,100% { transform: translateY(0px); }
           50%      { transform: translateY(-10px); }
+        }
+        @keyframes confetti-fall {
+          0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(110vh) rotate(720deg); opacity: 0.3; }
         }
         @keyframes nm-shine {
           0% { transform: translateX(-130%) skewX(-18deg); }
@@ -632,6 +634,70 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
             )}
           </div>
         </>
+      )}
+
+      {/* ── Day gate celebration screen ── */}
+      {showDayGateScreen && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          background: '#fff',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'space-between',
+          padding: '40px 24px 48px', boxSizing: 'border-box',
+          overflow: 'hidden',
+        }}>
+          {/* Floating confetti */}
+          {[
+            { left: '8%',  color: '#58cc02', size: 14, dur: '3.2s', delay: '0s',    shape: 'rect' },
+            { left: '20%', color: '#1CB0F6', size: 10, dur: '2.8s', delay: '0.3s',  shape: 'circle' },
+            { left: '35%', color: '#FF9600', size: 12, dur: '3.5s', delay: '0.6s',  shape: 'rect' },
+            { left: '50%', color: '#CE82FF', size: 16, dur: '2.6s', delay: '0.1s',  shape: 'circle' },
+            { left: '65%', color: '#FF4B4B', size: 11, dur: '3.8s', delay: '0.4s',  shape: 'rect' },
+            { left: '78%', color: '#FFD700', size: 13, dur: '3.0s', delay: '0.7s',  shape: 'circle' },
+            { left: '88%', color: '#58cc02', size: 10, dur: '2.9s', delay: '0.2s',  shape: 'rect' },
+            { left: '14%', color: '#FF9600', size: 15, dur: '3.4s', delay: '0.9s',  shape: 'circle' },
+            { left: '42%', color: '#1CB0F6', size: 9,  dur: '2.7s', delay: '0.5s',  shape: 'rect' },
+            { left: '72%', color: '#CE82FF', size: 12, dur: '3.6s', delay: '0.8s',  shape: 'circle' },
+          ].map((c, i) => (
+            <div key={i} style={{
+              position: 'absolute', top: -20, left: c.left,
+              width: c.size, height: c.size,
+              borderRadius: c.shape === 'circle' ? '50%' : 3,
+              backgroundColor: c.color,
+              animation: `confetti-fall ${c.dur} ${c.delay} linear infinite`,
+              zIndex: 0,
+            }} />
+          ))}
+
+          {/* Mascot */}
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1 }}>
+            <img
+              src="/daygate-mascot.png"
+              alt="Numio chilling"
+              style={{
+                width: '100%', maxWidth: 320, objectFit: 'contain',
+                animation: 'mascot-float 2.5s ease-in-out infinite',
+              }}
+            />
+          </div>
+
+          {/* Button */}
+          <div style={{ width: '100%', maxWidth: 340, zIndex: 1 }}>
+            <button
+              onClick={() => setShowDayGateScreen(false)}
+              style={{
+                width: '100%', border: 'none', cursor: 'pointer',
+                padding: '18px 0', borderRadius: 16,
+                background: '#58cc02', boxShadow: '0 5px 0 #46a302',
+                color: '#fff', fontFamily: "'Baloo 2', sans-serif",
+                fontWeight: 800, fontSize: 17, letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+              }}
+            >
+              I will go enjoy my rewards! 🎁
+            </button>
+          </div>
+        </div>
       )}
 
       {/* ── No rewards screen ── */}
