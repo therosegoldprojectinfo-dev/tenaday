@@ -396,7 +396,7 @@ export default function App() {
 
   let content
   if (navTab === 'rewards') {
-    content = <Rewards kidId={kidId} parentId={parentId} onGoToParent={() => setShowParentPin(true)} />
+    content = <Rewards kidId={kidId} parentId={parentId} onGoToParent={() => { setParentDashInitialTab('claims'); setShowParentPin(true) }} />
   } else if (navTab === 'profile') {
     content = <Profile kidId={kidId} onSwitchProfile={handleSwitchProfile} />
   } else if (screen === 'path' && activeChapter) {
@@ -409,6 +409,7 @@ export default function App() {
         onStartNode={handleStartNode}
         onBack={handleBackToList}
         onGoToParent={() => { setParentDashInitialTab('rewards'); setShowParentPin(true) }}
+        onGoToRewards={() => { setNavTab('rewards') }}
       />
     )
   } else {
