@@ -259,7 +259,7 @@ function AddRewardSheet({ parentId, onAdded, onClose }) {
 }
 
 // ── Main parent dashboard ──────────────────────────────────────────────────
-export default function ParentDashboard({ parentId, onBack, onAddKid }) {
+export default function ParentDashboard({ parentId, onBack, onAddKid, initialTab = 'kids' }) {
   const [kids,        setKids]        = useState([])
   const [kidStats,    setKidStats]    = useState({})
   const [kidStreaks,   setKidStreaks]   = useState({})
@@ -268,7 +268,7 @@ export default function ParentDashboard({ parentId, onBack, onAddKid }) {
   const [loading,     setLoading]     = useState(true)
   const [viewingKid, setViewingKid] = useState(null)
   const [showAddReward, setShowAddReward] = useState(false)
-  const [activeTab,   setActiveTab]   = useState('kids') // 'kids' | 'rewards' | 'claims' | 'coins'
+  const [activeTab,   setActiveTab]   = useState(initialTab)
   const [coinHistory, setCoinHistory] = useState([])
   const [coinKidId,   setCoinKidId]   = useState(null)
   const [coinLoading, setCoinLoading] = useState(false)
