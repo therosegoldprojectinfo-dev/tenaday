@@ -41,6 +41,7 @@ export default function App() {
   const [selectedTables, setSelectedTables] = useState([]) // tables the kid picked in TablePicker
   const [showParentPin, setShowParentPin]   = useState(false)
   const [showParentDash, setShowParentDash] = useState(false)
+  const [parentDashInitialTab, setParentDashInitialTab] = useState('kids')
 
   // Game-level navigation state (only meaningful once authPhase === 'game')
   const [navTab, setNavTab] = useState('home') // 'home' | 'rewards' | 'profile'
@@ -407,7 +408,7 @@ export default function App() {
         parentId={parentId}
         onStartNode={handleStartNode}
         onBack={handleBackToList}
-        onGoToParent={() => setShowParentPin(true)}
+        onGoToParent={() => { setParentDashInitialTab('rewards'); setShowParentPin(true) }}
       />
     )
   } else {
@@ -429,9 +430,11 @@ export default function App() {
     return (
       <ParentDashboard
         parentId={parentId}
-        onBack={() => setShowParentDash(false)}
+        initialTab={parentDashInitialTab}
+        onBack={() => { setShowParentDash(false); setParentDashInitialTab('kids') }}
         onAddKid={() => {
           setShowParentDash(false)
+          setParentDashInitialTab('kids')
           setAuthPhase('createKid')
         }}
       />
