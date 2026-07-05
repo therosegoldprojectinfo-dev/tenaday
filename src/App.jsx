@@ -422,7 +422,7 @@ export default function App() {
       <ParentPinEntry
         parentId={parentId}
         onSuccess={() => { setShowParentPin(false); setShowParentDash(true) }}
-        onBack={() => setShowParentPin(false)}
+        onBack={() => { setShowParentPin(false); setParentDashInitialTab('kids') }}
       />
     )
   }
@@ -443,7 +443,7 @@ export default function App() {
   }
 
   return (
-    <NavShell active={navTab} onNavigate={handleNavigate} onParentZone={() => setShowParentPin(true)}>
+    <NavShell active={navTab} onNavigate={handleNavigate} onParentZone={() => { setParentDashInitialTab('kids'); setShowParentPin(true) }}>
       {content}
     </NavShell>
   )
