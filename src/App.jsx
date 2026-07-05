@@ -404,8 +404,10 @@ export default function App() {
         key={`${activeChapter}-${refreshKey}`}
         operation={activeChapter}
         kidId={kidId}
+        parentId={parentId}
         onStartNode={handleStartNode}
         onBack={handleBackToList}
+        onGoToParent={() => setShowParentPin(true)}
       />
     )
   } else {
