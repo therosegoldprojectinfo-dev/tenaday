@@ -229,3 +229,9 @@ drop policy if exists "gift_claims_anon_delete" on gift_claims;
 create policy "gift_claims_anon_delete" on gift_claims
   for delete to anon
   using (true);
+
+-- ── Remove global starter rewards ─────────────────────────────────────────
+-- Default rewards (parent_id IS NULL) have been removed from the product.
+-- Parents now set up their own rewards from scratch.
+-- Run this to clean up any existing seeded rewards from the live DB.
+delete from gifts where parent_id is null;
