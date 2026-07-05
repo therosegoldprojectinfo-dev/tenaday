@@ -18,8 +18,7 @@ import {
   normalizeNode,
 } from '../lib/progression'
 import { canStartNewUnit, nextUnlockMessage } from '../lib/dayGate'
-import { fetchKid, fetchStreak, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
-import { fetchAvailableGifts } from '../lib/kidData'
+import { fetchKid, fetchStreak, setCoinBalance, logCoinTransaction, DEMO_KID_ID, fetchAvailableGifts } from '../lib/kidData'
 
 
 const DUO_GREEN = '#58cc02'
@@ -285,7 +284,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
         if (cancelled) return
         setKid(data)
         setStreak(streakData)
-        setHasRewards(gifts && gifts.length > 0)
+        setHasRewards(gifts && gifts.some(g => g.parent_id !== null))
         if (data.current_operation === operation) {
           const day = (data.current_table - 1) * BATCH_COUNT + (data.current_batch || 1)
           setSelectedDay(day)
@@ -381,6 +380,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
         @keyframes pulse-glow {
           0%, 100% { filter: drop-shadow(0 0 8px rgba(124,58,237,0.4)); }
           50% { filter: drop-shadow(0 0 18px rgba(124,58,237,0.8)); }
+        }
+        @keyframes mascot-float {
+          0%,100% { transform: translateY(0px); }
+          50%      { transform: translateY(-10px); }
         }
         @keyframes nm-shine {
           0% { transform: translateX(-130%) skewX(-18deg); }
