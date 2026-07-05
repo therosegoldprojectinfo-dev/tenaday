@@ -132,7 +132,7 @@ export default function Rewards({ kidId, parentId, onGoToParent }) {
         fetchAvailableGifts(parentId),
       ])
       setKid(kidData)
-      setGifts(giftsData)
+      setGifts(giftsData.filter(g => g.parent_id !== null))
     } catch (err) {
       console.error('Failed to load rewards:', err)
       setError(err)
