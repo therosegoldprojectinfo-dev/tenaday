@@ -326,8 +326,8 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
       : 0
 
   function handleTogglePopover(table, batch, node, status, isCurrent) {
-    // If no rewards set up, block play and show the no-rewards screen
-    if (!hasRewards && status !== 'locked' && status !== 'completed') {
+    // If no rewards set up, block ALL node taps
+    if (!hasRewards) {
       setShowNoRewards(true)
       return
     }
