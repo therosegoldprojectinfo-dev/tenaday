@@ -19,6 +19,7 @@ import {
 } from '../lib/progression'
 import { canStartNewUnit, nextUnlockMessage } from '../lib/dayGate'
 import { fetchKid, fetchStreak, setCoinBalance, logCoinTransaction, DEMO_KID_ID } from '../lib/kidData'
+import { fetchAvailableGifts } from '../lib/kidData'
 
 
 const DUO_GREEN = '#58cc02'
@@ -235,7 +236,7 @@ function StreakTooltip({ streak, align = 'left' }) {
   )
 }
 
-export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
+export default function ChapterPath({ operation, onStartNode, onBack, kidId, parentId, onGoToParent }) {
   if (!kidId) throw new Error('ChapterPath: kidId is required')
   const [kid, setKid] = useState(null)
   const [streak, setStreak] = useState(0)
@@ -246,6 +247,9 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
   const [dayGateBlocked, setDayGateBlocked] = useState(false)
   const [tooltip, setTooltip] = useState(null)
   const [visibleUnit, setVisibleUnit] = useState(1)
+  const [hasRewards, setHasRewards] = useState(true) // optimistic — assume true until checked
+  const [showNoRewards, setShowNoRewards] = useState(false)
+  const [showParentPopup, setShowParentPopup] = useState(false)
   const unitRefs = useRef({})       // DOM elements, used for scrollIntoView
   const unitObservers = useRef({})  // IntersectionObserver instances, used for cleanup
   const hasScrolled = useRef(false)
@@ -276,11 +280,12 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
 
   useEffect(() => {
     let cancelled = false
-    Promise.all([fetchKid(kidId), fetchStreak(kidId)])
-      .then(([data, streakData]) => {
+    Promise.all([fetchKid(kidId), fetchStreak(kidId), parentId ? fetchAvailableGifts(parentId) : Promise.resolve([])])
+      .then(([data, streakData, gifts]) => {
         if (cancelled) return
         setKid(data)
         setStreak(streakData)
+        setHasRewards(gifts && gifts.length > 0)
         if (data.current_operation === operation) {
           const day = (data.current_table - 1) * BATCH_COUNT + (data.current_batch || 1)
           setSelectedDay(day)
@@ -321,6 +326,11 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
       : 0
 
   function handleTogglePopover(table, batch, node, status, isCurrent) {
+    // If no rewards set up, block play and show the no-rewards screen
+    if (!hasRewards && status !== 'locked' && status !== 'completed') {
+      setShowNoRewards(true)
+      return
+    }
     setOpenNode(prev =>
       prev && prev.table === table && prev.batch === batch && prev.node === node
         ? null
@@ -619,6 +629,100 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId }) {
             )}
           </div>
         </>
+      )}
+
+      {/* ── No rewards screen ── */}
+      {showNoRewards && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 100,
+          background: '#fff',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'space-between',
+          padding: '60px 24px 48px', boxSizing: 'border-box',
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <h1 style={{
+              fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 28,
+              color: '#1a1a1a', margin: '0 0 10px',
+            }}>No rewards yet! 😤</h1>
+            <p style={{
+              fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 16,
+              color: '#6b7280', margin: 0, maxWidth: 280,
+            }}>Ask your parent to set up rewards before you can start playing!</p>
+          </div>
+
+          <img
+            src="/no-rewards-mascot.png"
+            alt="Numio is waiting"
+            style={{ width: '100%', maxWidth: 300, objectFit: 'contain', flex: 1, maxHeight: 380 }}
+          />
+
+          <div style={{ width: '100%', maxWidth: 340, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <button
+              onClick={() => setShowParentPopup(true)}
+              style={{
+                width: '100%', border: 'none', cursor: 'pointer',
+                padding: '18px 0', borderRadius: 16,
+                background: '#58cc02', boxShadow: '0 5px 0 #46a302',
+                color: '#fff', fontFamily: "'Baloo 2', sans-serif",
+                fontWeight: 800, fontSize: 17, letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+              }}
+            >
+              My parent will set up! →
+            </button>
+            <button
+              onClick={() => setShowNoRewards(false)}
+              style={{
+                width: '100%', border: 'none', cursor: 'pointer',
+                padding: '12px 0', borderRadius: 16,
+                background: 'none', color: '#9ca3af',
+                fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 14,
+              }}
+            >
+              Go back
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Are you the parent? popup ── */}
+      {showParentPopup && (
+        <div style={{
+          position: 'fixed', inset: 0, zIndex: 110,
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'flex-end',
+          background: 'rgba(0,0,0,0.5)',
+        }}>
+          <div style={{
+            background: 'white', borderRadius: '24px 24px 0 0',
+            padding: '24px 24px 40px', width: '100%', maxWidth: 480,
+            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
+          }}>
+            <div style={{ animation: 'mascot-float 1.8s ease-in-out infinite' }}>
+              <img src="/onboarding-mascot.png" alt="Numio" style={{ width: 80, height: 'auto' }} />
+            </div>
+            <p style={{
+              fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 20,
+              color: '#1a1a1a', textAlign: 'center', margin: 0,
+            }}>Are you the parent? 👋</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+              <button onClick={() => { setShowParentPopup(false); setShowNoRewards(false); onGoToParent?.() }} style={{
+                width: '100%', border: 'none', cursor: 'pointer',
+                padding: '16px 0', borderRadius: 14,
+                background: '#58cc02', boxShadow: '0 4px 0 #46a302',
+                color: '#fff', fontFamily: "'Baloo 2', sans-serif",
+                fontWeight: 800, fontSize: 16, letterSpacing: '0.05em', textTransform: 'uppercase',
+              }}>Yes, I'm the parent ✅</button>
+              <button onClick={() => setShowParentPopup(false)} style={{
+                width: '100%', border: 'none', cursor: 'pointer',
+                padding: '12px 0', borderRadius: 14,
+                background: 'none', color: '#9ca3af',
+                fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 14,
+              }}>No, go back</button>
+            </div>
+          </div>
+        </div>
       )}
 
     </div>
