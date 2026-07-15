@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { signUp, logIn, AuthError } from '../lib/parentAuth'
+import PrivacyPolicy from './PrivacyPolicy'
+import TermsAndConditions from './TermsAndConditions'
 
 function GoogleIcon() {
   return (
@@ -47,12 +49,14 @@ function PinDots({ value }) {
 }
 
 export default function Auth({ onAuthenticated, onBack }) {
-  const [mode, setMode] = useState('signup') // 'signup' | 'login'
+  const [mode, setMode] = useState('signup')
   const [phone, setPhone] = useState('')
   const [pin, setPin] = useState('')
   const [pinConfirm, setPinConfirm] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
+  const [showPrivacy, setShowPrivacy] = useState(false)
+  const [showTerms, setShowTerms] = useState(false)
 
   const isSignup = mode === 'signup'
   const pinsMismatch = isSignup && pinConfirm.length === 4 && pin !== pinConfirm
@@ -83,6 +87,9 @@ export default function Auth({ onAuthenticated, onBack }) {
       setter(digits)
     }
   }
+
+  if (showPrivacy) return <PrivacyPolicy onBack={() => setShowPrivacy(false)} />
+  if (showTerms) return <TermsAndConditions onBack={() => setShowTerms(false)} />
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -192,6 +199,31 @@ export default function Auth({ onAuthenticated, onBack }) {
             >
               {submitting ? 'PLEASE WAIT…' : isSignup ? 'CREATE ACCOUNT' : 'LOG IN'}
             </button>
+
+            {/* Legal text — only on signup */}
+            {isSignup && (
+              <p className="font-body text-xs text-gray-400 text-center leading-relaxed mt-1">
+                By creating an account, you agree to our{' '}
+                <button
+                  type="button"
+                  onClick={() => setShowTerms(true)}
+                  className="font-bold underline"
+                  style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
+                >
+                  Terms and Conditions
+                </button>
+                {' '}and our{' '}
+                <button
+                  type="button"
+                  onClick={() => setShowPrivacy(true)}
+                  className="font-bold underline"
+                  style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
+                >
+                  Privacy Policy
+                </button>
+                .
+              </p>
+            )}
           </form>
 
           <div className="flex items-center gap-3 my-6">
