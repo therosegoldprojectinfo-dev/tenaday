@@ -200,10 +200,9 @@ export default function Auth({ onAuthenticated, onBack }) {
               {submitting ? 'PLEASE WAIT…' : isSignup ? 'CREATE ACCOUNT' : 'LOG IN'}
             </button>
 
-            {/* Legal text — only on signup */}
-            {isSignup && (
+            {/* Legal text — signup and login */}
               <p className="font-body text-xs text-gray-400 text-center leading-relaxed mt-1">
-                By creating an account, you agree to our{' '}
+                By {isSignup ? 'creating an account' : 'logging in'}, you agree to our{' '}
                 <button
                   type="button"
                   onClick={() => setShowTerms(true)}
@@ -223,7 +222,6 @@ export default function Auth({ onAuthenticated, onBack }) {
                 </button>
                 .
               </p>
-            )}
           </form>
 
           <div className="flex items-center gap-3 my-6">
