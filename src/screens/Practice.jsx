@@ -941,10 +941,10 @@ export default function Practice({
         <div key={`choices-${idx}-${isRetry}`} className="flex-shrink-0 px-4 mt-2">
           {isFormula ? (
             // Formula keyboard — kid types e.g. "3 + 4"
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-1.5">
               {/* Display box */}
               <div className={[
-                'w-64 h-16 rounded-2xl border-2 flex items-center justify-center px-4',
+                'w-64 h-12 rounded-2xl border-2 flex items-center justify-center px-4',
                 revealed
                   ? normalizeFormula(selected) === normalizeFormula(q.answer)
                     ? 'border-green-400 bg-green-50'
@@ -961,19 +961,19 @@ export default function Practice({
                 </p>
               )}
               {!revealed && (
-                <div className="w-full max-w-xs flex flex-col gap-2">
+                <div className="w-full max-w-xs flex flex-col gap-1.5">
                   {/* Number row */}
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className="grid grid-cols-5 gap-1.5">
                     {[1,2,3,4,5,6,7,8,9,0].map(n => (
                       <button key={n}
                         onClick={() => setSelected(s => ((s || '') + String(n)).slice(0, 8))}
-                        className="h-12 rounded-xl font-display font-bold text-xl bg-gray-50 text-gray-800 border-2 border-gray-200 active:bg-gray-100 flex items-center justify-center">
+                        className="h-10 rounded-xl font-display font-bold text-lg bg-gray-50 text-gray-800 border-2 border-gray-200 active:bg-gray-100 flex items-center justify-center">
                         {n}
                       </button>
                     ))}
                   </div>
                   {/* Operator row */}
-                  <div className="grid grid-cols-5 gap-2">
+                  <div className="grid grid-cols-5 gap-1.5">
                     {['+', '−', '×', '÷', '⌫'].map(op => (
                       <button key={op}
                         onClick={() => {
@@ -1000,7 +1000,7 @@ export default function Practice({
                           }
                         }}
                         className={[
-                          'h-12 rounded-xl font-display font-bold text-xl flex items-center justify-center border-2',
+                          'h-10 rounded-xl font-display font-bold text-lg flex items-center justify-center border-2',
                           op === '⌫'
                             ? 'bg-red-50 text-red-400 border-red-100 active:bg-red-100'
                             : 'bg-amber-50 text-amber-600 border-amber-200 active:bg-amber-100',
@@ -1012,14 +1012,14 @@ export default function Practice({
                   {/* Space/clear */}
                   <button
                     onClick={() => setSelected(null)}
-                    className="w-full h-10 rounded-xl font-body font-bold text-sm text-gray-400 border-2 border-gray-200 bg-white active:bg-gray-50">
+                    className="w-full h-8 rounded-xl font-body font-bold text-sm text-gray-400 border-2 border-gray-200 bg-white active:bg-gray-50">
                     Clear
                   </button>
                 </div>
               )}
             </div>
           ) : isTyped ? (
-            <div className="flex flex-col items-center gap-2">
+            <div className="flex flex-col items-center gap-1.5">
               <div className={[
                 'w-40 h-20 rounded-2xl border-2 flex items-center justify-center',
                 revealed
