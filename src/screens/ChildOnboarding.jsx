@@ -39,7 +39,7 @@ function useTypewriter(text, speed = 10) {
 function Layout({ bubbleText, mascotSize = 130, children, button, step }) {
   const [showBubble, setShowBubble] = useState(false)
   useEffect(() => {
-    const t = setTimeout(() => setShowBubble(true), 100)
+    const t = setTimeout(() => setShowBubble(true), 400)
     return () => clearTimeout(t)
   }, [bubbleText])
 
@@ -58,12 +58,13 @@ function Layout({ bubbleText, mascotSize = 130, children, button, step }) {
       maxWidth: 420, margin: '0 auto',
       fontFamily: "'Baloo 2', sans-serif",
       animation: 'fadeUp 0.3s ease both',
+      alignItems: 'center',
     }}>
       <style>{ANIM}</style>
 
       {/* Progress bar */}
       {step && (
-        <div style={{ width: '100%', padding: '16px 24px 0', boxSizing: 'border-box' }}>
+        <div style={{ width: '100%', maxWidth: 420, padding: '16px 24px 0', boxSizing: 'border-box', margin: '0 auto' }}>
           <div style={{ height: 8, background: '#f3f4f6', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{
               height: '100%', borderRadius: 8,
@@ -75,7 +76,7 @@ function Layout({ bubbleText, mascotSize = 130, children, button, step }) {
         </div>
       )}
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, width: '100%', padding: '24px 24px 0' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, width: '100%', maxWidth: 420, padding: '24px 24px 0', margin: '0 auto' }}>
         {/* Bubble — appears 100ms after mascot */}
         {showBubble && (
           <div style={{
@@ -104,7 +105,7 @@ function Layout({ bubbleText, mascotSize = 130, children, button, step }) {
         {children && <div style={{ width: '100%', maxWidth: 340 }}>{children}</div>}
       </div>
 
-      <div style={{ padding: '0 24px', width: '100%', maxWidth: 420, boxSizing: 'border-box' }}>
+      <div style={{ padding: '0 24px', width: '100%', maxWidth: 420, boxSizing: 'border-box', margin: '0 auto' }}>
         {button}
       </div>
     </div>
