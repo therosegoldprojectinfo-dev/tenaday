@@ -242,7 +242,13 @@
   // ── Config — fill these in with your own project values ──────────────
   const SUPABASE_URL = 'https://vwqjfoxpwpqnzykoimso.supabase.co'
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3cWpmb3hwd3Bxbnp5a29pbXNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5OTM3MjMsImV4cCI6MjA5NzU2OTcyM30.nBIcdP2A0LyiiGT4e4xdGkLWNKyQ0PvpHDfN-4yTsUE'
-  const ADMIN_KEY = 'Osman' // must match the SQL function's check
+  // Admin key is intentionally NOT stored here — it lives only in the
+  // SQL function itself (get_dashboard_stats). Whatever the person types
+  // in the gate box gets sent straight to the server on every request;
+  // the server is the only thing that ever checks it. This file is public
+  // (anyone can view-source it), so there is nothing secret to protect
+  // here on purpose.
+  let adminKey = null
 
   let currentDays = 7
 
@@ -254,9 +260,14 @@
         'apikey': SUPABASE_ANON_KEY,
         'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
       },
-      body: JSON.stringify({ p_admin_key: ADMIN_KEY, p_days: days }),
+      body: JSON.stringify({ p_admin_key: adminKey, p_days: days }),
     })
-    if (!res.ok) throw new Error(`RPC failed: ${res.status}`)
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}))
+      const err = new Error(`RPC failed: ${res.status}`)
+      err.unauthorized = /unauthorized/i.test(body.message || body.hint || '')
+      throw err
+    }
     return res.json()
   }
 
@@ -354,13 +365,26 @@
 
   document.getElementById('unlock-btn').addEventListener('click', async () => {
     const input = document.getElementById('admin-key-input').value
-    if (input !== ADMIN_KEY) {
-      document.getElementById('gate-error').textContent = 'Incorrect key.'
-      return
+    const unlockBtn = document.getElementById('unlock-btn')
+    adminKey = input
+    unlockBtn.disabled = true
+    unlockBtn.textContent = 'Checking...'
+    try {
+      const stats = await fetchStats(currentDays)
+      document.getElementById('gate').style.display = 'none'
+      document.getElementById('dash').style.display = 'block'
+      render(stats)
+      document.getElementById('loading').style.display = 'none'
+      document.getElementById('content').style.display = 'block'
+    } catch (err) {
+      adminKey = null
+      document.getElementById('gate-error').textContent = err.unauthorized
+        ? 'Incorrect key.'
+        : 'Something went wrong — try again.'
+    } finally {
+      unlockBtn.disabled = false
+      unlockBtn.textContent = 'Unlock'
     }
-    document.getElementById('gate').style.display = 'none'
-    document.getElementById('dash').style.display = 'block'
-    loadDashboard()
   })
 
   document.getElementById('admin-key-input').addEventListener('keydown', (e) => {
