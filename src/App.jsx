@@ -36,7 +36,7 @@ export default function App() {
   const [parentId, setParentId] = useState(null)
   const [kidId, setKidId] = useState(null)
   const [pendingClaim, setPendingClaim] = useState(null) // placement claim for the diagnostic phase
-  const [selectedTables, setSelectedTables] = useState([]) // tables the kid picked in TablePicker
+  const [selectedTables, setSelectedTables] = useState([]) // tables the kid picked during the level-check step
   const [showParentPin, setShowParentPin]   = useState(false)
   const [showParentDash, setShowParentDash] = useState(false)
   const [parentDashInitialTab, setParentDashInitialTab] = useState('kids')
