@@ -117,7 +117,7 @@ export async function createKid(parentId, { name, age, placementClaim, timezone 
       name: name.trim(),
       age: age || null,
       placement_claim: placementClaim || null,
-      timezone: timezone || 'America/Toronto',
+      timezone: timezone || 'UTC',
       current_operation: 'addition',
       current_table: 1,
       current_batch: 1,
