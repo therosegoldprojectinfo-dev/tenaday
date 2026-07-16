@@ -197,37 +197,28 @@ export async function fetchClaimedGiftIds(kidId) {
  *  Buy. Per spec §7, while in debt a kid's rewards stay LOCKED until the
  *  balance is back to >= 0 — that gate is enforced by the caller (the
  *  Rewards screen disables every buy button while in debt), not here;
- *  this function only re-checks raw affordability (balance >= price). */
+ *  this function only re-checks raw affordability (balance >= price).
+ *
+ *  All three writes (balance update, gift_claims insert, coin_transactions
+ *  insert) happen atomically inside the purchase_gift RPC (see
+ *  supabase/purchase_gift_rpc.sql) — either all three happen or none do,
+ *  fixing the case where a network failure between separate client-side
+ *  writes could deduct coins with no claim record for the parent to see. */
 export async function purchaseGift(kidId, gift, currentBalance) {
   if (currentBalance < gift.coin_price) {
     throw new Error('Not enough coins for this reward.')
   }
 
-  const newBalance = currentBalance - gift.coin_price
-
-  const { error: balanceError } = await supabase
-    .from('kids')
-    .update({ coin_balance: newBalance })
-    .eq('id', kidId)
-  if (balanceError) throw balanceError
-
-  const { error: claimError } = await supabase
-    .from('gift_claims')
-    .insert({ kid_id: kidId, gift_id: gift.id })
-  if (claimError) {
-    // Coin balance already moved — log but don't throw, since the
-    // purchase itself (the part that matters to the kid) succeeded; a
-    // missing claims-history row is a minor bookkeeping gap, not a
-    // reason to show the kid an error after their coins were already
-    // correctly deducted.
-    console.error('gift_claims insert failed (non-blocking):', claimError)
-  }
-
-  await logCoinTransaction(kidId, {
-    amount: -gift.coin_price,
-    reason: 'gift_purchase',
-    balanceAfter: newBalance,
+  const { data: newBalance, error } = await supabase.rpc('purchase_gift', {
+    p_kid_id: kidId,
+    p_gift_id: gift.id,
   })
+  if (error) {
+    if (error.message?.includes('NOT_ENOUGH_COINS')) {
+      throw new Error('Not enough coins for this reward.')
+    }
+    throw error
+  }
 
   return newBalance
 }
