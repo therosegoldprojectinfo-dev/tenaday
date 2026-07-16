@@ -435,7 +435,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
   ]
 
   return (
-    <div className="h-screen flex flex-col chapter-path-root relative" style={{ backgroundColor: '#ffffff' }}>
+    <div className="flex flex-col chapter-path-root relative" style={{ height: '100dvh', backgroundColor: '#ffffff' }}>
 
       <style>{`
         @keyframes pulse-glow {
