@@ -409,7 +409,7 @@ function FinishedScreen({ payout, node, saving, onExit }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50 relative overflow-hidden">
       <ConfettiBlast active />
-      <div className="h-screen md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6 relative z-10">
+      <div className="md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6 relative z-10" style={{height:"100dvh"}}>
 
         {/* Floating mascot */}
         <div style={{ animation: 'mascot-float 2s ease-in-out infinite' }}>
@@ -482,7 +482,7 @@ function LessonScreen({ facts, theme, operation, table, batchNum, node, kidId, c
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
-      <div className="h-screen md:h-auto md:min-h-[500px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col bg-white px-6 py-10">
+      <div className="md:h-auto md:min-h-[500px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col bg-white px-6 py-10" style={{height:"100dvh"}}>
         <div className="flex-1 flex flex-col items-center justify-center gap-8">
           <div className="text-center">
             <p className="font-body font-bold text-xs tracking-widest uppercase mb-1" style={{ color: theme.colors.primary }}>
@@ -562,14 +562,12 @@ export default function Practice({
   node          = 'learn',
   kidId,
   coinBalance   = 0,
-  heartBalance  = 5,
   reviewPool,
   unlockBatch,
   placementClaim = null,
   kidCurrentStep = null,
   onExit,
   onBalanceChange,
-  onHeartChange,
 }) {
   const theme    = themeFor(operation)
   const isReview = node === 'review'
