@@ -36,35 +36,64 @@ function useTypewriter(text, speed = 10) {
 }
 
 // ── Layout: bubble above mascot ────────────────────────────────────────────────
-function Layout({ bubbleText, mascotSize = 130, children, button }) {
-  const { displayed, done } = useTypewriter(bubbleText, 10)
+function Layout({ bubbleText, mascotSize = 130, children, button, step }) {
+  const [showBubble, setShowBubble] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setShowBubble(true), 100)
+    return () => clearTimeout(t)
+  }, [bubbleText])
+
+  const { displayed, done } = useTypewriter(showBubble ? bubbleText : '', 10)
+
+  // Progress bar: screens 1-8 out of 8 total steps
+  const totalSteps = 8
+  const progress = step ? Math.min((step / totalSteps) * 100, 100) : 0
+
   return (
     <div style={{
       minHeight: '100dvh', background: '#fff',
       display: 'flex', flexDirection: 'column',
       alignItems: 'center', justifyContent: 'space-between',
-      padding: '48px 24px 40px', boxSizing: 'border-box',
+      padding: '0 0 40px', boxSizing: 'border-box',
       maxWidth: 420, margin: '0 auto',
       fontFamily: "'Baloo 2', sans-serif",
       animation: 'fadeUp 0.3s ease both',
     }}>
       <style>{ANIM}</style>
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, width: '100%' }}>
-        {/* Bubble */}
-        <div style={{
-          background: '#fff', border: '2.5px solid #e5e7eb',
-          borderRadius: 20, padding: '16px 22px',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
-          position: 'relative', width: '100%', maxWidth: 320,
-          minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 20, color: '#1a1a1a', margin: 0, lineHeight: 1.4, textAlign: 'center' }}>
-            {displayed}
-            {!done && <span style={{ opacity: 0.5, animation: 'blink 0.7s step-end infinite' }}>|</span>}
-          </p>
-          <div style={{ position: 'absolute', bottom: -13, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '11px solid transparent', borderRight: '11px solid transparent', borderTop: '13px solid white' }} />
-          <div style={{ position: 'absolute', bottom: -16, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '12px solid transparent', borderRight: '12px solid transparent', borderTop: '14px solid #e5e7eb', zIndex: -1 }} />
+
+      {/* Progress bar */}
+      {step && (
+        <div style={{ width: '100%', padding: '16px 24px 0', boxSizing: 'border-box' }}>
+          <div style={{ height: 8, background: '#f3f4f6', borderRadius: 8, overflow: 'hidden' }}>
+            <div style={{
+              height: '100%', borderRadius: 8,
+              background: '#58cc02',
+              width: `${progress}%`,
+              transition: 'width 0.4s ease',
+            }} />
+          </div>
         </div>
+      )}
+
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, width: '100%', padding: '24px 24px 0' }}>
+        {/* Bubble — appears 100ms after mascot */}
+        {showBubble && (
+          <div style={{
+            background: '#fff', border: '2.5px solid #e5e7eb',
+            borderRadius: 20, padding: '16px 22px',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.07)',
+            position: 'relative', width: '100%', maxWidth: 320,
+            minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            animation: 'fadeUp 0.25s ease both',
+          }}>
+            <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 20, color: '#1a1a1a', margin: 0, lineHeight: 1.4, textAlign: 'center' }}>
+              {displayed}
+              {!done && <span style={{ opacity: 0.5, animation: 'blink 0.7s step-end infinite' }}>|</span>}
+            </p>
+            <div style={{ position: 'absolute', bottom: -13, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '11px solid transparent', borderRight: '11px solid transparent', borderTop: '13px solid white' }} />
+            <div style={{ position: 'absolute', bottom: -16, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '12px solid transparent', borderRight: '12px solid transparent', borderTop: '14px solid #e5e7eb', zIndex: -1 }} />
+          </div>
+        )}
 
         {/* Mascot */}
         <div style={{ animation: 'mascot-float 2.2s ease-in-out infinite' }}>
@@ -75,7 +104,9 @@ function Layout({ bubbleText, mascotSize = 130, children, button }) {
         {children && <div style={{ width: '100%', maxWidth: 340 }}>{children}</div>}
       </div>
 
-      {button}
+      <div style={{ padding: '0 24px', width: '100%', maxWidth: 420, boxSizing: 'border-box' }}>
+        {button}
+      </div>
     </div>
   )
 }
@@ -206,15 +237,15 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
   // SCREEN 1: Child's name (parent POV)
   if (step === 1) return (
     <Layout bubbleText="What is your child's name? 😊"
-      button={<GreenButton onClick={() => setStep(2)} disabled={!name.trim()}>CONTINUE →</GreenButton>}>
+      step={1} button={<GreenButton onClick={() => setStep(2)} disabled={!name.trim()}>CONTINUE →</GreenButton>}>
       <StyledInput autoFocus value={name} onChange={e => setName(e.target.value)} placeholder="Your child's first name..." />
     </Layout>
   )
 
   // SCREEN 2: Age
   if (step === 2) return (
-    <Layout bubbleText={`How old is ${name || 'your child'}? 🎂`}
-      button={<GreenButton onClick={() => setStep(3)} disabled={!age || isNaN(parseInt(age))}>CONTINUE →</GreenButton>}>
+    <Layout bubbleText={`How old is ${name || 'your child'}? 🎈`}
+      step={2} button={<GreenButton onClick={() => setStep(3)} disabled={!age || isNaN(parseInt(age)) || parseInt(age) < 3 || parseInt(age) > 14}>CONTINUE →</GreenButton>}>
       <StyledInput type="number" value={age} onChange={e => setAge(e.target.value)} placeholder="Age..." min={4} max={18} />
     </Layout>
   )
@@ -222,7 +253,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
   // SCREEN 3: Reward setup
   if (step === 3) return (
     <Layout bubbleText={`Set a reward ${name} already wants and give it a price! 🎁`}
-      button={<GreenButton onClick={() => setStep(4)} disabled={!rewardName.trim() || !rewardPrice}>CONTINUE →</GreenButton>}>
+      step={3} button={<GreenButton onClick={() => setStep(4)} disabled={!rewardName.trim() || !rewardPrice}>CONTINUE →</GreenButton>}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <StyledInput value={rewardName} onChange={e => setRewardName(e.target.value)} placeholder="e.g. Extra screen time, a toy..." />
         <div>
@@ -238,7 +269,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
   // SCREEN 4: How it works
   if (step === 4) return (
     <Layout bubbleText="Here's how Numio works! 😄"
-      button={howStep < howSteps.length - 1
+      step={4} button={howStep < howSteps.length - 1
         ? <GreenButton onClick={() => setHowStep(s => s + 1)}>NEXT →</GreenButton>
         : <GreenButton onClick={() => setStep(5)}>GOT IT! →</GreenButton>}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
@@ -256,7 +287,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
   // SCREEN 5: Level check intro
   if (step === 5) return (
     <Layout bubbleText={`Now let's see what ${name} already knows! 👀`}
-      button={<GreenButton onClick={() => setStep(6)}>LET'S GO! →</GreenButton>}>
+      step={5} button={<GreenButton onClick={() => setStep(6)}>LET'S GO! →</GreenButton>}>
       <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 15, color: '#6b7280', textAlign: 'center', lineHeight: 1.6, margin: 0 }}>
         I just want to know where to start with {name}! 😊
       </p>
@@ -266,7 +297,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
   // SCREEN 6: What do they know? — just starting out ON TOP, single select
   if (step === 6) return (
     <Layout bubbleText={`What math does ${name} know? 😄`}
-      button={
+      step={6} button={
         <GreenButton onClick={() => {
           if (justStarting) setStep(9) // go to congrats screen
           else if (knownOps.length > 0) setStep(7)
@@ -319,7 +350,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
     const currentTables = tablesByOp[highestOp.id] || []
     return (
       <Layout bubbleText={`${highestOp.emoji} ${highestOp.label} — which tables does ${name} know? 😊`}
-        button={<GreenButton onClick={() => setStep(8)} disabled={currentTables.length === 0}>DONE →</GreenButton>}>
+        step={7} button={<GreenButton onClick={() => setStep(8)} disabled={currentTables.length === 0}>DONE →</GreenButton>}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
           {Array.from({ length: 12 }, (_, i) => i + 1).map(t => {
             const selected = currentTables.includes(t)
@@ -357,7 +388,8 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
           </div>
           <img src="/ChatGPT Image 27 juin 2026, 14_15_36.png" alt="Numio ready" style={{ width: '100%', maxWidth: 280, objectFit: 'contain', animation: 'pop 0.4s ease both' }} />
           <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 15, color: '#6b7280', textAlign: 'center', lineHeight: 1.6, margin: 0 }}>
-            It's super short and there are no wrong answers 😊
+            Get 20 out of 25 right to confirm the level! 🎯<br />
+            <span style={{ fontSize: 13, color: '#9ca3af' }}>No pressure — just do your best 😊</span>
           </p>
         </div>
         <GreenButton onClick={() => saveAndFinish(true)} disabled={saving}>{saving ? 'SAVING...' : "LET'S GO! 🚀"}</GreenButton>
