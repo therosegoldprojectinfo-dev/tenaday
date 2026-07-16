@@ -461,23 +461,31 @@ export default function ParentDashboard({ parentId, onBack, onAddKid, initialTab
                 </div>
               )}
 
-              {/* Global starter rewards — read only, parents cannot delete these */}
-              <p className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide mb-2">Starter rewards</p>
-              <div className="flex flex-col gap-2">
-                {gifts.filter(g => g.parent_id === null).map(gift => (
-                  <div key={gift.id} className="flex items-center gap-3 rounded-2xl border border-gray-100 px-4 py-3 bg-white">
-                    <GiftIconBadge icon={gift.icon || 'gift'} />
-                    <div className="flex-1">
-                      <p className="font-body font-bold text-sm text-gray-900">{gift.name}</p>
-                      <div className="flex items-center gap-1 mt-0.5">
-                        <CoinIcon />
-                        <span className="font-body text-xs text-amber-700 font-bold">{gift.coin_price} coins</span>
+              {/* Global starter rewards — read only, parents cannot delete these.
+                  Guarded: only render this whole section if any actually exist —
+                  previously showed the "Starter rewards" heading over nothing in
+                  every install, since the global seed gifts were removed from
+                  production but this section rendered unconditionally. */}
+              {gifts.filter(g => g.parent_id === null).length > 0 && (
+                <>
+                  <p className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide mb-2">Starter rewards</p>
+                  <div className="flex flex-col gap-2">
+                    {gifts.filter(g => g.parent_id === null).map(gift => (
+                      <div key={gift.id} className="flex items-center gap-3 rounded-2xl border border-gray-100 px-4 py-3 bg-white">
+                        <GiftIconBadge icon={gift.icon || 'gift'} />
+                        <div className="flex-1">
+                          <p className="font-body font-bold text-sm text-gray-900">{gift.name}</p>
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <CoinIcon />
+                            <span className="font-body text-xs text-amber-700 font-bold">{gift.coin_price} coins</span>
+                          </div>
+                        </div>
+                        <span className="font-body text-xs text-gray-300">Default</span>
                       </div>
-                    </div>
-                    <span className="font-body text-xs text-gray-300">Default</span>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </>
+              )}
 
               {gifts.length === 0 && (
                 <div className="rounded-3xl bg-white border-2 border-dashed border-gray-200 py-10 text-center">
