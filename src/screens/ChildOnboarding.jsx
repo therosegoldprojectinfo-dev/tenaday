@@ -19,7 +19,7 @@ const ANIM = `
 `
 
 // ── Typewriter hook ────────────────────────────────────────────────────────────
-function useTypewriter(text, speed = 25) {
+function useTypewriter(text, speed = 10) {
   const [displayed, setDisplayed] = useState('')
   const [done, setDone] = useState(false)
   useEffect(() => {
@@ -147,7 +147,7 @@ const OPERATIONS = [
 
 // ── Hello screen with typewriter ───────────────────────────────────────────────
 function HelloScreen({ onNext }) {
-  const { displayed, done } = useTypewriter("Hi! 👋 I'm Numio!", 25)
+  const { displayed, done } = useTypewriter("Hi! 👋 I'm Numio!", 10)
 
   return (
     <div style={{
@@ -188,8 +188,8 @@ function HelloScreen({ onNext }) {
 }
 
 // ── Main component ─────────────────────────────────────────────────────────────
-export default function ChildOnboarding({ kidId, parentId, onDone }) {
-  const [step, setStep] = useState(0)
+export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0 }) {
+  const [step, setStep] = useState(startStep)
   const [name, setName] = useState('')
   const [age, setAge] = useState('')
   const [rewardName, setRewardName] = useState('')
@@ -234,24 +234,24 @@ export default function ChildOnboarding({ kidId, parentId, onDone }) {
   // SCREEN 1: Name
   if (step === 1) return (
     <Layout
-      bubble="What's your name? 😊"
+      bubble="What is your child's name? 😊"
       button={<GreenButton onClick={() => setStep(2)} disabled={!name.trim()}>CONTINUE →</GreenButton>}
     >
-      <StyledInput autoFocus value={name} onChange={e => setName(e.target.value)} placeholder="Your first name..." />
+      <StyledInput autoFocus value={name} onChange={e => setName(e.target.value)} placeholder="Your child's first name..." />
     </Layout>
   )
 
   // SCREEN 2: Age (typed)
   if (step === 2) return (
     <Layout
-      bubble={`How old are you, ${name}? 🎂`}
+      bubble={`How old is ${name}? 🎂`}
       button={<GreenButton onClick={() => setStep(3)} disabled={!age || isNaN(parseInt(age))}>CONTINUE →</GreenButton>}
     >
       <StyledInput
         type="number"
         value={age}
         onChange={e => setAge(e.target.value)}
-        placeholder="Your age..."
+        placeholder="Your child's age..."
         min={4} max={18}
       />
     </Layout>
@@ -260,7 +260,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone }) {
   // SCREEN 3: Reward setup (parent POV, price typed)
   if (step === 3) return (
     <Layout
-      bubble={`Set a reward ${name} already wants and give it a price 🎁`}
+      bubble={`Set a reward ${name} already wants and give it a price! 🎁`}
       button={<GreenButton onClick={() => setStep(4)} disabled={!rewardName.trim() || !rewardPrice}>CONTINUE →</GreenButton>}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -320,16 +320,25 @@ export default function ChildOnboarding({ kidId, parentId, onDone }) {
       button={<GreenButton onClick={() => setStep(6)}>LET'S GO! →</GreenButton>}
     >
       <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 15, color: '#6b7280', textAlign: 'center', lineHeight: 1.6, margin: 0 }}>
-        Don't worry — this is <strong>NOT a test</strong> 😊<br />
-        I just want to know where to start with you!
+        I just want to know where to start with you! 😊
       </p>
     </Layout>
   )
 
-  // SCREEN 6: What do you know?
+  // SCREEN 6: What do you know? — SINGLE SELECT + hierarchy
+  // Picking multiplication means they also know addition + subtraction (auto-included)
+  const OP_ORDER = ['addition', 'subtraction', 'multiplication', 'division']
+  const selectedOp = justStarting ? null : (knownOps.length > 0 ? knownOps[knownOps.length - 1] : null)
+
+  function selectOp(opId) {
+    setJustStarting(false)
+    const idx = OP_ORDER.indexOf(opId)
+    setKnownOps(OP_ORDER.slice(0, idx + 1))
+  }
+
   if (step === 6) return (
     <Layout
-      bubble="What math do you know? 😄"
+      bubble={`What math does ${name} know? 😄`}
       button={
         <GreenButton
           onClick={() => {
@@ -342,12 +351,9 @@ export default function ChildOnboarding({ kidId, parentId, onDone }) {
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {OPERATIONS.map(op => {
-          const selected = knownOps.includes(op.id)
+          const selected = selectedOp === op.id
           return (
-            <button key={op.id} onClick={() => {
-              if (justStarting) return
-              setKnownOps(prev => selected ? prev.filter(o => o !== op.id) : [...prev, op.id])
-            }} style={{
+            <button key={op.id} onClick={() => selectOp(op.id)} style={{
               display: 'flex', alignItems: 'center', gap: 14,
               padding: '14px 18px', borderRadius: 16,
               border: `3px solid ${selected ? op.color : '#e5e7eb'}`,
@@ -356,7 +362,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone }) {
               opacity: justStarting ? 0.4 : 1,
             }}>
               <span style={{ fontSize: 22 }}>{op.emoji}</span>
-              <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 17, color: selected ? op.color : '#1a1a1a' }}>{op.label}</span>
+              <span style={{ fontFamily: "\'Baloo 2\', sans-serif", fontWeight: 700, fontSize: 17, color: selected ? op.color : '#1a1a1a' }}>{op.label}</span>
               {selected && <span style={{ marginLeft: 'auto', color: op.color, fontSize: 20 }}>✓</span>}
             </button>
           )
@@ -364,11 +370,11 @@ export default function ChildOnboarding({ kidId, parentId, onDone }) {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '4px 0' }}>
           <div style={{ flex: 1, height: 1, background: '#e5e7eb' }} />
-          <span style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: 13, color: '#9ca3af' }}>or</span>
+          <span style={{ fontFamily: "\'Baloo 2\', sans-serif", fontSize: 13, color: '#9ca3af' }}>or</span>
           <div style={{ flex: 1, height: 1, background: '#e5e7eb' }} />
         </div>
 
-        <button onClick={() => { setJustStarting(!justStarting); setKnownOps([]) }} style={{
+        <button onClick={() => { setJustStarting(true); setKnownOps([]) }} style={{
           display: 'flex', alignItems: 'center', gap: 14,
           padding: '14px 18px', borderRadius: 16,
           border: `3px solid ${justStarting ? '#58cc02' : '#e5e7eb'}`,
@@ -376,7 +382,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone }) {
           cursor: 'pointer', transition: 'all 0.15s',
         }}>
           <span style={{ fontSize: 22 }}>🌱</span>
-          <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 17, color: justStarting ? '#58cc02' : '#1a1a1a' }}>Just starting out!</span>
+          <span style={{ fontFamily: "\'Baloo 2\', sans-serif", fontWeight: 700, fontSize: 17, color: justStarting ? '#58cc02' : '#1a1a1a' }}>Just starting out!</span>
           {justStarting && <span style={{ marginLeft: 'auto', color: '#58cc02', fontSize: 20 }}>✓</span>}
         </button>
       </div>
