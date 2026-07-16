@@ -275,17 +275,21 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
     const tryScroll = () => {
       attempts++
       const el = unitRefs.current[currentDay]
-      if (el) {
+      const container = scrollContainerRef.current
+      if (el && container) {
+        const elTop = el.getBoundingClientRect().top
+        const containerTop = container.getBoundingClientRect().top
+        const offset = elTop - containerTop - 190
+        // Only scroll if we actually need to (unit not already visible)
+        if (Math.abs(offset) > 20) {
+          container.scrollTo({ top: container.scrollTop + offset, behavior: 'smooth' })
+        }
         hasScrolled.current = true
-        // scroll-margin-top pushes the element down from the top edge
-        // so scrollIntoView(start) lands it just below the fixed banner
-        el.style.scrollMarginTop = '190px'
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      } else if (attempts < 15) {
+      } else if (attempts < 20) {
         setTimeout(tryScroll, 150)
       }
     }
-    setTimeout(tryScroll, 500)
+    setTimeout(tryScroll, 600)
   }, [kid, operation])
 
   const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT
