@@ -250,9 +250,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
   const [showNoRewards, setShowNoRewards] = useState(false)
   const [showParentPopup, setShowParentPopup] = useState(false)
   const [showDayGateScreen, setShowDayGateScreen] = useState(false)
+  const [scrollDir, setScrollDir] = useState(null) // 'up' | 'down' | null
+  const currentUnitRef = useRef(null)
   const unitRefs = useRef({})
   const unitObservers = useRef({})
-  const hasScrolled = useRef(false)
   const scrollContainerRef = useRef(null)
 
   // Cleanup all IntersectionObservers on unmount
@@ -263,42 +264,53 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
     }
   }, [])
 
-  // Auto-scroll to current unit once after load
-  // We wait until AFTER paint (setTimeout 0) so refs are populated
-  useEffect(() => {
-    if (!kid || hasScrolled.current) return
+  // Auto-scroll removed — using floating nav button instead
 
+  // Scroll to current unit on first load + track scroll direction for floating button
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container || !kid) return
+
+    // Initial scroll to current unit
     const currentDay = kid.current_operation === operation
       ? (kid.current_table - 1) * BATCH_COUNT + (kid.current_batch || 1)
       : 1
 
-    // Unit 1 is already at the top — no scroll needed
-    if (currentDay === 1) {
-      hasScrolled.current = true
-      return
-    }
-
-    let attempts = 0
-    const tryScroll = () => {
-      attempts++
+    const tryInitialScroll = (attempts = 0) => {
       const el = unitRefs.current[currentDay]
-      const container = scrollContainerRef.current
-
-      if (el && container) {
-        hasScrolled.current = true
+      if (el && currentDay > 1) {
         const elTop = el.getBoundingClientRect().top
         const containerTop = container.getBoundingClientRect().top
-        const scrollTop = container.scrollTop
-        const target = scrollTop + elTop - containerTop - 190
-        container.scrollTo({ top: target, behavior: 'smooth' })
-      } else if (attempts < 20) {
-        setTimeout(tryScroll, 200)
+        const target = container.scrollTop + elTop - containerTop - 190
+        container.scrollTo({ top: Math.max(0, target), behavior: 'instant' })
+        currentUnitRef.current = el
+      } else if (!el && attempts < 15) {
+        setTimeout(() => tryInitialScroll(attempts + 1), 150)
+      } else {
+        currentUnitRef.current = unitRefs.current[currentDay] || null
+      }
+    }
+    setTimeout(() => tryInitialScroll(), 300)
+
+    // Track scroll to show floating button
+    const handleScroll = () => {
+      const currentEl = currentUnitRef.current
+      if (!currentEl) return
+      const elTop = currentEl.getBoundingClientRect().top
+      const containerTop = container.getBoundingClientRect().top
+      const relativeTop = elTop - containerTop
+      if (relativeTop < -60) {
+        setScrollDir('up') // scrolled past current — show ↑
+      } else if (relativeTop > container.clientHeight - 60) {
+        setScrollDir('down') // current is below viewport — show ↓
+      } else {
+        setScrollDir(null) // current is visible — hide button
       }
     }
 
-    // Wait for DOM to fully render before first attempt
-    setTimeout(tryScroll, 800)
-  }, [kid])
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    return () => container.removeEventListener('scroll', handleScroll)
+  }, [kid, operation])
 
   const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT
 
@@ -816,6 +828,43 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── Floating back-to-current button ── */}
+      {scrollDir && (
+        <button
+          onClick={() => {
+            const el = currentUnitRef.current
+            const container = scrollContainerRef.current
+            if (el && container) {
+              const elTop = el.getBoundingClientRect().top
+              const containerTop = container.getBoundingClientRect().top
+              const target = container.scrollTop + elTop - containerTop - 190
+              container.scrollTo({ top: Math.max(0, target), behavior: 'smooth' })
+            }
+          }}
+          style={{
+            position: 'fixed',
+            bottom: 80,
+            right: 20,
+            zIndex: 60,
+            width: 44,
+            height: 44,
+            borderRadius: '50%',
+            background: '#58cc02',
+            boxShadow: '0 4px 12px rgba(88,204,2,0.4)',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: 20,
+            color: '#fff',
+            animation: 'fadeUp 0.2s ease both',
+          }}
+        >
+          {scrollDir === 'up' ? '↓' : '↑'}
+        </button>
       )}
 
     </div>
