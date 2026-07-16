@@ -132,8 +132,15 @@ export async function logIn(phoneRaw, pin) {
   return parentId
 }
 
-export function logOut() {
+export async function logOut() {
   clearSession()
+  // Previously only cleared the local parentId, leaving the underlying
+  // Supabase auth session alive — meaning a second parent on the same
+  // shared device (e.g. a family tablet) who logged in next would silently
+  // reuse the FIRST parent's anonymous session until they entered their
+  // own phone+PIN successfully rebinds it. Explicitly ending the session
+  // here closes that gap.
+  await supabase.auth.signOut()
 }
 
 // ── Kid profile CRUD ─────────────────────────────────────────────────────
@@ -149,6 +156,27 @@ export async function listKidsForParent(parentId) {
 
 export async function createKid(parentId, { name, age, placementClaim, timezone }) {
   if (!name || !name.trim()) throw new AuthError('Enter a name for your kid.')
+
+  // Before inserting: check for an untouched "New Kid" placeholder already
+  // sitting on this parent's account (name still the default, no age set,
+  // never advanced past the very first node). If CreateKid's insert
+  // actually succeeded on a previous attempt but the response was lost
+  // (e.g. a dropped connection) — the exact case that was creating a new
+  // orphan row on every retry — reuse that same row instead of creating
+  // another one.
+  if (name.trim() === 'New Kid' && !age) {
+    const { data: existing } = await supabase
+      .from('kids')
+      .select('id')
+      .eq('parent_id', parentId)
+      .eq('name', 'New Kid')
+      .is('age', null)
+      .eq('current_node', 'welcome')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+    if (existing) return existing.id
+  }
 
   const { data, error } = await supabase
     .from('kids')
