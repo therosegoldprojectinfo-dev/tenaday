@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { signUp, logIn, AuthError } from '../lib/parentAuth'
+import { trackEvent } from '../lib/analytics'
 import PrivacyPolicy from './PrivacyPolicy'
 import TermsAndConditions from './TermsAndConditions'
 
@@ -73,6 +74,7 @@ export default function Auth({ onAuthenticated, onBack }) {
     setError(null)
     try {
       const parentId = isSignup ? await signUp(phone, pin) : await logIn(phone, pin)
+      trackEvent(isSignup ? 'parent_signup' : 'parent_login')
       onAuthenticated(parentId, isSignup) // isSignup=true means new account
     } catch (err) {
       setError(err instanceof AuthError ? err.message : 'Something went wrong. Please try again.')
