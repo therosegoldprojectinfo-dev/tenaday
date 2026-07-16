@@ -938,7 +938,7 @@ export default function Practice({
         </div>
 
         {/* ── Answer choices ──────────────────────────────────── */}
-        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col justify-center px-4 gap-2">
+        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col px-4 pb-2">
           {isFormula ? (
             // Formula keyboard — kid types e.g. "3 + 4"
             <div className="flex flex-col items-center gap-2">
@@ -1094,7 +1094,7 @@ export default function Practice({
                 <button key={choice} disabled={revealed}
                   onClick={() => !revealed && setSelected(choice)}
                   className={['rounded-2xl border-2 font-display font-bold text-4xl card-answer',
-                    'flex items-center justify-center w-full select-none py-4',
+                    'flex items-center justify-center w-full select-none',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
