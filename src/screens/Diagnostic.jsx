@@ -109,7 +109,7 @@ function ResultScreen({ passed, correct, claimedOperation, selectedTables, savin
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
-      <div className="h-screen md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6">
+      <div className="md:h-auto md:min-h-[600px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col items-center justify-center bg-white px-8 gap-6" style={{height:"100dvh"}}>
         <span className="text-8xl select-none">{passed ? '🎉' : '💪'}</span>
         <div className="text-center">
           <h2 className="font-display font-bold text-3xl text-gray-900 mb-2">
