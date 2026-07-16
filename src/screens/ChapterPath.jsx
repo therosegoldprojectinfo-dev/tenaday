@@ -277,17 +277,14 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
       const el = unitRefs.current[currentDay]
       if (el) {
         hasScrolled.current = true
+        // scroll-margin-top pushes the element down from the top edge
+        // so scrollIntoView(start) lands it just below the fixed banner
+        el.style.scrollMarginTop = '190px'
         el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        // After scrollIntoView, nudge up a bit to clear the fixed banner
-        setTimeout(() => {
-          const scrollContainer = scrollContainerRef.current
-          if (scrollContainer) scrollContainer.scrollBy({ top: -180, behavior: 'smooth' })
-        }, 300)
       } else if (attempts < 15) {
         setTimeout(tryScroll, 150)
       }
     }
-
     setTimeout(tryScroll, 500)
   }, [kid, operation])
 
