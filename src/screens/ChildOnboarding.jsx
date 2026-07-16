@@ -83,7 +83,85 @@ function Bubble({ text }) {
   )
 }
 
-// ── Operations for level selection ────────────────────────────────────────────
+// ── Typewriter hook ───────────────────────────────────────────────────────────
+function useTypewriter(text, speed = 50) {
+  const [displayed, setDisplayed] = useState('')
+  const [done, setDone] = useState(false)
+  useEffect(() => {
+    setDisplayed('')
+    setDone(false)
+    let i = 0
+    const id = setInterval(() => {
+      i++
+      setDisplayed(text.slice(0, i))
+      if (i >= text.length) { clearInterval(id); setDone(true) }
+    }, speed)
+    return () => clearInterval(id)
+  }, [text, speed])
+  return { displayed, done }
+}
+
+// ── Hello screen — mascot centered, bubble above with typewriter ──────────────
+function HelloScreen({ onNext }) {
+  const text = "Hi! 👋 I'm Numio!"
+  const { displayed, done } = useTypewriter(text, 55)
+
+  return (
+    <div style={{
+      minHeight: '100dvh', background: '#fff',
+      display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'space-between',
+      padding: '60px 24px 40px', boxSizing: 'border-box',
+      fontFamily: "'Baloo 2', sans-serif",
+    }}>
+      <style>{ANIM + `@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
+
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 32 }}>
+        {/* Speech bubble above mascot */}
+        <div style={{
+          background: '#fff', border: '2.5px solid #e5e7eb',
+          borderRadius: 20, padding: '18px 24px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          position: 'relative', maxWidth: 280,
+          animation: 'pop 0.4s ease both',
+          minHeight: 56, display: 'flex', alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <p style={{
+            fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 22,
+            color: '#1a1a1a', margin: 0, lineHeight: 1.3, textAlign: 'center',
+          }}>
+            {displayed}
+            {!done && <span style={{ opacity: 0.5, animation: 'blink 0.8s step-end infinite' }}>|</span>}
+          </p>
+          {/* Bubble tail pointing down toward mascot */}
+          <div style={{
+            position: 'absolute', bottom: -14, left: '50%', transform: 'translateX(-50%)',
+            width: 0, height: 0,
+            borderLeft: '12px solid transparent', borderRight: '12px solid transparent',
+            borderTop: '14px solid white',
+          }} />
+          <div style={{
+            position: 'absolute', bottom: -17, left: '50%', transform: 'translateX(-50%)',
+            width: 0, height: 0,
+            borderLeft: '13px solid transparent', borderRight: '13px solid transparent',
+            borderTop: '15px solid #e5e7eb',
+            zIndex: -1,
+          }} />
+        </div>
+
+        {/* Big mascot */}
+        <div style={{ animation: 'mascot-float 2.2s ease-in-out infinite' }}>
+          <img src="/onboarding-mascot.png" alt="Numio"
+            style={{ width: 200, height: 'auto', display: 'block' }} />
+        </div>
+      </div>
+
+      <GreenButton onClick={onNext} disabled={!done}>CONTINUE →</GreenButton>
+    </div>
+  )
+}
+
 const OPERATIONS = [
   { id: 'addition', label: 'Addition', emoji: '➕', color: '#58cc02' },
   { id: 'subtraction', label: 'Subtraction', emoji: '➖', color: '#1CB0F6' },
@@ -146,13 +224,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone }) {
   }
 
   // ── SCREEN 0: Hello ───────────────────────────────────────────────────────
-  if (step === 0) return (
-    <Screen>
-      <Mascot size={140} />
-      <Bubble text="Hi! 👋 I'm Numio!" />
-      <GreenButton onClick={() => setStep(1)}>CONTINUE →</GreenButton>
-    </Screen>
-  )
+  if (step === 0) return <HelloScreen onNext={() => setStep(1)} />
 
   // ── SCREEN 1: Name ────────────────────────────────────────────────────────
   if (step === 1) return (
