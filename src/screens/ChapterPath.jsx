@@ -274,11 +274,14 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
       ? (kid.current_table - 1) * BATCH_COUNT + (kid.current_batch || 1)
       : 1
 
-    // Wait for React to render the refs, then scroll
     let attempts = 0
-    const tryInitialScroll = () => {
+    let rafId = null
+    let timeoutId = null
+
+    const tryScroll = () => {
       const container = scrollContainerRef.current
       const el = unitRefs.current[currentDay]
+
       if (container && el) {
         const elTop = el.getBoundingClientRect().top
         const containerTop = container.getBoundingClientRect().top
@@ -288,32 +291,38 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
         }
         currentUnitRef.current = el
 
-        // Now attach scroll listener
+        // Attach scroll listener now that we have the element
         const handleScroll = () => {
           const currentEl = currentUnitRef.current
           if (!currentEl) return
           const elTop2 = currentEl.getBoundingClientRect().top
           const cTop = container.getBoundingClientRect().top
           const rel = elTop2 - cTop
-          // current is above viewport (we scrolled down past it) → need to scroll UP → show ↑
           if (rel < -60) setScrollDir('up')
-          // current is below viewport (we scrolled up past it) → need to scroll DOWN → show ↓
           else if (rel > container.clientHeight - 60) setScrollDir('down')
           else setScrollDir(null)
         }
         container.addEventListener('scroll', handleScroll, { passive: true })
-        // Store cleanup fn
         currentUnitRef._cleanup = () => container.removeEventListener('scroll', handleScroll)
-      } else if (attempts < 30) {
+      } else if (attempts < 40) {
         attempts++
-        setTimeout(tryInitialScroll, 100)
+        // Use rAF for first few attempts (fast), then slow down
+        if (attempts < 5) {
+          rafId = requestAnimationFrame(tryScroll)
+        } else {
+          timeoutId = setTimeout(tryScroll, 100)
+        }
       }
     }
 
-    // Small delay to let React render unitRefs after setKid triggers re-render
-    setTimeout(tryInitialScroll, 50)
+    // Wait 2 frames for React to fully render unitRefs
+    rafId = requestAnimationFrame(() => {
+      rafId = requestAnimationFrame(tryScroll)
+    })
 
     return () => {
+      if (rafId) cancelAnimationFrame(rafId)
+      if (timeoutId) clearTimeout(timeoutId)
       if (currentUnitRef._cleanup) {
         currentUnitRef._cleanup()
         currentUnitRef._cleanup = null
