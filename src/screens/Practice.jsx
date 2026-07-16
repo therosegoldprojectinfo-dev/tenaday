@@ -1094,7 +1094,7 @@ export default function Practice({
                 <button key={choice} disabled={revealed}
                   onClick={() => !revealed && setSelected(choice)}
                   className={['rounded-2xl border-2 font-display font-bold text-4xl card-answer',
-                    'flex items-center justify-center w-full select-none h-24',
+                    'flex items-center justify-center w-full select-none h-20',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
@@ -1107,7 +1107,7 @@ export default function Practice({
         </div>
 
         {/* ── Bottom action ───────────────────────────────────── */}
-        <div className="flex-shrink-0 px-4 pb-4 pt-2">
+        <div className="flex-shrink-0 px-4 pt-2" style={{paddingBottom: "max(16px, env(safe-area-inset-bottom, 16px))"}}>
           {!revealed ? (
             <button
               disabled={selected === null || selected === undefined || selected === ''}
