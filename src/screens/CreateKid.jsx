@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createKid, AuthError } from '../lib/parentAuth'
 import { detectTimezone } from '../lib/dayGate'
+import { trackEvent } from '../lib/analytics'
 
 export default function CreateKid({ parentId, onCreated, onBack }) {
   const [error, setError] = useState(null)
@@ -19,6 +20,7 @@ export default function CreateKid({ parentId, onCreated, onBack }) {
           placementClaim: null,
           timezone: detectTimezone(),
         })
+        trackEvent('kid_created')
         onCreated(kidId)
       } catch (err) {
         setError(err instanceof AuthError ? err.message : 'Something went wrong. Please try again.')
