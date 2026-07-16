@@ -105,9 +105,14 @@ export default function App() {
     }
   }, [])
 
-  function handleAuthenticated(newParentId) {
+  function handleAuthenticated(newParentId, isNewAccount = false) {
     setParentId(newParentId)
-    setAuthPhase('kidPicker')
+    if (isNewAccount) {
+      // New account — go straight to create kid + onboarding, skip KidPicker
+      setAuthPhase('createKid')
+    } else {
+      setAuthPhase('kidPicker')
+    }
   }
 
   function handleSelectKid(selectedKidId) {
