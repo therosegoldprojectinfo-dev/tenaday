@@ -1,8 +1,26 @@
 import { useState } from 'react'
-import { signUp, logIn, AuthError } from '../lib/parentAuth'
+import { signUp, logIn, AuthError, isValidPhone } from '../lib/parentAuth'
 import { trackEvent } from '../lib/analytics'
 import PrivacyPolicy from './PrivacyPolicy'
 import TermsAndConditions from './TermsAndConditions'
+
+// Some keyboards (common on Android devices set to Arabic, and some
+// regional iOS settings) emit Arabic-Indic (٠-٩) or Extended Arabic-Indic
+// (۰-۹) digits instead of ASCII 0-9. Our phone/PIN strippers only ever
+// recognized ASCII digits, so a parent typing on one of these keyboards
+// had every character silently deleted with no error message — a hard,
+// invisible signup blocker. Transliterate to ASCII before any stripping.
+const ARABIC_INDIC_DIGITS = '٠١٢٣٤٥٦٧٨٩'
+const EXTENDED_ARABIC_INDIC_DIGITS = '۰۱۲۳۴۵۶۷۸۹'
+function toAsciiDigits(str) {
+  return str.replace(/[٠-٩۰-۹]/g, (ch) => {
+    const arabicIdx = ARABIC_INDIC_DIGITS.indexOf(ch)
+    if (arabicIdx !== -1) return String(arabicIdx)
+    const extendedIdx = EXTENDED_ARABIC_INDIC_DIGITS.indexOf(ch)
+    if (extendedIdx !== -1) return String(extendedIdx)
+    return ch
+  })
+}
 
 function GoogleIcon() {
   return (
@@ -61,8 +79,9 @@ export default function Auth({ onAuthenticated, onBack }) {
 
   const isSignup = mode === 'signup'
   const pinsMismatch = isSignup && pinConfirm.length === 4 && pin !== pinConfirm
+  const phoneEnteredButInvalid = phone.trim().length >= 7 && !isValidPhone(phone)
   const canSubmit =
-    phone.trim().length >= 7 &&
+    isValidPhone(phone) &&
     pin.length === 4 &&
     (!isSignup || (pinConfirm.length === 4 && pin === pinConfirm)) &&
     !submitting
@@ -85,7 +104,7 @@ export default function Auth({ onAuthenticated, onBack }) {
 
   function handlePinChange(setter) {
     return (e) => {
-      const digits = e.target.value.replace(/\D/g, '').slice(0, 4)
+      const digits = toAsciiDigits(e.target.value).replace(/\D/g, '').slice(0, 4)
       setter(digits)
     }
   }
@@ -139,11 +158,16 @@ export default function Auth({ onAuthenticated, onBack }) {
                 inputMode="tel"
                 autoComplete="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value.replace(/[^0-9+\-\s()]/g, ''))}
+                onChange={(e) => setPhone(toAsciiDigits(e.target.value).replace(/[^0-9+\-\s()]/g, ''))}
                 placeholder="(555) 123-4567"
                 className="w-full rounded-2xl border-2 border-gray-200 px-4 py-3.5 font-body text-base text-gray-900
                            focus:border-green-500 focus:outline-none transition-colors"
               />
+              {phoneEnteredButInvalid && (
+                <p className="font-body text-xs text-red-500 mt-1.5">
+                  Enter a valid Canada/US or Saudi Arabia phone number.
+                </p>
+              )}
             </div>
 
             <div>
