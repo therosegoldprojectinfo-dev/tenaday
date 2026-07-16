@@ -902,14 +902,11 @@ export default function Practice({
           </div>
         )}
 
-        {/* ── Scrollable content area ─────────────────────────── */}
-        <div className="flex-1 overflow-y-auto flex flex-col">
-
         {/* ── Question text ───────────────────────────────────── */}
         <div className={`flex-shrink-0 px-6 pt-6 pb-2 ${q.text.endsWith('= ?') ? 'flex items-center justify-center' : ''}`}>
           <p className={
             q.text.endsWith('= ?')
-              ? 'text-5xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
+              ? 'text-4xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
               : 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto whitespace-pre-line'
           }>
             {q.text}
@@ -927,7 +924,7 @@ export default function Practice({
         )}
 
         {/* ── Read aloud button ───────────────────────────────── */}
-        <div className="flex-shrink-0 flex justify-center pb-2">
+        <div className="flex-shrink-0 flex justify-center pb-1">
           <button onClick={() => speaking ? stop() : speak(q.text)}
             className="flex items-center gap-2 px-4 py-2 rounded-full transition-all active:scale-90"
             style={{
@@ -941,7 +938,7 @@ export default function Practice({
         </div>
 
         {/* ── Answer choices ──────────────────────────────────── */}
-        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col justify-evenly px-4 gap-2 py-2">
+        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col justify-center px-4 gap-2">
           {isFormula ? (
             // Formula keyboard — kid types e.g. "3 + 4"
             <div className="flex flex-col items-center gap-4">
@@ -1097,7 +1094,7 @@ export default function Practice({
                 <button key={choice} disabled={revealed}
                   onClick={() => !revealed && setSelected(choice)}
                   className={['rounded-2xl border-2 font-display font-bold text-4xl card-answer',
-                    'flex items-center justify-center h-28 w-full select-none',
+                    'flex items-center justify-center w-full select-none py-6',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
@@ -1109,10 +1106,8 @@ export default function Practice({
           )}
         </div>
 
-        </div>{/* end scrollable content */}
-
-        {/* ── Bottom action — sticky, never scrolls ───────────── */}
-        <div className="flex-shrink-0 px-4 pb-8 pt-3" style={{ borderTop: '1px solid #f3f4f6', background: '#fff' }}>
+        {/* ── Bottom action ───────────────────────────────────── */}
+        <div className="flex-shrink-0 px-4 pb-6 pt-2">
           {!revealed ? (
             <button
               disabled={selected === null || selected === undefined || selected === ''}
