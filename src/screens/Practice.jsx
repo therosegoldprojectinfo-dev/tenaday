@@ -874,7 +874,7 @@ export default function Practice({
         </div>
 
         {/* ── Node label + timer ──────────────────────────────── */}
-        <div className="flex-shrink-0 px-5 flex items-center justify-between">
+        <div className="flex-shrink-0 px-5 pt-2 flex items-center justify-between">
           <p className="font-body font-bold text-xs tracking-widest uppercase" style={{ color: theme.colors.dark }}>
             {theme.era} · Table {table} · {nodeLabel(node)}
           </p>
@@ -903,7 +903,7 @@ export default function Practice({
         )}
 
         {/* ── Question text ───────────────────────────────────── */}
-        <div className={`flex-shrink-0 px-6 pt-1 pb-0 ${q.text.endsWith('= ?') ? 'flex items-center justify-center' : ''}`}>
+        <div className={`flex-shrink-0 px-6 pt-3 pb-1 ${q.text.endsWith('= ?') ? 'flex items-center justify-center' : ''}`}>
           <p className={
             q.text.endsWith('= ?')
               ? 'text-4xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
@@ -915,7 +915,7 @@ export default function Practice({
 
         {/* ── Retry badge ─────────────────────────────────────── */}
         {isRetry && !revealed && (
-          <div className="flex-shrink-0 flex justify-center">
+          <div className="flex-shrink-0 flex justify-center py-2">
             <span className="font-body font-bold text-xs px-3 py-1 rounded-full"
               style={{ backgroundColor: '#FEF3C7', color: '#D97706' }}>
               🔄 Retry — you've got this!
@@ -924,7 +924,7 @@ export default function Practice({
         )}
 
         {/* ── Read aloud button ───────────────────────────────── */}
-        <div className="flex-shrink-0 flex justify-center">
+        <div className="flex-shrink-0 flex justify-center py-2">
           <button onClick={() => speaking ? stop() : speak(q.text)}
             className="flex items-center gap-2 px-4 py-2 rounded-full transition-all active:scale-90"
             style={{
@@ -938,7 +938,7 @@ export default function Practice({
         </div>
 
         {/* ── Answer choices ──────────────────────────────────── */}
-        <div key={`choices-${idx}-${isRetry}`} className="flex-shrink-0 px-4">
+        <div key={`choices-${idx}-${isRetry}`} className="flex-shrink-0 px-4 mt-2">
           {isFormula ? (
             // Formula keyboard — kid types e.g. "3 + 4"
             <div className="flex flex-col items-center gap-2">
@@ -1094,7 +1094,7 @@ export default function Practice({
                 <button key={choice} disabled={revealed}
                   onClick={() => !revealed && setSelected(choice)}
                   className={['rounded-2xl border-2 font-display font-bold text-4xl card-answer',
-                    'flex items-center justify-center w-full select-none h-16',
+                    'flex items-center justify-center w-full select-none h-20',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
@@ -1107,7 +1107,7 @@ export default function Practice({
         </div>
 
         {/* ── Bottom action ───────────────────────────────────── */}
-        <div className="flex-shrink-0 px-4 pt-3 pb-4">
+        <div className="flex-shrink-0 px-4 pt-4 pb-5">
           {!revealed ? (
             <button
               disabled={selected === null || selected === undefined || selected === ''}
