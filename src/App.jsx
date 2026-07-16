@@ -10,9 +10,6 @@ import Auth from './screens/Auth'
 import KidPicker from './screens/KidPicker'
 import CreateKid from './screens/CreateKid'
 import ChildOnboarding from './screens/ChildOnboarding'
-import LevelSelect from './screens/LevelSelect'
-import TablePicker from './screens/TablePicker'
-import TestIntro from './screens/TestIntro'
 import ParentPinEntry from './screens/ParentPinEntry'
 import ParentDashboard from './screens/ParentDashboard'
 import StreakSlide from './screens/StreakSlide'
@@ -51,6 +48,7 @@ export default function App() {
   const [refreshKey, setRefreshKey] = useState(0)
   const [onboardingStartStep, setOnboardingStartStep] = useState(0)
   const [onboardingKidName, setOnboardingKidName] = useState('')
+  const [onboardingKidAge, setOnboardingKidAge] = useState('')
   const [showStreakSlide,  setShowStreakSlide]  = useState(false)
   const [streakCount,    setStreakCount]    = useState(1)
   const [streakTrigger,  setStreakTrigger]  = useState('welcome')
@@ -66,6 +64,10 @@ export default function App() {
     } else if (kidId && authPhase === 'diagnostic') {
       try {
         sessionStorage.setItem('numio_kid', JSON.stringify({ kidId, phase: 'diagnostic', pendingClaim, selectedTables }))
+      } catch {}
+    } else if (kidId && authPhase === 'onboarding') {
+      try {
+        sessionStorage.setItem('numio_kid', JSON.stringify({ kidId, phase: 'onboarding' }))
       } catch {}
     }
   }, [kidId, authPhase, navTab, screen, pendingClaim, selectedTables])
@@ -87,12 +89,12 @@ export default function App() {
             setKidId(savedKidId)
             setParentId(saved)
             if (phase === 'diagnostic') {
-              // Restore to diagnostic — questions regenerated fresh but kid stays in flow
               if (parsed.pendingClaim) setPendingClaim(parsed.pendingClaim)
               if (parsed.selectedTables) setSelectedTables(parsed.selectedTables)
               setAuthPhase('diagnostic')
+            } else if (phase === 'onboarding') {
+              setAuthPhase('onboarding')
             } else {
-              // Restore to game — if was mid-play, go back to path safely
               setNavTab(parsed.navTab || 'home')
               setScreen(parsed.screen === 'play' ? 'path' : (parsed.screen || 'list'))
               setAuthPhase('game')
@@ -126,6 +128,9 @@ export default function App() {
 
   function handleKidCreated(newKidId) {
     setKidId(newKidId)
+    setOnboardingStartStep(0)
+    setOnboardingKidName('')
+    setOnboardingKidAge('')
     setAuthPhase('onboarding')
   }
 
@@ -274,8 +279,10 @@ export default function App() {
         parentId={parentId}
         startStep={onboardingStartStep}
         savedName={onboardingKidName}
-        onDone={async ({ justStarting, knownOps, tablesByOp, goToDiagnostic, kidName }) => {
+        savedAge={onboardingKidAge}
+        onDone={async ({ justStarting, knownOps, tablesByOp, goToDiagnostic, kidName, kidAge }) => {
           if (kidName) setOnboardingKidName(kidName)
+          if (kidAge) setOnboardingKidAge(kidAge)
           if (justStarting || !goToDiagnostic) {
             // Just starting out or no diagnostic needed — go straight to game
             setAuthPhase('game')
@@ -283,13 +290,13 @@ export default function App() {
             setScreen('list')
           } else {
             // They know some math — set up diagnostic
-            const firstOp = knownOps[0]
-            const tables = tablesByOp[firstOp] || []
-            setPendingClaim(firstOp)
+            const claimOp = knownOps[knownOps.length - 1]
+            const tables = tablesByOp[claimOp] || []
+            setPendingClaim(claimOp)
             setSelectedTables(tables)
             try {
               const { updatePlacementClaim } = await import('./lib/kidData')
-              await updatePlacementClaim(kidId, firstOp)
+              await updatePlacementClaim(kidId, claimOp)
             } catch (err) { console.error('Failed to save placement claim:', err) }
             setAuthPhase('diagnostic')
           }
