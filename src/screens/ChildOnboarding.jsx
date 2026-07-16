@@ -36,7 +36,7 @@ function useTypewriter(text, speed = 10) {
 }
 
 // ── Layout: bubble above mascot ────────────────────────────────────────────────
-function Layout({ bubbleText, mascotSize = 130, children, button, step }) {
+function Layout({ bubbleText, mascotSize = 110, children, button, step }) {
   const [showBubble, setShowBubble] = useState(false)
   useEffect(() => {
     const t = setTimeout(() => setShowBubble(true), 400)
@@ -59,6 +59,7 @@ function Layout({ bubbleText, mascotSize = 130, children, button, step }) {
       fontFamily: "'Baloo 2', sans-serif",
       animation: 'fadeUp 0.3s ease both',
       alignItems: 'center',
+      overflow: 'hidden',
     }}>
       <style>{ANIM}</style>
 
@@ -76,7 +77,7 @@ function Layout({ bubbleText, mascotSize = 130, children, button, step }) {
         </div>
       )}
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 20, width: '100%', maxWidth: 420, padding: '24px 24px 0', margin: '0 auto' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-evenly', gap: 12, width: '100%', maxWidth: 420, padding: '16px 24px 0', margin: '0 auto', overflowY: 'auto' }}>
         {/* Bubble — appears 100ms after mascot */}
         {showBubble && (
           <div style={{
@@ -105,7 +106,7 @@ function Layout({ bubbleText, mascotSize = 130, children, button, step }) {
         {children && <div style={{ width: '100%', maxWidth: 340 }}>{children}</div>}
       </div>
 
-      <div style={{ padding: '0 24px', width: '100%', maxWidth: 420, boxSizing: 'border-box', margin: '0 auto' }}>
+      <div style={{ padding: '12px 24px 0', width: '100%', maxWidth: 420, boxSizing: 'border-box', margin: '0 auto' }}>
         {button}
       </div>
     </div>
@@ -286,12 +287,12 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
       step={4} button={howStep < howSteps.length - 1
         ? <GreenButton onClick={() => setHowStep(s => s + 1)}>NEXT →</GreenButton>
         : <GreenButton onClick={() => setStep(5)}>GOT IT! →</GreenButton>}>
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, width: '100%' }}>
         {howSteps.map((s, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <div style={{ width: 68, height: 68, borderRadius: '50%', background: howStep >= i ? '#f0fff0' : '#f9fafb', border: `3px solid ${howStep >= i ? '#58cc02' : '#e5e7eb'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 30, transition: 'all 0.3s', animation: howStep === i ? 'pop 0.4s ease both' : 'none' }}>{s.icon}</div>
-            <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 15, color: howStep >= i ? '#1a1a1a' : '#d1d5db', margin: '8px 0', transition: 'color 0.3s' }}>{s.label}</p>
-            {i < howSteps.length - 1 && <div style={{ fontSize: 20, color: howStep > i ? '#58cc02' : '#e5e7eb', margin: '4px 0', transition: 'color 0.3s' }}>↓</div>}
+            <div style={{ width: 56, height: 56, borderRadius: '50%', background: howStep >= i ? '#f0fff0' : '#f9fafb', border: `3px solid ${howStep >= i ? '#58cc02' : '#e5e7eb'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, transition: 'all 0.3s', animation: howStep === i ? 'pop 0.4s ease both' : 'none' }}>{s.icon}</div>
+            <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 14, color: howStep >= i ? '#1a1a1a' : '#d1d5db', margin: '6px 0', transition: 'color 0.3s' }}>{s.label}</p>
+            {i < howSteps.length - 1 && <div style={{ fontSize: 16, color: howStep > i ? '#58cc02' : '#e5e7eb', margin: '2px 0', transition: 'color 0.3s' }}>↓</div>}
           </div>
         ))}
       </div>
@@ -319,7 +320,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
           CONTINUE →
         </GreenButton>
       }>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
         {/* Just starting out — ON TOP */}
         <button onClick={() => { setJustStarting(true); setKnownOps([]) }} style={{
           display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 12,
@@ -384,7 +385,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
             {Array.from({length:12},(_,i)=>i+1).every(t=>currentTables.includes(t)) ? '✓ All selected' : 'Select all'}
           </button>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 7 }}>
           {Array.from({ length: 12 }, (_, i) => i + 1).map(t => {
             const selected = currentTables.includes(t)
             return (
@@ -394,7 +395,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
                   [highestOp.id]: selected ? (prev[highestOp.id] || []).filter(x => x !== t) : [...(prev[highestOp.id] || []), t],
                 }))
               }} style={{
-                padding: '12px 0', borderRadius: 12,
+                padding: '10px 0', borderRadius: 10,
                 border: `3px solid ${selected ? highestOp.color : '#e5e7eb'}`,
                 background: selected ? `${highestOp.color}15` : '#fff',
                 fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 18,
