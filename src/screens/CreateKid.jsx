@@ -20,7 +20,7 @@ export default function CreateKid({ parentId, onCreated, onBack }) {
           placementClaim: null,
           timezone: detectTimezone(),
         })
-        trackEvent('kid_created')
+        trackEvent('child_created', { parentId, kidId })
         onCreated(kidId)
       } catch (err) {
         setError(err instanceof AuthError ? err.message : 'Something went wrong. Please try again.')
