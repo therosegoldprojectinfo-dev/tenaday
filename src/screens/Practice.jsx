@@ -836,7 +836,7 @@ export default function Practice({
         onGiveUp={handleGiveUp}
       />
 
-      <div className="h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md">
+      <div className="h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md" style={{height: "100dvh"}}>
 
         {/* ── Top bar ─────────────────────────────────────────── */}
         <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-3 pb-2">
@@ -938,7 +938,7 @@ export default function Practice({
         </div>
 
         {/* ── Answer choices ──────────────────────────────────── */}
-        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col px-4 pb-2">
+        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col justify-center px-4">
           {isFormula ? (
             // Formula keyboard — kid types e.g. "3 + 4"
             <div className="flex flex-col items-center gap-2">
@@ -1094,7 +1094,7 @@ export default function Practice({
                 <button key={choice} disabled={revealed}
                   onClick={() => !revealed && setSelected(choice)}
                   className={['rounded-2xl border-2 font-display font-bold text-4xl card-answer',
-                    'flex items-center justify-center w-full select-none',
+                    'flex items-center justify-center w-full select-none h-24',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
