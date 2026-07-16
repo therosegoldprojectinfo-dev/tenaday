@@ -385,6 +385,17 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
   const [timerKey, setTimerKey] = useState(0)
   const timeoutRef = useRef(null)
 
+  // The 10s timer's setTimeout schedules handleTimerExpire once per
+  // question (see the effect below, deps don't include `selected` on
+  // purpose — re-scheduling the timer every keystroke would reset the
+  // countdown). But that means the scheduled callback closed over
+  // whatever `selected` was AT THE MOMENT the timer was set (usually
+  // null) — a kid picking the right answer just before the timer fires
+  // was still graded as wrong. Mirror `selected` into a ref so the
+  // callback always reads the CURRENT value when it actually fires.
+  const selectedRef = useRef(selected)
+  useEffect(() => { selectedRef.current = selected }, [selected])
+
   // Build pedagogical hint based on operation
   function buildHint(wrongAnswer) {
     if (!q) return ''
@@ -396,7 +407,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
 
   function handleTimerExpire() {
     if (revealed || over || showPopup) return
-    const choice = selected
+    const choice = selectedRef.current
     const correct = choice !== null && choice !== undefined && choice !== ''
       ? (isTyped ? String(choice).trim() === String(q.answer) : choice === q.answer)
       : false
