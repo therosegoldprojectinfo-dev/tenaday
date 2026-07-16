@@ -152,6 +152,16 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
   const [tablesByOp, setTablesByOp] = useState({})
   const [howStep, setHowStep] = useState(0)
 
+  // Typewriter texts for screens 8 and 9 — must be at top level (Rules of Hooks)
+  const { displayed: screen8Text } = useTypewriter(
+    step === 8 ? `Ooh nice, ${name}! 🔥 Let's do a quick test to confirm the level!` : '',
+    10
+  )
+  const { displayed: screen9Text } = useTypewriter(
+    step === 9 ? `Ok ${name}, let's start your journey! 🚀` : '',
+    10
+  )
+
   const howSteps = [
     { icon: '🧮', label: 'Practice math' },
     { icon: '🪙', label: 'Earn coins' },
@@ -336,13 +346,12 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
 
   // SCREEN 8: Result before diagnostic — special image
   if (step === 8) {
-    const { displayed } = useTypewriter(`Ooh nice, ${name}! 🔥 Let's do a quick test to confirm the level!`, 10)
     return (
       <div style={{ minHeight: '100dvh', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '48px 24px 40px', boxSizing: 'border-box', maxWidth: 420, margin: '0 auto', fontFamily: "'Baloo 2', sans-serif" }}>
         <style>{ANIM}</style>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
           <div style={{ background: '#fff', border: '2.5px solid #e5e7eb', borderRadius: 20, padding: '16px 22px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', position: 'relative', width: '100%', maxWidth: 320, minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 20, color: '#1a1a1a', margin: 0, lineHeight: 1.4, textAlign: 'center' }}>{displayed}</p>
+            <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 20, color: '#1a1a1a', margin: 0, lineHeight: 1.4, textAlign: 'center' }}>{screen8Text}</p>
             <div style={{ position: 'absolute', bottom: -13, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '11px solid transparent', borderRight: '11px solid transparent', borderTop: '13px solid white' }} />
             <div style={{ position: 'absolute', bottom: -16, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '12px solid transparent', borderRight: '12px solid transparent', borderTop: '14px solid #e5e7eb', zIndex: -1 }} />
           </div>
@@ -358,13 +367,12 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
 
   // SCREEN 9: Just starting out congrats screen
   if (step === 9) {
-    const { displayed } = useTypewriter(`Ok ${name}, let's start your journey! 🚀`, 10)
     return (
       <div style={{ minHeight: '100dvh', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '60px 24px 40px', boxSizing: 'border-box', maxWidth: 420, margin: '0 auto', fontFamily: "'Baloo 2', sans-serif" }}>
         <style>{ANIM}</style>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28 }}>
           <div style={{ background: '#fff', border: '2.5px solid #e5e7eb', borderRadius: 20, padding: '18px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', position: 'relative', maxWidth: 300, minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 22, color: '#1a1a1a', margin: 0, textAlign: 'center' }}>{displayed}</p>
+            <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 22, color: '#1a1a1a', margin: 0, textAlign: 'center' }}>{screen9Text}</p>
             <div style={{ position: 'absolute', bottom: -13, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '11px solid transparent', borderRight: '11px solid transparent', borderTop: '13px solid white' }} />
             <div style={{ position: 'absolute', bottom: -16, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '12px solid transparent', borderRight: '12px solid transparent', borderTop: '14px solid #e5e7eb', zIndex: -1 }} />
           </div>
