@@ -144,44 +144,56 @@ const CLAIM_LABELS = {
 
 // ── Main CreateKid orchestrator ───────────────────────────────────────────
 export default function CreateKid({ parentId, onCreated, onBack }) {
-  const [nameAge, setNameAge]       = useState(null)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError]           = useState(null)
 
-  async function handleStep1Done({ name, age }) {
-    setNameAge({ name, age })
+  // Create a minimal kid record immediately — name and age will be
+  // collected in the new ChildOnboarding flow right after this.
+  async function handleCreate() {
     setSubmitting(true)
     setError(null)
     try {
       const kidId = await createKid(parentId, {
-        name,
-        age,
+        name: 'New Kid',
+        age: null,
         placementClaim: null,
         timezone: detectTimezone(),
       })
-      onCreated(kidId, null)
+      onCreated(kidId)
     } catch (err) {
       setError(err instanceof AuthError ? err.message : 'Something went wrong. Please try again.')
       setSubmitting(false)
     }
   }
 
-  if (submitting) {
+  // Auto-create on mount
+  if (!submitting && !error) {
+    handleCreate()
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="font-body text-gray-400">Creating profile…</p>
+        <p className="font-body text-gray-400">Setting up...</p>
       </div>
     )
   }
 
-  return (
-    <div>
-      {error && (
-        <div className="fixed top-4 left-4 right-4 z-50 rounded-xl bg-red-50 border border-red-100 px-4 py-3">
-          <p className="font-body text-sm text-red-600">{error}</p>
-        </div>
-      )}
-      <StepNameAge onNext={handleStep1Done} onBack={onBack} />
-    </div>
-  )
+  if (submitting) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="font-body text-gray-400">Setting up...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 gap-4">
+        <p className="font-body text-gray-500 text-center">{error}</p>
+        <button onClick={handleCreate} className="btn-duo px-8 py-3 rounded-2xl font-body font-bold">
+          Try again
+        </button>
+      </div>
+    )
+  }
+
+  return null
 }
