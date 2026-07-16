@@ -81,7 +81,7 @@ export default function ChapterIntro({ operation, table, batchNum, node, kidId, 
       console.error('Failed to advance after chapter intro:', err)
     } finally {
       setSaving(false)
-      onDone?.()
+      onDone?.(node, table, batchNum)
     }
   }
 
