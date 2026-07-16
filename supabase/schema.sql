@@ -277,7 +277,7 @@ on conflict (id) do update set
 -- next_unlock_at: the exact server timestamp when the next batch unlocks —
 -- set by complete_unit() RPC, checked by can_start_new_unit() RPC.
 
-alter table kids add column if not exists timezone text not null default 'America/Toronto';
+alter table kids add column if not exists timezone text not null default 'UTC';
 alter table kids add column if not exists next_unlock_at timestamptz;
 -- heart_balance column removed in v4 — hearts mechanic was fully removed.
 -- (Existing DBs: run `alter table kids drop column if exists heart_balance;`
