@@ -902,6 +902,9 @@ export default function Practice({
           </div>
         )}
 
+        {/* ── Scrollable content area ─────────────────────────── */}
+        <div className="flex-1 overflow-y-auto flex flex-col">
+
         {/* ── Question text ───────────────────────────────────── */}
         <div className={`flex-shrink-0 px-6 pt-6 pb-2 ${q.text.endsWith('= ?') ? 'flex items-center justify-center' : ''}`}>
           <p className={
@@ -1106,8 +1109,10 @@ export default function Practice({
           )}
         </div>
 
-        {/* ── Bottom action ───────────────────────────────────── */}
-        <div className="flex-shrink-0 px-4 pb-8 pt-3">
+        </div>{/* end scrollable content */}
+
+        {/* ── Bottom action — sticky, never scrolls ───────────── */}
+        <div className="flex-shrink-0 px-4 pb-8 pt-3" style={{ borderTop: '1px solid #f3f4f6', background: '#fff' }}>
           {!revealed ? (
             <button
               disabled={selected === null || selected === undefined || selected === ''}
