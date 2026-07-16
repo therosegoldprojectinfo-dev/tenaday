@@ -941,7 +941,7 @@ export default function Practice({
         </div>
 
         {/* ── Answer choices ──────────────────────────────────── */}
-        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col justify-center px-4 gap-3">
+        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col justify-evenly px-4 gap-2 py-2">
           {isFormula ? (
             // Formula keyboard — kid types e.g. "3 + 4"
             <div className="flex flex-col items-center gap-4">
