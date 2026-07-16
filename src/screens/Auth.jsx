@@ -73,7 +73,7 @@ export default function Auth({ onAuthenticated, onBack }) {
     setError(null)
     try {
       const parentId = isSignup ? await signUp(phone, pin) : await logIn(phone, pin)
-      onAuthenticated(parentId)
+      onAuthenticated(parentId, isSignup) // isSignup=true means new account
     } catch (err) {
       setError(err instanceof AuthError ? err.message : 'Something went wrong. Please try again.')
     } finally {
