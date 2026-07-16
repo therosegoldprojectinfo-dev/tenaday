@@ -59,7 +59,6 @@ function Layout({ bubbleText, mascotSize = 110, children, button, step }) {
       maxWidth: 420, margin: '0 auto',
       fontFamily: "'Baloo 2', sans-serif",
       animation: 'fadeUp 0.3s ease both',
-      alignItems: 'center',
       overflow: 'hidden',
     }}>
       <style>{ANIM}</style>
@@ -425,6 +424,14 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
     return (
       <div style={{ minHeight: '100dvh', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '48px 24px 40px', boxSizing: 'border-box', maxWidth: 420, margin: '0 auto', fontFamily: "'Baloo 2', sans-serif" }}>
         <style>{ANIM}</style>
+        {/* Progress bar — screens 1-7 show this via Layout; this screen has
+            its own bespoke layout (bypassing Layout) so it was previously
+            missing entirely. Step 8 of 8 = full bar. */}
+        <div style={{ width: '100%', maxWidth: 420, padding: '0 0 16px', boxSizing: 'border-box', margin: '0 auto' }}>
+          <div style={{ height: 8, background: '#f3f4f6', borderRadius: 8, overflow: 'hidden' }}>
+            <div style={{ height: '100%', borderRadius: 8, background: '#58cc02', width: '100%' }} />
+          </div>
+        </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 24 }}>
           <div style={{ background: '#fff', border: '2.5px solid #e5e7eb', borderRadius: 20, padding: '16px 22px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', position: 'relative', width: '100%', maxWidth: 320, minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 20, color: '#1a1a1a', margin: 0, lineHeight: 1.4, textAlign: 'center' }}>{screen8Text}</p>
