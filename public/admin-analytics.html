@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex, nofollow" />
+<title>Numio — Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #58cc02;
+    --green-dark: #46a302;
+    --ink: #1a1a1a;
+    --gray-500: #6b7280;
+    --gray-400: #9ca3af;
+    --gray-100: #f3f4f6;
+    --border: #e5e7eb;
+    --blue: #1CB0F6;
+    --orange: #FF9600;
+    --purple: #CE82FF;
+    --red: #ff4b4b;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #fafafa;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, .brand { font-family: 'Baloo 2', sans-serif; }
+
+  /* ── Gate screen ─────────────────────────────────────────────── */
+  #gate {
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .gate-card {
+    background: #fff;
+    border: 2px solid var(--border);
+    border-radius: 20px;
+    padding: 40px 32px;
+    width: 100%;
+    max-width: 340px;
+    text-align: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.05);
+  }
+  .gate-card .brand {
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--green);
+    margin: 0 0 4px;
+  }
+  .gate-card p {
+    color: var(--gray-500);
+    font-size: 14px;
+    margin: 0 0 20px;
+  }
+  input[type="password"] {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 2.5px solid var(--border);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    outline: none;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  input[type="password"]:focus { border-color: var(--green); }
+  button.primary {
+    width: 100%;
+    padding: 14px 0;
+    border: none;
+    border-radius: 12px;
+    background: var(--green);
+    box-shadow: 0 4px 0 var(--green-dark);
+    color: #fff;
+    font-family: 'Baloo 2', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  button.primary:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--green-dark); }
+  #gate-error { color: var(--red); font-size: 13px; margin-top: 10px; min-height: 16px; }
+
+  /* ── Dashboard ────────────────────────────────────────────────── */
+  #dash { display: none; max-width: 1040px; margin: 0 auto; padding: 32px 20px 80px; }
+  .topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 16px; margin-bottom: 28px;
+  }
+  .topbar .brand { font-size: 24px; font-weight: 800; color: var(--ink); margin: 0; }
+  .topbar .brand span { color: var(--green); }
+  .window-toggle { display: flex; gap: 6px; background: var(--gray-100); padding: 4px; border-radius: 12px; }
+  .window-toggle button {
+    border: none; background: transparent; padding: 8px 16px; border-radius: 9px;
+    font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; color: var(--gray-500);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .window-toggle button.active { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+
+  section.group { margin-bottom: 32px; }
+  section.group h2 {
+    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--gray-400); margin: 0 0 12px;
+  }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .card {
+    background: #fff; border: 2px solid var(--border); border-radius: 16px;
+    padding: 18px 20px;
+  }
+  .card .num { font-family: 'Baloo 2', sans-serif; font-size: 30px; font-weight: 800; color: var(--ink); line-height: 1; }
+  .card .label { font-size: 12.5px; color: var(--gray-500); margin-top: 6px; font-weight: 500; }
+  .card.accent .num { color: var(--green); }
+  .card.warn .num { color: var(--orange); }
+  .card.bad .num { color: var(--red); }
+
+  /* ── Funnel bars ──────────────────────────────────────────────── */
+  .funnel { display: flex; flex-direction: column; gap: 10px; }
+  .funnel-row { display: flex; align-items: center; gap: 12px; }
+  .funnel-label { width: 160px; flex-shrink: 0; font-size: 13px; font-weight: 600; color: var(--gray-500); }
+  .funnel-track { flex: 1; height: 30px; background: var(--gray-100); border-radius: 8px; overflow: hidden; position: relative; }
+  .funnel-fill { height: 100%; background: var(--green); border-radius: 8px; transition: width 0.5s ease; }
+  .funnel-count { width: 46px; text-align: right; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+
+  .split-row { display: flex; gap: 12px; }
+  .split-row .card { flex: 1; }
+
+  #loading, #error { text-align: center; padding: 60px 20px; color: var(--gray-500); font-size: 14px; }
+  #error { color: var(--red); display: none; }
+  .updated { text-align: center; font-size: 12px; color: var(--gray-400); margin-top: 24px; }
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <div class="gate-card">
+    <p class="brand">Numio Analytics</p>
+    <p>Enter your admin key to continue</p>
+    <input type="password" id="admin-key-input" placeholder="Admin key" autofocus />
+    <button class="primary" id="unlock-btn">Unlock</button>
+    <div id="gate-error"></div>
+  </div>
+</div>
+
+<div id="dash">
+  <div class="topbar">
+    <p class="brand">Numio <span>Analytics</span></p>
+    <div class="window-toggle">
+      <button data-days="7" class="active">7 days</button>
+      <button data-days="30">30 days</button>
+    </div>
+  </div>
+
+  <div id="loading">Loading…</div>
+  <div id="error">Something went wrong loading stats. Check the console.</div>
+
+  <div id="content" style="display:none">
+
+    <section class="group">
+      <h2>Acquisition</h2>
+      <div class="cards">
+        <div class="card accent"><div class="num" id="signups_total">–</div><div class="label">Total signups</div></div>
+        <div class="card"><div class="num" id="signups_window">–</div><div class="label" id="signups_window_label">Signups (7d)</div></div>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2>Onboarding & activation funnel</h2>
+      <div class="funnel" id="funnel"></div>
+    </section>
+
+    <section class="group">
+      <h2>Level check</h2>
+      <div class="split-row">
+        <div class="card"><div class="num" id="level_just_starting">–</div><div class="label">Just starting out</div></div>
+        <div class="card"><div class="num" id="level_picked_op">–</div><div class="label">Claimed a level</div></div>
+        <div class="card accent"><div class="num" id="diagnostic_passed">–</div><div class="label">Diagnostic passed</div></div>
+        <div class="card warn"><div class="num" id="diagnostic_failed">–</div><div class="label">Diagnostic failed</div></div>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2>Learning activity</h2>
+      <div class="cards">
+        <div class="card"><div class="num" id="units_started_total">–</div><div class="label">Nodes started (all time)</div></div>
+        <div class="card accent"><div class="num" id="units_completed_total">–</div><div class="label">Nodes completed (all time)</div></div>
+        <div class="card"><div class="num" id="units_completed_window">–</div><div class="label" id="units_window_label">Completed (7d)</div></div>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2>Rewards loop</h2>
+      <div class="cards">
+        <div class="card"><div class="num" id="rewards_created">–</div><div class="label">Rewards created</div></div>
+        <div class="card accent"><div class="num" id="rewards_redeemed">–</div><div class="label">Rewards redeemed</div></div>
+        <div class="card" id="redemption-rate-card"><div class="num" id="redemption_rate">–</div><div class="label">Redemption rate</div></div>
+      </div>
+    </section>
+
+    <section class="group">
+      <h2>Abandonment & churn</h2>
+      <div class="cards">
+        <div class="card bad"><div class="num" id="signup_no_kid">–</div><div class="label">Signed up, no kid created</div></div>
+        <div class="card bad"><div class="num" id="kid_no_unit">–</div><div class="label">Kid created, never played a node</div></div>
+        <div class="card bad"><div class="num" id="churned_kids">–</div><div class="label">Churned (played before, silent 14d+)</div></div>
+      </div>
+    </section>
+
+    <div class="updated" id="updated"></div>
+  </div>
+</div>
+
+<script>
+  // ── Config — fill these in with your own project values ──────────────
+  const SUPABASE_URL = 'https://vwqjfoxpwpqnzykoimso.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ3cWpmb3hwd3Bxbnp5a29pbXNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE5OTM3MjMsImV4cCI6MjA5NzU2OTcyM30.nBIcdP2A0LyiiGT4e4xdGkLWNKyQ0PvpHDfN-4yTsUE'
+  const ADMIN_KEY = 'Osman' // must match the SQL function's check
+
+  let currentDays = 7
+
+  async function fetchStats(days) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_dashboard_stats`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      },
+      body: JSON.stringify({ p_admin_key: ADMIN_KEY, p_days: days }),
+    })
+    if (!res.ok) throw new Error(`RPC failed: ${res.status}`)
+    return res.json()
+  }
+
+  function pct(n, d) {
+    if (!d) return '0%'
+    return Math.round((n / d) * 100) + '%'
+  }
+
+  function renderFunnel(stats) {
+    const steps = [
+      { label: 'Signed up',        value: stats.signups_total },
+      { label: 'Created a kid',    value: stats.kids_created },
+      { label: 'Started onboarding', value: stats.onboarding_started },
+      { label: 'Selected a level', value: stats.level_selected_total },
+      { label: 'Completed a node', value: stats.kids_completed_a_unit },
+    ]
+    const max = steps[0].value || 1
+    const el = document.getElementById('funnel')
+    el.innerHTML = steps.map(s => `
+      <div class="funnel-row">
+        <div class="funnel-label">${s.label}</div>
+        <div class="funnel-track">
+          <div class="funnel-fill" style="width:${Math.max(4, (s.value / max) * 100)}%"></div>
+        </div>
+        <div class="funnel-count">${s.value}</div>
+      </div>
+    `).join('')
+  }
+
+  function render(stats) {
+    document.getElementById('signups_total').textContent = stats.signups_total
+    document.getElementById('signups_window').textContent = stats.signups_window
+    document.getElementById('signups_window_label').textContent = `Signups (${currentDays}d)`
+
+    renderFunnel(stats)
+
+    document.getElementById('level_just_starting').textContent = stats.level_just_starting
+    document.getElementById('level_picked_op').textContent = stats.level_picked_op
+    document.getElementById('diagnostic_passed').textContent = stats.diagnostic_passed
+    document.getElementById('diagnostic_failed').textContent = stats.diagnostic_failed
+
+    document.getElementById('units_started_total').textContent = stats.units_started_total
+    document.getElementById('units_completed_total').textContent = stats.units_completed_total
+    document.getElementById('units_completed_window').textContent = stats.units_completed_window
+    document.getElementById('units_window_label').textContent = `Completed (${currentDays}d)`
+
+    document.getElementById('rewards_created').textContent = stats.rewards_created
+    document.getElementById('rewards_redeemed').textContent = stats.rewards_redeemed
+    document.getElementById('redemption_rate').textContent = pct(stats.rewards_redeemed, stats.rewards_created)
+
+    document.getElementById('signup_no_kid').textContent = stats.signup_no_kid
+    document.getElementById('kid_no_unit').textContent = stats.kid_no_unit
+    document.getElementById('churned_kids').textContent = stats.churned_kids
+
+    document.getElementById('updated').textContent = `Updated ${new Date(stats.generated_at).toLocaleString()}`
+  }
+
+  async function loadDashboard() {
+    document.getElementById('loading').style.display = 'block'
+    document.getElementById('error').style.display = 'none'
+    document.getElementById('content').style.display = 'none'
+    try {
+      const stats = await fetchStats(currentDays)
+      render(stats)
+      document.getElementById('loading').style.display = 'none'
+      document.getElementById('content').style.display = 'block'
+    } catch (err) {
+      console.error(err)
+      document.getElementById('loading').style.display = 'none'
+      document.getElementById('error').style.display = 'block'
+    }
+  }
+
+  document.querySelectorAll('.window-toggle button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.window-toggle button').forEach(b => b.classList.remove('active'))
+      btn.classList.add('active')
+      currentDays = parseInt(btn.dataset.days, 10)
+      loadDashboard()
+    })
+  })
+
+  document.getElementById('unlock-btn').addEventListener('click', async () => {
+    const input = document.getElementById('admin-key-input').value
+    if (input !== ADMIN_KEY) {
+      document.getElementById('gate-error').textContent = 'Incorrect key.'
+      return
+    }
+    document.getElementById('gate').style.display = 'none'
+    document.getElementById('dash').style.display = 'block'
+    loadDashboard()
+  })
+
+  document.getElementById('admin-key-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('unlock-btn').click()
+  })
+</script>
+
+</body>
+</html>
