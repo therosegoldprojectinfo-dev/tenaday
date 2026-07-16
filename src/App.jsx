@@ -181,6 +181,13 @@ export default function App() {
   }
 
   function handleStartNode(nodeConfig) {
+    trackEvent('unit_started', {
+      kidId,
+      operation: nodeConfig?.operation,
+      table: nodeConfig?.table,
+      batch: nodeConfig?.batchNum,
+      node: nodeConfig?.node,
+    })
     setActiveNode(nodeConfig)
     setScreen('play')
   }
@@ -194,19 +201,13 @@ export default function App() {
       return
     }
 
-    trackEvent('node_completed', {
+    trackEvent('unit_completed', {
+      kidId,
       operation: activeNode?.operation,
       table,
       batch: batchNum,
       node: completedNode,
     })
-    if (completedNode === 'review') {
-      trackEvent('unit_completed', {
-        operation: activeNode?.operation,
-        table,
-        batch: batchNum,
-      })
-    }
 
     const isVeryFirstUnit = table === 1 && batchNum === 1 && activeNode?.operation === 'addition'
     const shouldShowStreak =
