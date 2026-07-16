@@ -720,7 +720,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
         </div>
 
         {/* ── Bottom action ─────────────────────────────────────────── */}
-        <div className="flex-shrink-0 px-4 pt-3" style={{paddingBottom: "max(16px, env(safe-area-inset-bottom, 16px))"}}
+        <div className="flex-shrink-0 px-4 pt-3" style={{paddingBottom: "max(16px, env(safe-area-inset-bottom, 16px))"}}>
           {!revealed ? (
             <button disabled={selected === null || selected === undefined || selected === ''} onClick={handleCheck}
               className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
