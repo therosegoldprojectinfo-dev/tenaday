@@ -264,6 +264,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
   }, [])
 
   // Auto-scroll to current unit once after load
+  // We wait until AFTER paint (setTimeout 0) so refs are populated
   useEffect(() => {
     if (!kid || hasScrolled.current) return
 
@@ -271,26 +272,33 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
       ? (kid.current_table - 1) * BATCH_COUNT + (kid.current_batch || 1)
       : 1
 
+    // Unit 1 is already at the top — no scroll needed
+    if (currentDay === 1) {
+      hasScrolled.current = true
+      return
+    }
+
     let attempts = 0
     const tryScroll = () => {
       attempts++
       const el = unitRefs.current[currentDay]
       const container = scrollContainerRef.current
+
       if (el && container) {
+        hasScrolled.current = true
         const elTop = el.getBoundingClientRect().top
         const containerTop = container.getBoundingClientRect().top
-        const offset = elTop - containerTop - 190
-        // Only scroll if we actually need to (unit not already visible)
-        if (Math.abs(offset) > 20) {
-          container.scrollTo({ top: container.scrollTop + offset, behavior: 'smooth' })
-        }
-        hasScrolled.current = true
+        const scrollTop = container.scrollTop
+        const target = scrollTop + elTop - containerTop - 190
+        container.scrollTo({ top: target, behavior: 'smooth' })
       } else if (attempts < 20) {
-        setTimeout(tryScroll, 150)
+        setTimeout(tryScroll, 200)
       }
     }
-    setTimeout(tryScroll, 600)
-  }, [kid, operation])
+
+    // Wait for DOM to fully render before first attempt
+    setTimeout(tryScroll, 800)
+  }, [kid])
 
   const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT
 
