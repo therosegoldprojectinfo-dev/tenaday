@@ -209,8 +209,10 @@
       <h2>Learning activity</h2>
       <div class="cards">
         <div class="card"><div class="num" id="units_started_total">–</div><div class="label">Nodes started (all time)</div></div>
-        <div class="card accent"><div class="num" id="units_completed_total">–</div><div class="label">Nodes completed (all time)</div></div>
+        <div class="card"><div class="num" id="units_completed_total">–</div><div class="label">Nodes completed (all time)</div></div>
         <div class="card"><div class="num" id="units_completed_window">–</div><div class="label" id="units_window_label">Completed (7d)</div></div>
+        <div class="card accent"><div class="num" id="kids_ever_played">–</div><div class="label">Kids who've ever played</div></div>
+        <div class="card accent"><div class="num" id="active_kids_24h">–</div><div class="label">Active kids (played in 24h)</div></div>
       </div>
     </section>
 
@@ -299,6 +301,8 @@
     document.getElementById('units_started_total').textContent = stats.units_started_total
     document.getElementById('units_completed_total').textContent = stats.units_completed_total
     document.getElementById('units_completed_window').textContent = stats.units_completed_window
+    document.getElementById('kids_ever_played').textContent = stats.kids_ever_played
+    document.getElementById('active_kids_24h').textContent = stats.active_kids_24h
     document.getElementById('units_window_label').textContent = `Completed (${currentDays}d)`
 
     document.getElementById('rewards_created').textContent = stats.rewards_created
