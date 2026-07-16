@@ -611,6 +611,15 @@ export default function Practice({
   const timeoutRef = useRef(null)
   const { speak, stop, speaking } = useSpeech()
 
+  // Same stale-closure fix as Diagnostic.jsx: the timer effect below
+  // deliberately doesn't depend on `selected` (so picking an answer
+  // doesn't reset the countdown), but that means the scheduled timeout
+  // was closing over whatever `selected` was when the timer was set
+  // (usually null). Mirror it into a ref so handleTimerExpire always
+  // reads the CURRENT selection when it actually fires.
+  const selectedRef = useRef(selected)
+  useEffect(() => { selectedRef.current = selected }, [selected])
+
   const q         = questions[idx]
   const isTyped   = q?.isTyped === true
   const isFormula = q?.choiceType === 'formula'
@@ -709,7 +718,7 @@ export default function Practice({
 
   function handleTimerExpire() {
     if (revealed || over || showPopup) return
-    const choice = selected
+    const choice = selectedRef.current
     const correct = choice !== null && choice !== undefined && choice !== ''
       ? (isTyped ? String(choice).trim() === String(q.answer) : choice === q.answer)
       : false
@@ -769,7 +778,7 @@ export default function Practice({
         kidId ? setCoinBalance(kidId, newBalance) : Promise.resolve(),
         kidId ? logCoinTransaction(kidId, { amount: basePayout, reason: 'node_pass', balanceAfter: newBalance }) : Promise.resolve(),
         kidId ? logAttempt(kidId, { operation, table, node, questionsSeen: questions.length, correctCount: questions.length - wrong, wrongCount: wrong, livesUsed: 0, result: 'passed', coinsDelta: basePayout }) : Promise.resolve(),
-        (node === 'review' && kidId) ? stampAdvanceDate(kidId) : Promise.resolve(),
+        (node === 'review' && kidId && isForward) ? stampAdvanceDate(kidId) : Promise.resolve(),
       ])
       onBalanceChange?.(newBalance)
     } catch (err) {
