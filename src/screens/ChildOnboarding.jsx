@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { trackEvent } from '../lib/analytics'
 
 const ANIM = `
   @keyframes mascot-float {
@@ -192,6 +193,14 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
   const [tablesByOp, setTablesByOp] = useState({})
   const [howStep, setHowStep] = useState(0)
 
+  // Fires once per real onboarding attempt. startStep > 0 means this is a
+  // resume (e.g. App.jsx's onPickLevel jumps back in at step 6 to redo the
+  // level check) rather than a fresh start, so don't double-count those.
+  useEffect(() => {
+    if (startStep === 0) trackEvent('onboarding_started', { parentId, kidId })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Typewriter texts for screens 8 and 9 — must be at top level (Rules of Hooks)
   const { displayed: screen8Text } = useTypewriter(
     step === 8 ? `Ooh nice, ${name}! 🔥 Let's do a quick test to confirm the level!` : '',
@@ -232,7 +241,9 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
           .from('gifts')
           .insert({ parent_id: parentId, name: rewardName.trim(), coin_price: price, icon: 'gift' })
         if (giftError) console.error('Gift insert failed:', giftError) // non-fatal — proceed
+        else trackEvent('reward_created', { parentId, reward_name: rewardName.trim(), coin_price: price })
       }
+      trackEvent('level_selected', { parentId, kidId, just_starting: justStarting, known_ops: knownOps })
       const completedTablesByOp = {}
       knownOps.forEach((op, i) => {
         completedTablesByOp[op] = i < knownOps.length - 1
