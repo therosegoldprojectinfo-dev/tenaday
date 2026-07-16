@@ -137,6 +137,7 @@ export default function App() {
 
   function handleDiagnosticPass() {
     // Cursor already set to claimed chapter by Diagnostic.jsx; go straight to game.
+    trackEvent('diagnostic_completed', { kidId, passed: true })
     setPendingClaim(null)
     setAuthPhase('game')
     setNavTab('home')
@@ -145,6 +146,7 @@ export default function App() {
 
   function handleDiagnosticFail() {
     // Cursor stays at addition/table1/batch1/learn (the default from createKid).
+    trackEvent('diagnostic_completed', { kidId, passed: false })
     setPendingClaim(null)
     setAuthPhase('game')
     setNavTab('home')
