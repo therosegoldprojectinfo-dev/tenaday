@@ -179,10 +179,10 @@ function HelloScreen({ onNext }) {
 }
 
 // ── Main component ─────────────────────────────────────────────────────────────
-export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0, savedName = '' }) {
+export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0, savedName = '', savedAge = '' }) {
   const [step, setStep] = useState(startStep)
   const [name, setName] = useState(savedName)
-  const [age, setAge] = useState('')
+  const [age, setAge] = useState(savedAge)
   const [rewardName, setRewardName] = useState('')
   const [rewardPrice, setRewardPrice] = useState('')
   const [saving, setSaving] = useState(false)
@@ -219,11 +219,18 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
     setSaving(true)
     try {
       if (name.trim()) {
-        await supabase.from('kids').update({ name: name.trim(), age: parseInt(age) || null }).eq('id', kidId)
+        const { error: kidError } = await supabase
+          .from('kids')
+          .update({ name: name.trim(), age: parseInt(age) || null })
+          .eq('id', kidId)
+        if (kidError) throw kidError
       }
       if (rewardName.trim() && rewardPrice) {
         const price = Math.min(250, Math.max(150, parseInt(rewardPrice) || 200))
-        await supabase.from('gifts').insert({ parent_id: parentId, name: rewardName.trim(), coin_price: price, icon: 'gift' })
+        const { error: giftError } = await supabase
+          .from('gifts')
+          .insert({ parent_id: parentId, name: rewardName.trim(), coin_price: price, icon: 'gift' })
+        if (giftError) console.error('Gift insert failed:', giftError) // non-fatal — proceed
       }
       const completedTablesByOp = {}
       knownOps.forEach((op, i) => {
@@ -231,10 +238,9 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
           ? Array.from({ length: 12 }, (_, j) => j + 1)
           : (tablesByOp[op] || [])
       })
-      onDone({ justStarting, knownOps, tablesByOp: completedTablesByOp, goToDiagnostic, kidName: name.trim() })
+      onDone({ justStarting, knownOps, tablesByOp: completedTablesByOp, goToDiagnostic, kidName: name.trim(), kidAge: age })
     } catch (err) {
       console.error('Onboarding save failed:', err)
-    } finally {
       setSaving(false)
     }
   }
@@ -254,7 +260,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
   if (step === 2) return (
     <Layout bubbleText={`How old is ${name || 'your child'}? 🎈`}
       step={2} button={<GreenButton onClick={() => setStep(3)} disabled={!age || isNaN(parseInt(age)) || parseInt(age) < 3 || parseInt(age) > 14}>CONTINUE →</GreenButton>}>
-      <StyledInput type="number" value={age} onChange={e => setAge(e.target.value)} placeholder="Age..." min={4} max={18} />
+      <StyledInput type="number" value={age} onChange={e => setAge(e.target.value)} placeholder="Age..." min={3} max={14} />
     </Layout>
   )
 
