@@ -137,7 +137,7 @@ export default function Auth({ onAuthenticated, onBack }) {
                 inputMode="tel"
                 autoComplete="tel"
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPhone(e.target.value.replace(/[^0-9+\-\s()]/g, ''))}
                 placeholder="(555) 123-4567"
                 className="w-full rounded-2xl border-2 border-gray-200 px-4 py-3.5 font-body text-base text-gray-900
                            focus:border-green-500 focus:outline-none transition-colors"
