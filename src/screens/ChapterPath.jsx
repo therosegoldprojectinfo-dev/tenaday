@@ -250,9 +250,10 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
   const [showNoRewards, setShowNoRewards] = useState(false)
   const [showParentPopup, setShowParentPopup] = useState(false)
   const [showDayGateScreen, setShowDayGateScreen] = useState(false)
-  const unitRefs = useRef({})       // DOM elements, used for scrollIntoView
-  const unitObservers = useRef({})  // IntersectionObserver instances, used for cleanup
+  const unitRefs = useRef({})
+  const unitObservers = useRef({})
   const hasScrolled = useRef(false)
+  const scrollContainerRef = useRef(null)
 
   // Cleanup all IntersectionObservers on unmount
   useEffect(() => {
@@ -272,13 +273,13 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
     if (el) {
       hasScrolled.current = true
       setTimeout(() => {
-        const scrollContainer = el.closest('.overflow-y-auto') || el.parentElement
+        const scrollContainer = scrollContainerRef.current
         if (!scrollContainer) return
         const elTop = el.getBoundingClientRect().top
         const containerTop = scrollContainer.getBoundingClientRect().top
         const offset = elTop - containerTop - 160
         scrollContainer.scrollBy({ top: offset, behavior: 'smooth' })
-      }, 300)
+      }, 400)
     }
   }, [kid, operation])
 
@@ -528,7 +529,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
       })()}
 
       {/* ── Scrollable content ── */}
-      <div className="flex-1 overflow-y-auto relative z-10">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto relative z-10">
 
         {/* Alerts */}
         {dayGateBlocked && (
