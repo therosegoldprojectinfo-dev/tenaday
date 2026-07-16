@@ -269,7 +269,7 @@ function DiagnosticNumioPopup({ visible, hint, answer, isSecondWrong, onRetry, o
 
 // ── Quit confirmation popup — specific to leaving the diagnostic ──────────
 
-function DiagnosticQuitPopup({ visible, onLeave, onStay }) {
+function DiagnosticQuitPopup({ visible, onLeave, onStay, onPickLevel }) {
   if (!visible) return null
   return (
     <div style={{
@@ -296,14 +296,6 @@ function DiagnosticQuitPopup({ visible, onLeave, onStay }) {
           Why are you leaving? 🌸<br />
           Do you want to pick a different level instead?
         </p>
-        <p style={{
-          fontFamily: "'Baloo 2', sans-serif",
-          fontWeight: 600, fontSize: 13,
-          color: '#9ca3af', textAlign: 'center',
-          lineHeight: 1.4, margin: 0,
-        }}>
-          If you quit this test, you'll start at the very beginning of Numio's program.
-        </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
           <button onClick={onStay} style={{
@@ -316,14 +308,23 @@ function DiagnosticQuitPopup({ visible, onLeave, onStay }) {
           }}>
             CONTINUE TEST 💪
           </button>
-          <button onClick={onLeave} style={{
+          <button onClick={onPickLevel} style={{
             width: '100%', border: 'none', cursor: 'pointer',
-            padding: '12px 0', borderRadius: 14,
-            background: 'none', color: '#9ca3af',
+            padding: '13px 0', borderRadius: 14,
+            background: '#f3f4f6', color: '#4b5563',
             fontFamily: "'Baloo 2', sans-serif",
             fontWeight: 700, fontSize: 14,
           }}>
-            Yes, start from the beginning
+            Pick a different level 🔄
+          </button>
+          <button onClick={onLeave} style={{
+            width: '100%', border: 'none', cursor: 'pointer',
+            padding: '10px 0', borderRadius: 14,
+            background: 'none', color: '#9ca3af',
+            fontFamily: "'Baloo 2', sans-serif",
+            fontWeight: 700, fontSize: 13,
+          }}>
+            Start from the beginning
           </button>
         </div>
 
@@ -345,7 +346,7 @@ function DiagnosticQuitPopup({ visible, onLeave, onStay }) {
 
 // ── Main Diagnostic component ─────────────────────────────────────────────
 
-export default function Diagnostic({ kidId, claimedOperation, selectedTables, onPass, onFail }) {
+export default function Diagnostic({ kidId, claimedOperation, selectedTables, onPass, onFail, onPickLevel }) {
   const questions = useMemo(
     () => generateDiagnostic(claimedOperation, selectedTables || []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -533,6 +534,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
         visible={showQuitPopup}
         onStay={() => setShowQuitPopup(false)}
         onLeave={() => { setShowQuitPopup(false); onFail() }}
+        onPickLevel={() => { setShowQuitPopup(false); onPickLevel?.() }}
       />
 
       {/* Numio wrong-answer popup */}
