@@ -269,7 +269,7 @@ function DiagnosticNumioPopup({ visible, hint, answer, isSecondWrong, onRetry, o
 
 // ── Quit confirmation popup — specific to leaving the diagnostic ──────────
 
-function DiagnosticQuitPopup({ visible, onLeave, onStay, onPickLevel }) {
+function DiagnosticQuitPopup({ visible, onLeave, onStay }) {
   if (!visible) return null
   return (
     <div style={{
@@ -296,6 +296,14 @@ function DiagnosticQuitPopup({ visible, onLeave, onStay, onPickLevel }) {
           Why are you leaving? 🌸<br />
           Do you want to pick a different level instead?
         </p>
+        <p style={{
+          fontFamily: "'Baloo 2', sans-serif",
+          fontWeight: 600, fontSize: 13,
+          color: '#9ca3af', textAlign: 'center',
+          lineHeight: 1.4, margin: 0,
+        }}>
+          If you quit this test, you'll start at the very beginning of Numio's program.
+        </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
           <button onClick={onStay} style={{
@@ -308,23 +316,14 @@ function DiagnosticQuitPopup({ visible, onLeave, onStay, onPickLevel }) {
           }}>
             CONTINUE TEST 💪
           </button>
-          <button onClick={onPickLevel} style={{
+          <button onClick={onLeave} style={{
             width: '100%', border: 'none', cursor: 'pointer',
-            padding: '13px 0', borderRadius: 14,
-            background: '#f3f4f6', color: '#4b5563',
+            padding: '12px 0', borderRadius: 14,
+            background: 'none', color: '#9ca3af',
             fontFamily: "'Baloo 2', sans-serif",
             fontWeight: 700, fontSize: 14,
           }}>
-            Pick a different level 🔄
-          </button>
-          <button onClick={onLeave} style={{
-            width: '100%', border: 'none', cursor: 'pointer',
-            padding: '10px 0', borderRadius: 14,
-            background: 'none', color: '#9ca3af',
-            fontFamily: "'Baloo 2', sans-serif",
-            fontWeight: 700, fontSize: 13,
-          }}>
-            Start from the beginning
+            Yes, start from the beginning
           </button>
         </div>
 
@@ -346,7 +345,7 @@ function DiagnosticQuitPopup({ visible, onLeave, onStay, onPickLevel }) {
 
 // ── Main Diagnostic component ─────────────────────────────────────────────
 
-export default function Diagnostic({ kidId, claimedOperation, selectedTables, onPass, onFail, onPickLevel }) {
+export default function Diagnostic({ kidId, claimedOperation, selectedTables, onPass, onFail }) {
   const questions = useMemo(
     () => generateDiagnostic(claimedOperation, selectedTables || []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -534,7 +533,6 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
         visible={showQuitPopup}
         onStay={() => setShowQuitPopup(false)}
         onLeave={() => { setShowQuitPopup(false); onFail() }}
-        onPickLevel={() => { setShowQuitPopup(false); onPickLevel?.() }}
       />
 
       {/* Numio wrong-answer popup */}
@@ -547,10 +545,10 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
         onGiveUp={handleGiveUp}
       />
 
-      <div className="h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md">
+      <div className="md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md" style={{height:"100dvh"}}>
 
         {/* ── Top bar ───────────────────────────────────────────────── */}
-        <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-5 pb-3">
+        <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-2 pb-1">
           <button onClick={() => { stop(); setShowQuitPopup(true) }}
             className="w-11 h-11 flex items-center justify-center rounded-full text-gray-300 transition-colors duration-150 active:bg-gray-100">
             <XIcon />
@@ -582,10 +580,10 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
         </div>
 
         {/* ── Question text ─────────────────────────────────────────── */}
-        <div className={`flex-shrink-0 px-6 pt-6 pb-2 ${q.text.endsWith('= ?') ? 'flex items-center justify-center' : ''}`}>
+        <div className={`flex-shrink-0 px-6 pt-3 pb-1 ${q.text.endsWith('= ?') ? 'flex items-center justify-center' : ''}`}>
           <p className={
             q.text.endsWith('= ?')
-              ? 'text-5xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
+              ? 'text-4xl font-display font-extrabold text-gray-900 text-center leading-tight tracking-tight'
               : 'text-xl font-body font-semibold text-gray-900 text-center leading-snug max-w-[34ch] mx-auto'
           }>
             {q.text}
@@ -593,7 +591,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
         </div>
 
         {/* ── Read aloud button ─────────────────────────────────────── */}
-        <div className="flex-shrink-0 flex justify-center pb-2">
+        <div className="flex-shrink-0 flex justify-center py-1">
           <button
             onClick={() => speaking ? stop() : speak(q.text)}
             className="flex items-center gap-2 px-4 py-2 rounded-full transition-all active:scale-90"
@@ -623,7 +621,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
         )}
 
         {/* ── Answer choices ────────────────────────────────────────── */}
-        <div className="flex-1 flex flex-col justify-center px-4 gap-3">
+        <div className="flex-shrink-0 flex flex-col justify-center px-4 gap-2 mt-1">
           {isTyped ? (
             <div className="flex flex-col items-center gap-4">
               <div className={[
@@ -667,7 +665,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
                         }
                       }}
                       className={[
-                        'h-14 rounded-2xl font-display font-bold text-2xl',
+                        'h-11 rounded-2xl font-display font-bold text-2xl',
                         'flex items-center justify-center select-none',
                         key === null
                           ? 'opacity-0 pointer-events-none'
@@ -690,7 +688,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
                   aria-pressed={selected === choice}
                   className={[
                     'flex-1 rounded-2xl border-2 font-display font-bold text-2xl card-answer',
-                    'flex items-center justify-center h-28 select-none',
+                    'flex items-center justify-center h-20 select-none',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
@@ -701,14 +699,14 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               {q.choices.map(choice => (
                 <button key={choice} disabled={revealed}
                   onClick={() => !revealed && setSelected(choice)}
                   aria-pressed={selected === choice}
                   className={[
                     'rounded-2xl border-2 font-display font-bold text-4xl card-answer',
-                    'flex items-center justify-center h-28 w-full select-none',
+                    'flex items-center justify-center h-20 w-full select-none',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
@@ -722,7 +720,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
         </div>
 
         {/* ── Bottom action ─────────────────────────────────────────── */}
-        <div className="flex-shrink-0 px-4 pb-8 pt-3">
+        <div className="flex-shrink-0 px-4 pt-3" style={{paddingBottom: "max(16px, env(safe-area-inset-bottom, 16px))"}}
           {!revealed ? (
             <button disabled={selected === null || selected === undefined || selected === ''} onClick={handleCheck}
               className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-xl tracking-widest">
