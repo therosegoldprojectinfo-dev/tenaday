@@ -270,9 +270,18 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
   useEffect(() => {
     if (!kid) return
 
+    // Previously this always fell back to unit 1 whenever the kid's
+    // current operation didn't match this chapter — which is correct for
+    // a chapter the kid hasn't reached yet, but wrong for a chapter
+    // they've already FINISHED (kid has moved on to a later operation).
+    // A completed chapter should scroll to its last unit, not its first.
+    const opOrder = ['addition', 'subtraction', 'multiplication', 'division']
+    const isCompletedChapter = opOrder.indexOf(kid.current_operation) > opOrder.indexOf(operation)
     const currentDay = kid.current_operation === operation
       ? (kid.current_table - 1) * BATCH_COUNT + (kid.current_batch || 1)
-      : 1
+      : isCompletedChapter
+        ? TABLE_COUNT * BATCH_COUNT
+        : 1
 
     let attempts = 0
     let rafId = null
