@@ -267,17 +267,16 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
     if (!kid || hasScrolled.current) return
     const currentDay = kid.current_operation === operation
       ? (kid.current_table - 1) * BATCH_COUNT + (kid.current_batch || 1)
-      : null
-    if (!currentDay) return
+      : 1 // default to unit 1 if this chapter isn't active yet
     const el = unitRefs.current[currentDay]
     if (el) {
       hasScrolled.current = true
       setTimeout(() => {
-        // Get the scroll container (the overflow-y-auto div)
         const scrollContainer = el.closest('.overflow-y-auto') || el.parentElement
+        if (!scrollContainer) return
         const elTop = el.getBoundingClientRect().top
         const containerTop = scrollContainer.getBoundingClientRect().top
-        const offset = elTop - containerTop - 160 // 160px from top of scroll area (clears fixed banner)
+        const offset = elTop - containerTop - 160
         scrollContainer.scrollBy({ top: offset, behavior: 'smooth' })
       }, 300)
     }
