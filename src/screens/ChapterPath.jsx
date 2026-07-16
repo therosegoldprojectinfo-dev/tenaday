@@ -266,21 +266,33 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
   // Auto-scroll to current unit once after load
   useEffect(() => {
     if (!kid || hasScrolled.current) return
+
     const currentDay = kid.current_operation === operation
       ? (kid.current_table - 1) * BATCH_COUNT + (kid.current_batch || 1)
-      : 1 // default to unit 1 if this chapter isn't active yet
-    const el = unitRefs.current[currentDay]
-    if (el) {
-      hasScrolled.current = true
-      setTimeout(() => {
-        const scrollContainer = scrollContainerRef.current
-        if (!scrollContainer) return
+      : 1
+
+    // Try multiple times — refs may not be populated immediately after kid loads
+    let attempts = 0
+    const tryScroll = () => {
+      attempts++
+      const el = unitRefs.current[currentDay]
+      const scrollContainer = scrollContainerRef.current
+
+      if (el && scrollContainer) {
+        hasScrolled.current = true
         const elTop = el.getBoundingClientRect().top
         const containerTop = scrollContainer.getBoundingClientRect().top
-        const offset = elTop - containerTop - 160
-        scrollContainer.scrollBy({ top: offset, behavior: 'smooth' })
-      }, 400)
+        const offset = elTop - containerTop - 170
+        if (Math.abs(offset) > 10) {
+          scrollContainer.scrollBy({ top: offset, behavior: 'smooth' })
+        }
+      } else if (attempts < 10) {
+        // Refs not ready yet — try again in 100ms
+        setTimeout(tryScroll, 100)
+      }
     }
+
+    setTimeout(tryScroll, 300)
   }, [kid, operation])
 
   const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT
