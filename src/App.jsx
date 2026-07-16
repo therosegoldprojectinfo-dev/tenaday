@@ -49,7 +49,7 @@ export default function App() {
   const [activeChapter, setActiveChapter] = useState(null)
   const [activeNode, setActiveNode] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
-  const [showStreakSlide, setShowStreakSlide] = useState(false)
+  const [onboardingStartStep, setOnboardingStartStep] = useState(0)
   const [streakCount,    setStreakCount]    = useState(1)
   const [streakTrigger,  setStreakTrigger]  = useState('welcome')
 
@@ -270,6 +270,7 @@ export default function App() {
       <ChildOnboarding
         kidId={kidId}
         parentId={parentId}
+        startStep={onboardingStartStep}
         onDone={async ({ justStarting, knownOps, tablesByOp, goToDiagnostic }) => {
           if (justStarting || !goToDiagnostic) {
             // Just starting out or no diagnostic needed — go straight to game
@@ -301,6 +302,7 @@ export default function App() {
         selectedTables={selectedTables}
         onPass={handleDiagnosticPass}
         onFail={handleDiagnosticFail}
+        onPickLevel={() => { setOnboardingStartStep(6); setAuthPhase('onboarding') }}
       />
     )
   }
