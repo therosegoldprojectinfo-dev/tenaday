@@ -220,7 +220,20 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
           icon: 'gift',
         })
       }
-      onDone({ justStarting, knownOps, tablesByOp, goToDiagnostic })
+      // Build complete tablesByOp — lower ops get all 12 tables by default
+      const OP_ORDER_FULL = ['addition', 'subtraction', 'multiplication', 'division']
+      const highestIdx = knownOps.length > 0 ? OP_ORDER_FULL.indexOf(knownOps[knownOps.length - 1]) : -1
+      const completedTablesByOp = {}
+      knownOps.forEach((op, i) => {
+        if (i < knownOps.length - 1) {
+          // Previous ops — mastered all 12 tables
+          completedTablesByOp[op] = Array.from({ length: 12 }, (_, j) => j + 1)
+        } else {
+          // Highest op — use what they actually selected
+          completedTablesByOp[op] = tablesByOp[op] || []
+        }
+      })
+      onDone({ justStarting, knownOps, tablesByOp: completedTablesByOp, goToDiagnostic })
     } catch (err) {
       console.error('Onboarding save failed:', err)
     } finally {
@@ -378,35 +391,32 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
           display: 'flex', alignItems: 'center', gap: 14,
           padding: '14px 18px', borderRadius: 16,
           border: `3px solid ${justStarting ? '#58cc02' : '#e5e7eb'}`,
-          background: justStarting ? '#f0fff0' : '#fff',
+          background: justStarting ? '#58cc02' : '#fff',
           cursor: 'pointer', transition: 'all 0.15s',
         }}>
           <span style={{ fontSize: 22 }}>🌱</span>
-          <span style={{ fontFamily: "\'Baloo 2\', sans-serif", fontWeight: 700, fontSize: 17, color: justStarting ? '#58cc02' : '#1a1a1a' }}>Just starting out!</span>
-          {justStarting && <span style={{ marginLeft: 'auto', color: '#58cc02', fontSize: 20 }}>✓</span>}
+          <span style={{ fontFamily: "\'Baloo 2\', sans-serif", fontWeight: 700, fontSize: 17, color: justStarting ? '#fff' : '#1a1a1a' }}>Just starting out!</span>
+          {justStarting && <span style={{ marginLeft: 'auto', color: '#fff', fontSize: 20 }}>✓</span>}
         </button>
       </div>
     </Layout>
   )
 
-  // SCREEN 7: Table picker per operation
+  // SCREEN 7: Table picker — ONLY for the highest operation they selected
+  // Previous operations are mastered by default (no need to ask)
   if (step === 7) {
-    const op = OPERATIONS.find(o => o.id === knownOps[currentOpIdx])
-    const currentTables = tablesByOp[op.id] || []
-    const isLastOp = currentOpIdx === knownOps.length - 1
+    const highestOp = OPERATIONS.find(o => o.id === knownOps[knownOps.length - 1])
+    const currentTables = tablesByOp[highestOp.id] || []
 
     return (
       <Layout
-        bubble={`${op.emoji} ${op.label} — which tables do you know? 😊`}
+        bubble={`${highestOp.emoji} ${highestOp.label} — which tables do you know? 😊`}
         button={
           <GreenButton
-            onClick={() => {
-              if (!isLastOp) setCurrentOpIdx(i => i + 1)
-              else setStep(8)
-            }}
+            onClick={() => setStep(8)}
             disabled={currentTables.length === 0}
           >
-            {isLastOp ? 'DONE →' : `NEXT: ${OPERATIONS.find(o => o.id === knownOps[currentOpIdx + 1])?.label} →`}
+            DONE →
           </GreenButton>
         }
       >
@@ -417,14 +427,14 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
               <button key={t} onClick={() => {
                 setTablesByOp(prev => ({
                   ...prev,
-                  [op.id]: selected ? (prev[op.id] || []).filter(x => x !== t) : [...(prev[op.id] || []), t],
+                  [highestOp.id]: selected ? (prev[highestOp.id] || []).filter(x => x !== t) : [...(prev[highestOp.id] || []), t],
                 }))
               }} style={{
                 padding: '12px 0', borderRadius: 12,
-                border: `3px solid ${selected ? op.color : '#e5e7eb'}`,
-                background: selected ? `${op.color}15` : '#fff',
+                border: `3px solid ${selected ? highestOp.color : '#e5e7eb'}`,
+                background: selected ? `${highestOp.color}15` : '#fff',
                 fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 18,
-                color: selected ? op.color : '#6b7280',
+                color: selected ? highestOp.color : '#6b7280',
                 cursor: 'pointer', transition: 'all 0.15s',
               }}>{t}</button>
             )
