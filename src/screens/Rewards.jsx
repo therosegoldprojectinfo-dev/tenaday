@@ -151,7 +151,7 @@ export default function Rewards({ kidId, parentId, onGoToParent }) {
     try {
       const freshKid = await fetchKid(kidId)
       const newBalance = await purchaseGift(kidId, confirming, freshKid.coin_balance)
-      trackEvent('reward_redeemed', { reward_name: confirming.name, coin_price: confirming.coin_price })
+      trackEvent('reward_redeemed', { kidId, parentId, reward_name: confirming.name, coin_price: confirming.coin_price })
       setKid(k => ({ ...k, coin_balance: newBalance }))
       setUnlockedReward(confirming) // show celebration screen
     } catch (err) {
