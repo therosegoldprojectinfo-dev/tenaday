@@ -1,10 +1,34 @@
 -- ============================================================================
 -- Ten a Day — Supabase schema (v3: Numio Daily Loop)
 -- ============================================================================
--- ⚠️  SECURITY: After running this file on a fresh DB, you MUST also run
---     supabase/rls_security.sql to apply RLS policies and server-side auth RPCs.
---     Running schema.sql alone leaves the parents table wide open (dev_open_*
---     policies). The security layer lives in rls_security.sql — don't skip it.
+-- ⚠️  SECURITY: this file alone is NOT safe to run on a fresh DB. It creates
+--     permissive dev_open_* policies (world-readable/writable) as a starting
+--     point — every table stays wide open until the files below run too, IN
+--     THIS ORDER. Skipping any of these recreates the exact security hole
+--     that existed in production for several days across a real deploy:
+--
+--       1. schema.sql                    (this file)
+--       2. rls_security.sql              — drops dev_open_*, adds base RLS
+--       3. rls_owner_lockdown.sql        — REQUIRED: adds real per-parent
+--                                          ownership (auth_user_id) so RLS
+--                                          has something to actually check.
+--                                          Without this file, kids/attempts/
+--                                          coin_transactions/gifts/gift_claims
+--                                          are still readable by anyone with
+--                                          the public anon key.
+--       4. analytics_schema.sql          — analytics_events table + log_event
+--       5. analytics_schema_v2.sql       — widens analytics_events to 11 events
+--       6. analytics_dashboard_rpc.sql   — admin dashboard stats RPC
+--                                          (change the placeholder admin key
+--                                          before running!)
+--       7. purchase_gift_rpc.sql         — atomic reward-purchase RPC
+--
+--     Also required in the Supabase dashboard (not a SQL file):
+--       Authentication → Sign In / Providers → enable "Allow anonymous
+--       sign-ins" — required for rls_owner_lockdown.sql's auth model to work
+--       at all. Without it, nobody can sign up or log in.
+--
+--     See supabase/README.md for the same list with more context.
 -- ============================================================================
 -- Supersedes the 5-node-per-unit model with the 6-node daily loop per
 -- table (spec §6.5):
@@ -321,3 +345,10 @@ as $$
   from kids
   where id = kid_id;
 $$;
+
+-- Explicit grants — every other RPC in this codebase has one; these two
+-- were relying on Supabase's default function privileges, which some
+-- hardened project configs revoke. Without this, kids could silently be
+-- blocked from completing units or having the day gate checked.
+grant execute on function complete_unit(uuid) to authenticated;
+grant execute on function can_start_new_unit(uuid) to authenticated;
