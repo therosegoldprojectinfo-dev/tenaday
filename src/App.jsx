@@ -9,7 +9,7 @@ import Profile from './screens/Profile'
 import Auth from './screens/Auth'
 import KidPicker from './screens/KidPicker'
 import CreateKid from './screens/CreateKid'
-import Onboarding from './screens/Onboarding'
+import ChildOnboarding from './screens/ChildOnboarding'
 import LevelSelect from './screens/LevelSelect'
 import TablePicker from './screens/TablePicker'
 import TestIntro from './screens/TestIntro'
@@ -117,11 +117,8 @@ export default function App() {
     setScreen('list')
   }
 
-  function handleKidCreated(newKidId, placementClaim) {
+  function handleKidCreated(newKidId) {
     setKidId(newKidId)
-    // Always show onboarding first — every new kid sees it.
-    // Store placement claim so we know what to do after onboarding.
-    if (placementClaim) setPendingClaim(placementClaim)
     setAuthPhase('onboarding')
   }
 
@@ -265,59 +262,27 @@ export default function App() {
 
   if (authPhase === 'onboarding') {
     return (
-      <Onboarding
-        onDone={() => setAuthPhase('levelSelect')}
-      />
-    )
-  }
-
-  if (authPhase === 'levelSelect') {
-    return (
-      <LevelSelect
-        onBack={() => setAuthPhase('onboarding')}
-        onDone={async (claim) => {
-          if (claim) {
-            setPendingClaim(claim)
-            // Persist the claim to DB so passThresholdFor works correctly
-            if (kidId) {
-              try {
-                const { updatePlacementClaim } = await import('./lib/kidData')
-                await updatePlacementClaim(kidId, claim)
-              } catch (err) { console.error('Failed to save placement claim:', err) }
-            }
-            setAuthPhase('tablePicker')
-          } else {
+      <ChildOnboarding
+        kidId={kidId}
+        parentId={parentId}
+        onDone={async ({ justStarting, knownOps, tablesByOp, goToDiagnostic }) => {
+          if (justStarting || !goToDiagnostic) {
+            // Just starting out or no diagnostic needed — go straight to game
             setAuthPhase('game')
             setNavTab('home')
             setScreen('list')
+          } else {
+            // They know some math — set up diagnostic
+            const firstOp = knownOps[0]
+            const tables = tablesByOp[firstOp] || []
+            setPendingClaim(firstOp)
+            setSelectedTables(tables)
+            try {
+              const { updatePlacementClaim } = await import('./lib/kidData')
+              await updatePlacementClaim(kidId, firstOp)
+            } catch (err) { console.error('Failed to save placement claim:', err) }
+            setAuthPhase('diagnostic')
           }
-        }}
-      />
-    )
-  }
-
-  if (authPhase === 'tablePicker') {
-    return (
-      <TablePicker
-        operation={pendingClaim}
-        onBack={() => setAuthPhase('levelSelect')}
-        onDone={(tables) => {
-          setSelectedTables(tables)
-          setAuthPhase('testIntro')
-        }}
-      />
-    )
-  }
-
-  if (authPhase === 'testIntro') {
-    return (
-      <TestIntro
-        onBack={() => setAuthPhase('tablePicker')}
-        onStart={() => setAuthPhase('diagnostic')}
-        onSkip={() => {
-          setAuthPhase('game')
-          setNavTab('home')
-          setScreen('list')
         }}
       />
     )
