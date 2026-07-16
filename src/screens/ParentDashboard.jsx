@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { fetchKidStats, fetchStreak } from '../lib/kidData'
+import { trackEvent } from '../lib/analytics'
 
 const DUO_GREEN      = '#58cc02'
 const DUO_GREEN_DARK = '#46a302'
@@ -207,6 +208,7 @@ function AddRewardSheet({ parentId, onAdded, onClose }) {
         icon: 'gift',
       })
       if (error) throw error
+      trackEvent('reward_created', { parentId, reward_name: name.trim(), coin_price: parseInt(price, 10) })
       onAdded()
     } catch (err) {
       console.error('Failed to add reward:', err)
