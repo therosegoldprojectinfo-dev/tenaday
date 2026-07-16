@@ -836,10 +836,10 @@ export default function Practice({
         onGiveUp={handleGiveUp}
       />
 
-      <div className="h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md" style={{height: "100dvh"}}>
+      <div className="md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md" style={{height:"100dvh"}}>
 
         {/* ── Top bar ─────────────────────────────────────────── */}
-        <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-1 pb-0">
+        <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-2 pb-1">
           <button onClick={() => { stop(); setShowQuitPopup(true) }}
             className="w-11 h-11 flex items-center justify-center rounded-full text-gray-300 transition-colors duration-150 active:bg-gray-100">
             <XIcon />
@@ -938,7 +938,7 @@ export default function Practice({
         </div>
 
         {/* ── Answer choices ──────────────────────────────────── */}
-        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col justify-end px-4 pb-2">
+        <div key={`choices-${idx}-${isRetry}`} className="flex-shrink-0 px-4">
           {isFormula ? (
             // Formula keyboard — kid types e.g. "3 + 4"
             <div className="flex flex-col items-center gap-2">
@@ -1107,7 +1107,7 @@ export default function Practice({
         </div>
 
         {/* ── Bottom action ───────────────────────────────────── */}
-        <div className="flex-shrink-0 px-4 pt-1" style={{paddingBottom: "max(12px, env(safe-area-inset-bottom, 12px))"}}>
+        <div className="flex-shrink-0 px-4 pt-3 pb-4">
           {!revealed ? (
             <button
               disabled={selected === null || selected === undefined || selected === ''}
