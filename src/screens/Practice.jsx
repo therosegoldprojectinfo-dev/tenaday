@@ -839,7 +839,7 @@ export default function Practice({
       <div className="h-screen md:h-auto md:min-h-[700px] md:my-8 md:rounded-3xl md:shadow-xl md:border md:border-gray-100 overflow-hidden flex flex-col bg-white w-full max-w-sm md:max-w-md" style={{height: "100dvh"}}>
 
         {/* ── Top bar ─────────────────────────────────────────── */}
-        <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-2 pb-1">
+        <div className="flex-shrink-0 flex items-center gap-3 px-4 pt-1 pb-0">
           <button onClick={() => { stop(); setShowQuitPopup(true) }}
             className="w-11 h-11 flex items-center justify-center rounded-full text-gray-300 transition-colors duration-150 active:bg-gray-100">
             <XIcon />
@@ -915,7 +915,7 @@ export default function Practice({
 
         {/* ── Retry badge ─────────────────────────────────────── */}
         {isRetry && !revealed && (
-          <div className="flex-shrink-0 flex justify-center py-0 mb-1">
+          <div className="flex-shrink-0 flex justify-center">
             <span className="font-body font-bold text-xs px-3 py-1 rounded-full"
               style={{ backgroundColor: '#FEF3C7', color: '#D97706' }}>
               🔄 Retry — you've got this!
@@ -924,7 +924,7 @@ export default function Practice({
         )}
 
         {/* ── Read aloud button ───────────────────────────────── */}
-        <div className="flex-shrink-0 flex justify-center py-0 mb-1">
+        <div className="flex-shrink-0 flex justify-center">
           <button onClick={() => speaking ? stop() : speak(q.text)}
             className="flex items-center gap-2 px-4 py-2 rounded-full transition-all active:scale-90"
             style={{
@@ -938,7 +938,7 @@ export default function Practice({
         </div>
 
         {/* ── Answer choices ──────────────────────────────────── */}
-        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col justify-center px-4 mt-1">
+        <div key={`choices-${idx}-${isRetry}`} className="flex-1 flex flex-col justify-end px-4 pb-2">
           {isFormula ? (
             // Formula keyboard — kid types e.g. "3 + 4"
             <div className="flex flex-col items-center gap-2">
@@ -1094,7 +1094,7 @@ export default function Practice({
                 <button key={choice} disabled={revealed}
                   onClick={() => !revealed && setSelected(choice)}
                   className={['rounded-2xl border-2 font-display font-bold text-4xl card-answer',
-                    'flex items-center justify-center w-full select-none h-20',
+                    'flex items-center justify-center w-full select-none h-16',
                     cardColorClass(choice, selected, revealed, q.answer),
                     cardAnimClass(choice, selected, revealed, q.answer),
                   ].join(' ')}
