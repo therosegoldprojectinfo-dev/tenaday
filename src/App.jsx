@@ -15,6 +15,7 @@ import ParentDashboard from './screens/ParentDashboard'
 import StreakSlide from './screens/StreakSlide'
 import NavShell from './components/NavShell'
 import { getSession, logOut as authLogOut } from './lib/parentAuth'
+import { trackEvent } from './lib/analytics'
 
 // Top-level app flow, in order:
 //   'auth'        — parent signup/login (shown if no saved session)
@@ -191,6 +192,20 @@ export default function App() {
       setScreen('path')
       setRefreshKey(k => k + 1)
       return
+    }
+
+    trackEvent('node_completed', {
+      operation: activeNode?.operation,
+      table,
+      batch: batchNum,
+      node: completedNode,
+    })
+    if (completedNode === 'review') {
+      trackEvent('unit_completed', {
+        operation: activeNode?.operation,
+        table,
+        batch: batchNum,
+      })
     }
 
     const isVeryFirstUnit = table === 1 && batchNum === 1 && activeNode?.operation === 'addition'
