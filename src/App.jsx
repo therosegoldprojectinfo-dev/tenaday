@@ -50,6 +50,8 @@ export default function App() {
   const [activeNode, setActiveNode] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const [onboardingStartStep, setOnboardingStartStep] = useState(0)
+  const [onboardingKidName, setOnboardingKidName] = useState('')
+  const [showStreakSlide,  setShowStreakSlide]  = useState(false)
   const [streakCount,    setStreakCount]    = useState(1)
   const [streakTrigger,  setStreakTrigger]  = useState('welcome')
 
@@ -271,7 +273,9 @@ export default function App() {
         kidId={kidId}
         parentId={parentId}
         startStep={onboardingStartStep}
-        onDone={async ({ justStarting, knownOps, tablesByOp, goToDiagnostic }) => {
+        savedName={onboardingKidName}
+        onDone={async ({ justStarting, knownOps, tablesByOp, goToDiagnostic, kidName }) => {
+          if (kidName) setOnboardingKidName(kidName)
           if (justStarting || !goToDiagnostic) {
             // Just starting out or no diagnostic needed — go straight to game
             setAuthPhase('game')
