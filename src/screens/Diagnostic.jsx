@@ -3,6 +3,7 @@ import { generateDiagnostic } from '../lib/problems'
 import { updateProgress } from '../lib/kidData'
 import { OPERATIONS } from '../lib/progression'
 import { generateHint } from '../lib/hints'
+import { trackEvent } from '../lib/analytics'
 
 const SESSION_TOTAL  = 25
 const PASS_THRESHOLD = 20
@@ -367,6 +368,11 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
   const [showQuitPopup, setShowQuitPopup] = useState(false)
   const [wrongAttempts, setWrongAttempts] = useState(0)
   const { speak, stop, speaking } = useSpeech()
+
+  useEffect(() => {
+    trackEvent('diagnostic_started', { kidId, operation: claimedOperation })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const q                = questions[idx]
   const isTyped          = q?.isTyped === true
