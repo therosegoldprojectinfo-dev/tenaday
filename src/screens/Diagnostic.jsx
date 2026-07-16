@@ -270,7 +270,7 @@ function DiagnosticNumioPopup({ visible, hint, answer, isSecondWrong, onRetry, o
 
 // ── Quit confirmation popup — specific to leaving the diagnostic ──────────
 
-function DiagnosticQuitPopup({ visible, onLeave, onStay }) {
+function DiagnosticQuitPopup({ visible, onLeave, onStay, onPickLevel }) {
   if (!visible) return null
   return (
     <div style={{
@@ -303,7 +303,7 @@ function DiagnosticQuitPopup({ visible, onLeave, onStay }) {
           color: '#9ca3af', textAlign: 'center',
           lineHeight: 1.4, margin: 0,
         }}>
-          If you quit this test, you'll start at the very beginning of Numio's program.
+          If you pick a different level, you'll retake the test there. Starting from the beginning skips the test entirely.
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
@@ -317,6 +317,17 @@ function DiagnosticQuitPopup({ visible, onLeave, onStay }) {
           }}>
             CONTINUE TEST 💪
           </button>
+          {onPickLevel && (
+            <button onClick={onPickLevel} style={{
+              width: '100%', border: 'none', cursor: 'pointer',
+              padding: '12px 0', borderRadius: 14,
+              background: 'none', color: '#1CB0F6',
+              fontFamily: "'Baloo 2', sans-serif",
+              fontWeight: 700, fontSize: 14,
+            }}>
+              Pick a different level
+            </button>
+          )}
           <button onClick={onLeave} style={{
             width: '100%', border: 'none', cursor: 'pointer',
             padding: '12px 0', borderRadius: 14,
@@ -324,7 +335,7 @@ function DiagnosticQuitPopup({ visible, onLeave, onStay }) {
             fontFamily: "'Baloo 2', sans-serif",
             fontWeight: 700, fontSize: 14,
           }}>
-            Yes, start from the beginning
+            Start from the beginning
           </button>
         </div>
 
@@ -346,7 +357,7 @@ function DiagnosticQuitPopup({ visible, onLeave, onStay }) {
 
 // ── Main Diagnostic component ─────────────────────────────────────────────
 
-export default function Diagnostic({ kidId, claimedOperation, selectedTables, onPass, onFail }) {
+export default function Diagnostic({ kidId, claimedOperation, selectedTables, onPass, onFail, onPickLevel }) {
   const questions = useMemo(
     () => generateDiagnostic(claimedOperation, selectedTables || []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -550,6 +561,7 @@ export default function Diagnostic({ kidId, claimedOperation, selectedTables, on
         visible={showQuitPopup}
         onStay={() => setShowQuitPopup(false)}
         onLeave={() => { setShowQuitPopup(false); onFail() }}
+        onPickLevel={onPickLevel ? () => { setShowQuitPopup(false); onPickLevel() } : null}
       />
 
       {/* Numio wrong-answer popup */}
