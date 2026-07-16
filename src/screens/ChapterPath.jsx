@@ -272,7 +272,14 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
     const el = unitRefs.current[currentDay]
     if (el) {
       hasScrolled.current = true
-      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)
+      setTimeout(() => {
+        // Get the scroll container (the overflow-y-auto div)
+        const scrollContainer = el.closest('.overflow-y-auto') || el.parentElement
+        const elTop = el.getBoundingClientRect().top
+        const containerTop = scrollContainer.getBoundingClientRect().top
+        const offset = elTop - containerTop - 160 // 160px from top of scroll area (clears fixed banner)
+        scrollContainer.scrollBy({ top: offset, behavior: 'smooth' })
+      }, 300)
     }
   }, [kid, operation])
 
