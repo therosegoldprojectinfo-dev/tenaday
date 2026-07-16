@@ -268,50 +268,57 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
 
   // Scroll to current unit on first load + track scroll direction for floating button
   useEffect(() => {
-    const container = scrollContainerRef.current
-    if (!container || !kid) return
+    if (!kid) return
 
     const currentDay = kid.current_operation === operation
       ? (kid.current_table - 1) * BATCH_COUNT + (kid.current_batch || 1)
       : 1
 
-    const scrollToUnit = (el) => {
-      const elTop = el.getBoundingClientRect().top
-      const containerTop = container.getBoundingClientRect().top
-      const target = container.scrollTop + elTop - containerTop - 190
-      container.scrollTo({ top: Math.max(0, target), behavior: 'instant' })
-      currentUnitRef.current = el
-    }
-
-    // Keep trying until the ref exists (DOM may not be ready immediately)
-    const tryInitialScroll = (attempts = 0) => {
+    // Wait for React to render the refs, then scroll
+    let attempts = 0
+    const tryInitialScroll = () => {
+      const container = scrollContainerRef.current
       const el = unitRefs.current[currentDay]
-      if (el) {
-        scrollToUnit(el)
-      } else if (attempts < 20) {
-        setTimeout(() => tryInitialScroll(attempts + 1), 100)
+      if (container && el) {
+        const elTop = el.getBoundingClientRect().top
+        const containerTop = container.getBoundingClientRect().top
+        const target = container.scrollTop + elTop - containerTop - 190
+        if (target > 10) {
+          container.scrollTo({ top: target, behavior: 'instant' })
+        }
+        currentUnitRef.current = el
+
+        // Now attach scroll listener
+        const handleScroll = () => {
+          const currentEl = currentUnitRef.current
+          if (!currentEl) return
+          const elTop2 = currentEl.getBoundingClientRect().top
+          const cTop = container.getBoundingClientRect().top
+          const rel = elTop2 - cTop
+          // current is above viewport (we scrolled down past it) → need to scroll UP → show ↑
+          if (rel < -60) setScrollDir('up')
+          // current is below viewport (we scrolled up past it) → need to scroll DOWN → show ↓
+          else if (rel > container.clientHeight - 60) setScrollDir('down')
+          else setScrollDir(null)
+        }
+        container.addEventListener('scroll', handleScroll, { passive: true })
+        // Store cleanup fn
+        currentUnitRef._cleanup = () => container.removeEventListener('scroll', handleScroll)
+      } else if (attempts < 30) {
+        attempts++
+        setTimeout(tryInitialScroll, 100)
       }
     }
-    tryInitialScroll()
 
-    // Track scroll to show floating button
-    const handleScroll = () => {
-      const currentEl = currentUnitRef.current
-      if (!currentEl) return
-      const elTop = currentEl.getBoundingClientRect().top
-      const containerTop = container.getBoundingClientRect().top
-      const relativeTop = elTop - containerTop
-      if (relativeTop < -60) {
-        setScrollDir('down') // scrolled PAST current (current is above) — need to go DOWN to return
-      } else if (relativeTop > container.clientHeight - 60) {
-        setScrollDir('up') // current is BELOW viewport — need to go UP to return
-      } else {
-        setScrollDir(null)
+    // Small delay to let React render unitRefs after setKid triggers re-render
+    setTimeout(tryInitialScroll, 50)
+
+    return () => {
+      if (currentUnitRef._cleanup) {
+        currentUnitRef._cleanup()
+        currentUnitRef._cleanup = null
       }
     }
-
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    return () => container.removeEventListener('scroll', handleScroll)
   }, [kid, operation])
 
   const TOTAL_DAYS = TABLE_COUNT * BATCH_COUNT
@@ -865,7 +872,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
             animation: 'fadeUp 0.2s ease both',
           }}
         >
-          {scrollDir === 'down' ? '↓' : '↑'}
+          {scrollDir === 'up' ? '↑' : '↓'}
         </button>
       )}
 
