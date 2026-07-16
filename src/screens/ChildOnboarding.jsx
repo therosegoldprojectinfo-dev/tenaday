@@ -150,21 +150,28 @@ const OP_ORDER = ['addition', 'subtraction', 'multiplication', 'division']
 
 // ── Hello screen ───────────────────────────────────────────────────────────────
 function HelloScreen({ onNext }) {
-  const { displayed, done } = useTypewriter("Hi! 👋 I'm Numio!", 10)
+  const [showBubble, setShowBubble] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setShowBubble(true), 400)
+    return () => clearTimeout(t)
+  }, [])
+  const { displayed, done } = useTypewriter(showBubble ? "Hi! 👋 I'm Numio!" : '', 10)
   return (
     <div style={{ minHeight: '100dvh', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '60px 24px 40px', boxSizing: 'border-box', maxWidth: 420, margin: '0 auto', fontFamily: "'Baloo 2', sans-serif" }}>
       <style>{ANIM}</style>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28 }}>
-        <div style={{ background: '#fff', border: '2.5px solid #e5e7eb', borderRadius: 20, padding: '18px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', position: 'relative', maxWidth: 300, minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 24, color: '#1a1a1a', margin: 0, textAlign: 'center' }}>
-            {displayed}{!done && <span style={{ animation: 'blink 0.7s step-end infinite', opacity: 0.5 }}>|</span>}
-          </p>
-          <div style={{ position: 'absolute', bottom: -13, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '11px solid transparent', borderRight: '11px solid transparent', borderTop: '13px solid white' }} />
-          <div style={{ position: 'absolute', bottom: -16, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '12px solid transparent', borderRight: '12px solid transparent', borderTop: '14px solid #e5e7eb', zIndex: -1 }} />
-        </div>
         <div style={{ animation: 'mascot-float 2.2s ease-in-out infinite' }}>
           <img src="/onboarding-mascot.png" alt="Numio" style={{ width: 200, height: 'auto' }} />
         </div>
+        {showBubble && (
+          <div style={{ background: '#fff', border: '2.5px solid #e5e7eb', borderRadius: 20, padding: '18px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', position: 'relative', maxWidth: 300, minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeUp 0.25s ease both' }}>
+            <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 24, color: '#1a1a1a', margin: 0, textAlign: 'center' }}>
+              {displayed}{!done && <span style={{ animation: 'blink 0.7s step-end infinite', opacity: 0.5 }}>|</span>}
+            </p>
+            <div style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '11px solid transparent', borderRight: '11px solid transparent', borderBottom: '13px solid white' }} />
+            <div style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '12px solid transparent', borderRight: '12px solid transparent', borderBottom: '14px solid #e5e7eb', zIndex: -1 }} />
+          </div>
+        )}
       </div>
       <GreenButton onClick={onNext} disabled={!done}>CONTINUE →</GreenButton>
     </div>
@@ -309,13 +316,13 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {/* Just starting out — ON TOP */}
         <button onClick={() => { setJustStarting(true); setKnownOps([]) }} style={{
-          display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 16,
+          display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 12,
           border: `3px solid ${justStarting ? '#58cc02' : '#e5e7eb'}`,
           background: justStarting ? '#58cc02' : '#fff',
           cursor: 'pointer', transition: 'all 0.15s',
         }}>
-          <span style={{ fontSize: 22 }}>🌱</span>
-          <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 17, color: justStarting ? '#fff' : '#1a1a1a' }}>Just starting out!</span>
+          <span style={{ fontSize: 18 }}>🌱</span>
+          <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 15, color: justStarting ? '#fff' : '#1a1a1a' }}>Just starting out!</span>
           {justStarting && <span style={{ marginLeft: 'auto', color: '#fff', fontSize: 20 }}>✓</span>}
         </button>
 
@@ -329,14 +336,14 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
           const selected = selectedOp === op.id
           return (
             <button key={op.id} onClick={() => selectOp(op.id)} style={{
-              display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px', borderRadius: 16,
+              display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderRadius: 12,
               border: `3px solid ${selected ? op.color : '#e5e7eb'}`,
               background: selected ? `${op.color}15` : '#fff',
               cursor: 'pointer', transition: 'all 0.15s',
               opacity: justStarting ? 0.4 : 1,
             }}>
-              <span style={{ fontSize: 22 }}>{op.emoji}</span>
-              <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 17, color: selected ? op.color : '#1a1a1a' }}>{op.label}</span>
+              <span style={{ fontSize: 18 }}>{op.emoji}</span>
+              <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 15, color: selected ? op.color : '#1a1a1a' }}>{op.label}</span>
               {selected && <span style={{ marginLeft: 'auto', color: op.color, fontSize: 20 }}>✓</span>}
             </button>
           )
