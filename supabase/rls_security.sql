@@ -235,3 +235,8 @@ create policy "gift_claims_anon_delete" on gift_claims
 -- Parents now set up their own rewards from scratch.
 -- Run this to clean up any existing seeded rewards from the live DB.
 delete from gifts where parent_id is null;
+
+-- ── Fix Toronto timezone default → UTC ────────────────────────────────────────
+-- Backfill any existing kids still on America/Toronto (would unlock at 7am Riyadh)
+alter table kids alter column timezone set default 'UTC';
+update kids set timezone = 'UTC' where timezone = 'America/Toronto';
