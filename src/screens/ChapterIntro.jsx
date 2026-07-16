@@ -87,7 +87,7 @@ export default function ChapterIntro({ operation, table, batchNum, node, kidId, 
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white md:bg-gray-50">
-      <div className="h-screen md:h-auto md:min-h-[580px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col bg-white px-8 py-10">
+      <div className="md:h-auto md:min-h-[580px] md:my-8 md:rounded-3xl md:shadow-xl w-full max-w-sm md:max-w-md flex flex-col bg-white px-8 py-10" style={{height:"100dvh"}}>
 
         {/* Progress dots */}
         <div className="flex items-center justify-center gap-2 mb-8">
