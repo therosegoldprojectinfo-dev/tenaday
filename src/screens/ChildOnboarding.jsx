@@ -160,18 +160,18 @@ function HelloScreen({ onNext }) {
     <div style={{ minHeight: '100dvh', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '60px 24px 40px', boxSizing: 'border-box', maxWidth: 420, margin: '0 auto', fontFamily: "'Baloo 2', sans-serif" }}>
       <style>{ANIM}</style>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 28 }}>
-        <div style={{ animation: 'mascot-float 2.2s ease-in-out infinite' }}>
-          <img src="/onboarding-mascot.png" alt="Numio" style={{ width: 200, height: 'auto' }} />
-        </div>
         {showBubble && (
           <div style={{ background: '#fff', border: '2.5px solid #e5e7eb', borderRadius: 20, padding: '18px 24px', boxShadow: '0 4px 20px rgba(0,0,0,0.07)', position: 'relative', maxWidth: 300, minHeight: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeUp 0.25s ease both' }}>
             <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 24, color: '#1a1a1a', margin: 0, textAlign: 'center' }}>
               {displayed}{!done && <span style={{ animation: 'blink 0.7s step-end infinite', opacity: 0.5 }}>|</span>}
             </p>
-            <div style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '11px solid transparent', borderRight: '11px solid transparent', borderBottom: '13px solid white' }} />
-            <div style={{ position: 'absolute', top: -16, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '12px solid transparent', borderRight: '12px solid transparent', borderBottom: '14px solid #e5e7eb', zIndex: -1 }} />
+            <div style={{ position: 'absolute', bottom: -13, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '11px solid transparent', borderRight: '11px solid transparent', borderTop: '13px solid white' }} />
+            <div style={{ position: 'absolute', bottom: -16, left: '50%', transform: 'translateX(-50%)', width: 0, height: 0, borderLeft: '12px solid transparent', borderRight: '12px solid transparent', borderTop: '14px solid #e5e7eb', zIndex: -1 }} />
           </div>
         )}
+        <div style={{ animation: 'mascot-float 2.2s ease-in-out infinite' }}>
+          <img src="/onboarding-mascot.png" alt="Numio" style={{ width: 200, height: 'auto' }} />
+        </div>
       </div>
       <GreenButton onClick={onNext} disabled={!done}>CONTINUE →</GreenButton>
     </div>
@@ -359,6 +359,25 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
     return (
       <Layout bubbleText={`${highestOp.emoji} ${highestOp.label} — which tables does ${name} know? 😊`}
         step={7} button={<GreenButton onClick={() => setStep(8)} disabled={currentTables.length === 0}>DONE →</GreenButton>}>
+        <div style={{ marginBottom: 10 }}>
+          <button onClick={() => {
+            const allTables = Array.from({ length: 12 }, (_, i) => i + 1)
+            const allSelected = allTables.every(t => currentTables.includes(t))
+            setTablesByOp(prev => ({
+              ...prev,
+              [highestOp.id]: allSelected ? [] : allTables,
+            }))
+          }} style={{
+            width: '100%', padding: '10px 0', borderRadius: 12,
+            border: `2.5px solid ${Array.from({length:12},(_,i)=>i+1).every(t=>currentTables.includes(t)) ? highestOp.color : '#e5e7eb'}`,
+            background: Array.from({length:12},(_,i)=>i+1).every(t=>currentTables.includes(t)) ? `${highestOp.color}15` : '#fff',
+            fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 14,
+            color: Array.from({length:12},(_,i)=>i+1).every(t=>currentTables.includes(t)) ? highestOp.color : '#6b7280',
+            cursor: 'pointer', transition: 'all 0.15s',
+          }}>
+            {Array.from({length:12},(_,i)=>i+1).every(t=>currentTables.includes(t)) ? '✓ All selected' : 'Select all'}
+          </button>
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
           {Array.from({ length: 12 }, (_, i) => i + 1).map(t => {
             const selected = currentTables.includes(t)
