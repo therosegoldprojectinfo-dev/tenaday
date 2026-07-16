@@ -271,26 +271,28 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
     const container = scrollContainerRef.current
     if (!container || !kid) return
 
-    // Initial scroll to current unit
     const currentDay = kid.current_operation === operation
       ? (kid.current_table - 1) * BATCH_COUNT + (kid.current_batch || 1)
       : 1
 
+    const scrollToUnit = (el) => {
+      const elTop = el.getBoundingClientRect().top
+      const containerTop = container.getBoundingClientRect().top
+      const target = container.scrollTop + elTop - containerTop - 190
+      container.scrollTo({ top: Math.max(0, target), behavior: 'instant' })
+      currentUnitRef.current = el
+    }
+
+    // Keep trying until the ref exists (DOM may not be ready immediately)
     const tryInitialScroll = (attempts = 0) => {
       const el = unitRefs.current[currentDay]
-      if (el && currentDay > 1) {
-        const elTop = el.getBoundingClientRect().top
-        const containerTop = container.getBoundingClientRect().top
-        const target = container.scrollTop + elTop - containerTop - 190
-        container.scrollTo({ top: Math.max(0, target), behavior: 'instant' })
-        currentUnitRef.current = el
-      } else if (!el && attempts < 15) {
-        setTimeout(() => tryInitialScroll(attempts + 1), 150)
-      } else {
-        currentUnitRef.current = unitRefs.current[currentDay] || null
+      if (el) {
+        scrollToUnit(el)
+      } else if (attempts < 20) {
+        setTimeout(() => tryInitialScroll(attempts + 1), 100)
       }
     }
-    setTimeout(() => tryInitialScroll(), 300)
+    tryInitialScroll()
 
     // Track scroll to show floating button
     const handleScroll = () => {
@@ -300,11 +302,11 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
       const containerTop = container.getBoundingClientRect().top
       const relativeTop = elTop - containerTop
       if (relativeTop < -60) {
-        setScrollDir('up') // scrolled past current — show ↑
+        setScrollDir('down') // scrolled PAST current (current is above) — need to go DOWN to return
       } else if (relativeTop > container.clientHeight - 60) {
-        setScrollDir('down') // current is below viewport — show ↓
+        setScrollDir('up') // current is BELOW viewport — need to go UP to return
       } else {
-        setScrollDir(null) // current is visible — hide button
+        setScrollDir(null)
       }
     }
 
@@ -863,7 +865,7 @@ export default function ChapterPath({ operation, onStartNode, onBack, kidId, par
             animation: 'fadeUp 0.2s ease both',
           }}
         >
-          {scrollDir === 'up' ? '↓' : '↑'}
+          {scrollDir === 'down' ? '↓' : '↑'}
         </button>
       )}
 
