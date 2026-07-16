@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchKid, fetchAvailableGifts, purchaseGift } from '../lib/kidData'
 import { isInDebt } from '../lib/economy'
+import { trackEvent } from '../lib/analytics'
 
 const DUO_GREEN = '#58cc02'
 const DUO_GREEN_DARK = '#46a302'
@@ -150,6 +151,7 @@ export default function Rewards({ kidId, parentId, onGoToParent }) {
     try {
       const freshKid = await fetchKid(kidId)
       const newBalance = await purchaseGift(kidId, confirming, freshKid.coin_balance)
+      trackEvent('reward_redeemed', { reward_name: confirming.name, coin_price: confirming.coin_price })
       setKid(k => ({ ...k, coin_balance: newBalance }))
       setUnlockedReward(confirming) // show celebration screen
     } catch (err) {
