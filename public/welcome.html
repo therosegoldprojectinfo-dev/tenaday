@@ -132,11 +132,17 @@
   /* ── Mobile — stack vertically, logo centered, art smaller, matching
        the reference mobile layout ─────────────────────────────────── */
   @media (max-width: 720px) {
+    body { align-items: flex-start; }
     .wrap { padding: 20px; padding-top: 96px; }
     .topbar { justify-content: center; }
     .topbar img { width: 48px; height: 48px; }
     .topbar .wordmark { font-size: 26px; }
-    main { flex-direction: column; gap: 28px; padding: 0; }
+    main {
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 20px;
+      padding: 0;
+    }
     .art { margin: 8px 0 -20px; max-width: 220px; }
     .copy h1 { font-size: 22px; margin-bottom: 20px; }
   }
