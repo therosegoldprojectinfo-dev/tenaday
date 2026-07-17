@@ -34,15 +34,21 @@
     width: 100%;
     max-width: 1120px;
     margin: 0 auto;
-    padding: 24px;
+    padding: 88px 24px 24px;
   }
 
-  /* ── Top bar — logo + wordmark, Duolingo-style ─────────────────── */
+  /* ── Top bar — pinned to the actual top of the page, Duolingo-style,
+       independent of the centered hero content below it ────────────── */
   .topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 8px;
+    padding: 20px 24px;
+    box-sizing: border-box;
   }
   .topbar img {
     width: 64px;
@@ -126,23 +132,23 @@
   /* ── Mobile — stack vertically, logo centered, art smaller, matching
        the reference mobile layout ─────────────────────────────────── */
   @media (max-width: 720px) {
-    .wrap { padding: 20px; }
-    .topbar { justify-content: center; margin-bottom: 20px; }
+    .wrap { padding: 20px; padding-top: 96px; }
+    .topbar { justify-content: center; }
     .topbar img { width: 48px; height: 48px; }
     .topbar .wordmark { font-size: 26px; }
     main { flex-direction: column; gap: 28px; padding: 0; }
-    .art { margin: -20px 0; max-width: 220px; }
+    .art { margin: 8px 0 -20px; max-width: 220px; }
     .copy h1 { font-size: 22px; margin-bottom: 20px; }
   }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="topbar">
-      <img src="/numio-mascot.png" alt="" />
-      <span class="wordmark">Numio</span>
-    </div>
+  <div class="topbar">
+    <img src="/numio-mascot.png" alt="" />
+    <span class="wordmark">Numio</span>
+  </div>
 
+  <div class="wrap">
     <main>
       <div class="art">
         <img src="/hero-illustration.png" alt="Numio mascot with coins and a phone showing the app" />
