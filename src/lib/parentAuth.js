@@ -8,10 +8,12 @@ import { hashPin, hashPinWithSalt } from './pinAuth'
 // holding the public anon key. Fix: get a real (anonymous) Supabase auth
 // session first, so auth.uid() exists and RLS can check ownership against
 // something the client cannot forge. See supabase/rls_owner_lockdown.sql.
-async function ensureAuthSession() {
+async function ensureAuthSession(captchaToken) {
   const { data: { session } } = await supabase.auth.getSession()
   if (session) return session
-  const { data, error } = await supabase.auth.signInAnonymously()
+  const { data, error } = await supabase.auth.signInAnonymously(
+    captchaToken ? { options: { captchaToken } } : undefined
+  )
   if (error) throw error
   return data.session
 }
@@ -70,12 +72,12 @@ export class AuthError extends Error {}
 // The resulting hash is sent to the server-side RPC — the anon key
 // never reads the parents table directly anymore.
 
-export async function signUp(phoneRaw, pin) {
+export async function signUp(phoneRaw, pin, captchaToken) {
   const phone = normalizePhone(phoneRaw)
   if (phone.length < 7) throw new AuthError('Enter a valid phone number.')
   if (!/^\d{4}$/.test(pin)) throw new AuthError('PIN must be exactly 4 digits.')
 
-  await ensureAuthSession()
+  await ensureAuthSession(captchaToken)
 
   const pinHash = await hashPin(pin)
 
@@ -103,10 +105,10 @@ export async function signUp(phoneRaw, pin) {
 // Step 3: send the computed hash to the server for comparison.
 // The full pin_hash never leaves the server — anon key can't read parents table.
 
-export async function logIn(phoneRaw, pin) {
+export async function logIn(phoneRaw, pin, captchaToken) {
   const phone = normalizePhone(phoneRaw)
 
-  await ensureAuthSession()
+  await ensureAuthSession(captchaToken)
 
   // Step 1: get salt for this phone (safe — returns fake salt if phone not found)
   const { data: saltHex, error: saltError } = await supabase.rpc('get_parent_salt', {
