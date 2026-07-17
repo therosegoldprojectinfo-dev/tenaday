@@ -318,6 +318,17 @@ declare
   kid_tz text;
   next_midnight timestamptz;
 begin
+  -- Ownership check: without this, ANY authenticated session (trivially
+  -- easy to get — anyone can sign up) could call this with a stranger's
+  -- kid_id and re-lock/re-stamp another family's day gate. Same pattern
+  -- as every RLS owner-check elsewhere in this codebase.
+  if not exists (
+    select 1 from kids k join parents p on p.id = k.parent_id
+    where k.id = kid_id and p.auth_user_id = auth.uid()
+  ) then
+    raise exception 'NOT_YOUR_KID';
+  end if;
+
   select timezone into kid_tz from kids where id = kid_id;
 
   -- Correctly compute next midnight in kid's local timezone.
@@ -337,13 +348,28 @@ $$;
 -- Returns true if next_unlock_at is null (never locked) or already in the past.
 create or replace function can_start_new_unit(kid_id uuid)
 returns boolean
-language sql
+language plpgsql
 security definer
 as $$
-  select
-    next_unlock_at is null or now() >= next_unlock_at
+declare
+  result boolean;
+begin
+  -- Same ownership check as complete_unit — without it, any authenticated
+  -- stranger could read another family's kid's day-gate timer.
+  if not exists (
+    select 1 from kids k join parents p on p.id = k.parent_id
+    where k.id = kid_id and p.auth_user_id = auth.uid()
+  ) then
+    raise exception 'NOT_YOUR_KID';
+  end if;
+
+  select next_unlock_at is null or now() >= next_unlock_at
+  into result
   from kids
   where id = kid_id;
+
+  return result;
+end;
 $$;
 
 -- Explicit grants — every other RPC in this codebase has one; these two
