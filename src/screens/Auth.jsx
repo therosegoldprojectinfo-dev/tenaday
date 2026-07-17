@@ -3,6 +3,7 @@ import { signUp, logIn, AuthError, isValidPhone } from '../lib/parentAuth'
 import { trackEvent } from '../lib/analytics'
 import PrivacyPolicy from './PrivacyPolicy'
 import TermsAndConditions from './TermsAndConditions'
+import Turnstile from '../components/Turnstile'
 
 // Some keyboards (common on Android devices set to Arabic, and some
 // regional iOS settings) emit Arabic-Indic (٠-٩) or Extended Arabic-Indic
@@ -76,6 +77,7 @@ export default function Auth({ onAuthenticated, onBack }) {
   const [error, setError] = useState(null)
   const [showPrivacy, setShowPrivacy] = useState(false)
   const [showTerms, setShowTerms] = useState(false)
+  const [captchaToken, setCaptchaToken] = useState(null)
 
   const isSignup = mode === 'signup'
   const pinsMismatch = isSignup && pinConfirm.length === 4 && pin !== pinConfirm
@@ -84,6 +86,7 @@ export default function Auth({ onAuthenticated, onBack }) {
     isValidPhone(phone) &&
     pin.length === 4 &&
     (!isSignup || (pinConfirm.length === 4 && pin === pinConfirm)) &&
+    !!captchaToken &&
     !submitting
 
   async function handleSubmit(e) {
@@ -92,11 +95,12 @@ export default function Auth({ onAuthenticated, onBack }) {
     setSubmitting(true)
     setError(null)
     try {
-      const parentId = isSignup ? await signUp(phone, pin) : await logIn(phone, pin)
+      const parentId = isSignup ? await signUp(phone, pin, captchaToken) : await logIn(phone, pin, captchaToken)
       if (isSignup) trackEvent('signup_completed', { parentId })
       onAuthenticated(parentId, isSignup) // isSignup=true means new account
     } catch (err) {
       setError(err instanceof AuthError ? err.message : 'Something went wrong. Please try again.')
+      setCaptchaToken(null) // Turnstile tokens are single-use — always require a fresh one on retry
     } finally {
       setSubmitting(false)
     }
@@ -217,6 +221,11 @@ export default function Auth({ onAuthenticated, onBack }) {
                 <p className="font-body text-sm text-red-600">{error}</p>
               </div>
             )}
+
+            <Turnstile
+              onVerify={setCaptchaToken}
+              onExpire={() => setCaptchaToken(null)}
+            />
 
             <button
               type="submit"
