@@ -29,6 +29,10 @@
       href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+    <!-- Cloudflare Turnstile — bot/abuse protection on signup+login, paired
+         with Supabase's "Enable CAPTCHA protection" dashboard setting.
+         Loaded async so it never blocks the app's own load. -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   </head>
   <body class="font-body text-ink overscroll-none bg-white">
     <div id="root"></div>
