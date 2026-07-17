@@ -41,13 +41,13 @@
     margin-bottom: 8px;
   }
   .topbar img {
-    width: 40px;
-    height: 40px;
+    width: 64px;
+    height: 64px;
   }
   .topbar .wordmark {
     font-family: 'Baloo 2', sans-serif;
     font-weight: 800;
-    font-size: 26px;
+    font-size: 32px;
     color: var(--green);
     letter-spacing: -0.01em;
   }
@@ -58,18 +58,18 @@
     align-items: center;
     justify-content: center;
     gap: 40px;
-    min-height: calc(100dvh - 160px);
     flex-wrap: wrap;
+    padding: 32px 0 40px;
   }
 
   .art {
-    flex: 1 1 460px;
-    max-width: 560px;
+    flex: 1 1 340px;
+    max-width: 380px;
     /* The source illustration has generous internal padding around the
        actual artwork — pull it in with negative margin so it sits close
        to the text block instead of leaving a visual gap, same as
        Duolingo's tightly-cropped hero art. */
-    margin: -40px -20px -40px 0;
+    margin: -28px -16px -28px 0;
   }
   .art img {
     width: 100%;
@@ -123,9 +123,11 @@
        the reference mobile layout ─────────────────────────────────── */
   @media (max-width: 720px) {
     .wrap { padding: 20px 20px 40px; }
-    .topbar { justify-content: center; margin-bottom: 24px; }
-    main { flex-direction: column; gap: 8px; min-height: auto; padding-top: 4px; }
-    .art { margin: -32px -12px -36px; max-width: 340px; }
+    .topbar { justify-content: center; margin-bottom: 4px; }
+    .topbar img { width: 48px; height: 48px; }
+    .topbar .wordmark { font-size: 26px; }
+    main { flex-direction: column; gap: 4px; padding: 8px 0 24px; }
+    .art { margin: 4px 0 -20px; max-width: 220px; }
     .copy h1 { font-size: 22px; margin-bottom: 20px; }
   }
 </style>
