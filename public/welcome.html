@@ -34,7 +34,7 @@
     width: 100%;
     max-width: 1120px;
     margin: 0 auto;
-    padding: 88px 24px 24px;
+    padding: 150px 24px 24px;
   }
 
   /* ── Top bar — pinned to the actual top of the page, Duolingo-style,
@@ -44,20 +44,22 @@
     top: 0;
     left: 0;
     width: 100%;
+    background: #ffffff;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 14px;
     padding: 20px 24px;
     box-sizing: border-box;
+    z-index: 10;
   }
   .topbar img {
-    width: 64px;
-    height: 64px;
+    width: 90px;
+    height: 90px;
   }
   .topbar .wordmark {
     font-family: 'Baloo 2', sans-serif;
     font-weight: 800;
-    font-size: 32px;
+    font-size: 48px;
     color: var(--green);
     letter-spacing: -0.01em;
   }
@@ -133,17 +135,17 @@
        the reference mobile layout ─────────────────────────────────── */
   @media (max-width: 720px) {
     body { align-items: flex-start; }
-    .wrap { padding: 20px; padding-top: 96px; }
+    .wrap { padding: 20px; padding-top: 130px; }
     .topbar { justify-content: center; }
-    .topbar img { width: 48px; height: 48px; }
-    .topbar .wordmark { font-size: 26px; }
+    .topbar img { width: 64px; height: 64px; }
+    .topbar .wordmark { font-size: 36px; }
     main {
       flex-direction: column;
       justify-content: flex-start;
       gap: 20px;
       padding: 0;
     }
-    .art { margin: 8px 0 -20px; max-width: 220px; }
+    .art { margin: 48px 0 -20px; max-width: 220px; }
     .copy h1 { font-size: 22px; margin-bottom: 20px; }
   }
 </style>
