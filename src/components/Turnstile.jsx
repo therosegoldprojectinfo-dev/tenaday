@@ -16,9 +16,16 @@ export default function Turnstile({ onVerify, onExpire }) {
 
   useEffect(() => {
     let cancelled = false
+    let pollInterval = null
 
     function renderWidget() {
       if (cancelled || !containerRef.current || !window.turnstile) return
+      // Guard against ever rendering a second widget into the same
+      // container — this is what was previously missing, and it's what
+      // caused "Cannot find Widget" + cascading 600010 errors whenever
+      // the component re-mounted before the async script had finished
+      // loading on the first mount.
+      if (widgetIdRef.current) return
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: import.meta.env.VITE_TURNSTILE_SITE_KEY,
         callback: (token) => onVerify?.(token),
@@ -32,19 +39,26 @@ export default function Turnstile({ onVerify, onExpire }) {
     if (window.turnstile) {
       renderWidget()
     } else {
-      const interval = setInterval(() => {
+      pollInterval = setInterval(() => {
         if (window.turnstile) {
-          clearInterval(interval)
+          clearInterval(pollInterval)
+          pollInterval = null
           renderWidget()
         }
       }, 100)
-      return () => { cancelled = true; clearInterval(interval) }
     }
 
+    // ONE cleanup path, always registered, regardless of which branch
+    // above actually rendered the widget. Previously the "still waiting
+    // for the script" branch returned its own early cleanup that only
+    // cleared the interval — never removing the widget itself once it
+    // eventually rendered — which is exactly the bug that caused this.
     return () => {
       cancelled = true
+      if (pollInterval) clearInterval(pollInterval)
       if (widgetIdRef.current && window.turnstile) {
         window.turnstile.remove(widgetIdRef.current)
+        widgetIdRef.current = null
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
