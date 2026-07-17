@@ -25,12 +25,16 @@
     color: var(--ink);
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .wrap {
+    width: 100%;
     max-width: 1120px;
     margin: 0 auto;
-    padding: 28px 24px 60px;
+    padding: 24px;
   }
 
   /* ── Top bar — logo + wordmark, Duolingo-style ─────────────────── */
@@ -57,19 +61,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 40px;
+    gap: 48px;
     flex-wrap: wrap;
-    padding: 32px 0 40px;
+    padding: 24px 0;
   }
 
   .art {
     flex: 1 1 340px;
     max-width: 380px;
     /* The source illustration has generous internal padding around the
-       actual artwork — pull it in with negative margin so it sits close
-       to the text block instead of leaving a visual gap, same as
-       Duolingo's tightly-cropped hero art. */
-    margin: -28px -16px -28px 0;
+       actual artwork — trim the top/bottom only, so the image itself
+       reads tighter, while still leaving a real, deliberate gap (via
+       main's own `gap`) between the image and the text block next to it. */
+    margin: -28px 0;
   }
   .art img {
     width: 100%;
@@ -122,12 +126,12 @@
   /* ── Mobile — stack vertically, logo centered, art smaller, matching
        the reference mobile layout ─────────────────────────────────── */
   @media (max-width: 720px) {
-    .wrap { padding: 20px 20px 40px; }
-    .topbar { justify-content: center; margin-bottom: 4px; }
+    .wrap { padding: 20px; }
+    .topbar { justify-content: center; margin-bottom: 20px; }
     .topbar img { width: 48px; height: 48px; }
     .topbar .wordmark { font-size: 26px; }
-    main { flex-direction: column; gap: 4px; padding: 8px 0 24px; }
-    .art { margin: 4px 0 -20px; max-width: 220px; }
+    main { flex-direction: column; gap: 28px; padding: 0; }
+    .art { margin: -20px 0; max-width: 220px; }
     .copy h1 { font-size: 22px; margin-bottom: 20px; }
   }
 </style>
