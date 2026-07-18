@@ -47,7 +47,7 @@
     background: #ffffff;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 0;
     padding: 20px 24px;
     box-sizing: border-box;
     z-index: 10;
@@ -55,6 +55,10 @@
   .topbar img {
     width: 90px;
     height: 90px;
+    /* The mascot PNG has built-in transparent padding around the
+       character itself — cancel it out so the icon sits genuinely
+       close to the wordmark instead of leaving a visual gap. */
+    margin-right: -18px;
   }
   .topbar .wordmark {
     font-family: 'Baloo 2', sans-serif;
@@ -137,7 +141,7 @@
     body { align-items: flex-start; }
     .wrap { padding: 20px; padding-top: 130px; }
     .topbar { justify-content: center; }
-    .topbar img { width: 64px; height: 64px; }
+    .topbar img { width: 64px; height: 64px; margin-right: -13px; }
     .topbar .wordmark { font-size: 36px; }
     main {
       flex-direction: column;
