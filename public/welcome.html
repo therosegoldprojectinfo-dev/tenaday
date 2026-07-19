@@ -8,6 +8,21 @@
 <link rel="icon" type="image/png" href="/numio-mascot.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '1028944262871292');
+fbq('track', 'PageView');
+</script>
+<!-- End Meta Pixel Code -->
 <style>
   :root {
     --green: #58cc02;
@@ -157,6 +172,11 @@
 </style>
 </head>
 <body>
+  <!-- Meta Pixel noscript fallback — must live in <body>, not <head>;
+       an <img> isn't valid HTML directly inside a <head> <noscript>. -->
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=1028944262871292&amp;ev=PageView&amp;noscript=1"
+  /></noscript>
   <div class="topbar">
     <img src="/numio-mascot.png" alt="" />
     <span class="wordmark">Numio</span>
@@ -170,7 +190,7 @@
 
       <div class="copy">
         <h1>Help your child get better at addition — just 2–4 minutes a day.</h1>
-        <a class="btn btn-primary" href="/">GET STARTED</a>
+        <a class="btn btn-primary" href="/" onclick="fbq('track', 'Lead')">GET STARTED</a>
         <a class="btn btn-secondary" href="/">I ALREADY HAVE AN ACCOUNT</a>
       </div>
     </main>
