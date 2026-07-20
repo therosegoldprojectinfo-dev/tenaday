@@ -16,6 +16,7 @@ import StreakSlide from './screens/StreakSlide'
 import NavShell from './components/NavShell'
 import { getSession, logOut as authLogOut } from './lib/parentAuth'
 import { trackEvent } from './lib/analytics'
+import { trackPageView } from './lib/gtag'
 
 // Top-level app flow, in order:
 //   'auth'        — parent signup/login (shown if no saved session)
@@ -72,6 +73,13 @@ export default function App() {
       } catch {}
     }
   }, [kidId, authPhase, navTab, screen, pendingClaim, selectedTables])
+
+  // Virtual pageview for Google Analytics — Numio is a single-page app,
+  // so this is the one clean signal for "reached actual gameplay,"
+  // completing the funnel: landing page -> Auth -> onboarding -> playing.
+  useEffect(() => {
+    if (authPhase === 'game') trackPageView('/app/playing', 'Playing')
+  }, [authPhase])
 
   // On first mount, check for a saved session and skip straight to the
   // kid picker if one exists — avoids forcing a returning parent to log
