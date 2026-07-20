@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signUp, logIn, AuthError, isValidPhone } from '../lib/parentAuth'
 import { trackEvent } from '../lib/analytics'
+import { trackPageView } from '../lib/gtag'
 import PrivacyPolicy from './PrivacyPolicy'
 import TermsAndConditions from './TermsAndConditions'
 import Turnstile from '../components/Turnstile'
@@ -78,6 +79,11 @@ export default function Auth({ onAuthenticated, onBack }) {
   const [showPrivacy, setShowPrivacy] = useState(false)
   const [showTerms, setShowTerms] = useState(false)
   const [captchaToken, setCaptchaToken] = useState(null)
+
+  useEffect(() => {
+    trackPageView('/app/auth', 'Auth')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const isSignup = mode === 'signup'
   const pinsMismatch = isSignup && pinConfirm.length === 4 && pin !== pinConfirm
