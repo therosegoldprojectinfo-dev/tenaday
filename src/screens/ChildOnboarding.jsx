@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { trackEvent } from '../lib/analytics'
+import { trackPageView } from '../lib/gtag'
 
 const ANIM = `
   @keyframes mascot-float {
@@ -197,6 +198,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
   // level check) rather than a fresh start, so don't double-count those.
   useEffect(() => {
     if (startStep === 0) trackEvent('onboarding_started', { parentId, kidId })
+    trackPageView('/app/onboarding', 'Onboarding')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
