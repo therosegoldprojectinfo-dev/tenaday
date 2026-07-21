@@ -159,7 +159,7 @@ function HelloScreen({ onNext }) {
     const t = setTimeout(() => setShowBubble(true), 400)
     return () => clearTimeout(t)
   }, [])
-  const { displayed, done } = useTypewriter(showBubble ? "Let's set up your account to help your child get better at math in just one week! 🚀" : '', 10)
+  const { displayed, done } = useTypewriter(showBubble ? "Let's get your child better at math in just 7 days! 🚀" : '', 10)
   return (
     <div style={{ minHeight: '100dvh', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '60px 24px 40px', boxSizing: 'border-box', maxWidth: 420, margin: '0 auto', fontFamily: "'Baloo 2', sans-serif" }}>
       <style>{ANIM}</style>
@@ -177,7 +177,7 @@ function HelloScreen({ onNext }) {
           <img src="/onboarding-mascot.png" alt="Numio" style={{ width: 200, height: 'auto' }} />
         </div>
       </div>
-      <GreenButton onClick={onNext} disabled={!done}>CONTINUE →</GreenButton>
+      <GreenButton onClick={onNext} disabled={!done}>SET UP MY ACCOUNT →</GreenButton>
     </div>
   )
 }
@@ -194,6 +194,7 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
   const [justStarting, setJustStarting] = useState(false)
   const [tablesByOp, setTablesByOp] = useState({})
   const [howStep, setHowStep] = useState(0)
+  const [waitingForKid, setWaitingForKid] = useState(false)
 
   // Fires once per real onboarding attempt. startStep > 0 means this is a
   // resume (e.g. App.jsx's onPickLevel jumps back in at step 6 to redo the
@@ -324,19 +325,45 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
   )
 
   // SCREEN 6: Presence check — is the kid actually here? (NEW)
-  if (step === 6) return (
-    <Layout bubbleText={`Is ${name} with you right now? 👀`}
-      step={6} button={<GreenButton onClick={() => setStep(7)}>YES, LET'S GO! →</GreenButton>}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+  if (step === 6) {
+    // NO branch: a blocking "let's wait" screen — no way forward except
+    // confirming the kid has arrived, per the ask that this should stay
+    // blocked until they click through.
+    if (waitingForKid) return (
+      <Layout bubbleText={`Let's wait for ${name}! 👋`}
+        step={6} button={
+          <GreenButton onClick={() => { setWaitingForKid(false); setStep(7) }}>
+            {(name || 'THEY').toUpperCase()} IS HERE NOW! ✋
+          </GreenButton>
+        }>
+        <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 15, color: '#6b7280', textAlign: 'center', lineHeight: 1.6, margin: 0 }}>
+          No rush — Numio will be right here whenever {name}'s ready! 😊
+        </p>
+      </Layout>
+    )
+
+    // YES/NO choice
+    return (
+      <Layout bubbleText={`Is ${name} with you right now? 👀`}
+        step={6} button={
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <GreenButton onClick={() => setStep(7)}>YES →</GreenButton>
+            <button onClick={() => setWaitingForKid(true)} style={{
+              width: '100%', maxWidth: 340, border: '2.5px solid #e5e7eb', cursor: 'pointer',
+              padding: '13px 0', borderRadius: 16, background: '#fff', color: '#6b7280',
+              fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 16,
+              letterSpacing: '0.05em', textTransform: 'uppercase',
+            }}>
+              NO
+            </button>
+          </div>
+        }>
         <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 15, color: '#6b7280', textAlign: 'center', lineHeight: 1.6, margin: 0 }}>
           I need to see {name} to know their real level! 🎯
         </p>
-        <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 13, color: '#9ca3af', textAlign: 'center', lineHeight: 1.5, margin: 0 }}>
-          Psst — if {name}'s not here yet, leave Numio open and come back together to finish setting up the account 😉
-        </p>
-      </div>
-    </Layout>
-  )
+      </Layout>
+    )
+  }
 
   // SCREEN 7: Level check intro (was screen 5)
   if (step === 7) return (
@@ -478,14 +505,8 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
             Get 20 out of 25 right to confirm the level! 🎯<br />
             <span style={{ fontSize: 13, color: '#9ca3af' }}>No pressure — just do your best 😊</span>
           </p>
-          <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 15, color: '#1a1a1a', textAlign: 'center', margin: 0 }}>
-            Is this {name}? 👀
-          </p>
-          <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 13, color: '#9ca3af', textAlign: 'center', lineHeight: 1.5, margin: '-8px 0 0' }}>
-            Leave Numio open until {name} is here 😊
-          </p>
         </div>
-        <GreenButton onClick={() => saveAndFinish(true)} disabled={saving}>{saving ? 'SAVING...' : `YES, ${name.toUpperCase() || "THEY'RE"} HERE! 🚀`}</GreenButton>
+        <GreenButton onClick={() => saveAndFinish(true)} disabled={saving}>{saving ? 'SAVING...' : "LET'S GO! 🚀"}</GreenButton>
       </div>
     )
   }
