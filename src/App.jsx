@@ -339,7 +339,7 @@ export default function App() {
         selectedTables={selectedTables}
         onPass={handleDiagnosticPass}
         onFail={handleDiagnosticFail}
-        onPickLevel={() => { setOnboardingStartStep(6); setAuthPhase('onboarding') }}
+        onPickLevel={() => { setOnboardingStartStep(8); setAuthPhase('onboarding') }}
       />
     )
   }
