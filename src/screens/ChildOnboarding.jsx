@@ -177,7 +177,7 @@ function HelloScreen({ onNext }) {
           <img src="/onboarding-mascot.png" alt="Numio" style={{ width: 200, height: 'auto' }} />
         </div>
       </div>
-      <GreenButton onClick={onNext} disabled={!done}>SET UP MY ACCOUNT →</GreenButton>
+      <GreenButton onClick={onNext} disabled={!done}>SET UP ACCOUNT →</GreenButton>
     </div>
   )
 }
