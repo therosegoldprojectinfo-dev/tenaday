@@ -47,8 +47,10 @@ function Layout({ bubbleText, mascotSize = 110, children, button, step }) {
 
   const { displayed, done } = useTypewriter(showBubble ? bubbleText : '', 10)
 
-  // Progress bar: screens 1-8 out of 8 total steps
-  const totalSteps = 8
+  // Progress bar: screens 1-9 out of 10 total conceptual steps (step 10 is
+  // the final bespoke pre-diagnostic screen, which sets its own bar to 100%
+  // directly rather than using this constant).
+  const totalSteps = 10
   const progress = step ? Math.min((step / totalSteps) * 100, 100) : 0
 
   return (
@@ -157,7 +159,7 @@ function HelloScreen({ onNext }) {
     const t = setTimeout(() => setShowBubble(true), 400)
     return () => clearTimeout(t)
   }, [])
-  const { displayed, done } = useTypewriter(showBubble ? "Hi! 👋 I'm Numio!" : '', 10)
+  const { displayed, done } = useTypewriter(showBubble ? "Let's set up your account to help your child get better at math in just one week! 🚀" : '', 10)
   return (
     <div style={{ minHeight: '100dvh', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '60px 24px 40px', boxSizing: 'border-box', maxWidth: 420, margin: '0 auto', fontFamily: "'Baloo 2', sans-serif" }}>
       <style>{ANIM}</style>
@@ -202,13 +204,13 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Typewriter texts for screens 8 and 9 — must be at top level (Rules of Hooks)
+  // Typewriter texts for screens 10 and 11 — must be at top level (Rules of Hooks)
   const { displayed: screen8Text } = useTypewriter(
-    step === 8 ? `Ooh nice, ${name}! 🔥 Let's do a quick test to confirm the level!` : '',
+    step === 10 ? `Ooh nice, ${name}! 🔥 Let's do a quick test to confirm the level!` : '',
     10
   )
   const { displayed: screen9Text } = useTypewriter(
-    step === 9 ? `Ok ${name}, let's start your journey! 🚀` : '',
+    step === 11 ? `Ok ${name}, let's start your journey! 🚀` : '',
     10
   )
 
@@ -277,10 +279,20 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
     </Layout>
   )
 
-  // SCREEN 3: Reward setup
+  // SCREEN 3: Reward system explainer (NEW)
   if (step === 3) return (
+    <Layout bubbleText="According to science, getting a reward after effort helps kids stay motivated! 🧠✨"
+      step={3} button={<GreenButton onClick={() => setStep(4)}>CONTINUE →</GreenButton>}>
+      <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 15, color: '#6b7280', textAlign: 'center', lineHeight: 1.6, margin: 0 }}>
+        So let's choose a reward {name} already loves! 🎁
+      </p>
+    </Layout>
+  )
+
+  // SCREEN 4: Reward setup (was screen 3)
+  if (step === 4) return (
     <Layout bubbleText={`Set a reward ${name} already wants and give it a price! 🎁`}
-      step={3} button={<GreenButton onClick={() => setStep(4)} disabled={!rewardName.trim() || !rewardPrice}>CONTINUE →</GreenButton>}>
+      step={4} button={<GreenButton onClick={() => setStep(5)} disabled={!rewardName.trim() || !rewardPrice}>CONTINUE →</GreenButton>}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <StyledInput value={rewardName} onChange={e => setRewardName(e.target.value)} placeholder="e.g. Extra screen time, a toy..." />
         <div>
@@ -293,12 +305,12 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
     </Layout>
   )
 
-  // SCREEN 4: How it works
-  if (step === 4) return (
+  // SCREEN 5: How it works (was screen 4)
+  if (step === 5) return (
     <Layout bubbleText="Here's how Numio works! 😄"
-      step={4} button={howStep < howSteps.length - 1
+      step={5} button={howStep < howSteps.length - 1
         ? <GreenButton onClick={() => setHowStep(s => s + 1)}>NEXT →</GreenButton>
-        : <GreenButton onClick={() => setStep(5)}>GOT IT! →</GreenButton>}>
+        : <GreenButton onClick={() => setStep(6)}>GOT IT! →</GreenButton>}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, width: '100%' }}>
         {howSteps.map((s, i) => (
           <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -311,27 +323,45 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
     </Layout>
   )
 
-  // SCREEN 5: Level check intro
-  if (step === 5) return (
+  // SCREEN 6: Presence check — is the kid actually here? (NEW)
+  if (step === 6) return (
+    <Layout bubbleText={`Is ${name} with you right now? 👀`}
+      step={6} button={<GreenButton onClick={() => setStep(7)}>YES, LET'S GO! →</GreenButton>}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 15, color: '#6b7280', textAlign: 'center', lineHeight: 1.6, margin: 0 }}>
+          I need to see {name} to know their real level! 🎯
+        </p>
+        <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 13, color: '#9ca3af', textAlign: 'center', lineHeight: 1.5, margin: 0 }}>
+          Psst — if {name}'s not here yet, leave Numio open and come back together to finish setting up the account 😉
+        </p>
+      </div>
+    </Layout>
+  )
+
+  // SCREEN 7: Level check intro (was screen 5)
+  if (step === 7) return (
     <Layout bubbleText={`Now let's see what ${name} already knows! 👀`}
-      step={5} button={<GreenButton onClick={() => setStep(6)}>LET'S GO! →</GreenButton>}>
+      step={7} button={<GreenButton onClick={() => setStep(8)}>LET'S GO! →</GreenButton>}>
       <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 15, color: '#6b7280', textAlign: 'center', lineHeight: 1.6, margin: 0 }}>
         I just want to know where to start with {name}! 😊
       </p>
     </Layout>
   )
 
-  // SCREEN 6: What do they know? — just starting out ON TOP, single select
-  if (step === 6) return (
+  // SCREEN 8: What do they know? — just starting out ON TOP, single select (was screen 6)
+  if (step === 8) return (
     <Layout bubbleText={`What math does ${name} know? 😄`}
-      step={6} button={
+      step={8} button={
         <GreenButton onClick={() => {
-          if (justStarting) setStep(9) // go to congrats screen
-          else if (knownOps.length > 0) setStep(7)
+          if (justStarting) setStep(11) // go to congrats screen
+          else if (knownOps.length > 0) setStep(9)
         }} disabled={!justStarting && knownOps.length === 0}>
           CONTINUE →
         </GreenButton>
       }>
+      <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 12, color: '#9ca3af', margin: '0 0 10px', textAlign: 'center' }}>
+        This is what {name} already knows — not what they need to learn next! 😊
+      </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
         {/* Just starting out — ON TOP */}
         <button onClick={() => { setJustStarting(true); setKnownOps([]) }} style={{
@@ -371,13 +401,16 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
     </Layout>
   )
 
-  // SCREEN 7: Table picker — only highest op
-  if (step === 7) {
+  // SCREEN 9: Table picker — only highest op (was screen 7)
+  if (step === 9) {
     const highestOp = OPERATIONS.find(o => o.id === knownOps[knownOps.length - 1])
     const currentTables = tablesByOp[highestOp.id] || []
     return (
       <Layout bubbleText={`${highestOp.emoji} ${highestOp.label} — which tables does ${name} know? 😊`}
-        step={7} button={<GreenButton onClick={() => setStep(8)} disabled={currentTables.length === 0}>DONE →</GreenButton>}>
+        step={9} button={<GreenButton onClick={() => setStep(10)} disabled={currentTables.length === 0}>DONE →</GreenButton>}>
+        <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 12, color: '#9ca3af', margin: '0 0 10px', textAlign: 'center' }}>
+          What {name} already knows — not what's next! 😊
+        </p>
         <div style={{ marginBottom: 10 }}>
           <button onClick={() => {
             const allTables = Array.from({ length: 12 }, (_, i) => i + 1)
@@ -421,14 +454,14 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
     )
   }
 
-  // SCREEN 8: Result before diagnostic — special image
-  if (step === 8) {
+  // SCREEN 10: Result before diagnostic — special image (was screen 8)
+  if (step === 10) {
     return (
       <div style={{ minHeight: '100dvh', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '48px 24px 40px', boxSizing: 'border-box', maxWidth: 420, margin: '0 auto', fontFamily: "'Baloo 2', sans-serif" }}>
         <style>{ANIM}</style>
-        {/* Progress bar — screens 1-7 show this via Layout; this screen has
+        {/* Progress bar — screens 1-9 show this via Layout; this screen has
             its own bespoke layout (bypassing Layout) so it was previously
-            missing entirely. Step 8 of 8 = full bar. */}
+            missing entirely. Step 10 of 10 = full bar. */}
         <div style={{ width: '100%', maxWidth: 420, padding: '0 0 16px', boxSizing: 'border-box', margin: '0 auto' }}>
           <div style={{ height: 8, background: '#f3f4f6', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{ height: '100%', borderRadius: 8, background: '#58cc02', width: '100%' }} />
@@ -445,14 +478,20 @@ export default function ChildOnboarding({ kidId, parentId, onDone, startStep = 0
             Get 20 out of 25 right to confirm the level! 🎯<br />
             <span style={{ fontSize: 13, color: '#9ca3af' }}>No pressure — just do your best 😊</span>
           </p>
+          <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 15, color: '#1a1a1a', textAlign: 'center', margin: 0 }}>
+            Is this {name}? 👀
+          </p>
+          <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 13, color: '#9ca3af', textAlign: 'center', lineHeight: 1.5, margin: '-8px 0 0' }}>
+            Leave Numio open until {name} is here 😊
+          </p>
         </div>
-        <GreenButton onClick={() => saveAndFinish(true)} disabled={saving}>{saving ? 'SAVING...' : "LET'S GO! 🚀"}</GreenButton>
+        <GreenButton onClick={() => saveAndFinish(true)} disabled={saving}>{saving ? 'SAVING...' : `YES, ${name.toUpperCase() || "THEY'RE"} HERE! 🚀`}</GreenButton>
       </div>
     )
   }
 
-  // SCREEN 9: Just starting out congrats screen
-  if (step === 9) {
+  // SCREEN 11: Just starting out congrats screen (was screen 9)
+  if (step === 11) {
     return (
       <div style={{ minHeight: '100dvh', background: '#fff', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'space-between', padding: '60px 24px 40px', boxSizing: 'border-box', maxWidth: 420, margin: '0 auto', fontFamily: "'Baloo 2', sans-serif" }}>
         <style>{ANIM}</style>
