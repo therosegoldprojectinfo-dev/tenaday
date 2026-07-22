@@ -34,8 +34,8 @@ function PinDots({ value }) {
 // Order: get better everyday → earn coins → rewards
 const SLIDES = [
   { src: '/DAILY_PRA__2_.png', alt: 'Get a little better everyday' },
-  { src: '/DAILY_PRA__1_.png', alt: 'Earn coins' },
-  { src: '/DAILY_PRA.png',     alt: 'Exchange for real-life rewards' },
+  { src: '/DAILY_PRA.png', alt: 'Earn coins' },
+  { src: '/DAILY_PRA__1_.png',     alt: 'Exchange for real-life rewards' },
 ]
 
 const PEEK = 44  // px of next card peeking on right
