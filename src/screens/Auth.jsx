@@ -52,7 +52,7 @@ function Carousel({ onCTA }) {
       if (!containerRef.current) return
       // containerWidth - PEEK - GAP = cardWidth
       // leftPadding = (containerWidth - cardWidth) / 2 = (PEEK + GAP) / 2
-      setCardWidth(containerRef.current.offsetWidth - PEEK - GAP)
+      setCardWidth(Math.min(containerRef.current.offsetWidth - PEEK - GAP, 340))
     }
     const t = setTimeout(measure, 30)
     window.addEventListener('resize', measure)
@@ -254,7 +254,7 @@ export default function Auth({ onAuthenticated, onBack }) {
       </div>
 
       {/* ── CAROUSEL SECTION ───────────────────────────────────────── */}
-      <div ref={carouselRef} style={{ paddingTop: 40 }}>
+      <div ref={carouselRef} style={{ paddingTop: 40, maxWidth: 480, margin: '0 auto', width: '100%' }}>
         <Carousel onCTA={scrollToForm} />
       </div>
 
