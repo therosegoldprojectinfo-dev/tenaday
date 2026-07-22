@@ -47,7 +47,7 @@ export default function Auth({ onAuthenticated, onBack }) {
   const [mode, setMode] = useState('signup')
   const [phone, setPhone] = useState('')
   const [pin, setPin] = useState('')
-  const [pinConfirm, setPinConfirm] = useState('')
+  
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [showPrivacy, setShowPrivacy] = useState(false)
@@ -60,12 +60,12 @@ export default function Auth({ onAuthenticated, onBack }) {
   }, [])
 
   const isSignup = mode === 'signup'
-  const pinsMismatch = isSignup && pinConfirm.length === 4 && pin !== pinConfirm
+  
   const phoneEnteredButInvalid = phone.trim().length >= 7 && !isValidPhone(phone)
   const canSubmit =
     isValidPhone(phone) &&
     pin.length === 4 &&
-    (!isSignup || (pinConfirm.length === 4 && pin === pinConfirm)) &&
+    
     !!captchaToken &&
     !submitting
 
@@ -141,7 +141,7 @@ export default function Auth({ onAuthenticated, onBack }) {
           style={{
             fontFamily: "'Baloo 2', sans-serif",
             fontWeight: 700,
-            fontSize: 22,
+            fontSize: 28,
             color: '#1a1a1a',
             textAlign: 'center',
             margin: '12px 0 8px',
@@ -155,7 +155,7 @@ export default function Auth({ onAuthenticated, onBack }) {
           style={{
             fontFamily: "'Inter', sans-serif",
             fontWeight: 400,
-            fontSize: 15,
+            fontSize: 18,
             color: '#6b7280',
             textAlign: 'center',
             margin: '0 0 24px',
@@ -237,31 +237,7 @@ export default function Auth({ onAuthenticated, onBack }) {
                 <PinDots value={pin} />
               </div>
             </div>
-
-            {isSignup && (
-              <div>
-                <label className="font-body font-bold text-xs text-gray-500 uppercase tracking-wide mb-1.5 block">
-                  Confirm PIN
-                </label>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  autoComplete="new-password"
-                  value={pinConfirm}
-                  onChange={handlePinChange(setPinConfirm)}
-                  placeholder="****"
-                  className={`w-full rounded-2xl border-2 px-4 py-3.5 font-body text-base text-gray-900
-                             text-center tracking-[0.5em] focus:outline-none transition-colors ${
-                               pinsMismatch ? 'border-red-300' : 'border-gray-200 focus:border-green-500'
-                             }`}
-                />
-                {pinsMismatch && (
-                  <p className="font-body text-xs text-red-500 mt-1.5">PINs don't match.</p>
-                )}
-              </div>
-            )}
-
-            {error && (
+{error && (
               <div className="rounded-xl bg-red-50 border border-red-100 px-3 py-2.5">
                 <p className="font-body text-sm text-red-600">{error}</p>
               </div>
