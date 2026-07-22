@@ -22,152 +22,136 @@ function PinDots({ value }) {
   return (
     <div className="flex items-center gap-3 justify-center">
       {Array.from({ length: 4 }, (_, i) => (
-        <div
-          key={i}
-          className="w-4 h-4 rounded-full border-2"
-          style={{
-            borderColor: i < value.length ? '#58cc02' : '#D1D5DB',
-            backgroundColor: i < value.length ? '#58cc02' : 'transparent',
-          }}
-        />
+        <div key={i} className="w-4 h-4 rounded-full border-2" style={{
+          borderColor: i < value.length ? '#58cc02' : '#D1D5DB',
+          backgroundColor: i < value.length ? '#58cc02' : 'transparent',
+        }} />
       ))}
     </div>
   )
 }
 
-// Carousel slides — practice → earn coins → real rewards
+// Order: get better everyday → earn coins → rewards
 const SLIDES = [
   { src: '/DAILY_PRA__2_.png', alt: 'Get a little better everyday' },
-  { src: '/DAILY_PRA__1_.png', alt: 'Earn coins screen' },
-  { src: '/DAILY_PRA.png',     alt: 'Real-life rewards screen' },
+  { src: '/DAILY_PRA.png', alt: 'Earn coins' },
+  { src: '/DAILY_PRA__1_.png',     alt: 'Exchange for real-life rewards' },
 ]
+
+const PEEK = 44  // px of next card peeking on right
+const GAP  = 12  // px gap between cards
 
 function Carousel({ onCTA }) {
   const [active, setActive] = useState(0)
-  const startX = useRef(null)
-  const trackRef = useRef(null)
   const containerRef = useRef(null)
-  const [cardWidth, setCardWidth] = useState(0)
-  const [containerWidth, setContainerWidth] = useState(0)
-  const PEEK = 44 // px visible from next card
-  const GAP = 12  // px between cards
+  const startX = useRef(null)
+  const [cardWidth, setCardWidth] = useState(null)
 
   useEffect(() => {
     function measure() {
       if (!containerRef.current) return
-      const w = containerRef.current.offsetWidth
-      setContainerWidth(w)
-      setCardWidth(w - PEEK - GAP)
+      // containerWidth - PEEK - GAP = cardWidth
+      // leftPadding = (containerWidth - cardWidth) / 2 = (PEEK + GAP) / 2
+      setCardWidth(containerRef.current.offsetWidth - PEEK - GAP)
     }
-    // Small delay so DOM has painted and offsetWidth is accurate
-    const t = setTimeout(measure, 50)
+    const t = setTimeout(measure, 30)
     window.addEventListener('resize', measure)
     return () => { clearTimeout(t); window.removeEventListener('resize', measure) }
   }, [])
-
-  const offset = cardWidth > 0 ? active * (cardWidth + GAP) : 0
 
   function onTouchStart(e) { startX.current = e.touches[0].clientX }
   function onTouchEnd(e) {
     if (startX.current === null) return
     const diff = startX.current - e.changedTouches[0].clientX
-    if (diff > 40) setActive(i => (i + 1) % SLIDES.length)
+    if (diff > 40)  setActive(i => (i + 1) % SLIDES.length)
     if (diff < -40) setActive(i => (i - 1 + SLIDES.length) % SLIDES.length)
     startX.current = null
   }
 
+  // Left padding centers card 0. Each swipe shifts by (cardWidth + GAP).
+  const leftPad = cardWidth !== null ? (PEEK + GAP) / 2 : 0
+  const offset  = cardWidth !== null ? active * (cardWidth + GAP) : 0
+
   return (
     <div style={{ width: '100%', paddingBottom: 40 }}>
 
-      {/* Slide track */}
       <div
         ref={containerRef}
-        style={{ overflow: 'hidden', width: '100%', cursor: 'grab' }}
+        style={{ overflow: 'hidden', width: '100%' }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <div
-          ref={trackRef}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1)',
-            transform: `translateX(-${offset}px)`,
-          }}
-        >
-          {[...SLIDES, SLIDES[0]].map((slide, i) => (
-            <div
-              key={i}
-              onClick={() => setActive(i % SLIDES.length)}
-              style={{
-                flex: `0 0 ${cardWidth}px`,
-                marginRight: GAP,
-                borderRadius: 24,
-                overflow: 'hidden',
-                transition: 'transform 0.35s, opacity 0.35s',
-                transform: i % SLIDES.length === active ? 'scale(1)' : 'scale(0.93)',
-                opacity: i % SLIDES.length === active ? 1 : 0.45,
-                boxShadow: i % SLIDES.length === active ? '0 8px 32px rgba(0,0,0,0.13)' : 'none',
-              }}
-            >
-              <img
-                src={slide.src}
-                alt={slide.alt}
-                style={{ width: '100%', height: 'auto', display: 'block' }}
-                draggable={false}
-              />
-            </div>
-          ))}
+        <div style={{
+          display: 'flex',
+          paddingLeft: leftPad,
+          transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1)',
+          transform: `translateX(-${offset}px)`,
+        }}>
+          {[...SLIDES, SLIDES[0]].map((slide, i) => {
+            const isActive = i % SLIDES.length === active
+            return (
+              <div
+                key={i}
+                onClick={() => setActive(i % SLIDES.length)}
+                style={{
+                  flex: `0 0 ${cardWidth ?? 0}px`,
+                  marginRight: GAP,
+                  borderRadius: 24,
+                  overflow: 'hidden',
+                  transition: 'transform 0.35s, opacity 0.35s',
+                  transform: isActive ? 'scale(1)' : 'scale(0.93)',
+                  opacity: isActive ? 1 : 0.45,
+                  boxShadow: isActive ? '0 8px 32px rgba(0,0,0,0.13)' : 'none',
+                }}
+              >
+                <img
+                  src={slide.src}
+                  alt={slide.alt}
+                  style={{ width: '100%', height: 'auto', display: 'block' }}
+                  draggable={false}
+                />
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      {/* Dots + next hint */}
+      {/* Dots + Next */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: '16px 0 24px' }}>
         <div style={{ display: 'flex', gap: 8 }}>
           {SLIDES.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setActive(i)}
-              style={{
-                width: i === active ? 24 : 8,
-                height: 8,
-                borderRadius: 4,
-                background: i === active ? '#58cc02' : '#D1D5DB',
-                border: 'none',
-                padding: 0,
-                cursor: 'pointer',
-                transition: 'width 0.3s, background 0.3s',
-              }}
-            />
+            <button key={i} onClick={() => setActive(i)} style={{
+              width: i === active ? 24 : 8,
+              height: 8,
+              borderRadius: 4,
+              background: i === active ? '#58cc02' : '#D1D5DB',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              transition: 'width 0.3s, background 0.3s',
+            }} />
           ))}
         </div>
-        {true && (
-          <button
-            onClick={() => setActive(i => (i + 1) % SLIDES.length)}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontFamily: "'Baloo 2', sans-serif",
-              fontWeight: 700,
-              fontSize: 14,
-              color: '#58cc02',
-              padding: 0,
-            }}
-          >
-            Next →
-          </button>
-        )}
+        <button
+          onClick={() => setActive(i => (i + 1) % SLIDES.length)}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            fontFamily: "'Baloo 2', sans-serif", fontWeight: 700,
+            fontSize: 14, color: '#58cc02', padding: 0,
+          }}
+        >
+          Next →
+        </button>
       </div>
 
-      {/* CTA button — scrolls to form */}
+      {/* GET STARTED FOR FREE */}
       <div style={{ padding: '0 24px' }}>
         <button
           type="button"
           onClick={onCTA}
           className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-lg tracking-wide"
         >
-          CREATE YOUR FREE ACCOUNT
+          GET STARTED FOR FREE
         </button>
       </div>
     </div>
@@ -188,16 +172,11 @@ export default function Auth({ onAuthenticated, onBack }) {
 
   useEffect(() => {
     trackPageView('/app/auth', 'Auth')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const isSignup = mode === 'signup'
   const phoneEnteredButInvalid = phone.trim().length >= 7 && !isValidPhone(phone)
-  const canSubmit =
-    isValidPhone(phone) &&
-    pin.length === 4 &&
-    !!captchaToken &&
-    !submitting
+  const canSubmit = isValidPhone(phone) && pin.length === 4 && !!captchaToken && !submitting
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -232,71 +211,43 @@ export default function Auth({ onAuthenticated, onBack }) {
   }
 
   if (showPrivacy) return <PrivacyPolicy onBack={() => setShowPrivacy(false)} />
-  if (showTerms) return <TermsAndConditions onBack={() => setShowTerms(false)} />
+  if (showTerms)   return <TermsAndConditions onBack={() => setShowTerms(false)} />
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
 
-      {/* ── HERO SECTION — fills 100dvh ───────────────────────────── */}
-      <div className="flex flex-col items-center px-6 pt-10 pb-8" style={{ minHeight: '100dvh', justifyContent: 'center' }}>
+      {/* ── HERO — fills full screen ───────────────────────────────── */}
+      <div className="flex flex-col items-center px-6"
+        style={{ minHeight: '100dvh', justifyContent: 'center', paddingTop: 48, paddingBottom: 40 }}>
 
         {/* Logo + wordmark */}
-        <div className="flex items-center gap-1 mb-6">
-          <img
-            src="/numio-mascot.png"
-            alt=""
-            style={{ width: 52, height: 52, marginRight: -10 }}
-            draggable={false}
-          />
+        <div className="flex items-center gap-1 mb-8">
+          <img src="/numio-mascot.png" alt="" style={{ width: 52, height: 52, marginRight: -10 }} draggable={false} />
           <span style={{
-            fontFamily: "'Baloo 2', sans-serif",
-            fontWeight: 800,
-            fontSize: 38,
-            color: '#58cc02',
-            letterSpacing: '-0.01em',
-            lineHeight: 1,
-          }}>
-            Numio
-          </span>
+            fontFamily: "'Baloo 2', sans-serif", fontWeight: 800,
+            fontSize: 38, color: '#58cc02', letterSpacing: '-0.01em', lineHeight: 1,
+          }}>Numio</span>
         </div>
-
-        {/* Hero illustration */}
-        <img
-          src="/hero-illustration.png"
-          alt="Numio mascot with coins and a phone showing the app"
-          style={{ width: '100%', maxWidth: 300, height: 'auto', display: 'block' }}
-          draggable={false}
-        />
 
         {/* Headline */}
         <h1 style={{
-          fontFamily: "'Baloo 2', sans-serif",
-          fontWeight: 700,
-          fontSize: 28,
-          color: '#1a1a1a',
-          textAlign: 'center',
-          margin: '12px 0 8px',
-          lineHeight: 1.3,
-          maxWidth: 300,
+          fontFamily: "'Baloo 2', sans-serif", fontWeight: 700,
+          fontSize: 28, color: '#1a1a1a', textAlign: 'center',
+          margin: '0 0 12px', lineHeight: 1.3, maxWidth: 300,
         }}>
           Help your kid get better at addition for free 👀
         </h1>
 
         {/* Subheadline */}
         <p style={{
-          fontFamily: "'Inter', sans-serif",
-          fontWeight: 400,
-          fontSize: 18,
-          color: '#6b7280',
-          textAlign: 'center',
-          margin: '0 0 24px',
-          lineHeight: 1.5,
-          maxWidth: 280,
+          fontFamily: "'Inter', sans-serif", fontWeight: 400,
+          fontSize: 18, color: '#6b7280', textAlign: 'center',
+          margin: '0 0 32px', lineHeight: 1.5, maxWidth: 280,
         }}>
           Just 2–4 minutes a day with no extra work from you.
         </p>
 
-        {/* SEE HOW IT WORKS — scrolls to carousel */}
+        {/* SEE HOW IT WORKS */}
         <button
           type="button"
           onClick={scrollToCarousel}
@@ -310,12 +261,8 @@ export default function Auth({ onAuthenticated, onBack }) {
       {/* ── CAROUSEL SECTION ───────────────────────────────────────── */}
       <div ref={carouselRef} style={{ paddingTop: 40 }}>
         <p style={{
-          fontFamily: "'Baloo 2', sans-serif",
-          fontWeight: 700,
-          fontSize: 20,
-          color: '#1a1a1a',
-          textAlign: 'center',
-          margin: '0 0 24px',
+          fontFamily: "'Baloo 2', sans-serif", fontWeight: 700,
+          fontSize: 20, color: '#1a1a1a', textAlign: 'center', margin: '0 0 24px',
         }}>
           Here's how Numio works 👇
         </p>
@@ -323,13 +270,14 @@ export default function Auth({ onAuthenticated, onBack }) {
       </div>
 
       {/* ── DIVIDER ────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-6" style={{ maxWidth: 420, margin: '0 auto 32px', width: '100%' }}>
+      <div className="flex items-center gap-3 px-6"
+        style={{ maxWidth: 420, margin: '0 auto 32px', width: '100%' }}>
         <div className="flex-1 h-px bg-gray-200" />
         <span className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide">Join the Numio family</span>
         <div className="flex-1 h-px bg-gray-200" />
       </div>
 
-      {/* ── AUTH FORM SECTION ──────────────────────────────────────── */}
+      {/* ── AUTH FORM ──────────────────────────────────────────────── */}
       <div ref={formRef} className="flex-1 px-6 pb-10">
         <div className="w-full max-w-sm mx-auto">
 
@@ -348,14 +296,11 @@ export default function Auth({ onAuthenticated, onBack }) {
                 Phone number
               </label>
               <input
-                type="tel"
-                inputMode="tel"
-                autoComplete="tel"
+                type="tel" inputMode="tel" autoComplete="tel"
                 value={phone}
                 onChange={(e) => setPhone(toAsciiDigits(e.target.value).replace(/[^0-9+\-\s()]/g, ''))}
                 placeholder="(555) 123-4567"
-                className="w-full rounded-2xl border-2 border-gray-200 px-4 py-3.5 font-body text-base text-gray-900
-                           focus:border-green-500 focus:outline-none transition-colors"
+                className="w-full rounded-2xl border-2 border-gray-200 px-4 py-3.5 font-body text-base text-gray-900 focus:border-green-500 focus:outline-none transition-colors"
               />
               {phoneEnteredButInvalid && (
                 <p className="font-body text-xs text-red-500 mt-1.5">
@@ -369,18 +314,12 @@ export default function Auth({ onAuthenticated, onBack }) {
                 4-digit PIN
               </label>
               <input
-                type="password"
-                inputMode="numeric"
+                type="password" inputMode="numeric"
                 autoComplete={isSignup ? 'new-password' : 'current-password'}
-                value={pin}
-                onChange={handlePinChange(setPin)}
-                placeholder="****"
-                className="w-full rounded-2xl border-2 border-gray-200 px-4 py-3.5 font-body text-base text-gray-900
-                           text-center tracking-[0.5em] focus:border-green-500 focus:outline-none transition-colors"
+                value={pin} onChange={handlePinChange(setPin)} placeholder="****"
+                className="w-full rounded-2xl border-2 border-gray-200 px-4 py-3.5 font-body text-base text-gray-900 text-center tracking-[0.5em] focus:border-green-500 focus:outline-none transition-colors"
               />
-              <div className="mt-2">
-                <PinDots value={pin} />
-              </div>
+              <div className="mt-2"><PinDots value={pin} /></div>
             </div>
 
             {error && (
@@ -389,14 +328,10 @@ export default function Auth({ onAuthenticated, onBack }) {
               </div>
             )}
 
-            <Turnstile
-              onVerify={setCaptchaToken}
-              onExpire={() => setCaptchaToken(null)}
-            />
+            <Turnstile onVerify={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
 
             <button
-              type="submit"
-              disabled={!canSubmit}
+              type="submit" disabled={!canSubmit}
               className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-lg tracking-wide mt-2"
             >
               {submitting ? 'PLEASE WAIT…' : isSignup ? 'CREATE ACCOUNT' : 'LOG IN'}
@@ -404,24 +339,14 @@ export default function Auth({ onAuthenticated, onBack }) {
 
             <p className="font-body text-xs text-gray-400 text-center leading-relaxed mt-1">
               By {isSignup ? 'creating an account' : 'logging in'}, you agree to our{' '}
-              <button
-                type="button"
-                onClick={() => setShowTerms(true)}
-                className="font-bold underline"
-                style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
-              >
+              <button type="button" onClick={() => setShowTerms(true)} className="font-bold underline"
+                style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}>
                 Terms and Conditions
-              </button>
-              {' '}and our{' '}
-              <button
-                type="button"
-                onClick={() => setShowPrivacy(true)}
-                className="font-bold underline"
-                style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
-              >
+              </button>{' '}and our{' '}
+              <button type="button" onClick={() => setShowPrivacy(true)} className="font-bold underline"
+                style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}>
                 Privacy Policy
-              </button>
-              .
+              </button>.
             </p>
           </form>
 
