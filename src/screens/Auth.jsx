@@ -34,8 +34,8 @@ function PinDots({ value }) {
 // Order: get better everyday → earn coins → rewards
 const SLIDES = [
   { src: '/DAILY_PRA__2_.png', alt: 'Get a little better everyday' },
-  { src: '/DAILY_PRA.png', alt: 'Earn coins' },
-  { src: '/DAILY_PRA__1_.png',     alt: 'Exchange for real-life rewards' },
+  { src: '/DAILY_PRA__1_.png', alt: 'Earn coins' },
+  { src: '/DAILY_PRA.png',     alt: 'Exchange for real-life rewards' },
 ]
 
 const PEEK = 44  // px of next card peeking on right
@@ -202,10 +202,6 @@ export default function Auth({ onAuthenticated, onBack }) {
     }
   }
 
-  function scrollToCarousel() {
-    carouselRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
-
   function scrollToForm() {
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -216,9 +212,8 @@ export default function Auth({ onAuthenticated, onBack }) {
   return (
     <div className="min-h-screen bg-white flex flex-col">
 
-      {/* ── HERO — fills full screen ───────────────────────────────── */}
-      <div className="flex flex-col items-center px-6"
-        style={{ minHeight: '100dvh', justifyContent: 'center', paddingTop: 48, paddingBottom: 40 }}>
+      {/* ── HERO ──────────────────────────────────────────────────── */}
+      <div className="flex flex-col items-center px-6" style={{ paddingTop: 48, paddingBottom: 0 }}>
 
         {/* Logo + wordmark */}
         <div className="flex items-center gap-1 mb-8">
@@ -242,30 +237,24 @@ export default function Auth({ onAuthenticated, onBack }) {
         <p style={{
           fontFamily: "'Inter', sans-serif", fontWeight: 400,
           fontSize: 18, color: '#6b7280', textAlign: 'center',
-          margin: '0 0 32px', lineHeight: 1.5, maxWidth: 280,
+          margin: '0 0 28px', lineHeight: 1.5, maxWidth: 280,
         }}>
           Just 2–4 minutes a day with no extra work from you.
         </p>
 
-        {/* SEE HOW IT WORKS */}
+        {/* GET STARTED FOR FREE */}
         <button
           type="button"
-          onClick={scrollToCarousel}
+          onClick={scrollToForm}
           className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-lg tracking-wide"
           style={{ maxWidth: 360 }}
         >
-          SEE HOW IT WORKS
+          GET STARTED FOR FREE
         </button>
       </div>
 
       {/* ── CAROUSEL SECTION ───────────────────────────────────────── */}
       <div ref={carouselRef} style={{ paddingTop: 40 }}>
-        <p style={{
-          fontFamily: "'Baloo 2', sans-serif", fontWeight: 700,
-          fontSize: 20, color: '#1a1a1a', textAlign: 'center', margin: '0 0 24px',
-        }}>
-          Here's how Numio works 👇
-        </p>
         <Carousel onCTA={scrollToForm} />
       </div>
 
