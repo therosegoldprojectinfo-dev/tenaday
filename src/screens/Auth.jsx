@@ -37,14 +37,34 @@ function PinDots({ value }) {
 
 // Carousel slides — practice → earn coins → real rewards
 const SLIDES = [
-  { src: '/DAILY_PRA__2_.png',     alt: 'Get a little better everyday' },
-  { src: '/DAILY_PRA.png', alt: 'Earn coins screen' },
-  { src: '/DAILY_PRA__1_.png', alt: 'Real-life rewards screen' },
+  { src: '/DAILY_PRA.png',     alt: 'Get a little better everyday' },
+  { src: '/DAILY_PRA__1_.png', alt: 'Earn coins screen' },
+  { src: '/DAILY_PRA__2_.png', alt: 'Real-life rewards screen' },
 ]
 
 function Carousel({ onCTA }) {
   const [active, setActive] = useState(0)
   const startX = useRef(null)
+  const trackRef = useRef(null)
+  const containerRef = useRef(null)
+  const [cardWidth, setCardWidth] = useState(0)
+  const [containerWidth, setContainerWidth] = useState(0)
+  const PEEK = 40 // px visible from next card
+  const GAP = 12  // px between cards
+
+  useEffect(() => {
+    function measure() {
+      if (!containerRef.current) return
+      const w = containerRef.current.offsetWidth
+      setContainerWidth(w)
+      setCardWidth(w - PEEK - GAP)
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
+
+  const offset = active * (cardWidth + GAP)
 
   function onTouchStart(e) { startX.current = e.touches[0].clientX }
   function onTouchEnd(e) {
@@ -58,18 +78,20 @@ function Carousel({ onCTA }) {
   return (
     <div style={{ width: '100%', paddingBottom: 40 }}>
 
-      {/* Slide track — centered active card, peek on sides */}
+      {/* Slide track */}
       <div
+        ref={containerRef}
         style={{ overflow: 'hidden', width: '100%', cursor: 'grab' }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
         <div
+          ref={trackRef}
           style={{
             display: 'flex',
             alignItems: 'center',
             transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1)',
-            transform: `translateX(calc(10vw - ${active * 86}vw))`,
+            transform: `translateX(-${offset}px)`,
           }}
         >
           {[...SLIDES, SLIDES[0]].map((slide, i) => (
@@ -77,13 +99,12 @@ function Carousel({ onCTA }) {
               key={i}
               onClick={() => setActive(i % SLIDES.length)}
               style={{
-                flex: '0 0 80vw',
-                maxWidth: 320,
-                marginRight: '6vw',
+                flex: `0 0 ${cardWidth}px`,
+                marginRight: GAP,
                 borderRadius: 24,
                 overflow: 'hidden',
                 transition: 'transform 0.35s, opacity 0.35s',
-                transform: i % SLIDES.length === active ? 'scale(1)' : 'scale(0.92)',
+                transform: i % SLIDES.length === active ? 'scale(1)' : 'scale(0.93)',
                 opacity: i % SLIDES.length === active ? 1 : 0.45,
                 boxShadow: i % SLIDES.length === active ? '0 8px 32px rgba(0,0,0,0.13)' : 'none',
               }}
