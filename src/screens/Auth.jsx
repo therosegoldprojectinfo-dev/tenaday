@@ -58,7 +58,7 @@ function Carousel({ onCTA }) {
   return (
     <div style={{ width: '100%', paddingBottom: 40 }}>
 
-      {/* Slide track — peek of next card on the right */}
+      {/* Slide track — centered active card, peek on sides */}
       <div
         style={{ overflow: 'hidden', width: '100%', cursor: 'grab' }}
         onTouchStart={onTouchStart}
@@ -67,8 +67,9 @@ function Carousel({ onCTA }) {
         <div
           style={{
             display: 'flex',
+            alignItems: 'center',
             transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1)',
-            transform: `translateX(calc(${active * -82}vw + ${active === 0 ? 0 : -8}px))`,
+            transform: `translateX(calc(50% - 39vw - ${active * (78 + 3)}vw))`,
           }}
         >
           {SLIDES.map((slide, i) => (
@@ -77,13 +78,13 @@ function Carousel({ onCTA }) {
               onClick={() => setActive(i)}
               style={{
                 flex: '0 0 78vw',
-                maxWidth: 320,
-                marginRight: 12,
+                maxWidth: 300,
+                marginRight: '3vw',
                 borderRadius: 24,
                 overflow: 'hidden',
                 transition: 'transform 0.35s, opacity 0.35s',
-                transform: i === active ? 'scale(1)' : 'scale(0.95)',
-                opacity: i === active ? 1 : 0.5,
+                transform: i === active ? 'scale(1)' : 'scale(0.92)',
+                opacity: i === active ? 1 : 0.45,
                 boxShadow: i === active ? '0 8px 32px rgba(0,0,0,0.13)' : 'none',
               }}
             >
@@ -98,24 +99,43 @@ function Carousel({ onCTA }) {
         </div>
       </div>
 
-      {/* Dots */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: 8, margin: '16px 0 24px' }}>
-        {SLIDES.map((_, i) => (
+      {/* Dots + next hint */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: '16px 0 24px' }}>
+        <div style={{ display: 'flex', gap: 8 }}>
+          {SLIDES.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              style={{
+                width: i === active ? 24 : 8,
+                height: 8,
+                borderRadius: 4,
+                background: i === active ? '#58cc02' : '#D1D5DB',
+                border: 'none',
+                padding: 0,
+                cursor: 'pointer',
+                transition: 'width 0.3s, background 0.3s',
+              }}
+            />
+          ))}
+        </div>
+        {active < SLIDES.length - 1 && (
           <button
-            key={i}
-            onClick={() => setActive(i)}
+            onClick={() => setActive(i => Math.min(i + 1, SLIDES.length - 1))}
             style={{
-              width: i === active ? 24 : 8,
-              height: 8,
-              borderRadius: 4,
-              background: i === active ? '#58cc02' : '#D1D5DB',
+              background: 'none',
               border: 'none',
-              padding: 0,
               cursor: 'pointer',
-              transition: 'width 0.3s, background 0.3s',
+              fontFamily: "'Baloo 2', sans-serif",
+              fontWeight: 700,
+              fontSize: 14,
+              color: '#58cc02',
+              padding: 0,
             }}
-          />
-        ))}
+          >
+            Next →
+          </button>
+        )}
       </div>
 
       {/* CTA button — scrolls to form */}
