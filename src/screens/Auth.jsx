@@ -162,13 +162,27 @@ export default function Auth({ onAuthenticated, onBack }) {
             fontSize: 22,
             color: '#1a1a1a',
             textAlign: 'center',
-            margin: '12px 0 24px',
+            margin: '12px 0 8px',
             lineHeight: 1.3,
             maxWidth: 300,
           }}
         >
-          Help your child get better at addition — just 2–4 minutes a day.
+          Help your kid get better at addition for free 👀
         </h1>
+        <p
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 400,
+            fontSize: 15,
+            color: '#6b7280',
+            textAlign: 'center',
+            margin: '0 0 24px',
+            lineHeight: 1.5,
+            maxWidth: 280,
+          }}
+        >
+          Just 2–4 minutes a day with no extra work from you.
+        </p>
 
         {/* GET STARTED FOR FREE — scrolls to form */}
         <button
