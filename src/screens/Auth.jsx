@@ -144,16 +144,7 @@ function Carousel({ onCTA }) {
         </button>
       </div>
 
-      {/* GET STARTED FOR FREE */}
-      <div style={{ padding: '0 24px' }}>
-        <button
-          type="button"
-          onClick={onCTA}
-          className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-lg tracking-wide"
-        >
-          GET STARTED FOR FREE
-        </button>
-      </div>
+
     </div>
   )
 }
