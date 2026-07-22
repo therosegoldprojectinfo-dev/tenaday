@@ -6,12 +6,6 @@ import PrivacyPolicy from './PrivacyPolicy'
 import TermsAndConditions from './TermsAndConditions'
 import Turnstile from '../components/Turnstile'
 
-// Some keyboards (common on Android devices set to Arabic, and some
-// regional iOS settings) emit Arabic-Indic (٠-٩) or Extended Arabic-Indic
-// (۰-۹) digits instead of ASCII 0-9. Our phone/PIN strippers only ever
-// recognized ASCII digits, so a parent typing on one of these keyboards
-// had every character silently deleted with no error message — a hard,
-// invisible signup blocker. Transliterate to ASCII before any stripping.
 const ARABIC_INDIC_DIGITS = '٠١٢٣٤٥٦٧٨٩'
 const EXTENDED_ARABIC_INDIC_DIGITS = '۰۱۲۳۴۵۶۷۸۹'
 function toAsciiDigits(str) {
@@ -23,7 +17,6 @@ function toAsciiDigits(str) {
     return ch
   })
 }
-
 
 function PinDots({ value }) {
   return (
@@ -42,12 +35,109 @@ function PinDots({ value }) {
   )
 }
 
+// Carousel slides — practice → earn coins → real rewards
+const SLIDES = [
+  { src: '/DAILY_PRA.png',     alt: 'Daily practice screen' },
+  { src: '/DAILY_PRA__1_.png', alt: 'Earn coins screen' },
+  { src: '/DAILY_PRA__2_.png', alt: 'Real-life rewards screen' },
+]
+
+function Carousel({ onCTA }) {
+  const [active, setActive] = useState(0)
+  const startX = useRef(null)
+
+  function onTouchStart(e) { startX.current = e.touches[0].clientX }
+  function onTouchEnd(e) {
+    if (startX.current === null) return
+    const diff = startX.current - e.changedTouches[0].clientX
+    if (diff > 40) setActive(i => Math.min(i + 1, SLIDES.length - 1))
+    if (diff < -40) setActive(i => Math.max(i - 1, 0))
+    startX.current = null
+  }
+
+  return (
+    <div style={{ width: '100%', paddingBottom: 40 }}>
+
+      {/* Slide track — peek of next card on the right */}
+      <div
+        style={{ overflow: 'hidden', width: '100%', cursor: 'grab' }}
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
+        <div
+          style={{
+            display: 'flex',
+            transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1)',
+            transform: `translateX(calc(${active * -82}vw + ${active === 0 ? 0 : -8}px))`,
+          }}
+        >
+          {SLIDES.map((slide, i) => (
+            <div
+              key={i}
+              onClick={() => setActive(i)}
+              style={{
+                flex: '0 0 78vw',
+                maxWidth: 320,
+                marginRight: 12,
+                borderRadius: 24,
+                overflow: 'hidden',
+                transition: 'transform 0.35s, opacity 0.35s',
+                transform: i === active ? 'scale(1)' : 'scale(0.95)',
+                opacity: i === active ? 1 : 0.5,
+                boxShadow: i === active ? '0 8px 32px rgba(0,0,0,0.13)' : 'none',
+              }}
+            >
+              <img
+                src={slide.src}
+                alt={slide.alt}
+                style={{ width: '100%', height: 'auto', display: 'block' }}
+                draggable={false}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Dots */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 8, margin: '16px 0 24px' }}>
+        {SLIDES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setActive(i)}
+            style={{
+              width: i === active ? 24 : 8,
+              height: 8,
+              borderRadius: 4,
+              background: i === active ? '#58cc02' : '#D1D5DB',
+              border: 'none',
+              padding: 0,
+              cursor: 'pointer',
+              transition: 'width 0.3s, background 0.3s',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* CTA button — scrolls to form */}
+      <div style={{ padding: '0 24px' }}>
+        <button
+          type="button"
+          onClick={onCTA}
+          className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-lg tracking-wide"
+        >
+          CREATE YOUR FREE ACCOUNT
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function Auth({ onAuthenticated, onBack }) {
+  const carouselRef = useRef(null)
   const formRef = useRef(null)
   const [mode, setMode] = useState('signup')
   const [phone, setPhone] = useState('')
   const [pin, setPin] = useState('')
-  
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
   const [showPrivacy, setShowPrivacy] = useState(false)
@@ -60,12 +150,10 @@ export default function Auth({ onAuthenticated, onBack }) {
   }, [])
 
   const isSignup = mode === 'signup'
-  
   const phoneEnteredButInvalid = phone.trim().length >= 7 && !isValidPhone(phone)
   const canSubmit =
     isValidPhone(phone) &&
     pin.length === 4 &&
-    
     !!captchaToken &&
     !submitting
 
@@ -93,6 +181,10 @@ export default function Auth({ onAuthenticated, onBack }) {
     }
   }
 
+  function scrollToCarousel() {
+    carouselRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   function scrollToForm() {
     formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
@@ -103,7 +195,7 @@ export default function Auth({ onAuthenticated, onBack }) {
   return (
     <div className="min-h-screen bg-white flex flex-col">
 
-      {/* ── HERO SECTION — fills 100dvh so form is just below the fold ── */}
+      {/* ── HERO SECTION — fills 100dvh ───────────────────────────── */}
       <div className="flex flex-col items-center px-6 pt-10 pb-8" style={{ minHeight: '100dvh', justifyContent: 'center' }}>
 
         {/* Logo + wordmark */}
@@ -114,16 +206,14 @@ export default function Auth({ onAuthenticated, onBack }) {
             style={{ width: 52, height: 52, marginRight: -10 }}
             draggable={false}
           />
-          <span
-            style={{
-              fontFamily: "'Baloo 2', sans-serif",
-              fontWeight: 800,
-              fontSize: 38,
-              color: '#58cc02',
-              letterSpacing: '-0.01em',
-              lineHeight: 1,
-            }}
-          >
+          <span style={{
+            fontFamily: "'Baloo 2', sans-serif",
+            fontWeight: 800,
+            fontSize: 38,
+            color: '#58cc02',
+            letterSpacing: '-0.01em',
+            lineHeight: 1,
+          }}>
             Numio
           </span>
         </div>
@@ -136,49 +226,62 @@ export default function Auth({ onAuthenticated, onBack }) {
           draggable={false}
         />
 
-        {/* Headline — tight to image */}
-        <h1
-          style={{
-            fontFamily: "'Baloo 2', sans-serif",
-            fontWeight: 700,
-            fontSize: 28,
-            color: '#1a1a1a',
-            textAlign: 'center',
-            margin: '12px 0 8px',
-            lineHeight: 1.3,
-            maxWidth: 300,
-          }}
-        >
+        {/* Headline */}
+        <h1 style={{
+          fontFamily: "'Baloo 2', sans-serif",
+          fontWeight: 700,
+          fontSize: 28,
+          color: '#1a1a1a',
+          textAlign: 'center',
+          margin: '12px 0 8px',
+          lineHeight: 1.3,
+          maxWidth: 300,
+        }}>
           Help your kid get better at addition for free 👀
         </h1>
-        <p
-          style={{
-            fontFamily: "'Inter', sans-serif",
-            fontWeight: 400,
-            fontSize: 18,
-            color: '#6b7280',
-            textAlign: 'center',
-            margin: '0 0 24px',
-            lineHeight: 1.5,
-            maxWidth: 280,
-          }}
-        >
+
+        {/* Subheadline */}
+        <p style={{
+          fontFamily: "'Inter', sans-serif",
+          fontWeight: 400,
+          fontSize: 18,
+          color: '#6b7280',
+          textAlign: 'center',
+          margin: '0 0 24px',
+          lineHeight: 1.5,
+          maxWidth: 280,
+        }}>
           Just 2–4 minutes a day with no extra work from you.
         </p>
 
-        {/* GET STARTED FOR FREE — scrolls to form */}
+        {/* SEE HOW IT WORKS — scrolls to carousel */}
         <button
           type="button"
-          onClick={scrollToForm}
+          onClick={scrollToCarousel}
           className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-lg tracking-wide"
           style={{ maxWidth: 360 }}
         >
-          GET STARTED FOR FREE
+          SEE HOW IT WORKS
         </button>
       </div>
 
+      {/* ── CAROUSEL SECTION ───────────────────────────────────────── */}
+      <div ref={carouselRef} style={{ paddingTop: 40 }}>
+        <p style={{
+          fontFamily: "'Baloo 2', sans-serif",
+          fontWeight: 700,
+          fontSize: 20,
+          color: '#1a1a1a',
+          textAlign: 'center',
+          margin: '0 0 24px',
+        }}>
+          Here's how Numio works 👇
+        </p>
+        <Carousel onCTA={scrollToForm} />
+      </div>
+
       {/* ── DIVIDER ────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-6 mb-8" style={{ maxWidth: 420, margin: '0 auto 32px', width: '100%' }}>
+      <div className="flex items-center gap-3 px-6" style={{ maxWidth: 420, margin: '0 auto 32px', width: '100%' }}>
         <div className="flex-1 h-px bg-gray-200" />
         <span className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide">Join the Numio family</span>
         <div className="flex-1 h-px bg-gray-200" />
@@ -237,7 +340,8 @@ export default function Auth({ onAuthenticated, onBack }) {
                 <PinDots value={pin} />
               </div>
             </div>
-{error && (
+
+            {error && (
               <div className="rounded-xl bg-red-50 border border-red-100 px-3 py-2.5">
                 <p className="font-body text-sm text-red-600">{error}</p>
               </div>
