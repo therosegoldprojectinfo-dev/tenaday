@@ -50,8 +50,8 @@ function Carousel({ onCTA }) {
   function onTouchEnd(e) {
     if (startX.current === null) return
     const diff = startX.current - e.changedTouches[0].clientX
-    if (diff > 40) setActive(i => Math.min(i + 1, SLIDES.length - 1))
-    if (diff < -40) setActive(i => Math.max(i - 1, 0))
+    if (diff > 40) setActive(i => (i + 1) % SLIDES.length)
+    if (diff < -40) setActive(i => (i - 1 + SLIDES.length) % SLIDES.length)
     startX.current = null
   }
 
@@ -119,9 +119,9 @@ function Carousel({ onCTA }) {
             />
           ))}
         </div>
-        {active < SLIDES.length - 1 && (
+        {true && (
           <button
-            onClick={() => setActive(i => Math.min(i + 1, SLIDES.length - 1))}
+            onClick={() => setActive(i => (i + 1) % SLIDES.length)}
             style={{
               background: 'none',
               border: 'none',
