@@ -37,9 +37,9 @@ function PinDots({ value }) {
 
 // Carousel slides — practice → earn coins → real rewards
 const SLIDES = [
-  { src: '/DAILY_PRA__2_.png', alt: 'Daily practice screen' },
+  { src: '/DAILY_PRA.png',     alt: 'Get a little better everyday' },
   { src: '/DAILY_PRA__1_.png', alt: 'Earn coins screen' },
-  { src: '/DAILY_PRA.png',     alt: 'Real-life rewards screen' },
+  { src: '/DAILY_PRA__2_.png', alt: 'Real-life rewards screen' },
 ]
 
 function Carousel({ onCTA }) {
@@ -60,7 +60,7 @@ function Carousel({ onCTA }) {
 
       {/* Slide track — centered active card, peek on sides */}
       <div
-        style={{ overflow: 'hidden', width: '100%', cursor: 'grab' }}
+        style={{ overflow: 'hidden', width: '100%', cursor: 'grab', paddingRight: '11vw', boxSizing: 'border-box' }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
