@@ -221,7 +221,7 @@ export default function Auth({ onAuthenticated, onBack }) {
           fontSize: 28, color: '#1a1a1a', textAlign: 'center',
           margin: '0 0 12px', lineHeight: 1.3, maxWidth: 300,
         }}>
-          Help your kid get better at addition for free !?
+          Help your kid get better at addition for free 👀
         </h1>
 
         {/* Subheadline */}
@@ -253,7 +253,7 @@ export default function Auth({ onAuthenticated, onBack }) {
       <div className="flex items-center gap-3 px-6"
         style={{ maxWidth: 420, margin: '0 auto 32px', width: '100%' }}>
         <div className="flex-1 h-px bg-gray-200" />
-        <span className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide">Join the Numio family</span>
+        <span className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide">Let's help your kid get better</span>
         <div className="flex-1 h-px bg-gray-200" />
       </div>
 
@@ -262,7 +262,7 @@ export default function Auth({ onAuthenticated, onBack }) {
         <div className="w-full max-w-sm mx-auto">
 
           <h2 className="font-display font-bold text-2xl text-gray-900 text-center mb-1">
-            {isSignup ? 'Join the Numio family' : 'Welcome back'}
+            {isSignup ? 'Let's help your kid get better' : 'Welcome back'}
           </h2>
           <p className="font-body text-sm text-gray-400 text-center mb-7">
             {isSignup
