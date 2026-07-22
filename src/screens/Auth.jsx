@@ -60,7 +60,7 @@ function Carousel({ onCTA }) {
 
       {/* Slide track — centered active card, peek on sides */}
       <div
-        style={{ overflow: 'hidden', width: '100%', cursor: 'grab', paddingRight: '11vw', boxSizing: 'border-box' }}
+        style={{ overflow: 'hidden', width: '100%', cursor: 'grab' }}
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
@@ -69,7 +69,7 @@ function Carousel({ onCTA }) {
             display: 'flex',
             alignItems: 'center',
             transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1)',
-            transform: `translateX(calc(50% - 39vw - ${active * (78 + 3)}vw))`,
+            transform: `translateX(calc(10vw - ${active * 86}vw))`,
           }}
         >
           {[...SLIDES, SLIDES[0]].map((slide, i) => (
@@ -77,9 +77,9 @@ function Carousel({ onCTA }) {
               key={i}
               onClick={() => setActive(i % SLIDES.length)}
               style={{
-                flex: '0 0 78vw',
-                maxWidth: 300,
-                marginRight: '3vw',
+                flex: '0 0 80vw',
+                maxWidth: 320,
+                marginRight: '6vw',
                 borderRadius: 24,
                 overflow: 'hidden',
                 transition: 'transform 0.35s, opacity 0.35s',
