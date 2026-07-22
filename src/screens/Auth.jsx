@@ -37,9 +37,9 @@ function PinDots({ value }) {
 
 // Carousel slides — practice → earn coins → real rewards
 const SLIDES = [
-  { src: '/DAILY_PRA.png',     alt: 'Get a little better everyday' },
+  { src: '/DAILY_PRA__2_.png', alt: 'Get a little better everyday' },
   { src: '/DAILY_PRA__1_.png', alt: 'Earn coins screen' },
-  { src: '/DAILY_PRA__2_.png', alt: 'Real-life rewards screen' },
+  { src: '/DAILY_PRA.png',     alt: 'Real-life rewards screen' },
 ]
 
 function Carousel({ onCTA }) {
@@ -49,7 +49,7 @@ function Carousel({ onCTA }) {
   const containerRef = useRef(null)
   const [cardWidth, setCardWidth] = useState(0)
   const [containerWidth, setContainerWidth] = useState(0)
-  const PEEK = 40 // px visible from next card
+  const PEEK = 44 // px visible from next card
   const GAP = 12  // px between cards
 
   useEffect(() => {
@@ -59,12 +59,13 @@ function Carousel({ onCTA }) {
       setContainerWidth(w)
       setCardWidth(w - PEEK - GAP)
     }
-    measure()
+    // Small delay so DOM has painted and offsetWidth is accurate
+    const t = setTimeout(measure, 50)
     window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
+    return () => { clearTimeout(t); window.removeEventListener('resize', measure) }
   }, [])
 
-  const offset = active * (cardWidth + GAP)
+  const offset = cardWidth > 0 ? active * (cardWidth + GAP) : 0
 
   function onTouchStart(e) { startX.current = e.touches[0].clientX }
   function onTouchEnd(e) {
