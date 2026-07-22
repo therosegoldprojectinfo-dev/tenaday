@@ -198,7 +198,7 @@ export default function Auth({ onAuthenticated, onBack }) {
       {/* ── DIVIDER ────────────────────────────────────────────────── */}
       <div className="flex items-center gap-3 px-6 mb-8" style={{ maxWidth: 420, margin: '0 auto 32px', width: '100%' }}>
         <div className="flex-1 h-px bg-gray-200" />
-        <span className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide">Create your free account</span>
+        <span className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide">Join the Numio family</span>
         <div className="flex-1 h-px bg-gray-200" />
       </div>
 
@@ -207,7 +207,7 @@ export default function Auth({ onAuthenticated, onBack }) {
         <div className="w-full max-w-sm mx-auto">
 
           <h2 className="font-display font-bold text-2xl text-gray-900 text-center mb-1">
-            {isSignup ? 'Create your account' : 'Welcome back'}
+            {isSignup ? 'Join the Numio family' : 'Welcome back'}
           </h2>
           <p className="font-body text-sm text-gray-400 text-center mb-7">
             {isSignup
