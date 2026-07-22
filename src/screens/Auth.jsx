@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { signUp, logIn, AuthError, isValidPhone } from '../lib/parentAuth'
 import { trackEvent } from '../lib/analytics'
 import { trackPageView } from '../lib/gtag'
@@ -43,15 +43,6 @@ function FacebookIcon() {
   )
 }
 
-function BackIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2.5"
-      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12.5 16L6.5 10L12.5 4" />
-    </svg>
-  )
-}
-
 function PinDots({ value }) {
   return (
     <div className="flex items-center gap-3 justify-center">
@@ -70,6 +61,7 @@ function PinDots({ value }) {
 }
 
 export default function Auth({ onAuthenticated, onBack }) {
+  const formRef = useRef(null)
   const [mode, setMode] = useState('signup')
   const [phone, setPhone] = useState('')
   const [pin, setPin] = useState('')
@@ -103,10 +95,10 @@ export default function Auth({ onAuthenticated, onBack }) {
     try {
       const parentId = isSignup ? await signUp(phone, pin, captchaToken) : await logIn(phone, pin, captchaToken)
       if (isSignup) trackEvent('signup_completed', { parentId })
-      onAuthenticated(parentId, isSignup) // isSignup=true means new account
+      onAuthenticated(parentId, isSignup)
     } catch (err) {
       setError(err instanceof AuthError ? err.message : 'Something went wrong. Please try again.')
-      setCaptchaToken(null) // Turnstile tokens are single-use — always require a fresh one on retry
+      setCaptchaToken(null)
     } finally {
       setSubmitting(false)
     }
@@ -119,39 +111,90 @@ export default function Auth({ onAuthenticated, onBack }) {
     }
   }
 
+  function scrollToForm() {
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   if (showPrivacy) return <PrivacyPolicy onBack={() => setShowPrivacy(false)} />
   if (showTerms) return <TermsAndConditions onBack={() => setShowTerms(false)} />
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <div className="flex items-center px-4 pt-5">
-        {onBack && (
-          <button
-            onClick={onBack}
-            className="w-10 h-10 flex items-center justify-center rounded-full text-gray-500 transition-colors active:bg-gray-100"
-            aria-label="Back"
+
+      {/* ── HERO SECTION ───────────────────────────────────────────── */}
+      <div className="flex flex-col items-center px-6 pt-10 pb-8">
+
+        {/* Logo + wordmark */}
+        <div className="flex items-center gap-1 mb-6">
+          <img
+            src="/numio-mascot.png"
+            alt=""
+            style={{ width: 52, height: 52, marginRight: -10 }}
+            draggable={false}
+          />
+          <span
+            style={{
+              fontFamily: "'Baloo 2', sans-serif",
+              fontWeight: 800,
+              fontSize: 38,
+              color: '#58cc02',
+              letterSpacing: '-0.01em',
+              lineHeight: 1,
+            }}
           >
-            <BackIcon />
-          </button>
-        )}
+            Numio
+          </span>
+        </div>
+
+        {/* Hero illustration */}
+        <img
+          src="/hero-illustration.png"
+          alt="Numio mascot with coins and a phone showing the app"
+          style={{ width: '100%', maxWidth: 300, height: 'auto', display: 'block' }}
+          draggable={false}
+        />
+
+        {/* Headline — tight to image */}
+        <h1
+          style={{
+            fontFamily: "'Baloo 2', sans-serif",
+            fontWeight: 700,
+            fontSize: 22,
+            color: '#1a1a1a',
+            textAlign: 'center',
+            margin: '12px 0 24px',
+            lineHeight: 1.3,
+            maxWidth: 300,
+          }}
+        >
+          Help your child get better at addition — just 2–4 minutes a day.
+        </h1>
+
+        {/* GET STARTED FOR FREE — scrolls to form */}
+        <button
+          type="button"
+          onClick={scrollToForm}
+          className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-lg tracking-wide"
+          style={{ maxWidth: 360 }}
+        >
+          GET STARTED FOR FREE
+        </button>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-6 py-8">
-        <div className="w-full max-w-sm">
+      {/* ── DIVIDER ────────────────────────────────────────────────── */}
+      <div className="flex items-center gap-3 px-6 mb-8" style={{ maxWidth: 420, margin: '0 auto 32px', width: '100%' }}>
+        <div className="flex-1 h-px bg-gray-200" />
+        <span className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide">Create your free account</span>
+        <div className="flex-1 h-px bg-gray-200" />
+      </div>
 
-          {/* Brand identity — logo */}
-          <div className="flex flex-col items-center mb-8">
-            <img
-              src="/numiologoapp.png"
-              alt="Numio"
-              className="h-24 w-auto object-contain"
-              draggable={false}
-            />
-          </div>
+      {/* ── AUTH FORM SECTION ──────────────────────────────────────── */}
+      <div ref={formRef} className="flex-1 px-6 pb-10">
+        <div className="w-full max-w-sm mx-auto">
 
-          <h1 className="font-display font-bold text-2xl text-gray-900 text-center mb-1">
+          <h2 className="font-display font-bold text-2xl text-gray-900 text-center mb-1">
             {isSignup ? 'Create your account' : 'Welcome back'}
-          </h1>
+          </h2>
           <p className="font-body text-sm text-gray-400 text-center mb-7">
             {isSignup
               ? 'A parent account lets you add and manage your kids\u2019 profiles.'
@@ -241,28 +284,27 @@ export default function Auth({ onAuthenticated, onBack }) {
               {submitting ? 'PLEASE WAIT…' : isSignup ? 'CREATE ACCOUNT' : 'LOG IN'}
             </button>
 
-            {/* Legal text — signup and login */}
-              <p className="font-body text-xs text-gray-400 text-center leading-relaxed mt-1">
-                By {isSignup ? 'creating an account' : 'logging in'}, you agree to our{' '}
-                <button
-                  type="button"
-                  onClick={() => setShowTerms(true)}
-                  className="font-bold underline"
-                  style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
-                >
-                  Terms and Conditions
-                </button>
-                {' '}and our{' '}
-                <button
-                  type="button"
-                  onClick={() => setShowPrivacy(true)}
-                  className="font-bold underline"
-                  style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
-                >
-                  Privacy Policy
-                </button>
-                .
-              </p>
+            <p className="font-body text-xs text-gray-400 text-center leading-relaxed mt-1">
+              By {isSignup ? 'creating an account' : 'logging in'}, you agree to our{' '}
+              <button
+                type="button"
+                onClick={() => setShowTerms(true)}
+                className="font-bold underline"
+                style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
+              >
+                Terms and Conditions
+              </button>
+              {' '}and our{' '}
+              <button
+                type="button"
+                onClick={() => setShowPrivacy(true)}
+                className="font-bold underline"
+                style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
+              >
+                Privacy Policy
+              </button>
+              .
+            </p>
           </form>
 
           <div className="flex items-center gap-3 my-6">
@@ -271,10 +313,7 @@ export default function Auth({ onAuthenticated, onBack }) {
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
-          {/* Google/Facebook are visible but intentionally disabled — real
-              OAuth (Supabase Auth + app registration with each provider)
-              is a separate, larger build phase. Phone + PIN is the only
-              working method right now, matching the product spec. */}
+          {/* Google/Facebook — disabled, coming soon */}
           <div className="flex flex-col gap-3">
             <button
               type="button"
