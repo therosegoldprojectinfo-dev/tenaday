@@ -37,9 +37,9 @@ function PinDots({ value }) {
 
 // Carousel slides — practice → earn coins → real rewards
 const SLIDES = [
-  { src: '/DAILY_PRA.png',     alt: 'Get a little better everyday' },
-  { src: '/DAILY_PRA__1_.png', alt: 'Earn coins screen' },
-  { src: '/DAILY_PRA__2_.png', alt: 'Real-life rewards screen' },
+  { src: '/DAILY_PRA__2_.png',     alt: 'Get a little better everyday' },
+  { src: '/DAILY_PRA.png', alt: 'Earn coins screen' },
+  { src: '/DAILY_PRA__1_.png', alt: 'Real-life rewards screen' },
 ]
 
 function Carousel({ onCTA }) {
