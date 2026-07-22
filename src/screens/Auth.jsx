@@ -34,8 +34,8 @@ function PinDots({ value }) {
 // Order: get better everyday → earn coins → rewards
 const SLIDES = [
   { src: '/DAILY_PRA__2_.png', alt: 'Get a little better everyday' },
-  { src: '/DAILY_PRA.png', alt: 'Earn coins' },
-  { src: '/DAILY_PRA__1_.png',     alt: 'Exchange for real-life rewards' },
+  { src: '/DAILY_PRA__1_.png', alt: 'Earn coins' },
+  { src: '/DAILY_PRA.png',     alt: 'Exchange for real-life rewards' },
 ]
 
 const PEEK = 44  // px of next card peeking on right
@@ -262,7 +262,7 @@ export default function Auth({ onAuthenticated, onBack }) {
         <div className="w-full max-w-sm mx-auto">
 
           <h2 className="font-display font-bold text-2xl text-gray-900 text-center mb-1">
-            {isSignup ? 'Let's help your kid get better' : 'Welcome back'}
+            {isSignup ? "Let's help your kid get better" : 'Welcome back'}
           </h2>
           <p className="font-body text-sm text-gray-400 text-center mb-7">
             {isSignup
