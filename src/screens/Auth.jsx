@@ -221,7 +221,7 @@ export default function Auth({ onAuthenticated, onBack }) {
           fontSize: 28, color: '#1a1a1a', textAlign: 'center',
           margin: '0 0 12px', lineHeight: 1.3, maxWidth: 300,
         }}>
-          Help your kid get better at addition for free
+          Help your kid get better at addition for free !?
         </h1>
 
         {/* Subheadline */}
