@@ -34,8 +34,8 @@ function PinDots({ value }) {
 // Order: get better everyday → earn coins → rewards
 const SLIDES = [
   { src: '/DAILY_PRA__2_.png', alt: 'Get a little better everyday' },
-  { src: '/DAILY_PRA__1_.png', alt: 'Earn coins' },
-  { src: '/DAILY_PRA.png',     alt: 'Exchange for real-life rewards' },
+  { src: '/DAILY_PRA.png', alt: 'Earn coins' },
+  { src: '/DAILY_PRA__1_.png',     alt: 'Exchange for real-life rewards' },
 ]
 
 const PEEK = 44  // px of next card peeking on right
@@ -221,7 +221,7 @@ export default function Auth({ onAuthenticated, onBack }) {
           fontSize: 28, color: '#1a1a1a', textAlign: 'center',
           margin: '0 0 12px', lineHeight: 1.3, maxWidth: 300,
         }}>
-          Help your kid get better at addition for free 👀
+          Help your kid get better at addition for free !
         </h1>
 
         {/* Subheadline */}
@@ -249,13 +249,7 @@ export default function Auth({ onAuthenticated, onBack }) {
         <Carousel onCTA={scrollToForm} />
       </div>
 
-      {/* ── DIVIDER ────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3 px-6"
-        style={{ maxWidth: 420, margin: '0 auto 32px', width: '100%' }}>
-        <div className="flex-1 h-px bg-gray-200" />
-        <span className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide">Let's help your kid get better</span>
-        <div className="flex-1 h-px bg-gray-200" />
-      </div>
+
 
       {/* ── AUTH FORM ──────────────────────────────────────────────── */}
       <div ref={formRef} className="flex-1 px-6 pb-10">
