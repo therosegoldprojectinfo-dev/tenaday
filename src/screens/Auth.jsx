@@ -37,9 +37,9 @@ function PinDots({ value }) {
 
 // Carousel slides — practice → earn coins → real rewards
 const SLIDES = [
-  { src: '/DAILY_PRA.png',     alt: 'Daily practice screen' },
+  { src: '/DAILY_PRA__2_.png', alt: 'Daily practice screen' },
   { src: '/DAILY_PRA__1_.png', alt: 'Earn coins screen' },
-  { src: '/DAILY_PRA__2_.png', alt: 'Real-life rewards screen' },
+  { src: '/DAILY_PRA.png',     alt: 'Real-life rewards screen' },
 ]
 
 function Carousel({ onCTA }) {
@@ -72,10 +72,10 @@ function Carousel({ onCTA }) {
             transform: `translateX(calc(50% - 39vw - ${active * (78 + 3)}vw))`,
           }}
         >
-          {SLIDES.map((slide, i) => (
+          {[...SLIDES, SLIDES[0]].map((slide, i) => (
             <div
               key={i}
-              onClick={() => setActive(i)}
+              onClick={() => setActive(i % SLIDES.length)}
               style={{
                 flex: '0 0 78vw',
                 maxWidth: 300,
@@ -83,9 +83,9 @@ function Carousel({ onCTA }) {
                 borderRadius: 24,
                 overflow: 'hidden',
                 transition: 'transform 0.35s, opacity 0.35s',
-                transform: i === active ? 'scale(1)' : 'scale(0.92)',
-                opacity: i === active ? 1 : 0.45,
-                boxShadow: i === active ? '0 8px 32px rgba(0,0,0,0.13)' : 'none',
+                transform: i % SLIDES.length === active ? 'scale(1)' : 'scale(0.92)',
+                opacity: i % SLIDES.length === active ? 1 : 0.45,
+                boxShadow: i % SLIDES.length === active ? '0 8px 32px rgba(0,0,0,0.13)' : 'none',
               }}
             >
               <img
