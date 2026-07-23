@@ -24,7 +24,6 @@ const T = {
     headline: 'Help your kid get better at addition for free 👀',
     subheadline: 'Just 2–4 minutes a day with no extra work from you.',
     getStarted: 'GET STARTED FOR FREE',
-    howItWorks: "Here's how Numio works 👇",
     next: 'Next →',
     formTitle: "Let's help your kid get better",
     formTitleLogin: 'Welcome back',
@@ -37,9 +36,6 @@ const T = {
     loading: 'PLEASE WAIT…',
     terms: 'Terms and Conditions',
     privacy: 'Privacy Policy',
-    legal: (action) => `By ${action}, you agree to our`,
-    legalAction: (isSignup) => isSignup ? 'creating an account' : 'logging in',
-    legalAnd: 'and our',
     switchToLogin: 'Already have an account? Log in',
     switchToSignup: 'New here? Create an account',
     switchLang: 'العربية',
@@ -53,7 +49,6 @@ const T = {
     headline: 'ساعد طفلك على إتقان الجمع مجاناً 👀',
     subheadline: 'دقيقتان إلى أربع دقائق يومياً، بدون أي جهد منك.',
     getStarted: 'ابدأ مجاناً',
-    howItWorks: 'كيف يعمل نوميو 👇',
     next: 'التالي ←',
     formTitle: 'لنساعد طفلك على التحسّن',
     formTitleLogin: 'مرحباً بعودتك',
@@ -66,9 +61,6 @@ const T = {
     loading: 'يرجى الانتظار…',
     terms: 'الشروط والأحكام',
     privacy: 'سياسة الخصوصية',
-    legal: () => 'بالمتابعة، أنت توافق على',
-    legalAction: () => '',
-    legalAnd: 'و',
     switchToLogin: 'لديك حساب بالفعل؟ سجّل الدخول',
     switchToSignup: 'جديد هنا؟ أنشئ حساباً',
     switchLang: 'English',
@@ -102,9 +94,7 @@ function Carousel({ slides, next, isRTL }) {
   const startX = useRef(null)
   const [cardWidth, setCardWidth] = useState(null)
 
-  useEffect(() => {
-    setActive(0)
-  }, [slides])
+  useEffect(() => { setActive(0) }, [slides])
 
   useEffect(() => {
     function measure() {
@@ -130,12 +120,8 @@ function Carousel({ slides, next, isRTL }) {
 
   return (
     <div style={{ width: '100%', paddingBottom: 40 }}>
-      <div
-        ref={containerRef}
-        style={{ overflow: 'hidden', width: '100%' }}
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
+      <div ref={containerRef} style={{ overflow: 'hidden', width: '100%' }}
+        onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <div style={{
           display: 'flex',
           paddingLeft: isRTL ? 0 : leftPad,
@@ -164,8 +150,6 @@ function Carousel({ slides, next, isRTL }) {
           })}
         </div>
       </div>
-
-      {/* Dots + Next */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, margin: '16px 0 0' }}>
         <div style={{ display: 'flex', gap: 8 }}>
           {slides.map((_, i) => (
@@ -218,14 +202,25 @@ export default function Auth({ onAuthenticated }) {
     setSubmitting(true)
     setError(null)
     try {
-      const parentId = isSignup ? await signUp(phone, pin, captchaToken) : await logIn(phone, pin, captchaToken)
+      const parentId = isSignup
+        ? await signUp(phone, pin, captchaToken)
+        : await logIn(phone, pin, captchaToken)
       if (isSignup) {
         trackEvent('signup_completed', { parentId, language: lang })
-        try { fbq('track', 'Lead') } catch(e) { console.error('fbq error', e) }
+        // Fire Meta Pixel Lead event
+        console.log('fbq about to fire, typeof fbq:', typeof window.fbq)
+        try {
+          window.fbq('track', 'Lead')
+          console.log('fbq Lead fired ok')
+        } catch (fbqErr) {
+          console.error('fbq error:', fbqErr)
+        }
       }
       onAuthenticated(parentId, isSignup)
     } catch (err) {
-      setError(err instanceof AuthError ? err.message : (isRTL ? 'حدث خطأ ما. يرجى المحاولة مجدداً.' : 'Something went wrong. Please try again.'))
+      setError(err instanceof AuthError
+        ? err.message
+        : (isRTL ? 'حدث خطأ ما. يرجى المحاولة مجدداً.' : 'Something went wrong. Please try again.'))
       setCaptchaToken(null)
     } finally {
       setSubmitting(false)
@@ -257,52 +252,33 @@ export default function Auth({ onAuthenticated }) {
             fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 14, color: '#374151',
           }}
         >
-          {lang === 'en'
-            ? <span style={{ fontSize: 18 }}>🇸🇦</span>
-            : <span style={{ fontSize: 18 }}>🇺🇸</span>
-          }
+          {lang === 'en' ? <span style={{ fontSize: 18 }}>🇸🇦</span> : <span style={{ fontSize: 18 }}>🇺🇸</span>}
           {t.switchLang}
         </button>
       </div>
 
       {/* ── HERO ──────────────────────────────────────────────────── */}
-      <div className="flex flex-col items-center px-6" style={{ paddingTop: 32, paddingBottom: 0 }}>
-        {/* Logo */}
+      <div className="flex flex-col items-center px-6" style={{ paddingTop: 32 }}>
         <div className="flex items-center gap-1 mb-8" style={{ flexDirection: isRTL ? 'row-reverse' : 'row' }}>
           <img src="/numio-mascot.png" alt="" style={{ width: 52, height: 52, marginRight: isRTL ? 0 : -10, marginLeft: isRTL ? -10 : 0 }} draggable={false} />
-          <span style={{
-            fontFamily: "'Baloo 2', sans-serif", fontWeight: 800,
-            fontSize: 38, color: '#58cc02', letterSpacing: '-0.01em', lineHeight: 1,
-          }}>Numio</span>
+          <span style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 800, fontSize: 38, color: '#58cc02', letterSpacing: '-0.01em', lineHeight: 1 }}>Numio</span>
         </div>
-
-        {/* Headline */}
         <h1 style={{
           fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : "'Baloo 2', sans-serif",
           fontWeight: 700, fontSize: 26, color: '#1a1a1a',
           textAlign: 'center', margin: '0 0 12px', lineHeight: 1.4, maxWidth: 320,
-        }}>
-          {t.headline}
-        </h1>
-
-        {/* Subheadline */}
+        }}>{t.headline}</h1>
         <p style={{
           fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : "'Inter', sans-serif",
           fontWeight: 400, fontSize: 17, color: '#6b7280',
           textAlign: 'center', margin: '0 0 28px', lineHeight: 1.6, maxWidth: 300,
-        }}>
-          {t.subheadline}
-        </p>
-
-        {/* CTA */}
+        }}>{t.subheadline}</p>
         <button
           type="button"
           onClick={() => formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
           className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-lg tracking-wide"
           style={{ maxWidth: 360, fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined }}
-        >
-          {t.getStarted}
-        </button>
+        >{t.getStarted}</button>
       </div>
 
       {/* ── CAROUSEL ──────────────────────────────────────────────── */}
@@ -313,33 +289,18 @@ export default function Auth({ onAuthenticated }) {
       {/* ── AUTH FORM ──────────────────────────────────────────────── */}
       <div ref={formRef} className="flex-1 px-6 pb-10" style={{ paddingTop: 32 }}>
         <div className="w-full max-w-sm mx-auto">
-
-          {!isSignup && (
-            <h2 style={{
-              fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined,
-              fontWeight: 700, fontSize: 24, color: '#111827',
-              textAlign: 'center', marginBottom: 28,
-            }}>
-              {t.formTitleLogin}
-            </h2>
-          )}
-
-          {isSignup && (
-            <h2 style={{
-              fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined,
-              fontWeight: 700, fontSize: 24, color: '#111827',
-              textAlign: 'center', marginBottom: 28,
-            }}>
-              {t.formTitle}
-            </h2>
-          )}
+          <h2 style={{
+            fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined,
+            fontWeight: 700, fontSize: 24, color: '#111827',
+            textAlign: 'center', marginBottom: 28,
+          }}>
+            {isSignup ? t.formTitle : t.formTitleLogin}
+          </h2>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label style={{
-                fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined,
-                display: 'block', marginBottom: 6,
-              }} className="font-body font-bold text-xs text-gray-500 uppercase tracking-wide">
+              <label style={{ fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined, display: 'block', marginBottom: 6 }}
+                className="font-body font-bold text-xs text-gray-500 uppercase tracking-wide">
                 {t.phone}
               </label>
               <input
@@ -350,16 +311,12 @@ export default function Auth({ onAuthenticated }) {
                 dir="ltr"
                 className="w-full rounded-2xl border-2 border-gray-200 px-4 py-3.5 font-body text-base text-gray-900 focus:border-green-500 focus:outline-none transition-colors"
               />
-              {phoneEnteredButInvalid && (
-                <p className="font-body text-xs text-red-500 mt-1.5">{t.phoneError}</p>
-              )}
+              {phoneEnteredButInvalid && <p className="font-body text-xs text-red-500 mt-1.5">{t.phoneError}</p>}
             </div>
 
             <div>
-              <label style={{
-                fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined,
-                display: 'block', marginBottom: 6,
-              }} className="font-body font-bold text-xs text-gray-500 uppercase tracking-wide">
+              <label style={{ fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined, display: 'block', marginBottom: 6 }}
+                className="font-body font-bold text-xs text-gray-500 uppercase tracking-wide">
                 {t.pin}
               </label>
               <input
@@ -380,11 +337,9 @@ export default function Auth({ onAuthenticated }) {
 
             <Turnstile onVerify={setCaptchaToken} onExpire={() => setCaptchaToken(null)} />
 
-            <button
-              type="submit" disabled={!canSubmit}
+            <button type="submit" disabled={!canSubmit}
               className="btn-duo w-full py-4 rounded-2xl font-body font-bold text-lg tracking-wide mt-2"
-              style={{ fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined }}
-            >
+              style={{ fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined }}>
               {submitting ? t.loading : isSignup ? t.createAccount : t.login}
             </button>
 
@@ -396,8 +351,7 @@ export default function Auth({ onAuthenticated }) {
                   <button type="button" onClick={() => setShowTerms(true)}
                     style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0, fontWeight: 700, textDecoration: 'underline' }}>
                     {t.terms}
-                  </button>
-                  {' '}و{' '}
+                  </button>{' '}و{' '}
                   <button type="button" onClick={() => setShowPrivacy(true)}
                     style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0, fontWeight: 700, textDecoration: 'underline' }}>
                     {t.privacy}
@@ -409,8 +363,7 @@ export default function Auth({ onAuthenticated }) {
                   <button type="button" onClick={() => setShowTerms(true)}
                     style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0, fontWeight: 700, textDecoration: 'underline' }}>
                     {t.terms}
-                  </button>
-                  {' '}and our{' '}
+                  </button>{' '}and our{' '}
                   <button type="button" onClick={() => setShowPrivacy(true)}
                     style={{ color: '#58cc02', background: 'none', border: 'none', cursor: 'pointer', fontSize: 'inherit', padding: 0, fontWeight: 700, textDecoration: 'underline' }}>
                     {t.privacy}
@@ -420,12 +373,10 @@ export default function Auth({ onAuthenticated }) {
             </p>
           </form>
 
-          <button
-            type="button"
+          <button type="button"
             onClick={() => { setMode(isSignup ? 'login' : 'signup'); setError(null) }}
             className="w-full text-center mt-7 font-body font-bold text-sm"
-            style={{ color: '#1CB0F6', fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined }}
-          >
+            style={{ color: '#1CB0F6', fontFamily: isRTL ? "'Noto Sans Arabic', sans-serif" : undefined }}>
             {isSignup ? t.switchToLogin : t.switchToSignup}
           </button>
         </div>
