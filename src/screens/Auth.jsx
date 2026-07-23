@@ -208,13 +208,7 @@ export default function Auth({ onAuthenticated }) {
       if (isSignup) {
         trackEvent('signup_completed', { parentId, language: lang })
         // Fire Meta Pixel Lead event
-        console.log('fbq about to fire, typeof fbq:', typeof window.fbq)
-        try {
-          window.fbq('track', 'Lead')
-          console.log('fbq Lead fired ok')
-        } catch (fbqErr) {
-          console.error('fbq error:', fbqErr)
-        }
+        try { window.fbq('track', 'Lead') } catch (_) {}
       }
       onAuthenticated(parentId, isSignup)
     } catch (err) {
