@@ -120,8 +120,8 @@ function Carousel({ slides, next, isRTL }) {
   function onTouchEnd(e) {
     if (startX.current === null) return
     const diff = startX.current - e.changedTouches[0].clientX
-    if (diff > 40)  setActive(i => (i + 1) % slides.length)
-    if (diff < -40) setActive(i => (i - 1 + slides.length) % slides.length)
+    if (diff > 40)  setActive(i => isRTL ? (i - 1 + slides.length) % slides.length : (i + 1) % slides.length)
+    if (diff < -40) setActive(i => isRTL ? (i + 1) % slides.length : (i - 1 + slides.length) % slides.length)
     startX.current = null
   }
 
@@ -138,9 +138,10 @@ function Carousel({ slides, next, isRTL }) {
       >
         <div style={{
           display: 'flex',
-          paddingLeft: leftPad,
+          paddingLeft: isRTL ? 0 : leftPad,
+          paddingRight: isRTL ? leftPad : 0,
           transition: 'transform 0.35s cubic-bezier(0.4,0,0.2,1)',
-          transform: `translateX(-${offset}px)`,
+          transform: isRTL ? `translateX(${offset}px)` : `translateX(-${offset}px)`,
         }}>
           {[...slides, slides[0]].map((slide, i) => {
             const isActive = i % slides.length === active
@@ -190,7 +191,7 @@ function Carousel({ slides, next, isRTL }) {
 
 export default function Auth({ onAuthenticated }) {
   const formRef = useRef(null)
-  const [lang, setLang] = useState('en')
+  const [lang, setLang] = useState('ar')
   const [mode, setMode] = useState('signup')
   const [phone, setPhone] = useState('')
   const [pin, setPin] = useState('')
