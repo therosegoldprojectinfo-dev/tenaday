@@ -21,7 +21,7 @@ function toAsciiDigits(str) {
 // ── Translations ──────────────────────────────────────────────────────────────
 const T = {
   en: {
-    headline: 'Help your kid get better at addition for free 👀',
+    headline: 'Help your kid get better at addition for free !',
     subheadline: 'Just 2–4 minutes a day with no extra work from you.',
     getStarted: 'GET STARTED FOR FREE',
     howItWorks: "Here's how Numio works 👇",
@@ -45,12 +45,12 @@ const T = {
     switchLang: 'العربية',
     slides: [
       { src: '/DAILY_PRA__2_.png', alt: 'Get a little better everyday' },
-      { src: '/DAILY_PRA__1_.png', alt: 'Earn coins' },
-      { src: '/DAILY_PRA.png',     alt: 'Exchange for real-life rewards' },
+      { src: '/DAILY_PRA.png', alt: 'Earn coins' },
+      { src: '/DAILY_PRA__1_.png',     alt: 'Exchange for real-life rewards' },
     ],
   },
   ar: {
-    headline: 'ساعد طفلك على إتقان الجمع مجاناً 👀',
+    headline: '! ساعد طفلك على إتقان الجمع مجاناً',
     subheadline: 'دقيقتان إلى أربع دقائق يومياً، بدون أي جهد منك.',
     getStarted: 'ابدأ مجاناً',
     howItWorks: 'كيف يعمل نوميو 👇',
