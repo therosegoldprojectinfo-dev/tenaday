@@ -149,6 +149,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
     if (pin !== confirmPin) { setAuthError(s.error_pin_match); return }
     if (pin.length !== 4)   { setAuthError(s.error_pin_length); return }
     if (phone.length < 8)   { setAuthError(s.error_phone); return }
+    if (!turnstileToken)    { setAuthError('Please complete the security check'); return }
     setLoading(true)
     setAuthError('')
     try {
@@ -156,6 +157,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       const { error } = await supabase.auth.signUp({
         email: fakeEmail,
         password: pin + pin.slice(0, 2),
+        options: { captchaToken: turnstileToken },
       })
       if (error) throw error
       const { data: { user } } = await supabase.auth.getUser()
@@ -163,6 +165,8 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       setScreen('graffiti')
     } catch (e) {
       setAuthError(e.message || 'Something went wrong')
+      setTurnstileToken('')
+      if (window.turnstile) window.turnstile.reset()
     } finally {
       setLoading(false)
     }
@@ -337,7 +341,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
               data-size="flexible"
             />
 
-            <button onClick={handleCreateAccount} disabled={loading || !phone || pin.length !== 4 || confirmPin.length !== 4}
+            <button onClick={handleCreateAccount} disabled={loading || !phone || pin.length !== 4 || confirmPin.length !== 4 || !turnstileToken}
               className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-lg rounded-2xl py-4 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all">
               {loading ? s.creating : s.create_cta}
             </button>
