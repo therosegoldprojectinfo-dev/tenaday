@@ -4,6 +4,23 @@ import { saveExam } from '../lib/chapters'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
 
+async function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
+  return new Promise((resolve) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const scale = Math.min(1, maxWidthPx / img.width)
+      const canvas = document.createElement('canvas')
+      canvas.width  = Math.round(img.width  * scale)
+      canvas.height = Math.round(img.height * scale)
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+      canvas.toBlob(blob => resolve(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', quality)
+    }
+    img.src = url
+  })
+}
+
 export default function Home({ chapter, onExamReady, onBack, kidId }) {
   const lang = useLang()
   const fileInputRef = useRef(null)
@@ -83,7 +100,9 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
     setStatus('loading')
     setError(null)
     try {
-      const exam = await generateExam(images.map(img => img.file))
+      // Compress all images before sending
+      const compressed = await Promise.all(images.map(img => compressImage(img.file)))
+      const exam = await generateExam(compressed)
       onExamReady(exam)
       saveExam({ chapterId: chapter.id, topic: exam.topic, questions: exam.questions, kidId })
         .catch(err => console.error('Failed to save exam:', err))
