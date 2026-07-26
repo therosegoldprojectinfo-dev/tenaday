@@ -25,19 +25,19 @@ export async function generateExam(files) {
     }))
   )
 
-  // Get current user for tracking
-  const { data: { user } } = await supabase.auth.getUser()
+  // Get current user session JWT for auth
+  const { data: { session } } = await supabase.auth.getSession()
+  const jwt = session?.access_token
+
+  if (!jwt) throw new Error('Not authenticated')
 
   const response = await fetch(EDGE_FUNCTION_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${ANON_KEY}`,
+      'Authorization': `Bearer ${jwt}`,
     },
-    body: JSON.stringify({
-      images,
-      user_id: user?.id,
-    }),
+    body: JSON.stringify({ images }),
   })
 
   if (!response.ok) {
