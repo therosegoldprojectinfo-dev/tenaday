@@ -149,7 +149,6 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
     if (pin !== confirmPin) { setAuthError(s.error_pin_match); return }
     if (pin.length !== 4)   { setAuthError(s.error_pin_length); return }
     if (phone.length < 8)   { setAuthError(s.error_phone); return }
-    if (!turnstileToken)    { setAuthError('Please complete the security check'); return }
     setLoading(true)
     setAuthError('')
     try {
@@ -164,9 +163,6 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       setScreen('graffiti')
     } catch (e) {
       setAuthError(e.message || 'Something went wrong')
-      setTurnstileToken('')
-      // Reset Turnstile widget
-      if (window.turnstile) window.turnstile.reset()
     } finally {
       setLoading(false)
     }
