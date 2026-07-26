@@ -157,7 +157,6 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       const { error } = await supabase.auth.signUp({
         email: fakeEmail,
         password: pin + pin.slice(0, 2),
-        options: { captchaToken: turnstileToken },
       })
       if (error) throw error
       const { data: { user } } = await supabase.auth.getUser()
@@ -342,7 +341,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
               data-size="flexible"
             />
 
-            <button onClick={handleCreateAccount} disabled={loading || !phone || pin.length !== 4 || confirmPin.length !== 4 || !turnstileToken}
+            <button onClick={handleCreateAccount} disabled={loading || !phone || pin.length !== 4 || confirmPin.length !== 4}
               className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-lg rounded-2xl py-4 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all">
               {loading ? s.creating : s.create_cta}
             </button>
