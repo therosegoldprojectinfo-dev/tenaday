@@ -23,6 +23,12 @@ export default function App() {
   const [authReady, setAuthReady]     = useState(false)
   const [streak, setStreak]           = useState(0)
   const [lang, setLang]               = useState('en')
+
+  // Sync html element lang + dir for screen readers and SEO
+  useEffect(() => {
+    document.documentElement.lang = lang
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
+  }, [lang])
   const [onboarded, setOnboarded]     = useState(null)
   const [tab, setTab]                 = useState('chapters')
   const [pinUnlocked, setPinUnlocked] = useState(false)
@@ -136,7 +142,7 @@ export default function App() {
           {showNav && <Nav active={tab} onChange={handleTabChange} streak={streak} />}
 
           <main
-            className={`flex-1 ${showNav ? 'md:ml-56' : ''}`}
+            className={`flex-1 ${showNav ? 'md:ms-56' : ''}`}
             style={{ paddingBottom: showNav ? 'calc(64px + env(safe-area-inset-bottom))' : 0, overflow: 'hidden', minWidth: 0, width: '100%' }}
           >
             {screen === 'chapters' && (
