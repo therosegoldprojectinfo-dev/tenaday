@@ -13,10 +13,29 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
   const [images, setImages]   = useState([]) // array of { file, preview }
   const [inputKey, setInputKey] = useState(0)
 
+  const MAX_IMAGES = 5
+  const MAX_SIZE_MB = 10
+
   // Called when user picks image(s) from gallery (multi-select)
   async function handleGallerySelected(e) {
     const files = Array.from(e.target.files || [])
     if (!files.length) return
+
+    // Count limit
+    if (images.length + files.length > MAX_IMAGES) {
+      setError(lang === 'ar' ? `الحد الأقصى ${MAX_IMAGES} صور` : `Max ${MAX_IMAGES} images allowed`)
+      setStatus('error')
+      return
+    }
+
+    // Size limit
+    const tooBig = files.find(f => f.size > MAX_SIZE_MB * 1024 * 1024)
+    if (tooBig) {
+      setError(lang === 'ar' ? `حجم الصورة كبير جداً (الحد ${MAX_SIZE_MB}MB)` : `Image too large (max ${MAX_SIZE_MB}MB each)`)
+      setStatus('error')
+      return
+    }
+
     const newImages = files.map(file => ({ file, preview: URL.createObjectURL(file) }))
     setImages(prev => [...prev, ...newImages])
     setStatus('review')
@@ -26,6 +45,19 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
   async function handleCameraSelected(e) {
     const file = e.target.files?.[0]
     if (!file) return
+
+    if (images.length >= MAX_IMAGES) {
+      setError(lang === 'ar' ? `الحد الأقصى ${MAX_IMAGES} صور` : `Max ${MAX_IMAGES} images allowed`)
+      setStatus('error')
+      return
+    }
+
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      setError(lang === 'ar' ? `حجم الصورة كبير جداً (الحد ${MAX_SIZE_MB}MB)` : `Image too large (max ${MAX_SIZE_MB}MB each)`)
+      setStatus('error')
+      return
+    }
+
     setImages(prev => [...prev, { file, preview: URL.createObjectURL(file) }])
     setStatus('review')
     setInputKey(k => k + 1)
@@ -158,7 +190,9 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
             <div className="w-full flex flex-col gap-4">
               <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-center">
                 <p className="font-display font-bold text-xl text-duo-red">{t(lang, 'home_error_title')}</p>
-                <p className="text-xs text-muted mt-2 font-mono break-all">{error}</p>
+                <p className="text-sm text-muted mt-2">
+                  {lang === 'ar' ? 'حدث خطأ ما. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'}
+                </p>
               </div>
               <button
                 onClick={handleReset}
