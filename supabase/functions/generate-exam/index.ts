@@ -6,7 +6,7 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
 const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Origin': 'https://numiomath.app',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
@@ -91,15 +91,10 @@ serve(async (req) => {
       )
     }
 
-    // ── Rate limit: max 20 quizzes per user per day ───────────────
-    const today = new Date().toISOString().slice(0, 10)
-    const { count } = await sb
-      .from('usage_logs')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .gte('created_at', `${today}T00:00:00Z`)
-
-    if ((count || 0) >= 20) {
+    // ── Rate limit: atomic increment via RPC (no race condition) ──
+    try {
+      await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
+    } catch (rateLimitErr) {
       return new Response(
         JSON.stringify({ error: 'Daily limit reached. Try again tomorrow.' }),
         { status: 429, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
