@@ -112,6 +112,25 @@ export const translations = {
     pin_enter: 'Enter →',
     pin_checking: 'Checking...',
 
+    // Quiz Results
+    quiz_results_perfect: 'Perfect score!',
+    quiz_results_perfect_sub: 'If this was a real exam, you just aced it!',
+    quiz_results_great: 'Almost perfect!',
+    quiz_results_great_sub: "You'd pass this exam easily!",
+    quiz_results_good: 'Good effort!',
+    quiz_results_good_sub: "You'd pass, but there's room to grow.",
+    quiz_results_keep: 'Keep going!',
+    quiz_results_keep_sub: 'Re-read the page and try again — you got this!',
+    quiz_results_coins: 'Coins earned',
+    quiz_results_score: 'Score',
+    quiz_results_review: '📖 Worth reviewing:',
+    quiz_results_continue: 'Continue →',
+    // Quit popup
+    quiz_quit_title: 'Leave the quiz? 😢',
+    quiz_quit_sub: "Your progress won't be saved.",
+    quiz_quit_stay: 'KEEP GOING 💪',
+    quiz_quit_leave: 'Yes, leave',
+
     // StreakPopup
     streak_first_headline: "You're on a streak! ⚡",
     streak_first_sub: 'Come back tomorrow to keep it going!',
@@ -147,7 +166,7 @@ export const translations = {
     chapters_modal_cancel: 'إلغاء',
 
     // CurrentChapter
-    current_back: 'رجوع ←',
+    current_back: 'رجوع →',
     current_exams_saved: (n) => `${n} ${n === 1 ? 'اختبار محفوظ' : 'اختبارات محفوظة'}`,
     current_new: 'جديد',
     current_revision: 'مراجعة',
@@ -157,7 +176,7 @@ export const translations = {
     current_questions: (n) => `${n} أسئلة`,
 
     // Home (Scan)
-    home_back: 'رجوع ←',
+    home_back: 'رجوع →',
     home_snap: 'صوّر ملاحظاتك أو كتابك المدرسي 📸',
     home_cta: '📸 التقط صورة أو اختر',
     home_generating: 'جارٍ إنشاء الاختبار...',
@@ -166,7 +185,7 @@ export const translations = {
     home_try_again: 'حاول مجدداً',
 
     // Revision
-    revision_back: 'رجوع ←',
+    revision_back: 'رجوع →',
     revision_title: 'مراجعة',
     revision_exam: (n) => `${n} ${n === 1 ? 'اختبار' : 'اختبارات'}`,
 
@@ -229,11 +248,30 @@ export const translations = {
     // PinGate
     pin_title: 'منطقة الأهل',
     pin_sub: 'أدخل رمز PIN للمتابعة 🔒',
-    pin_back: 'رجوع ←',
+    pin_back: 'رجوع →',
     pin_wrong: 'رمز PIN خاطئ، حاول مجدداً',
     pin_error: 'حدث خطأ ما',
     pin_enter: 'دخول ←',
     pin_checking: 'جارٍ التحقق...',
+
+    // Quiz Results
+    quiz_results_perfect: 'نتيجة مثالية!',
+    quiz_results_perfect_sub: 'لو كان امتحاناً حقيقياً، لنجحت بامتياز!',
+    quiz_results_great: 'شبه مثالي!',
+    quiz_results_great_sub: 'ستنجح في هذا الامتحان بسهولة!',
+    quiz_results_good: 'جهد رائع!',
+    quiz_results_good_sub: 'ستنجح، لكن يمكنك التحسين أكثر.',
+    quiz_results_keep: 'واصل المحاولة!',
+    quiz_results_keep_sub: 'أعد قراءة الصفحة وحاول مجدداً — أنت تستطيع!',
+    quiz_results_coins: 'العملات المكتسبة',
+    quiz_results_score: 'النتيجة',
+    quiz_results_review: '📖 يستحق المراجعة:',
+    quiz_results_continue: 'استمر ←',
+    // Quit popup
+    quiz_quit_title: 'هل تريد الخروج؟ 😢',
+    quiz_quit_sub: 'لن يتم حفظ تقدمك.',
+    quiz_quit_stay: 'واصل 💪',
+    quiz_quit_leave: 'نعم، اخرج',
 
     // StreakPopup
     streak_first_headline: 'أنت في سلسلة! ⚡',
