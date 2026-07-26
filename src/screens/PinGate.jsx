@@ -33,9 +33,10 @@ export default function PinGate({ onSuccess, onBack }) {
   async function verify(code) {
     setLoading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      const { data } = await supabase.from('profiles').select('parent_pin').eq('id', user.id).single()
-      if (data?.parent_pin === code) {
+      // PIN verified server-side — PIN value never sent to client
+      const { data, error } = await supabase.rpc('verify_parent_pin', { input_pin: code })
+      if (error) throw error
+      if (data === true) {
         onSuccess()
       } else {
         setShake(true)
@@ -54,7 +55,7 @@ export default function PinGate({ onSuccess, onBack }) {
 
   return (
     <div className="bg-white flex flex-col items-center justify-center px-6 gap-8" style={{ height: '100dvh' }}>
-      <button onClick={onBack} className="absolute top-12 left-5 text-muted font-body font-bold text-sm flex items-center gap-1 active:opacity-60">
+      <button onClick={onBack} className="absolute top-12 text-muted font-body font-bold text-sm flex items-center gap-1 active:opacity-60" style={{ insetInlineStart: 20 }}>
         {t(lang, 'pin_back')}
       </button>
       <img src="/mascot.png" alt="Numio" className="w-28 h-auto" />
