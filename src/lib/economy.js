@@ -45,28 +45,28 @@ export async function getCoinBalance(kidId) {
 // ── Rewards (shared across family) ───────────────────────────────
 
 export async function getRewards() {
+  const { data: { user } } = await supabase.auth.getUser()
   const { data, error } = await supabase
     .from('rewards')
     .select('*')
+    .eq('user_id', user.id)
     .order('cost', { ascending: true })
   if (error) throw error
   return data
 }
 
 export async function createReward({ name, cost }) {
-  const { data: { user } } = await supabase.auth.getUser()
-  const { data, error } = await supabase
-    .from('rewards')
-    .insert({ name, cost, user_id: user.id })
-    .select()
-    .single()
-  if (error) throw error
-  return data
+  const { data, error } = await supabase.rpc('create_reward_for_family', {
+    p_name: name,
+    p_cost: cost,
+  })
+  if (error) throw new Error(error.message)
+  return { id: data, name, cost }
 }
 
 export async function deleteReward(id) {
-  const { error } = await supabase.from('rewards').delete().eq('id', id)
-  if (error) throw error
+  const { error } = await supabase.rpc('delete_reward_for_family', { p_reward_id: id })
+  if (error) throw new Error(error.message)
 }
 
 // ── Claims (per kid) ─────────────────────────────────────────────
@@ -76,12 +76,9 @@ export async function getClaims(kidId) {
   let query = supabase
     .from('claims')
     .select('*, rewards(name, cost)')
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-  if (kidId) {
-    query = query.eq('kid_id', kidId)
-  } else {
-    query = query.eq('user_id', user.id)
-  }
+  if (kidId) query = query.eq('kid_id', kidId)
   const { data, error } = await query
   if (error) throw error
   return data
@@ -115,8 +112,8 @@ export async function claimReward(rewardId, rewardCost, kidId) {
 }
 
 export async function approveClaim(claimId) {
-  const { error } = await supabase.from('claims').update({ status: 'approved' }).eq('id', claimId)
-  if (error) throw error
+  const { error } = await supabase.rpc('approve_claim_for_family', { p_claim_id: claimId })
+  if (error) throw new Error(error.message)
 }
 
 // ── Streak (per kid) ─────────────────────────────────────────────
