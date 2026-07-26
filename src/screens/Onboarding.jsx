@@ -118,16 +118,17 @@ function OptionCard({ label, icon, selected, onSelect }) {
 
 // flow: welcome → language → goal → how → account → graffiti → name
 export default function Onboarding({ onComplete, onLanguageChange }) {
-  const [screen, setScreen]     = useState('welcome')
+  const [screen, setScreen]         = useState('welcome')
   const [mascotSmall, setMascotSmall] = useState(false)
-  const [language, setLanguage] = useState('en')
-  const [goal, setGoal]         = useState(null)
-  const [phone, setPhone]       = useState('')
-  const [pin, setPin]           = useState('')
+  const [language, setLanguage]     = useState('en')
+  const [goal, setGoal]             = useState(null)
+  const [phone, setPhone]           = useState('')
+  const [pin, setPin]               = useState('')
   const [confirmPin, setConfirmPin] = useState('')
   const [authError, setAuthError]   = useState('')
   const [loading, setLoading]       = useState(false)
-  const [name, setName]         = useState('')
+  const [name, setName]             = useState('')
+  const [isSignIn, setIsSignIn]     = useState(false)
 
   const s = STRINGS[language] || STRINGS.en
   const dir = s.dir
@@ -135,6 +136,26 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
   function handleStart() {
     setMascotSmall(true)
     setTimeout(() => setScreen('language'), 600)
+  }
+
+  async function handleSignIn() {
+    if (phone.length < 8)  { setAuthError(s.error_phone); return }
+    if (pin.length !== 4)  { setAuthError(s.error_pin_length); return }
+    setLoading(true)
+    setAuthError('')
+    try {
+      const fakeEmail = `${phone.replace(/\s+/g, '')}@numio.app`
+      const { error } = await supabase.auth.signInWithPassword({
+        email: fakeEmail,
+        password: pin + pin.slice(0, 2),
+      })
+      if (error) throw error
+      onComplete(null)
+    } catch (e) {
+      setAuthError(language === 'ar' ? 'رقم الهاتف أو الرمز السري غير صحيح' : 'Wrong phone number or PIN')
+    } finally {
+      setLoading(false)
+    }
   }
 
   async function handleCreateAccount() {
@@ -195,6 +216,12 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
             className="w-full bg-duo text-white font-display font-bold text-xl rounded-2xl py-5 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all"
             style={{ opacity: mascotSmall ? 0 : 1, transition: 'opacity 0.3s' }}>
             Let's start →
+          </button>
+          <button
+            onClick={() => { setIsSignIn(true); setScreen('account') }}
+            className="font-body font-bold text-sm text-muted"
+            style={{ opacity: mascotSmall ? 0 : 1, transition: 'opacity 0.3s' }}>
+            Already have an account? Log in
           </button>
         </div>
       </OnboardingShell>
@@ -297,7 +324,11 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
           <div className="flex-shrink-0 flex items-center gap-3 mb-5">
             <img src="/mascot.png" alt="" className="w-10 h-10 object-contain" />
             <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3">
-              <p className="font-display font-bold text-sm text-ink">{s.account_bubble}</p>
+              <p className="font-display font-bold text-sm text-ink">
+                {isSignIn
+                  ? (language === 'ar' ? 'مرحباً بعودتك! 👋' : 'Welcome back! 👋')
+                  : s.account_bubble}
+              </p>
             </div>
           </div>
           <div className="flex flex-col gap-4 pb-6">
@@ -312,16 +343,41 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
                 onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="••••"
                 className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 font-display font-bold text-2xl text-ink outline-none focus:border-duo transition-colors tracking-[1rem]" />
             </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">{s.confirm_pin_label}</label>
-              <input type="password" inputMode="numeric" maxLength={4} value={confirmPin}
-                onChange={e => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="••••"
-                className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 font-display font-bold text-2xl text-ink outline-none focus:border-duo transition-colors tracking-[1rem]" />
-            </div>
+            {!isSignIn && (
+              <div className="flex flex-col gap-1.5">
+                <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">{s.confirm_pin_label}</label>
+                <input type="password" inputMode="numeric" maxLength={4} value={confirmPin}
+                  onChange={e => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0, 4))} placeholder="••••"
+                  className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 font-display font-bold text-2xl text-ink outline-none focus:border-duo transition-colors tracking-[1rem]" />
+              </div>
+            )}
+            {!isSignIn && (
+              <p className="font-body text-xs text-muted text-center">
+                {language === 'ar'
+                  ? 'بالمتابعة، أنت توافق على '
+                  : 'By continuing, you agree to our '}
+                <a href="/privacy" target="_blank" className="text-duo underline">
+                  {language === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'}
+                </a>
+              </p>
+            )}
             {authError && <p className="font-body text-sm text-red-500 font-bold text-center">{authError}</p>}
-            <button onClick={handleCreateAccount} disabled={loading || !phone || pin.length !== 4 || confirmPin.length !== 4}
+            <button
+              onClick={isSignIn ? handleSignIn : handleCreateAccount}
+              disabled={loading || !phone || pin.length !== 4 || (!isSignIn && confirmPin.length !== 4)}
               className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-lg rounded-2xl py-4 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all">
-              {loading ? s.creating : s.create_cta}
+              {loading
+                ? s.creating
+                : isSignIn
+                  ? (language === 'ar' ? 'تسجيل الدخول ←' : 'Log in →')
+                  : s.create_cta}
+            </button>
+            <button
+              onClick={() => { setIsSignIn(!isSignIn); setAuthError(''); setPin(''); setConfirmPin('') }}
+              className="w-full text-muted font-body font-bold text-sm py-2 text-center">
+              {isSignIn
+                ? (language === 'ar' ? 'ليس لديك حساب؟ أنشئ واحداً' : "Don't have an account? Create one")
+                : (language === 'ar' ? 'لديك حساب بالفعل؟ سجّل الدخول' : 'Already have an account? Log in')}
             </button>
           </div>
         </div>
