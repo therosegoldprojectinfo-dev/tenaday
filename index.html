@@ -17,6 +17,16 @@
 
     <title>Numio</title>
 
+    <!-- Cloudflare Turnstile -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script>
+      function onTurnstileSuccess(token) {
+        window.__turnstileToken = token
+        // Dispatch event so React can pick it up
+        window.dispatchEvent(new CustomEvent('turnstile-success', { detail: token }))
+      }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
