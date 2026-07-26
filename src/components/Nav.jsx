@@ -46,7 +46,8 @@ export default function Nav({ active, onChange, streak = 0 }) {
       </nav>
 
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex fixed top-0 left-0 bottom-0 w-56 bg-white border-r border-gray-100 flex-col z-40 overflow-hidden">
+      <aside className="hidden md:flex fixed top-0 bottom-0 bg-white border-e border-gray-100 flex-col z-40 overflow-hidden w-56"
+        style={{ insetInlineStart: 0 }}>
         {/* Logo + mascot */}
         <div className="relative flex items-center px-4 pt-4 pb-2 mb-4" style={{ height: 80 }}>
           <img
@@ -54,7 +55,7 @@ export default function Nav({ active, onChange, streak = 0 }) {
             alt=""
             style={{
               position: 'absolute',
-              left: -8,
+              insetInlineStart: -8,
               bottom: -16,
               height: 110,
               width: 'auto',
@@ -62,10 +63,10 @@ export default function Nav({ active, onChange, streak = 0 }) {
               zIndex: 0,
             }}
           />
-          <span className="font-display font-extrabold text-2xl text-duo relative z-10 ml-14">
+          <span className="font-display font-extrabold text-2xl text-duo relative z-10 ms-14">
             Numio
           </span>
-          <div className="ml-auto relative z-10">
+          <div className="ms-auto relative z-10">
             <StreakBadge count={streak} />
           </div>
         </div>
@@ -77,7 +78,7 @@ export default function Nav({ active, onChange, streak = 0 }) {
               <button
                 key={id}
                 onClick={() => onChange(id)}
-                className={`flex items-center gap-3 px-3 py-3 rounded-2xl font-body font-bold text-sm transition-all text-left w-full ${
+                className={`flex items-center gap-3 px-3 py-3 rounded-2xl font-body font-bold text-sm transition-all text-start w-full ${
                   isActive ? 'bg-green-50 text-duo' : 'text-muted hover:bg-gray-50'
                 }`}
               >
