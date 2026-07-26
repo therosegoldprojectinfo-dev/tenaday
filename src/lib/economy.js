@@ -88,22 +88,19 @@ export async function getClaims(kidId) {
 }
 
 export async function claimReward(rewardId, rewardCost, kidId) {
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // Deduct coins from kid
   if (kidId) {
-    await deductCoinsFromKid(kidId, rewardCost)
-    const kidBalance = await getKidProfile(kidId)
-    const { data, error } = await supabase
-      .from('claims')
-      .insert({ reward_id: rewardId, user_id: user.id, kid_id: kidId, status: 'pending' })
-      .select()
-      .single()
-    if (error) throw error
-    return { claim: data, newBalance: kidBalance.coin_balance }
+    const { data, error } = await supabase.rpc('claim_reward_for_kid', {
+      p_reward_id: rewardId,
+      p_kid_id: kidId,
+    })
+    if (error) throw new Error(error.message)
+    // Refresh balance
+    const profile = await getKidProfile(kidId)
+    return { claim: { id: data }, newBalance: profile.coin_balance }
   }
 
   // Legacy fallback
+  const { data: { user } } = await supabase.auth.getUser()
   const profile = await getProfile()
   const newBalance = (profile?.coin_balance || 0) - rewardCost
   if (newBalance < 0) throw new Error('Not enough coins')
