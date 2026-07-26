@@ -26,15 +26,20 @@ export default function Rewards({ kidId }) {
     finally { setLoading(false) }
   }
 
+  const [claimError, setClaimError] = useState('')
+
   async function handleClaim(reward) {
     if (balance < reward.cost) return
     setClaiming(reward.id)
+    setClaimError('')
     try {
       const { newBalance } = await claimReward(reward.id, reward.cost, kidId)
       setBalance(newBalance)
       await load()
-    } catch (e) { alert(e.message) }
-    finally { setClaiming(null) }
+    } catch (e) {
+      setClaimError(lang === 'ar' ? 'فشل الاستبدال، حاول مرة أخرى' : 'Failed to claim, please try again')
+    } finally {
+      setClaiming(null) }
   }
 
   if (loading) return (
@@ -73,7 +78,11 @@ export default function Rewards({ kidId }) {
         <div className="flex-1 overflow-y-auto pb-6">
           {tab === 'rewards' && (
             <>
-              {rewards.length === 0 ? (
+              {claimError && (
+            <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 text-center">
+              <p className="font-body text-sm text-red-500 font-bold">{claimError}</p>
+            </div>
+          )}
                 <div className="flex flex-col items-center justify-center pt-20 gap-4 text-center">
                   <span style={{ fontSize: 64 }}>🎁</span>
                   <p className="font-display font-extrabold text-xl text-ink">{t(lang, 'rewards_empty_title')}</p>
