@@ -33,50 +33,19 @@ export async function getKidProfile(kidId) {
 }
 
 export async function addCoinsToKid(kidId, amount) {
-  const profile = await getKidProfile(kidId)
-  const newBalance = (profile?.coin_balance || 0) + amount
-  const { data } = await supabase
-    .from('kid_profiles')
-    .update({ coin_balance: newBalance })
-    .eq('id', kidId)
-    .select()
-    .single()
-  return data
+  const { data, error } = await supabase.rpc('add_coins_to_kid', { kid_id: kidId, amount })
+  if (error) throw error
+  return { coin_balance: data }
 }
 
 export async function deductCoinsFromKid(kidId, amount) {
-  const profile = await getKidProfile(kidId)
-  const newBalance = (profile?.coin_balance || 0) - amount
-  if (newBalance < 0) throw new Error('Not enough coins')
-  const { data } = await supabase
-    .from('kid_profiles')
-    .update({ coin_balance: newBalance })
-    .eq('id', kidId)
-    .select()
-    .single()
-  return { newBalance }
+  const { data, error } = await supabase.rpc('deduct_coins_from_kid', { kid_id: kidId, amount })
+  if (error) throw error
+  return { newBalance: data }
 }
 
 export async function updateKidStreak(kidId) {
-  const profile = await getKidProfile(kidId)
-  const today = new Date().toISOString().slice(0, 10)
-  const lastDate = profile?.streak_last_date || null
-  const currentStreak = profile?.streak_count || 0
-
-  if (lastDate === today) {
-    return { streakCount: currentStreak, isNewDay: false, previousStreak: currentStreak }
-  }
-
-  const yesterday = new Date()
-  yesterday.setDate(yesterday.getDate() - 1)
-  const yesterdayStr = yesterday.toISOString().slice(0, 10)
-
-  const newStreak = lastDate === yesterdayStr ? currentStreak + 1 : 1
-
-  await supabase
-    .from('kid_profiles')
-    .update({ streak_count: newStreak, streak_last_date: today })
-    .eq('id', kidId)
-
-  return { streakCount: newStreak, isNewDay: true, previousStreak: currentStreak }
+  const { data, error } = await supabase.rpc('update_kid_streak', { kid_id: kidId })
+  if (error) throw error
+  return data
 }
