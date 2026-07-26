@@ -1,43 +1,152 @@
-// ── Coin economy ─────────────────────────────────────────────────────────
-// v4: No entry fee, no debt, no hearts. Kids only ever earn coins.
-// A node always pays out its flat payoutForNode() amount on completion,
-// regardless of retries or wrong answers along the way — the live coin
-// ticker in Practice.jsx just shows that flat amount incrementally as
-// the kid plays, so what they see during play always matches the DB.
+import { supabase } from './supabaseClient'
+import { addCoinsToKid, deductCoinsFromKid, updateKidStreak, getKidProfile } from './kids'
 
-export const STARTING_BALANCE  = 50
-export const ENTRY_FEE         = 0   // removed — playing is always free
-export const NODE_PAYOUT       = 20
-export const REVIEW_PAYOUT     = 40
-export const DEBT_FLOOR        = 0   // can never go below 0
+// ── Profile (parent-level) ────────────────────────────────────────
 
-/** Entry fee is 0 — kept for API compatibility, always a no-op. */
-export function applyEntryFee(balance) {
-  return balance
+export async function getProfile() {
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .single()
+  if (error && error.code === 'PGRST116') {
+    const { data: created } = await supabase
+      .from('profiles')
+      .insert({ id: user.id, coin_balance: 0 })
+      .select()
+      .single()
+    return created
+  }
+  return data
 }
 
-/** Coin payout for passing a node. */
-export function payoutForNode(node) {
-  if (node === 'review')        return REVIEW_PAYOUT
-  if (node === 'double_reward') return NODE_PAYOUT * 2
-  return NODE_PAYOUT
+// ── Coins (per kid) ───────────────────────────────────────────────
+
+export async function addCoins(amount, kidId) {
+  if (kidId) return addCoinsToKid(kidId, amount)
+  // fallback legacy
+  const { data: { user } } = await supabase.auth.getUser()
+  const profile = await getProfile()
+  const newBalance = (profile?.coin_balance || 0) + amount
+  const { data } = await supabase.from('profiles').update({ coin_balance: newBalance }).eq('id', user.id).select().single()
+  return data
 }
 
-/** Applies a node-pass payout. Balance never goes below 0. */
-export function applyPayout(balance, node = 'learn') {
-  return Math.max(0, balance + payoutForNode(node))
+export async function getCoinBalance(kidId) {
+  if (kidId) {
+    const profile = await getKidProfile(kidId)
+    return profile?.coin_balance || 0
+  }
+  const profile = await getProfile()
+  return profile?.coin_balance || 0
 }
 
-export function isInDebt() { return false }
+// ── Rewards (shared across family) ───────────────────────────────
 
-/** Pass threshold scaled to session total. */
-export function passThresholdFor(operation, placementClaim, operationsOrder, sessionTotal = 12) {
-  const normalPct  = 8 / 12
-  const claimedPct = 9 / 12
-  if (!placementClaim) return Math.round(normalPct * sessionTotal)
-  const claimIdx = operationsOrder.indexOf(placementClaim)
-  const opIdx    = operationsOrder.indexOf(operation)
-  if (claimIdx === -1 || opIdx === -1) return Math.round(normalPct * sessionTotal)
-  const pct = opIdx <= claimIdx ? claimedPct : normalPct
-  return Math.round(pct * sessionTotal)
+export async function getRewards() {
+  const { data, error } = await supabase
+    .from('rewards')
+    .select('*')
+    .order('cost', { ascending: true })
+  if (error) throw error
+  return data
+}
+
+export async function createReward({ name, cost }) {
+  const { data: { user } } = await supabase.auth.getUser()
+  const { data, error } = await supabase
+    .from('rewards')
+    .insert({ name, cost, user_id: user.id })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteReward(id) {
+  const { error } = await supabase.from('rewards').delete().eq('id', id)
+  if (error) throw error
+}
+
+// ── Claims (per kid) ─────────────────────────────────────────────
+
+export async function getClaims(kidId) {
+  const { data: { user } } = await supabase.auth.getUser()
+  let query = supabase
+    .from('claims')
+    .select('*, rewards(name, cost)')
+    .order('created_at', { ascending: false })
+  if (kidId) {
+    query = query.eq('kid_id', kidId)
+  } else {
+    query = query.eq('user_id', user.id)
+  }
+  const { data, error } = await query
+  if (error) throw error
+  return data
+}
+
+export async function claimReward(rewardId, rewardCost, kidId) {
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Deduct coins from kid
+  if (kidId) {
+    await deductCoinsFromKid(kidId, rewardCost)
+    const kidBalance = await getKidProfile(kidId)
+    const { data, error } = await supabase
+      .from('claims')
+      .insert({ reward_id: rewardId, user_id: user.id, kid_id: kidId, status: 'pending' })
+      .select()
+      .single()
+    if (error) throw error
+    return { claim: data, newBalance: kidBalance.coin_balance }
+  }
+
+  // Legacy fallback
+  const profile = await getProfile()
+  const newBalance = (profile?.coin_balance || 0) - rewardCost
+  if (newBalance < 0) throw new Error('Not enough coins')
+  await supabase.from('profiles').update({ coin_balance: newBalance }).eq('id', user.id)
+  const { data, error } = await supabase
+    .from('claims')
+    .insert({ reward_id: rewardId, user_id: user.id, status: 'pending' })
+    .select()
+    .single()
+  if (error) throw error
+  return { claim: data, newBalance }
+}
+
+export async function approveClaim(claimId) {
+  const { error } = await supabase.from('claims').update({ status: 'approved' }).eq('id', claimId)
+  if (error) throw error
+}
+
+// ── Streak (per kid) ─────────────────────────────────────────────
+
+export async function getStreak(kidId) {
+  if (kidId) {
+    const profile = await getKidProfile(kidId)
+    return { count: profile?.streak_count || 0, lastDate: profile?.streak_last_date || null }
+  }
+  const profile = await getProfile()
+  return { count: profile?.streak_count || 0, lastDate: profile?.streak_last_date || null }
+}
+
+export async function updateStreak(kidId) {
+  if (kidId) return updateKidStreak(kidId)
+
+  // Legacy fallback
+  const { data: { user } } = await supabase.auth.getUser()
+  const profile = await getProfile()
+  const today = new Date().toISOString().slice(0, 10)
+  const lastDate = profile?.streak_last_date || null
+  const currentStreak = profile?.streak_count || 0
+  if (lastDate === today) return { streakCount: currentStreak, isNewDay: false, previousStreak: currentStreak }
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayStr = yesterday.toISOString().slice(0, 10)
+  const newStreak = lastDate === yesterdayStr ? currentStreak + 1 : 1
+  await supabase.from('profiles').update({ streak_count: newStreak, streak_last_date: today }).eq('id', user.id)
+  return { streakCount: newStreak, isNewDay: true, previousStreak: currentStreak }
 }

@@ -1,162 +1,194 @@
-import { useEffect, useState } from 'react'
-import { fetchKid, fetchKidStats, fetchStreak } from '../lib/kidData'
-import { eraProgress, OPERATIONS } from '../lib/progression'
-import { themeFor } from '../lib/eraTheme'
+import { useState } from 'react'
+import { supabase } from '../lib/supabaseClient'
+import { useLang } from '../lib/LangContext'
+import { useKid } from '../lib/KidContext'
+import { createKid } from '../lib/kids'
 
-function FlameIcon() {
-  return <img src="/Cr%C3%A9ation%20sans%20titre%20(29).png" width="44" height="44" alt="" />
+function CoinIcon({ size = 24 }) {
+  return <img src="/coin.png" width={size} height={size} alt="coin" style={{ objectFit: 'contain' }} />
 }
 
-function ZapIcon() {
+const AVATARS = ['🪐', '🌍', '🌙', '⭐', '🌟', '☀️', '🌎', '🌏', '🌑', '💫']
+
+export default function Profile({ onLogout }) {
+  const lang = useLang()
+  const { activeKid, kids, setActiveKid, setKids } = useKid()
+  const [showAddKid, setShowAddKid] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    onLogout()
+  }
+
+  async function handleAddKid(name) {
+    const newKid = await createKid(name)
+    setKids(prev => [...prev, newKid])
+    setActiveKid(newKid)
+    setShowAddKid(false)
+  }
+
+  const avatarIndex = kids.findIndex(k => k.id === activeKid?.id) % AVATARS.length
+
   return (
-    <svg width="44" height="44" viewBox="0 0 24 24" fill="#FFC700" aria-hidden="true">
-      <path d="M13 2 4 14h6l-1 8 9-12h-6z" />
-    </svg>
-  )
-}
+    <div className="bg-white flex flex-col" style={{ height: '100dvh', overflow: 'hidden' }}>
+      <div className="flex-1 overflow-y-auto px-5 pt-12 pb-10 max-w-lg mx-auto w-full">
+        <h1 className="font-display font-extrabold text-3xl text-ink mb-8">
+          {lang === 'ar' ? 'الملف الشخصي' : 'Profile'}
+        </h1>
 
-function CoinIcon() {
-  return <img src="/Cr%C3%A9ation%20sans%20titre%20(27).png" width="44" height="44" alt="" />
-}
+        {/* Active kid card */}
+        {activeKid && (
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-100 rounded-3xl px-6 py-6 mb-6"
+            style={{ boxShadow: '0 4px 0 #d1fae5' }}>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-white border-2 border-green-100 flex items-center justify-center text-4xl">
+                {AVATARS[avatarIndex]}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-display font-extrabold text-2xl text-ink truncate">{activeKid.name}</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <CoinIcon size={20} />
+                  <span className="font-display font-bold text-lg text-amber-500">
+                    {activeKid.coin_balance || 0} {lang === 'ar' ? 'عملات' : 'coins'}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-function TargetIcon() {
-  return (
-    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#1CB0F6" strokeWidth="2.3"
-      strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" />
-      <circle cx="12" cy="12" r="5" />
-      <circle cx="12" cy="12" r="1.2" fill="#1CB0F6" stroke="none" />
-    </svg>
-  )
-}
+        {/* Kids switcher */}
+        <div className="mb-6">
+          <p className="font-body font-bold text-xs text-muted uppercase tracking-widest mb-3">
+            {lang === 'ar' ? 'الأطفال في هذا الحساب' : 'Kids on this account'}
+          </p>
+          <div className="flex flex-col gap-3">
+            {kids.map((kid, i) => {
+              const isActive = kid.id === activeKid?.id
+              return (
+                <button
+                  key={kid.id}
+                  onClick={() => setActiveKid(kid)}
+                  className={`w-full flex items-center gap-4 px-5 py-4 rounded-2xl border-2 transition-all active:translate-y-0.5 ${
+                    isActive ? 'border-duo bg-green-50' : 'border-gray-100 bg-white'
+                  }`}
+                  style={{ boxShadow: isActive ? '0 3px 0 #86efac' : '0 3px 0 #e5e7eb' }}
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 flex items-center justify-center text-2xl flex-shrink-0">
+                    {AVATARS[i % AVATARS.length]}
+                  </div>
+                  <div className="flex-1 min-w-0 text-left">
+                    <p className={`font-display font-bold text-base truncate ${isActive ? 'text-duo' : 'text-ink'}`}>
+                      {kid.name}
+                    </p>
+                    <div className="flex items-center gap-1 mt-0.5">
+                      <CoinIcon size={14} />
+                      <span className="font-body text-xs text-amber-500 font-bold">{kid.coin_balance || 0}</span>
+                    </div>
+                  </div>
+                  {isActive && <span className="text-duo text-lg flex-shrink-0">✓</span>}
+                </button>
+              )
+            })}
 
-function StatCard({ icon, value, label }) {
-  return (
-    <div className="flex-1 px-4 py-4 flex items-center gap-3">
-      <div className="flex-shrink-0">{icon}</div>
-      <div className="min-w-0">
-        <p className="font-display font-bold text-xl text-gray-900 leading-none tabular-nums">{value}</p>
-        <p className="font-body text-xs text-gray-400 mt-1 leading-tight">{label}</p>
+            {/* Add kid button */}
+            <button
+              onClick={() => setShowAddKid(true)}
+              className="w-full py-4 rounded-2xl border-2 border-dashed border-gray-200 text-muted font-display font-bold text-base active:bg-gray-50 transition-colors"
+            >
+              {lang === 'ar' ? '+ إضافة طفل' : '+ Add a kid'}
+            </button>
+          </div>
+        </div>
+
+        {/* Logout */}
+        <button
+          onClick={() => setShowLogoutConfirm(true)}
+          className="w-full py-4 rounded-2xl border-2 border-red-100 bg-red-50 text-red-500 font-display font-bold text-base active:bg-red-100 transition-colors"
+        >
+          {lang === 'ar' ? '🚪 تسجيل الخروج' : '🚪 Log out'}
+        </button>
       </div>
+
+      {/* Add kid modal */}
+      {showAddKid && (
+        <AddKidModal
+          lang={lang}
+          onConfirm={handleAddKid}
+          onClose={() => setShowAddKid(false)}
+        />
+      )}
+
+      {/* Logout confirm */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4">
+            <h2 className="font-display font-extrabold text-xl text-ink text-center">
+              {lang === 'ar' ? 'تسجيل الخروج؟' : 'Log out?'}
+            </h2>
+            <p className="font-body text-sm text-muted text-center">
+              {lang === 'ar' ? 'ستحتاج إلى رقم هاتفك ورمز PIN لتسجيل الدخول مرة أخرى.' : "You'll need your phone number and PIN to log back in."}
+            </p>
+            <button
+              onClick={handleLogout}
+              className="w-full py-4 bg-red-500 text-white font-display font-bold text-lg rounded-2xl active:opacity-80"
+            >
+              {lang === 'ar' ? 'نعم، اخرج' : 'Yes, log out'}
+            </button>
+            <button
+              onClick={() => setShowLogoutConfirm(false)}
+              className="w-full py-3 text-muted font-body font-bold text-sm text-center"
+            >
+              {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
 
-export default function Profile({ kidId, onSwitchProfile }) {
-  const [kid, setKid] = useState(null)
-  const [stats, setStats] = useState(null)
-  const [streak, setStreak] = useState(0)
-  const [error, setError] = useState(null)
+function AddKidModal({ lang, onConfirm, onClose }) {
+  const [name, setName] = useState('')
+  const [saving, setSaving] = useState(false)
 
-  useEffect(() => {
-    let cancelled = false
-    Promise.all([fetchKid(kidId), fetchKidStats(kidId), fetchStreak(kidId)])
-      .then(([kidData, statsData, streakData]) => {
-        if (cancelled) return
-        setKid(kidData)
-        setStats(statsData)
-        setStreak(streakData)
-      })
-      .catch(err => {
-        console.error('Failed to load profile:', err)
-        if (!cancelled) setError(err)
-      })
-    return () => { cancelled = true }
-  }, [kidId])
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center px-6 text-center">
-        <p className="font-body text-gray-500">
-          Couldn't load profile. Check your Supabase connection and .env file.
-        </p>
-      </div>
-    )
+  async function handleSubmit() {
+    if (!name.trim()) return
+    setSaving(true)
+    await onConfirm(name.trim())
+    setSaving(false)
   }
-
-  if (!kid || !stats) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="font-body text-gray-400">Loading…</p>
-      </div>
-    )
-  }
-
-  const theme = themeFor(kid.current_operation)
-  const overallPct = Math.round(
-    (OPERATIONS.reduce((sum, op) => sum + eraProgress(
-      { operation: kid.current_operation, table: kid.current_table, batch: kid.current_batch || 1, node: kid.current_node },
-      op
-    ), 0) / OPERATIONS.length) * 100
-  )
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-sm md:max-w-md mx-auto px-4 pt-6 pb-10">
-
-        {/* Header zone — colored card matching the reference layout, no
-            human avatar per spec (kid-facing app, near-zero admin chrome).
-            Era-tinted to the kid's current chapter so it still feels
-            personal/alive rather than a flat generic header. */}
-        <div
-          className="rounded-3xl px-6 py-8 flex flex-col items-center text-center mb-5"
-          style={{ backgroundColor: `${theme.colors.primary}1A` }}
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-end"
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="w-full bg-white rounded-t-3xl px-5 pb-8 pt-4">
+        <div className="flex justify-center mb-4">
+          <div className="w-10 h-1 rounded-full bg-gray-200" />
+        </div>
+        <h2 className="font-display font-extrabold text-2xl text-ink text-center mb-5">
+          {lang === 'ar' ? 'إضافة طفل' : 'Add a kid'}
+        </h2>
+        <input
+          type="text"
+          value={name}
+          onChange={e => setName(e.target.value)}
+          placeholder={lang === 'ar' ? 'اسم الطفل...' : "Kid's name..."}
+          autoFocus
+          className="w-full border-2 border-gray-200 rounded-2xl px-4 py-4 font-display font-bold text-xl text-ink outline-none focus:border-duo transition-colors mb-4"
+        />
+        <button
+          onClick={handleSubmit}
+          disabled={!name.trim() || saving}
+          className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:translate-y-1"
+          style={{ boxShadow: name.trim() ? '0 4px 0 #46a302' : 'none' }}
         >
-          <div
-            className="w-20 h-20 rounded-full flex items-center justify-center mb-3"
-            style={{ backgroundColor: theme.colors.primary }}
-          >
-            <span className="font-display font-extrabold text-3xl text-white">
-              {kid.name?.trim()?.[0]?.toUpperCase() || '?'}
-            </span>
-          </div>
-          <h1 className="font-display font-bold text-2xl text-gray-900">{kid.name}</h1>
-          {kid.age && (
-            <p className="font-body text-sm text-gray-400 mt-0.5">{kid.age} years old</p>
-          )}
-        </div>
-
-        {/* Current progress */}
-        <div className="rounded-2xl border border-gray-100 px-4 py-4 mb-5">
-          <p className="font-body font-bold text-xs tracking-widest uppercase mb-1" style={{ color: theme.colors.primary }}>
-            {theme.operationLabel}
-          </p>
-          <p className="font-display font-bold text-lg text-gray-900 mb-2">
-            Table {kid.current_table} · Day {(kid.current_table - 1) * 6 + (kid.current_batch || 1)} of 72 · {overallPct}% complete
-          </p>
-          <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
-            <div
-              className="h-full rounded-full"
-              style={{ width: `${Math.max(overallPct, 2)}%`, backgroundColor: '#58cc02' }}
-            />
-          </div>
-        </div>
-
-        {/* Stats grid — only real, honestly-derived numbers. No
-            fabricated streak/league/leaderboard placeholders, since
-            those systems don't exist yet (spec explicitly puts social
-            features/leaderboards out of scope). */}
-        <p className="font-body font-bold text-xs text-gray-400 uppercase tracking-wide mb-2 px-1">Stats</p>
-        <div className="flex flex-col gap-2.5">
-          <div className="flex gap-2.5">
-            <StatCard icon={<FlameIcon />} value={streak} label="Day streak" />
-            <StatCard icon={<CoinIcon />} value={kid.coin_balance} label="Coin balance" />
-          </div>
-          <div className="flex gap-2.5">
-            <StatCard icon={<TargetIcon />} value={stats.nodesPassed} label="Nodes passed" />
-          </div>
-        </div>
-
-        {onSwitchProfile && (
-          <button
-            onClick={onSwitchProfile}
-            className="w-full text-center mt-6 font-body font-bold text-sm py-3 rounded-2xl border-2 border-gray-200
-                       transition-colors active:bg-gray-50"
-            style={{ color: '#1CB0F6' }}
-          >
-            Switch profile
-          </button>
-        )}
+          {saving ? '...' : lang === 'ar' ? 'إضافة ←' : 'Add kid →'}
+        </button>
+        <button onClick={onClose} className="w-full text-muted font-body font-bold text-sm py-3 text-center mt-1">
+          {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+        </button>
       </div>
     </div>
   )

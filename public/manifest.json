@@ -1,19 +1,19 @@
 {
-  "name": "Numio",
+  "name": "Numio Scan",
   "short_name": "Numio",
-  "description": "Two minutes of math, every day.",
+  "description": "Snap anything. Get a quiz.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#FFFFFF",
+  "background_color": "#ffffff",
   "theme_color": "#58cc02",
   "icons": [
     {
-      "src": "/Cr%C3%A9ation%20sans%20titre%20(20).png",
+      "src": "/icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/Cr%C3%A9ation%20sans%20titre%20(20).png",
+      "src": "/icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }

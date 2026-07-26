@@ -1,459 +1,218 @@
-import { useState, useEffect } from 'react'
-import Map from './screens/Map'
-import ChapterPath from './screens/ChapterPath'
-import Practice from './screens/Practice'
-import ChapterIntro from './screens/ChapterIntro'
-import Diagnostic from './screens/Diagnostic'
+import { useEffect, useState } from 'react'
+import { ensureAuth } from './lib/auth'
+import Onboarding from './screens/Onboarding'
+import { getStreak } from './lib/economy'
+import { getKids, createKid } from './lib/kids'
+import Nav from './components/Nav'
+import Chapters from './screens/Chapters'
+import CurrentChapter from './screens/CurrentChapter'
+import Home from './screens/Home'
+import Revision from './screens/Revision'
+import Quiz from './screens/Quiz'
 import Rewards from './screens/Rewards'
+import ParentZone from './screens/ParentZone'
+import PinGate from './screens/PinGate'
+import QuizIntro from './screens/QuizIntro'
 import Profile from './screens/Profile'
-import Auth from './screens/Auth'
-import KidPicker from './screens/KidPicker'
-import CreateKid from './screens/CreateKid'
-import ChildOnboarding from './screens/ChildOnboarding'
-import ParentPinEntry from './screens/ParentPinEntry'
-import ParentDashboard from './screens/ParentDashboard'
-import StreakSlide from './screens/StreakSlide'
-import NavShell from './components/NavShell'
-import { getSession, logOut as authLogOut } from './lib/parentAuth'
-import { trackEvent } from './lib/analytics'
-import { trackPageView } from './lib/gtag'
+import { LangContext } from './lib/LangContext'
+import { KidContext } from './lib/KidContext'
 
-// Top-level app flow, in order:
-//   'auth'        — parent signup/login (shown if no saved session)
-//   'kidPicker'   — Netflix-style "who's playing" grid (shown after login)
-//   'createKid'   — name/age/placement-claim form (shown from kidPicker's "Add kid")
-//   'game'        — the actual app (chapter list / chapter path / practice / nav tabs),
-//                    once a specific kid profile has been selected
-//
-// Session persistence (lib/parentAuth.js, localStorage-backed) means a
-// returning parent skips straight to 'kidPicker' on reload instead of
-// having to log in again every visit — but which KID was last active is
-// intentionally NOT persisted across reloads; landing on the picker each
-// time the app is freshly opened matches the Netflix-style mental model
-// ("who's playing right now") better than silently resuming whoever
-// played last, especially on a shared family device.
+const HIDE_NAV = ['quiz', 'scan', 'quiz_intro']
+
 export default function App() {
-  const [authPhase, setAuthPhase] = useState('checking') // 'checking' | 'auth' | 'kidPicker' | 'createKid' | 'diagnostic' | 'game'
-  const [parentId, setParentId] = useState(null)
-  const [kidId, setKidId] = useState(null)
-  const [pendingClaim, setPendingClaim] = useState(null) // placement claim for the diagnostic phase
-  const [selectedTables, setSelectedTables] = useState([]) // tables the kid picked during the level-check step
-  const [showParentPin, setShowParentPin]   = useState(false)
-  const [showParentDash, setShowParentDash] = useState(false)
-  const [parentDashInitialTab, setParentDashInitialTab] = useState('kids')
+  const [authReady, setAuthReady]     = useState(false)
+  const [streak, setStreak]           = useState(0)
+  const [lang, setLang]               = useState('en')
+  const [onboarded, setOnboarded]     = useState(null)
+  const [tab, setTab]                 = useState('chapters')
+  const [pinUnlocked, setPinUnlocked] = useState(false)
+  const [kids, setKids]               = useState([])
+  const [activeKid, setActiveKid]     = useState(null)
 
-  // Game-level navigation state (only meaningful once authPhase === 'game')
-  const [navTab, setNavTab] = useState('home') // 'home' | 'rewards' | 'profile'
-  const [screen, setScreen] = useState('list')       // 'list' | 'path' | 'play'
-  const [activeChapter, setActiveChapter] = useState(null)
-  const [activeNode, setActiveNode] = useState(null)
-  const [refreshKey, setRefreshKey] = useState(0)
-  const [onboardingStartStep, setOnboardingStartStep] = useState(0)
-  const [onboardingKidName, setOnboardingKidName] = useState('')
-  const [onboardingKidAge, setOnboardingKidAge] = useState('')
-  const [showStreakSlide,  setShowStreakSlide]  = useState(false)
-  const [streakCount,    setStreakCount]    = useState(1)
-  const [streakTrigger,  setStreakTrigger]  = useState('welcome')
+  const [nav, setNav] = useState({
+    screen: 'chapters', chapter: null, exam: null, revisionExams: [],
+  })
 
-  // Persist kidId + current phase to sessionStorage so page refresh
-  // brings you back to where you were instead of dropping you to kidPicker.
-  // sessionStorage is cleared when the tab/browser closes — intentional.
   useEffect(() => {
-    if (kidId && authPhase === 'game') {
+    ensureAuth().then(async () => {
       try {
-        sessionStorage.setItem('numio_kid', JSON.stringify({ kidId, navTab, screen, phase: 'game' }))
-      } catch {}
-    } else if (kidId && authPhase === 'diagnostic') {
-      try {
-        sessionStorage.setItem('numio_kid', JSON.stringify({ kidId, phase: 'diagnostic', pendingClaim, selectedTables }))
-      } catch {}
-    } else if (kidId && authPhase === 'onboarding') {
-      try {
-        sessionStorage.setItem('numio_kid', JSON.stringify({ kidId, phase: 'onboarding' }))
-      } catch {}
-    }
-  }, [kidId, authPhase, navTab, screen, pendingClaim, selectedTables])
+        const { supabase } = await import('./lib/supabaseClient')
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user || user.is_anonymous) { setOnboarded(false); return }
 
-  // Virtual pageview for Google Analytics — Numio is a single-page app,
-  // so this is the one clean signal for "reached actual gameplay,"
-  // completing the funnel: landing page -> Auth -> onboarding -> playing.
-  useEffect(() => {
-    if (authPhase === 'game') trackPageView('/app/playing', 'Playing')
-  }, [authPhase])
+        const { data } = await supabase.from('profiles').select('display_name, language').eq('id', user.id).single()
+        setOnboarded(!!data?.display_name)
+        if (data?.language) setLang(data.language)
 
-  // On first mount, check for a saved session and skip straight to the
-  // kid picker if one exists — avoids forcing a returning parent to log
-  // in again every single time they open the app.
-  useEffect(() => {
-    const saved = getSession()
-    if (saved) {
-      setParentId(saved)
-      // Also restore kid session if available
-      try {
-        const kidSession = sessionStorage.getItem('numio_kid')
-        if (kidSession) {
-          const parsed = JSON.parse(kidSession)
-          const { kidId: savedKidId, phase } = parsed
-          if (savedKidId) {
-            setKidId(savedKidId)
-            setParentId(saved)
-            if (phase === 'diagnostic') {
-              if (parsed.pendingClaim) setPendingClaim(parsed.pendingClaim)
-              if (parsed.selectedTables) setSelectedTables(parsed.selectedTables)
-              setAuthPhase('diagnostic')
-            } else if (phase === 'onboarding') {
-              setAuthPhase('onboarding')
-            } else {
-              setNavTab(parsed.navTab || 'home')
-              setScreen(parsed.screen === 'play' ? 'path' : (parsed.screen || 'list'))
-              setAuthPhase('game')
-            }
-            return
+        if (data?.display_name) {
+          // Load kids
+          const kidList = await getKids()
+          if (kidList.length === 0) {
+            // Migrate: create first kid from display_name
+            const firstKid = await createKid(data.display_name)
+            setKids([firstKid])
+            setActiveKid(firstKid)
+            getStreak(firstKid.id).then(s => setStreak(s.count)).catch(() => {})
+          } else {
+            setKids(kidList)
+            setActiveKid(kidList[0])
+            getStreak(kidList[0].id).then(s => setStreak(s.count)).catch(() => {})
           }
         }
-      } catch {}
-      setAuthPhase('kidPicker')
-    } else {
-      setAuthPhase('auth')
-    }
+      } catch { setOnboarded(false) }
+    }).finally(() => setAuthReady(true))
   }, [])
 
-  function handleAuthenticated(newParentId, isNewAccount = false) {
-    setParentId(newParentId)
-    if (isNewAccount) {
-      // New account — go straight to create kid + onboarding, skip KidPicker
-      setAuthPhase('createKid')
-    } else {
-      setAuthPhase('kidPicker')
-    }
-  }
+  // When active kid changes, reload streak
+  useEffect(() => {
+    if (!activeKid) return
+    getStreak(activeKid.id).then(s => setStreak(s.count)).catch(() => {})
+  }, [activeKid?.id])
 
-  function handleSelectKid(selectedKidId) {
-    setKidId(selectedKidId)
-    setAuthPhase('game')
-    setNavTab('home')
-    setScreen('list')
-  }
-
-  function handleKidCreated(newKidId) {
-    setKidId(newKidId)
-    setOnboardingStartStep(0)
-    setOnboardingKidName('')
-    setOnboardingKidAge('')
-    setAuthPhase('onboarding')
-  }
-
-  function handleDiagnosticPass() {
-    // Cursor already set to claimed chapter by Diagnostic.jsx; go straight to game.
-    trackEvent('diagnostic_completed', { kidId, passed: true })
-    setPendingClaim(null)
-    setAuthPhase('game')
-    setNavTab('home')
-    setScreen('list')
-  }
-
-  function handleDiagnosticFail() {
-    // Cursor stays at addition/table1/batch1/learn (the default from createKid).
-    trackEvent('diagnostic_completed', { kidId, passed: false })
-    setPendingClaim(null)
-    setAuthPhase('game')
-    setNavTab('home')
-    setScreen('list')
-  }
-
-  function handleLogOut() {
-    authLogOut()
-    try { sessionStorage.removeItem('numio_kid') } catch {}
-    setParentId(null)
-    setKidId(null)
-    setAuthPhase('auth')
-  }
-
-  function handleSwitchProfile() {
-    try { sessionStorage.removeItem('numio_kid') } catch {}
-    setKidId(null)
-    setAuthPhase('kidPicker')
-    setRefreshKey(k => k + 1)
-  }
-
-  function handleNavigate(tab) {
-    setNavTab(tab)
-    if (tab === 'home') {
-      setScreen('list')
-      setActiveChapter(null)
-      setActiveNode(null)
-    }
-  }
-
-  function handleOpenChapter(operation) {
-    setActiveChapter(operation)
-    setScreen('path')
-  }
-
-  function handleStartNode(nodeConfig) {
-    trackEvent('unit_started', {
-      kidId,
-      operation: nodeConfig?.operation,
-      table: nodeConfig?.table,
-      batch: nodeConfig?.batchNum,
-      node: nodeConfig?.node,
-    })
-    setActiveNode(nodeConfig)
-    setScreen('play')
-  }
-
-  async function handleExitPractice(completedNode, table, batchNum) {
-    // null = quit midway (X button) → no streak slide, just back to path
-    if (completedNode === null) {
-      setActiveNode(null)
-      setScreen('path')
-      setRefreshKey(k => k + 1)
-      return
-    }
-
-    trackEvent('unit_completed', {
-      kidId,
-      operation: activeNode?.operation,
-      table,
-      batch: batchNum,
-      node: completedNode,
-    })
-
-    const isVeryFirstUnit = table === 1 && batchNum === 1 && activeNode?.operation === 'addition'
-    const shouldShowStreak =
-      (isVeryFirstUnit && completedNode === 'review') ||       // Day 1 — after Review
-      (!isVeryFirstUnit && completedNode === 'welcome') ||     // Day 2+ — after Welcome
-      (!isVeryFirstUnit && completedNode === 'review')         // Day 2+ — after Review too
-
-    if (shouldShowStreak) {
-      try {
-        // For Day 1 Review, streak is always 1 — no need to query DB
-        // (the attempt was just written and may not be committed yet)
-        if (isVeryFirstUnit && completedNode === 'review') {
-          setStreakCount(1)
-        } else {
-          const { fetchStreak } = await import('./lib/kidData')
-          await new Promise(r => setTimeout(r, 500))
-          const streak = await fetchStreak(kidId)
-          setStreakCount(Math.max(1, streak))
-        }
-      } catch {
-        setStreakCount(1)
-      }
-      // Set the right trigger so StreakSlide shows correct messaging + circles
-      if (isVeryFirstUnit && completedNode === 'review') {
-        setStreakTrigger('review_day1')
-      } else if (completedNode === 'review') {
-        setStreakTrigger('review')
-      } else {
-        setStreakTrigger('welcome')
-      }
-      setShowStreakSlide(true)
-    } else {
-      setActiveNode(null)
-      setScreen('path')
-      setRefreshKey(k => k + 1)
-    }
-  }
-
-  function handleBackToList() {
-    setActiveChapter(null)
-    setScreen('list')
-    setRefreshKey(k => k + 1)
-  }
-
-  // ── Pre-game phases ──────────────────────────────────────────────────
-
-  if (authPhase === 'checking') {
+  if (!authReady || onboarded === null) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <p className="font-body text-gray-400">Loading…</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-duo animate-spin" />
       </div>
     )
   }
 
-  if (authPhase === 'auth') {
-    return <Auth onAuthenticated={handleAuthenticated} />
-  }
-
-  if (authPhase === 'kidPicker') {
+  if (!onboarded) {
     return (
-      <KidPicker
-        key={refreshKey}
-        parentId={parentId}
-        onSelectKid={handleSelectKid}
-        onCreateKid={() => setAuthPhase('createKid')}
-        onLogOut={handleLogOut}
-      />
+      <LangContext.Provider value={lang}>
+        <div dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+          <Onboarding
+            onComplete={async (kidName) => {
+              setOnboarded(true)
+              const kidList = await getKids()
+              let kid
+              if (kidList.length === 0) {
+                kid = await createKid(kidName || 'Kid 1')
+                setKids([kid])
+              } else {
+                setKids(kidList)
+                kid = kidList[0]
+              }
+              setActiveKid(kid)
+              getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+            }}
+            onLanguageChange={setLang}
+          />
+        </div>
+      </LangContext.Provider>
     )
   }
 
-  if (authPhase === 'createKid') {
-    return (
-      <CreateKid
-        parentId={parentId}
-        onCreated={handleKidCreated}
-        onBack={() => setAuthPhase('kidPicker')}
-      />
-    )
+  const { screen, chapter, exam, revisionExams } = nav
+
+  function go(updates) { setNav(prev => ({ ...prev, ...updates })) }
+
+  function handleTabChange(newTab) {
+    setTab(newTab)
+    if (newTab !== 'parent_zone') setPinUnlocked(false)
+    go({ screen: newTab, chapter: null, exam: null, revisionExams: [] })
   }
 
-  if (authPhase === 'onboarding') {
-    return (
-      <ChildOnboarding
-        kidId={kidId}
-        parentId={parentId}
-        startStep={onboardingStartStep}
-        savedName={onboardingKidName}
-        savedAge={onboardingKidAge}
-        onDone={async ({ justStarting, knownOps, tablesByOp, goToDiagnostic, kidName, kidAge }) => {
-          if (kidName) setOnboardingKidName(kidName)
-          if (kidAge) setOnboardingKidAge(kidAge)
-          if (justStarting || !goToDiagnostic) {
-            // Just starting out or no diagnostic needed — go straight to game
-            setAuthPhase('game')
-            setNavTab('home')
-            setScreen('list')
-          } else {
-            // They know some math — set up diagnostic
-            const claimOp = knownOps[knownOps.length - 1]
-            const tables = tablesByOp[claimOp] || []
-            setPendingClaim(claimOp)
-            setSelectedTables(tables)
-            try {
-              const { updatePlacementClaim } = await import('./lib/kidData')
-              await updatePlacementClaim(kidId, claimOp)
-            } catch (err) { console.error('Failed to save placement claim:', err) }
-            setAuthPhase('diagnostic')
-          }
-        }}
-      />
-    )
-  }
+  const showNav = !HIDE_NAV.includes(screen)
 
-  if (authPhase === 'diagnostic') {
-    return (
-      <Diagnostic
-        kidId={kidId}
-        claimedOperation={pendingClaim}
-        selectedTables={selectedTables}
-        onPass={handleDiagnosticPass}
-        onFail={handleDiagnosticFail}
-        onPickLevel={() => { setOnboardingStartStep(8); setAuthPhase('onboarding') }}
-      />
-    )
-  }
-
-  // ── Streak slide (after Welcome) ────────────────────────────────────────
-  if (showStreakSlide) {
-    return (
-      <StreakSlide
-        dayStreak={streakCount}
-        trigger={streakTrigger}
-        onContinue={() => {
-          setShowStreakSlide(false)
-          setActiveNode(null)
-          setScreen('path')
-          setRefreshKey(k => k + 1)
-        }}
-      />
-    )
-  }
-
-  // ── Game phase ───────────────────────────────────────────────────────
-
-  if (navTab === 'home' && screen === 'play' && activeNode) {
-    // Day 1 of any chapter (batch 1, unlock node) → show chapter intro
-    // instead of the unlock exercise (nothing to test yet on day 1).
-    // isFirstEver = true only for the very first session (addition/table1/batch1)
-    const isChapterDay1 = activeNode.node === 'welcome' && activeNode.batchNum === 1 && activeNode.table === 1
-    if (isChapterDay1) {
-      const isFirstEver = activeNode.operation === 'addition'
-      return (
-        <ChapterIntro
-          key={`intro-${activeNode.operation}`}
-          operation={activeNode.operation}
-          table={activeNode.table}
-          batchNum={activeNode.batchNum}
-          node={activeNode.node}
-          kidId={kidId}
-          isFirstEver={isFirstEver}
-          kidCurrentStep={activeNode.kidCurrentStep}
-          onDone={handleExitPractice}
-        />
-      )
-    }
-
-    return (
-      <Practice
-        key={`${activeNode.operation}-${activeNode.table}-${activeNode.batchNum}-${activeNode.node}`}
-        operation={activeNode.operation}
-        table={activeNode.table}
-        batchNum={activeNode.batchNum}
-        node={activeNode.node}
-        kidId={kidId}
-        coinBalance={activeNode.coinBalance}
-        reviewPool={activeNode.reviewPool}
-        unlockBatch={activeNode.unlockBatch}
-        placementClaim={activeNode.placementClaim}
-        kidCurrentStep={activeNode.kidCurrentStep}
-        onExit={(completedNode) => handleExitPractice(completedNode, activeNode.table, activeNode.batchNum)}
-        onBalanceChange={(newBal) => setActiveNode(n => n ? { ...n, coinBalance: newBal } : n)}
-      />
-    )
-  }
-
-  let content
-  if (navTab === 'rewards') {
-    content = <Rewards kidId={kidId} parentId={parentId} onGoToParent={() => { setParentDashInitialTab('claims'); setShowParentPin(true) }} />
-  } else if (navTab === 'profile') {
-    content = <Profile kidId={kidId} onSwitchProfile={handleSwitchProfile} />
-  } else if (screen === 'path' && activeChapter) {
-    content = (
-      <ChapterPath
-        key={`${activeChapter}-${refreshKey}`}
-        operation={activeChapter}
-        kidId={kidId}
-        parentId={parentId}
-        onStartNode={handleStartNode}
-        onBack={handleBackToList}
-        onGoToParent={() => { setParentDashInitialTab('rewards'); setShowParentPin(true) }}
-        onGoToRewards={() => { setNavTab('rewards') }}
-      />
-    )
-  } else {
-    content = <Map key={refreshKey} onOpenChapter={handleOpenChapter} kidId={kidId} />
-  }
-
-  // Parent zone overlays — shown on top of the game UI
-  if (showParentPin) {
-    return (
-      <ParentPinEntry
-        parentId={parentId}
-        onSuccess={() => { setShowParentPin(false); setShowParentDash(true) }}
-        onBack={() => { setShowParentPin(false); setParentDashInitialTab('kids') }}
-      />
-    )
-  }
-
-  if (showParentDash) {
-    return (
-      <ParentDashboard
-        parentId={parentId}
-        initialTab={parentDashInitialTab}
-        onBack={() => { setShowParentDash(false); setParentDashInitialTab('kids') }}
-        onAddKid={() => {
-          setShowParentDash(false)
-          setParentDashInitialTab('kids')
-          setAuthPhase('createKid')
-        }}
-      />
-    )
+  const kidContextValue = {
+    activeKid,
+    kids,
+    setActiveKid: (kid) => {
+      setActiveKid(kid)
+      // Reset to chapters when switching kid
+      go({ screen: 'chapters', chapter: null, exam: null, revisionExams: [] })
+      setTab('chapters')
+    },
+    setKids,
   }
 
   return (
-    <NavShell active={navTab} onNavigate={handleNavigate} onParentZone={() => { setParentDashInitialTab('kids'); setShowParentPin(true) }}>
-      {content}
-    </NavShell>
+    <LangContext.Provider value={lang}>
+      <KidContext.Provider value={kidContextValue}>
+        <div className="flex" dir={lang === 'ar' ? 'rtl' : 'ltr'}
+          style={{ overflow: 'hidden', maxWidth: '100vw', width: '100%' }}>
+
+          {showNav && <Nav active={tab} onChange={handleTabChange} streak={streak} />}
+
+          <main
+            className={`flex-1 ${showNav ? 'md:ml-56' : ''}`}
+            style={{ paddingBottom: showNav ? 'calc(64px + env(safe-area-inset-bottom))' : 0, overflow: 'hidden', minWidth: 0, width: '100%' }}
+          >
+            {screen === 'chapters' && (
+              <Chapters
+                kidId={activeKid?.id}
+                onSelectChapter={c => go({ screen: 'current_chapter', chapter: c })}
+              />
+            )}
+
+            {screen === 'current_chapter' && (
+              <CurrentChapter
+                chapter={chapter}
+                kidId={activeKid?.id}
+                onNew={c => go({ screen: 'scan', chapter: c, exam: null })}
+                onRevision={(c, exams) => go({ screen: 'revision', chapter: c, revisionExams: exams })}
+                onBack={() => go({ screen: 'chapters' })}
+              />
+            )}
+
+            {screen === 'scan' && (
+              <Home
+                chapter={chapter}
+                kidId={activeKid?.id}
+                onExamReady={freshExam => go({ screen: 'quiz_intro', exam: freshExam })}
+                onBack={() => go({ screen: 'current_chapter' })}
+              />
+            )}
+
+            {screen === 'revision' && (
+              <Revision
+                chapter={chapter}
+                exams={revisionExams}
+                onSelectExam={e => go({ screen: 'quiz_intro', exam: e })}
+                onBack={() => go({ screen: 'current_chapter' })}
+              />
+            )}
+
+            {screen === 'quiz_intro' && exam && (
+              <QuizIntro
+                exam={exam}
+                kidName={activeKid?.name}
+                onStart={() => go({ screen: 'quiz' })}
+              />
+            )}
+
+            {screen === 'quiz' && exam && (
+              <Quiz
+                exam={exam}
+                kidId={activeKid?.id}
+                onDone={() => {
+                  go({ screen: 'current_chapter' })
+                  // Refresh streak
+                  if (activeKid) getStreak(activeKid.id).then(s => setStreak(s.count)).catch(() => {})
+                }}
+              />
+            )}
+
+            {screen === 'rewards'     && <Rewards kidId={activeKid?.id} />}
+
+            {screen === 'parent_zone' && !pinUnlocked && (
+              <PinGate onSuccess={() => setPinUnlocked(true)} onBack={() => go({ screen: 'chapters' })} />
+            )}
+            {screen === 'parent_zone' && pinUnlocked && <ParentZone />}
+
+            {screen === 'profile' && (
+              <Profile
+                onLogout={() => {
+                  setOnboarded(false)
+                  setKids([])
+                  setActiveKid(null)
+                }}
+              />
+            )}
+          </main>
+        </div>
+      </KidContext.Provider>
+    </LangContext.Provider>
   )
 }
