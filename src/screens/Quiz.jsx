@@ -13,6 +13,7 @@ function CoinIcon({ size = 28 }) {
 
 // ── Quit popup ────────────────────────────────────────────────────
 function QuitPopup({ visible, onStay, onLeave }) {
+  const lang = useLang()
   if (!visible) return null
   return (
     <div style={{
@@ -34,7 +35,7 @@ function QuitPopup({ visible, onStay, onLeave }) {
           fontWeight: 700, fontSize: 18,
           color: '#3c3c3c', textAlign: 'center', lineHeight: 1.4, margin: 0,
         }}>
-          Leave the quiz? 😢<br />Your progress won't be saved.
+          {t(lang, 'quiz_quit_title')}<br />{t(lang, 'quiz_quit_sub')}
         </p>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 8, width: '100%' }}>
           <button onClick={onStay} style={{
@@ -44,14 +45,14 @@ function QuitPopup({ visible, onStay, onLeave }) {
             color: '#fff', fontFamily: "'Baloo 2', sans-serif",
             fontWeight: 800, fontSize: 16, letterSpacing: '0.05em',
             textTransform: 'uppercase',
-          }}>KEEP GOING 💪</button>
+          }}>{t(lang, 'quiz_quit_stay')}</button>
           <button onClick={onLeave} style={{
             width: '100%', border: 'none', cursor: 'pointer',
             padding: '12px 0', borderRadius: 14,
             background: 'none', color: '#9ca3af',
             fontFamily: "'Baloo 2', sans-serif",
             fontWeight: 700, fontSize: 14,
-          }}>Yes, leave</button>
+          }}>{t(lang, 'quiz_quit_leave')}</button>
         </div>
       </div>
     </div>
@@ -60,24 +61,24 @@ function QuitPopup({ visible, onStay, onLeave }) {
 
 // ── Results screen ────────────────────────────────────────────────
 function ResultsScreen({ questions, answers, topic, onDone, coinsEarned }) {
+  const lang = useLang()
   const correct = questions.filter((q, i) => {
     const a = answers[i]
     return normalize(a) === normalize(q.correct_answer)
   }).length
   const total   = questions.length
   const wrong   = questions.filter((q, i) => normalize(answers[i]) !== normalize(q.correct_answer))
-
   const pct = Math.round((correct / total) * 100)
 
-  let emoji, headline, sub
+  let emoji, headlineKey, subKey
   if (pct === 100) {
-    emoji = '🏆'; headline = 'Perfect score!'; sub = 'If this was a real exam, you just aced it!'
+    emoji = '🏆'; headlineKey = 'quiz_results_perfect'; subKey = 'quiz_results_perfect_sub'
   } else if (pct >= 80) {
-    emoji = '🎉'; headline = 'Almost perfect!'; sub = "You'd pass this exam easily!"
+    emoji = '🎉'; headlineKey = 'quiz_results_great'; subKey = 'quiz_results_great_sub'
   } else if (pct >= 60) {
-    emoji = '😊'; headline = 'Good effort!'; sub = "You'd pass, but there's room to grow."
+    emoji = '😊'; headlineKey = 'quiz_results_good'; subKey = 'quiz_results_good_sub'
   } else {
-    emoji = '💪'; headline = 'Keep going!'; sub = 'Re-read the page and try again — you got this!'
+    emoji = '💪'; headlineKey = 'quiz_results_keep'; subKey = 'quiz_results_keep_sub'
   }
 
   return (
@@ -92,22 +93,22 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned }) {
         {/* Headline */}
         <div className="text-center">
           <p style={{ fontSize: 48 }}>{emoji}</p>
-          <h2 className="font-display font-extrabold text-3xl text-ink mt-1">{headline}</h2>
-          <p className="font-body text-base text-muted mt-1">{sub}</p>
+          <h2 className="font-display font-extrabold text-3xl text-ink mt-1">{t(lang, headlineKey)}</h2>
+          <p className="font-body text-base text-muted mt-1">{t(lang, subKey)}</p>
         </div>
 
         {/* Coins earned */}
         <div className="flex items-center gap-3 bg-amber-50 border-2 border-amber-200 rounded-2xl px-6 py-4">
           <CoinIcon size={40} />
           <div>
-            <p className="font-body text-xs text-amber-600 font-bold uppercase tracking-widest">Coins earned</p>
+            <p className="font-body text-xs text-amber-600 font-bold uppercase tracking-widest">{t(lang, 'quiz_results_coins')}</p>
             <p className="font-display font-extrabold text-3xl text-amber-500">+{coinsEarned}</p>
           </div>
         </div>
 
         {/* Score */}
         <div className="w-full bg-gray-50 rounded-2xl px-5 py-3 flex items-center justify-between">
-          <span className="font-body font-bold text-sm text-muted">Score</span>
+          <span className="font-body font-bold text-sm text-muted">{t(lang, 'quiz_results_score')}</span>
           <span className="font-display font-bold text-lg text-ink">{correct}/{total} · {pct}%</span>
         </div>
 
@@ -115,7 +116,7 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned }) {
         {wrong.length > 0 && (
           <div className="w-full flex flex-col gap-2">
             <p className="font-body font-bold text-xs text-muted uppercase tracking-widest">
-              📖 Worth reviewing:
+              {t(lang, 'quiz_results_review')}
             </p>
             {wrong.map((q, i) => (
               <div key={i} className="bg-red-50 border border-red-100 rounded-2xl px-4 py-3">
@@ -130,7 +131,7 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned }) {
           onClick={onDone}
           className="w-full bg-duo active:bg-duo-dark text-white font-display font-bold text-xl rounded-2xl py-5 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all"
         >
-          Continue →
+          {t(lang, 'quiz_results_continue')}
         </button>
       </div>
 
