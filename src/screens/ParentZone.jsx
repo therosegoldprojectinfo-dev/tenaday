@@ -33,9 +33,15 @@ export default function ParentZone() {
     await load()
   }
 
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+
   async function handleDelete(id) {
-    if (!confirm('Delete this reward?')) return
-    await deleteReward(id)
+    setConfirmDeleteId(id)
+  }
+
+  async function confirmDelete() {
+    await deleteReward(confirmDeleteId)
+    setConfirmDeleteId(null)
     await load()
   }
 
@@ -150,6 +156,27 @@ export default function ParentZone() {
       </div>
 
       {showModal && <RewardModal lang={lang} onConfirm={handleCreate} onClose={() => setShowModal(false)} />}
+
+      {confirmDeleteId && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4">
+            <h2 className="font-display font-extrabold text-xl text-ink text-center">
+              {lang === 'ar' ? 'حذف المكافأة؟' : 'Delete reward?'}
+            </h2>
+            <p className="font-body text-sm text-muted text-center">
+              {lang === 'ar' ? 'لا يمكن التراجع عن هذا الإجراء.' : 'This cannot be undone.'}
+            </p>
+            <button onClick={confirmDelete}
+              className="w-full py-4 bg-red-500 text-white font-display font-bold text-lg rounded-2xl active:opacity-80">
+              {lang === 'ar' ? 'نعم، احذف' : 'Yes, delete'}
+            </button>
+            <button onClick={() => setConfirmDeleteId(null)}
+              className="w-full py-3 text-muted font-body font-bold text-sm text-center">
+              {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
