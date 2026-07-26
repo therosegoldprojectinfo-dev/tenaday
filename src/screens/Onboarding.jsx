@@ -137,10 +137,19 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
     setTimeout(() => setScreen('language'), 600)
   }
 
+  const [turnstileToken, setTurnstileToken] = useState('')
+
+  useEffect(() => {
+    function handleTurnstile(e) { setTurnstileToken(e.detail) }
+    window.addEventListener('turnstile-success', handleTurnstile)
+    return () => window.removeEventListener('turnstile-success', handleTurnstile)
+  }, [])
+
   async function handleCreateAccount() {
     if (pin !== confirmPin) { setAuthError(s.error_pin_match); return }
     if (pin.length !== 4)   { setAuthError(s.error_pin_length); return }
     if (phone.length < 8)   { setAuthError(s.error_phone); return }
+    if (!turnstileToken)    { setAuthError('Please complete the security check'); return }
     setLoading(true)
     setAuthError('')
     try {
@@ -148,6 +157,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       const { error } = await supabase.auth.signUp({
         email: fakeEmail,
         password: pin + pin.slice(0, 2),
+        options: { captchaToken: turnstileToken },
       })
       if (error) throw error
       const { data: { user } } = await supabase.auth.getUser()
@@ -155,6 +165,9 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       setScreen('graffiti')
     } catch (e) {
       setAuthError(e.message || 'Something went wrong')
+      setTurnstileToken('')
+      // Reset Turnstile widget
+      if (window.turnstile) window.turnstile.reset()
     } finally {
       setLoading(false)
     }
@@ -319,7 +332,17 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
                 className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 font-display font-bold text-2xl text-ink outline-none focus:border-duo transition-colors tracking-[1rem]" />
             </div>
             {authError && <p className="font-body text-sm text-red-500 font-bold text-center">{authError}</p>}
-            <button onClick={handleCreateAccount} disabled={loading || !phone || pin.length !== 4 || confirmPin.length !== 4}
+
+            {/* Turnstile CAPTCHA */}
+            <div
+              className="cf-turnstile"
+              data-sitekey={import.meta.env.VITE_TURNSTILE_SITE_KEY}
+              data-callback="onTurnstileSuccess"
+              data-theme="light"
+              data-size="flexible"
+            />
+
+            <button onClick={handleCreateAccount} disabled={loading || !phone || pin.length !== 4 || confirmPin.length !== 4 || !turnstileToken}
               className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-lg rounded-2xl py-4 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all">
               {loading ? s.creating : s.create_cta}
             </button>
