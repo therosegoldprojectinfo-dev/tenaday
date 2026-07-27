@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getRewards, createReward, deleteReward, getClaims, approveClaim, getCoinBalance } from '../lib/economy'
+import { getRewards, createReward, deleteReward, getClaims, approveClaim } from '../lib/economy'
 import { getKids } from '../lib/kids'
 import { useLang } from '../lib/LangContext'
 import { useKid } from '../lib/KidContext'
