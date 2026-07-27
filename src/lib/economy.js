@@ -92,6 +92,11 @@ export async function approveClaim(claimId) {
   if (error) throw new Error(error.message)
 }
 
+export async function rejectClaim(claimId) {
+  const { error } = await supabase.rpc('reject_claim_for_family', { p_claim_id: claimId })
+  if (error) throw new Error(error.message)
+}
+
 // ── Streak (per kid) ─────────────────────────────────────────────
 
 export async function getStreak(kidId) {
