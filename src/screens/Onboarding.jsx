@@ -124,7 +124,6 @@ function firePixel(event, params = {}) {
 
 export default function Onboarding({ onComplete, onLanguageChange }) {
   const [screen, setScreen]         = useState('language')
-  const [mascotSmall, setMascotSmall] = useState(false)
   const [language, setLanguage]     = useState('en')
   const [goal, setGoal]             = useState(null)
   const [phone, setPhone]           = useState('')
@@ -137,12 +136,6 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
 
   const s = STRINGS[language] || STRINGS.en
   const dir = s.dir
-
-  function handleStart() {
-    firePixel('Lead', { content_name: 'Started Onboarding' })
-    setMascotSmall(true)
-    setTimeout(() => setScreen('language'), 600)
-  }
 
   // Derive a high-entropy password from phone + PIN using SHA-256
   // This means the Auth password is never guessable from PIN alone
