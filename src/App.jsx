@@ -32,6 +32,7 @@ export default function App() {
   const [onboarded, setOnboarded]     = useState(null)
   const [tab, setTab]                 = useState('chapters')
   const [pinUnlocked, setPinUnlocked] = useState(false)
+  const [parentZoneDefaultTab, setParentZoneDefaultTab] = useState('rewards')
   const [kids, setKids]               = useState([])
   const [activeKid, setActiveKid]     = useState(null)
 
@@ -115,7 +116,7 @@ export default function App() {
 
   function handleTabChange(newTab) {
     setTab(newTab)
-    if (newTab !== 'parent_zone') setPinUnlocked(false)
+    if (newTab !== 'parent_zone') { setPinUnlocked(false); setParentZoneDefaultTab('rewards') }
     go({ screen: newTab, chapter: null, exam: null, revisionExams: [] })
   }
 
@@ -200,12 +201,12 @@ export default function App() {
               />
             )}
 
-            {screen === 'rewards'     && <Rewards kidId={activeKid?.id} onNavigateToParentZone={() => go({ screen: 'parent_zone' })} />}
+            {screen === 'rewards'     && <Rewards kidId={activeKid?.id} onNavigateToParentZone={() => { setParentZoneDefaultTab('claims'); go({ screen: 'parent_zone' }) }} />}
 
             {screen === 'parent_zone' && !pinUnlocked && (
               <PinGate onSuccess={() => setPinUnlocked(true)} onBack={() => go({ screen: 'chapters' })} />
             )}
-            {screen === 'parent_zone' && pinUnlocked && <ParentZone />}
+            {screen === 'parent_zone' && pinUnlocked && <ParentZone defaultTab={parentZoneDefaultTab} />}
 
             {screen === 'profile' && (
               <Profile
