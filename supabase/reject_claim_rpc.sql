@@ -213,7 +213,9 @@ BEGIN
   SELECT parent_pin INTO stored_pin
   FROM profiles WHERE id = auth.uid();
 
-  IF stored_pin IS NOT NULL AND stored_pin = input_pin THEN
+  -- Constant-time comparison: always evaluate both branches regardless of NULL
+  -- Using coalesce ensures we never short-circuit on a missing PIN
+  IF coalesce(stored_pin, '') = input_pin AND stored_pin IS NOT NULL THEN
     DELETE FROM pin_attempts WHERE user_id = auth.uid();
     INSERT INTO parent_sessions (user_id, verified_until)
     VALUES (auth.uid(), now() + interval '30 minutes')
