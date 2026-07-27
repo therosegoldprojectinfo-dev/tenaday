@@ -70,10 +70,10 @@ export default function ParentZone() {
     finally { setApproving(null) }
   }
 
-  async function handleReject(claimId, kidId, cost) {
+  async function handleReject(claimId) {
     setRejecting(claimId)
     try {
-      await supabase.rpc('reject_claim_for_family', { p_claim_id: claimId, p_kid_id: kidId, p_refund: cost })
+      await supabase.rpc('reject_claim_for_family', { p_claim_id: claimId })
       await load()
     } catch (e) { console.error(e) }
     finally { setRejecting(null) }
@@ -203,7 +203,7 @@ export default function ParentZone() {
                             {approving === claim.id ? '...' : t(lang, 'parent_approve')}
                           </button>
                           <button
-                            onClick={() => handleReject(claim.id, claim.kid_id, claim.rewards?.cost)}
+                            onClick={() => handleReject(claim.id)}
                             disabled={approving === claim.id || rejecting === claim.id}
                             className="px-3 py-2 rounded-xl bg-red-100 text-red-500 font-display font-bold text-xs transition-all active:translate-y-0.5">
                             {rejecting === claim.id ? '...' : (lang === 'ar' ? 'رفض' : 'Deny')}
