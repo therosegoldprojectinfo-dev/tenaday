@@ -319,18 +319,6 @@ export default function Quiz({ exam, onDone, kidId }) {
       return
     }
 
-    // Track consecutive correct for fire mode
-    const wasCorrect = checkCorrect(q.type === 'fill_blank' ? typedValue : selected)
-    if (wasCorrect) {
-      setConsecutiveCorrect(c => {
-        const next = c + 1
-        if (next >= 2) setFireKey(k => k + 1) // new burst each correct answer in streak
-        return next
-      })
-    } else {
-      setConsecutiveCorrect(0)
-    }
-
     setIdx(i => i + 1)
     setSelected(null)
     setRevealed(false)
@@ -342,6 +330,16 @@ export default function Quiz({ exam, onDone, kidId }) {
     if (!answer && answer !== false) return
     setSelected(q.type === 'fill_blank' ? typedValue : selected)
     setRevealed(true)
+    // Trigger fire burst at reveal time, not at continue
+    if (checkCorrect(answer)) {
+      setConsecutiveCorrect(c => {
+        const next = c + 1
+        if (next >= 2) setFireKey(k => k + 1)
+        return next
+      })
+    } else {
+      setConsecutiveCorrect(0)
+    }
   }
 
   if (showStreak) {
