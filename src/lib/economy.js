@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient'
-import { addCoinsToKid, updateKidStreak, getKidProfile } from './kids'
+import { updateKidStreak, getKidProfile } from './kids'
 
 // ── Profile (parent-level) ────────────────────────────────────────
 
@@ -22,11 +22,6 @@ export async function getProfile() {
 }
 
 // ── Coins (per kid) ───────────────────────────────────────────────
-
-export async function addCoins(amount, kidId) {
-  if (!kidId) throw new Error('kidId is required')
-  return addCoinsToKid(kidId, amount)
-}
 
 // Server-derives coin amount from exam's question count — client cannot supply amount
 export async function completeQuiz(examId, kidId) {
