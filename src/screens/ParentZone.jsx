@@ -1,28 +1,50 @@
 import { useState, useEffect } from 'react'
 import { getRewards, createReward, deleteReward, getClaims, approveClaim, getCoinBalance } from '../lib/economy'
+import { getKids } from '../lib/kids'
 import { useLang } from '../lib/LangContext'
+import { useKid } from '../lib/KidContext'
 import { t } from '../lib/i18n'
+import { supabase } from '../lib/supabaseClient'
 
 function CoinIcon({ size = 24 }) {
   return <img src="/coin.png" width={size} height={size} alt="coin" style={{ objectFit: 'contain' }} />
 }
 
+const PLANET_AVATARS = ['🪐', '🌍', '🌙', '⭐', '🌟', '☀️', '🌎', '🌏', '🌑', '💫']
+
 export default function ParentZone() {
   const lang = useLang()
+  const { kids } = useKid()
   const [rewards, setRewards]     = useState([])
   const [claims, setClaims]       = useState([])
-  const [balance, setBalance]     = useState(0)
+  const [kidBalances, setKidBalances] = useState({})
   const [loading, setLoading]     = useState(true)
   const [tab, setTab]             = useState('rewards')
   const [showModal, setShowModal] = useState(false)
   const [approving, setApproving] = useState(null)
+  const [rejecting, setRejecting] = useState(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
 
   useEffect(() => { load() }, [])
 
   async function load() {
     try {
-      const [r, c, b] = await Promise.all([getRewards(), getClaims(), getCoinBalance()])
-      setRewards(r); setClaims(c); setBalance(b)
+      // Load rewards + ALL claims (no kidId filter — parent sees all)
+      const [r, c] = await Promise.all([getRewards(), getClaims()])
+      setRewards(r)
+      setClaims(c)
+
+      // Load real balance per kid
+      const balances = {}
+      for (const kid of kids) {
+        const { data } = await supabase
+          .from('kid_profiles')
+          .select('coin_balance')
+          .eq('id', kid.id)
+          .single()
+        balances[kid.id] = data?.coin_balance || 0
+      }
+      setKidBalances(balances)
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
   }
@@ -33,12 +55,6 @@ export default function ParentZone() {
     await load()
   }
 
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
-
-  async function handleDelete(id) {
-    setConfirmDeleteId(id)
-  }
-
   async function confirmDelete() {
     await deleteReward(confirmDeleteId)
     setConfirmDeleteId(null)
@@ -47,9 +63,30 @@ export default function ParentZone() {
 
   async function handleApprove(claimId) {
     setApproving(claimId)
-    await approveClaim(claimId)
-    await load()
-    setApproving(null)
+    try {
+      await approveClaim(claimId)
+      await load()
+    } catch (e) { console.error(e) }
+    finally { setApproving(null) }
+  }
+
+  async function handleReject(claimId, kidId, cost) {
+    setRejecting(claimId)
+    try {
+      await supabase.rpc('reject_claim_for_family', { p_claim_id: claimId, p_kid_id: kidId, p_refund: cost })
+      await load()
+    } catch (e) { console.error(e) }
+    finally { setRejecting(null) }
+  }
+
+  function getKidName(kidId) {
+    const kid = kids.find(k => k.id === kidId)
+    return kid?.name || '?'
+  }
+
+  function getKidAvatar(kidId) {
+    const idx = kids.findIndex(k => k.id === kidId)
+    return PLANET_AVATARS[idx % PLANET_AVATARS.length] || '🌍'
   }
 
   const pendingClaims = claims.filter(c => c.status === 'pending')
@@ -75,13 +112,23 @@ export default function ParentZone() {
           )}
         </div>
 
-        <div className="flex-shrink-0 flex items-center gap-3 bg-amber-50 border-2 border-amber-200 rounded-2xl px-5 py-3 mb-5">
-          <CoinIcon size={64} />
-          <div>
-            <p className="font-body text-xs text-amber-600 font-bold uppercase tracking-widest">{t(lang, 'parent_balance_label')}</p>
-            <p className="font-display font-bold text-xl text-amber-500">{balance} {t(lang, 'rewards_balance_unit')}</p>
+        {/* Per-kid balances */}
+        {kids.length > 0 && (
+          <div className="flex-shrink-0 flex gap-3 mb-5 overflow-x-auto pb-1">
+            {kids.map((kid, i) => (
+              <div key={kid.id} className="flex-shrink-0 flex items-center gap-2 bg-amber-50 border-2 border-amber-200 rounded-2xl px-4 py-3">
+                <span style={{ fontSize: 24 }}>{PLANET_AVATARS[i % PLANET_AVATARS.length]}</span>
+                <div>
+                  <p className="font-display font-bold text-sm text-ink">{kid.name}</p>
+                  <div className="flex items-center gap-1">
+                    <CoinIcon size={14} />
+                    <span className="font-body font-bold text-xs text-amber-600">{kidBalances[kid.id] ?? '...'}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+        )}
 
         <div className="flex-shrink-0 flex gap-2 mb-4">
           {['rewards', 'claims'].map(tabId => (
@@ -107,7 +154,7 @@ export default function ParentZone() {
                       <span className="font-body text-xs text-amber-600 font-bold">{reward.cost} {t(lang, 'rewards_balance_unit')}</span>
                     </div>
                   </div>
-                  <button onClick={() => handleDelete(reward.id)} className="text-gray-300 font-body text-sm active:text-red-400">🗑️</button>
+                  <button onClick={() => setConfirmDeleteId(reward.id)} className="text-gray-300 font-body text-sm active:text-red-400">🗑️</button>
                 </div>
               ))}
               <button onClick={() => setShowModal(true)}
@@ -126,27 +173,44 @@ export default function ParentZone() {
                 </div>
               ) : (
                 claims.map(claim => (
-                  <div key={claim.id} className={`border-2 rounded-2xl px-5 py-4 flex items-center gap-4 ${
+                  <div key={claim.id} className={`border-2 rounded-2xl px-5 py-4 flex flex-col gap-3 ${
                     claim.status === 'pending' ? 'border-amber-200 bg-amber-50' : 'border-gray-100 bg-white'
                   }`}>
-                    <span style={{ fontSize: 28 }}>{claim.status === 'approved' ? '✅' : '⏳'}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-display font-bold text-base text-ink">{claim.rewards?.name}</p>
-                      <div className="flex items-center gap-1">
-                        <CoinIcon size={14} />
-                        <span className="font-body text-xs text-amber-600 font-bold">{claim.rewards?.cost} {t(lang, 'rewards_balance_unit')}</span>
-                      </div>
+                    {/* Kid info */}
+                    <div className="flex items-center gap-2">
+                      <span style={{ fontSize: 18 }}>{getKidAvatar(claim.kid_id)}</span>
+                      <span className="font-body font-bold text-sm text-muted">{getKidName(claim.kid_id)}</span>
                     </div>
-                    {claim.status === 'pending' && (
-                      <button
-                        onClick={() => handleApprove(claim.id)}
-                        disabled={approving === claim.id}
-                        className="px-4 py-2 rounded-xl bg-duo text-white font-display font-bold text-sm transition-all active:translate-y-0.5"
-                        style={{ boxShadow: '0 3px 0 #46a302' }}
-                      >
-                        {approving === claim.id ? '...' : t(lang, 'parent_approve')}
-                      </button>
-                    )}
+                    {/* Claim row */}
+                    <div className="flex items-center gap-4">
+                      <span style={{ fontSize: 24 }}>
+                        {claim.status === 'approved' ? '✅' : claim.status === 'rejected' ? '❌' : '⏳'}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-display font-bold text-base text-ink">{claim.rewards?.name}</p>
+                        <div className="flex items-center gap-1">
+                          <CoinIcon size={14} />
+                          <span className="font-body text-xs text-amber-600 font-bold">{claim.rewards?.cost} {t(lang, 'rewards_balance_unit')}</span>
+                        </div>
+                      </div>
+                      {claim.status === 'pending' && (
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleApprove(claim.id)}
+                            disabled={approving === claim.id || rejecting === claim.id}
+                            className="px-3 py-2 rounded-xl bg-duo text-white font-display font-bold text-xs transition-all active:translate-y-0.5"
+                            style={{ boxShadow: '0 3px 0 #46a302' }}>
+                            {approving === claim.id ? '...' : t(lang, 'parent_approve')}
+                          </button>
+                          <button
+                            onClick={() => handleReject(claim.id, claim.kid_id, claim.rewards?.cost)}
+                            disabled={approving === claim.id || rejecting === claim.id}
+                            className="px-3 py-2 rounded-xl bg-red-100 text-red-500 font-display font-bold text-xs transition-all active:translate-y-0.5">
+                            {rejecting === claim.id ? '...' : (lang === 'ar' ? 'رفض' : 'Deny')}
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))
               )}
