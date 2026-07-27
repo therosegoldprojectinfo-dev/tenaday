@@ -232,6 +232,9 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       <OnboardingShell dir="ltr">
         <div className="flex flex-col flex-1 px-6 overflow-y-auto">
           <div className="flex-shrink-0 pt-6 pb-4"><ProgressBar step={1} /></div>
+          <div className="flex-shrink-0 mb-4">
+            <h1 className="font-display font-extrabold text-3xl text-ink">Welcome to Numio! 👋</h1>
+          </div>
           <div className="flex-shrink-0 flex items-start gap-3 mb-6">
             <img src="/mascot.png" alt="" className="w-12 h-12 object-contain flex-shrink-0" />
             <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3">
