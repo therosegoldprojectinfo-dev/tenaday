@@ -38,7 +38,7 @@ export const translations = {
     home_snap: 'Snap your notes or textbook 📸',
     home_cta: '📸 Take Photo or Select',
     home_generating: 'Generating your quiz...',
-    home_reading: 'Claude is reading the image ✨',
+    home_reading: 'Numio is reading the image ✨',
     home_error_title: 'Something went wrong',
     home_try_again: 'Try Again',
 
@@ -181,7 +181,7 @@ export const translations = {
     home_snap: 'صوّر ملاحظاتك أو كتابك المدرسي 📸',
     home_cta: '📸 التقط صورة أو اختر',
     home_generating: 'جارٍ إنشاء الاختبار...',
-    home_reading: 'كلود يقرأ الصورة ✨',
+    home_reading: 'Numio يقرأ الصورة ✨',
     home_error_title: 'حدث خطأ ما',
     home_try_again: 'حاول مجدداً',
 
