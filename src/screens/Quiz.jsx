@@ -212,9 +212,9 @@ function FireModeOverlay() {
   const pieces = Array.from({ length: 60 }, (_, i) => ({
     id: i,
     left: Math.random() * 100,
-    delay: (Math.random() * 2).toFixed(2),
-    duration: (1.5 + Math.random() * 1.5).toFixed(2),
-    size: 20 + Math.random() * 20,
+    delay: (Math.random() * 0.3).toFixed(2),
+    duration: (1.3 + Math.random() * 0.4).toFixed(2),
+    size: i < 30 ? 80 + Math.random() * 40 : 80 + Math.random() * 40,
     isMascot: i < 30,
   }))
 
