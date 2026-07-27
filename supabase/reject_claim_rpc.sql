@@ -13,46 +13,6 @@ CREATE TABLE IF NOT EXISTS parent_sessions (
 ALTER TABLE parent_sessions ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON parent_sessions FROM anon, authenticated;
 
--- Update verify_parent_pin to set a 30-minute parent session
-CREATE OR REPLACE FUNCTION verify_parent_pin(input_pin text)
-RETURNS boolean
-LANGUAGE plpgsql
-SECURITY DEFINER
-SET search_path = public
-AS $$
-DECLARE
-  stored_pin text;
-  recent_attempts int;
-BEGIN
-  -- Rate limit: max 5 attempts in last 15 minutes
-  SELECT COUNT(*) INTO recent_attempts
-  FROM pin_attempts
-  WHERE user_id = auth.uid()
-    AND attempt_time > now() - interval '15 minutes';
-
-  IF recent_attempts >= 5 THEN
-    RAISE EXCEPTION 'Too many attempts. Try again in 15 minutes.';
-  END IF;
-
-  INSERT INTO pin_attempts (user_id) VALUES (auth.uid());
-
-  SELECT parent_pin INTO stored_pin
-  FROM profiles WHERE id = auth.uid();
-
-  -- Constant-time comparison: coalesce prevents short-circuit on NULL
-  IF coalesce(stored_pin, '') = input_pin AND stored_pin IS NOT NULL THEN
-    DELETE FROM pin_attempts WHERE user_id = auth.uid();
-    -- Grant 30-minute parent session
-    INSERT INTO parent_sessions (user_id, verified_until)
-    VALUES (auth.uid(), now() + interval '30 minutes')
-    ON CONFLICT (user_id) DO UPDATE SET verified_until = now() + interval '30 minutes';
-    RETURN true;
-  END IF;
-
-  RETURN false;
-END;
-$$;
-
 -- Helper: check if current user has an active parent session
 CREATE OR REPLACE FUNCTION is_parent_verified()
 RETURNS boolean
@@ -214,8 +174,9 @@ BEGIN
   SELECT parent_pin INTO stored_pin
   FROM profiles WHERE id = auth.uid();
 
-  -- Constant-time comparison: always evaluate both branches regardless of NULL
-  -- Using coalesce ensures we never short-circuit on a missing PIN
+  -- Hash comparison: coalesce on NULL prevents early exit on missing PIN
+  -- Inputs are fixed-length SHA-256 hex strings (64 chars); network jitter
+  -- far exceeds any byte-level timing signal in practice
   IF coalesce(stored_pin, '') = input_pin AND stored_pin IS NOT NULL THEN
     DELETE FROM pin_attempts WHERE user_id = auth.uid();
     INSERT INTO parent_sessions (user_id, verified_until)
