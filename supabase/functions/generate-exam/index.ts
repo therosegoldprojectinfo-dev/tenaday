@@ -148,7 +148,7 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
-        max_tokens: 1500, // Hard ceiling: ~$0.005/request max at Sonnet pricing
+        max_tokens: 4000,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content }],
       }),
