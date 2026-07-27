@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient'
-import { addCoinsToKid, deductCoinsFromKid, updateKidStreak, getKidProfile } from './kids'
+import { addCoinsToKid, updateKidStreak, getKidProfile } from './kids'
 
 // ── Profile (parent-level) ────────────────────────────────────────
 
@@ -24,21 +24,13 @@ export async function getProfile() {
 // ── Coins (per kid) ───────────────────────────────────────────────
 
 export async function addCoins(amount, kidId) {
-  if (kidId) return addCoinsToKid(kidId, amount)
-  // fallback legacy
-  const { data: { user } } = await supabase.auth.getUser()
-  const profile = await getProfile()
-  const newBalance = (profile?.coin_balance || 0) + amount
-  const { data } = await supabase.from('profiles').update({ coin_balance: newBalance }).eq('id', user.id).select().single()
-  return data
+  if (!kidId) throw new Error('kidId is required')
+  return addCoinsToKid(kidId, amount)
 }
 
 export async function getCoinBalance(kidId) {
-  if (kidId) {
-    const profile = await getKidProfile(kidId)
-    return profile?.coin_balance || 0
-  }
-  const profile = await getProfile()
+  if (!kidId) throw new Error('kidId is required')
+  const profile = await getKidProfile(kidId)
   return profile?.coin_balance || 0
 }
 
@@ -78,8 +70,6 @@ export async function getClaims(kidId) {
     .select('*, rewards(name, cost)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-  // If kidId provided, filter to that kid only (kid's own history view)
-  // If no kidId, return ALL claims (parent overview)
   if (kidId) query = query.eq('kid_id', kidId)
   const { data, error } = await query
   if (error) throw error
@@ -87,30 +77,14 @@ export async function getClaims(kidId) {
 }
 
 export async function claimReward(rewardId, rewardCost, kidId) {
-  if (kidId) {
-    const { data, error } = await supabase.rpc('claim_reward_for_kid', {
-      p_reward_id: rewardId,
-      p_kid_id: kidId,
-    })
-    if (error) throw new Error(error.message)
-    // Refresh balance
-    const profile = await getKidProfile(kidId)
-    return { claim: { id: data }, newBalance: profile.coin_balance }
-  }
-
-  // Legacy fallback
-  const { data: { user } } = await supabase.auth.getUser()
-  const profile = await getProfile()
-  const newBalance = (profile?.coin_balance || 0) - rewardCost
-  if (newBalance < 0) throw new Error('Not enough coins')
-  await supabase.from('profiles').update({ coin_balance: newBalance }).eq('id', user.id)
-  const { data, error } = await supabase
-    .from('claims')
-    .insert({ reward_id: rewardId, user_id: user.id, status: 'pending' })
-    .select()
-    .single()
-  if (error) throw error
-  return { claim: data, newBalance }
+  if (!kidId) throw new Error('kidId is required')
+  const { data, error } = await supabase.rpc('claim_reward_for_kid', {
+    p_reward_id: rewardId,
+    p_kid_id: kidId,
+  })
+  if (error) throw new Error(error.message)
+  const profile = await getKidProfile(kidId)
+  return { claim: { id: data }, newBalance: profile.coin_balance }
 }
 
 export async function approveClaim(claimId) {
@@ -121,28 +95,12 @@ export async function approveClaim(claimId) {
 // ── Streak (per kid) ─────────────────────────────────────────────
 
 export async function getStreak(kidId) {
-  if (kidId) {
-    const profile = await getKidProfile(kidId)
-    return { count: profile?.streak_count || 0, lastDate: profile?.streak_last_date || null }
-  }
-  const profile = await getProfile()
+  if (!kidId) throw new Error('kidId is required')
+  const profile = await getKidProfile(kidId)
   return { count: profile?.streak_count || 0, lastDate: profile?.streak_last_date || null }
 }
 
 export async function updateStreak(kidId) {
-  if (kidId) return updateKidStreak(kidId)
-
-  // Legacy fallback
-  const { data: { user } } = await supabase.auth.getUser()
-  const profile = await getProfile()
-  const today = new Date().toISOString().slice(0, 10)
-  const lastDate = profile?.streak_last_date || null
-  const currentStreak = profile?.streak_count || 0
-  if (lastDate === today) return { streakCount: currentStreak, isNewDay: false, previousStreak: currentStreak }
-  const yesterday = new Date()
-  yesterday.setDate(yesterday.getDate() - 1)
-  const yesterdayStr = yesterday.toISOString().slice(0, 10)
-  const newStreak = lastDate === yesterdayStr ? currentStreak + 1 : 1
-  await supabase.from('profiles').update({ streak_count: newStreak, streak_last_date: today }).eq('id', user.id)
-  return { streakCount: newStreak, isNewDay: true, previousStreak: currentStreak }
+  if (!kidId) throw new Error('kidId is required')
+  return updateKidStreak(kidId)
 }
