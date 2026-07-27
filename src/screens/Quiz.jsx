@@ -232,6 +232,8 @@ export default function Quiz({ exam, onDone, kidId }) {
 
   const isCorrect = revealed && checkCorrect(q?.type === 'fill_blank' ? typedValue : selected)
 
+  const [coinSaveError, setCoinSaveError] = useState(false)
+
   async function handleContinue() {
     const answer    = q.type === 'fill_blank' ? typedValue : selected
     const newAnswers = [...answers, answer]
@@ -240,6 +242,7 @@ export default function Quiz({ exam, onDone, kidId }) {
     if (idx === total - 1) {
       // Last question — award coins + update streak, then show results
       setSaving(true)
+      setCoinSaveError(false)
       try {
         await addCoins(COINS_PER_QUESTION * total, kidId)
         const { streakCount: sc, isNewDay } = await updateStreak(kidId)
@@ -251,7 +254,9 @@ export default function Quiz({ exam, onDone, kidId }) {
         }
       } catch (e) {
         console.error('End of quiz error:', e)
-        setShowResults(true)
+        // Don't show results with misleading coin count — show retry
+        setCoinSaveError(true)
+        setSaving(false)
       }
       setSaving(false)
       return
@@ -276,6 +281,39 @@ export default function Quiz({ exam, onDone, kidId }) {
         streakCount={streakCount}
         onClose={() => { setShowStreak(false); setShowResults(true) }}
       />
+    )
+  }
+
+  if (coinSaveError) {
+    return (
+      <div className="flex items-center justify-center bg-white" style={{ height: '100dvh' }}>
+        <div className="flex flex-col items-center gap-6 px-8 max-w-sm text-center">
+          <img src="/mascot.png" alt="Numio" className="w-28 h-auto" />
+          <p className="font-display font-bold text-xl text-ink">
+            {lang === 'ar' ? 'تعذّر حفظ عملاتك 😅' : "Couldn't save your coins 😅"}
+          </p>
+          <p className="font-body text-sm text-muted">
+            {lang === 'ar' ? 'تحقق من اتصالك بالإنترنت وحاول مجدداً' : 'Check your connection and try again'}
+          </p>
+          <button
+            onClick={async () => {
+              setCoinSaveError(false)
+              setSaving(true)
+              try {
+                await addCoins(COINS_PER_QUESTION * total, kidId)
+                const { streakCount: sc, isNewDay } = await updateStreak(kidId)
+                if (isNewDay) { setStreakCount(sc); setShowStreak(true) }
+                else setShowResults(true)
+              } catch { setCoinSaveError(true) }
+              setSaving(false)
+            }}
+            className="w-full bg-duo text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:translate-y-1"
+            style={{ boxShadow: '0 4px 0 #46a302' }}
+          >
+            {lang === 'ar' ? 'حاول مجدداً' : 'Try again'}
+          </button>
+        </div>
+      </div>
     )
   }
 
