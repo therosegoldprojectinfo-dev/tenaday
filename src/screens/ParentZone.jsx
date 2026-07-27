@@ -23,7 +23,8 @@ export default function ParentZone() {
   const [showModal, setShowModal] = useState(false)
   const [approving, setApproving] = useState(null)
   const [rejecting, setRejecting] = useState(null)
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+  const [confirmDeleteId,  setConfirmDeleteId]  = useState(null)
+  const [confirmRejectId,  setConfirmRejectId]  = useState(null)
 
   useEffect(() => { load() }, [])
 
@@ -203,7 +204,7 @@ export default function ParentZone() {
                             {approving === claim.id ? '...' : t(lang, 'parent_approve')}
                           </button>
                           <button
-                            onClick={() => handleReject(claim.id)}
+                            onClick={() => setConfirmRejectId(claim.id)}
                             disabled={approving === claim.id || rejecting === claim.id}
                             className="px-3 py-2 rounded-xl bg-red-100 text-red-500 font-display font-bold text-xs transition-all active:translate-y-0.5">
                             {rejecting === claim.id ? '...' : t(lang, 'parent_deny')}
@@ -220,6 +221,28 @@ export default function ParentZone() {
       </div>
 
       {showModal && <RewardModal lang={lang} onConfirm={handleCreate} onClose={() => setShowModal(false)} />}
+
+      {confirmRejectId && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4">
+            <h2 className="font-display font-extrabold text-xl text-ink text-center">
+              {lang === 'ar' ? 'رفض الطلب؟' : 'Reject this claim?'}
+            </h2>
+            <p className="font-body text-sm text-muted text-center">
+              {lang === 'ar' ? 'سيُعاد رصيد العملات إلى الطفل.' : 'Coins will be refunded to the child.'}
+            </p>
+            <button
+              onClick={async () => { await handleReject(confirmRejectId); setConfirmRejectId(null) }}
+              className="w-full py-4 bg-red-500 text-white font-display font-bold text-lg rounded-2xl active:opacity-80">
+              {lang === 'ar' ? 'نعم، ارفض' : 'Yes, reject'}
+            </button>
+            <button onClick={() => setConfirmRejectId(null)}
+              className="w-full py-3 text-muted font-body font-bold text-sm text-center">
+              {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {confirmDeleteId && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
