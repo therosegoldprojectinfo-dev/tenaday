@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { addCoins, updateStreak } from '../lib/economy'
+import { completeQuiz, updateStreak } from '../lib/economy'
 import StreakPopup from './StreakPopup'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
@@ -244,7 +244,7 @@ export default function Quiz({ exam, onDone, kidId }) {
       setSaving(true)
       setCoinSaveError(false)
       try {
-        await addCoins(COINS_PER_QUESTION * total, kidId)
+        await completeQuiz(exam.id, kidId)
         const { streakCount: sc, isNewDay } = await updateStreak(kidId)
         if (isNewDay) {
           setStreakCount(sc)
@@ -300,7 +300,7 @@ export default function Quiz({ exam, onDone, kidId }) {
               setCoinSaveError(false)
               setSaving(true)
               try {
-                await addCoins(COINS_PER_QUESTION * total, kidId)
+                await completeQuiz(exam.id, kidId)
                 const { streakCount: sc, isNewDay } = await updateStreak(kidId)
                 if (isNewDay) { setStreakCount(sc); setShowStreak(true) }
                 else setShowResults(true)
