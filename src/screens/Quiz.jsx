@@ -227,7 +227,7 @@ function FireModeOverlay() {
           bottom: '-60px',
           fontSize: p.isMascot ? undefined : p.size,
           width: p.isMascot ? p.size : undefined,
-          animation: `fire-float ${p.duration}s ${p.delay}s ease-out infinite`,
+          animation: `fire-float ${p.duration}s ${p.delay}s ease-out forwards`,
         }}>
           {p.isMascot
             ? <img src="/mascot.png" alt="" style={{ width: p.size, height: p.size, objectFit: 'contain' }} />
@@ -392,7 +392,7 @@ export default function Quiz({ exam, onDone, kidId }) {
         onLeave={onDone}
       />
 
-      {onFire && <FireModeOverlay />}
+      {onFire && <FireModeOverlay key={idx} />}
 
       <div className="flex flex-col bg-white w-full max-w-sm" style={{ height: '100dvh' }}>
 
