@@ -233,6 +233,7 @@ export default function Quiz({ exam, onDone, kidId }) {
   const isCorrect = revealed && checkCorrect(q?.type === 'fill_blank' ? typedValue : selected)
 
   const [coinSaveError, setCoinSaveError] = useState(false)
+  const [coinsEarned,  setCoinsEarned]  = useState(0)
 
   async function handleContinue() {
     const answer    = q.type === 'fill_blank' ? typedValue : selected
@@ -244,7 +245,8 @@ export default function Quiz({ exam, onDone, kidId }) {
       setSaving(true)
       setCoinSaveError(false)
       try {
-        await completeQuiz(exam.id, kidId)
+        const { coinsAwarded } = await completeQuiz(exam.id, kidId)
+        setCoinsEarned(coinsAwarded)
         const { streakCount: sc, isNewDay } = await updateStreak(kidId)
         if (isNewDay) {
           setStreakCount(sc)
@@ -300,7 +302,8 @@ export default function Quiz({ exam, onDone, kidId }) {
               setCoinSaveError(false)
               setSaving(true)
               try {
-                await completeQuiz(exam.id, kidId)
+                const { coinsAwarded } = await completeQuiz(exam.id, kidId)
+                setCoinsEarned(coinsAwarded)
                 const { streakCount: sc, isNewDay } = await updateStreak(kidId)
                 if (isNewDay) { setStreakCount(sc); setShowStreak(true) }
                 else setShowResults(true)
@@ -324,7 +327,7 @@ export default function Quiz({ exam, onDone, kidId }) {
         answers={answers}
         topic={topic}
         onDone={onDone}
-        coinsEarned={COINS_PER_QUESTION * total}
+        coinsEarned={coinsEarned}
       />
     )
   }
@@ -353,7 +356,7 @@ export default function Quiz({ exam, onDone, kidId }) {
           </div>
           <div className="flex items-center gap-1">
             <CoinIcon size={24} />
-            <span className="font-display font-bold text-sm text-amber-500">{COINS_PER_QUESTION * total}</span>
+            <span className="font-display font-bold text-sm text-amber-500">{coinsEarned > 0 ? coinsEarned : COINS_PER_QUESTION * total}</span>
           </div>
           <span className="font-display font-bold text-sm text-muted">{idx + 1}/{total}</span>
         </div>
