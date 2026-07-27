@@ -356,7 +356,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
                 {language === 'ar'
                   ? 'بالمتابعة، أنت توافق على '
                   : 'By continuing, you agree to our '}
-                <a href="/privacy" target="_blank" className="text-duo underline">
+                <a href="/privacy.html" target="_blank" className="text-duo underline">
                   {language === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'}
                 </a>
               </p>
