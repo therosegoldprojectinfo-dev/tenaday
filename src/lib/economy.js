@@ -78,6 +78,8 @@ export async function getClaims(kidId) {
     .select('*, rewards(name, cost)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
+  // If kidId provided, filter to that kid only (kid's own history view)
+  // If no kidId, return ALL claims (parent overview)
   if (kidId) query = query.eq('kid_id', kidId)
   const { data, error } = await query
   if (error) throw error
