@@ -182,3 +182,48 @@ GRANT EXECUTE ON FUNCTION create_reward_for_family(text, int) TO authenticated;
 GRANT EXECUTE ON FUNCTION delete_reward_for_family(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION approve_claim_for_family(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION reject_claim_for_family(uuid) TO authenticated;
+
+-- ============================================================
+-- PIN HASH UPGRADE (previously pin_hash_migration.sql)
+-- Supersedes verify_parent_pin defined earlier in this file.
+-- Client sends SHA-256("numio-pin:"+pin), stored value is also
+-- SHA-256 hash — plaintext PIN never touches network or DB.
+-- ============================================================
+CREATE OR REPLACE FUNCTION verify_parent_pin(input_pin text)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  stored_pin text;
+  recent_attempts int;
+BEGIN
+  SELECT COUNT(*) INTO recent_attempts
+  FROM pin_attempts
+  WHERE user_id = auth.uid()
+    AND attempt_time > now() - interval '15 minutes';
+
+  IF recent_attempts >= 5 THEN
+    RAISE EXCEPTION 'Too many attempts. Try again in 15 minutes.';
+  END IF;
+
+  INSERT INTO pin_attempts (user_id) VALUES (auth.uid());
+
+  SELECT parent_pin INTO stored_pin
+  FROM profiles WHERE id = auth.uid();
+
+  IF stored_pin IS NOT NULL AND stored_pin = input_pin THEN
+    DELETE FROM pin_attempts WHERE user_id = auth.uid();
+    INSERT INTO parent_sessions (user_id, verified_until)
+    VALUES (auth.uid(), now() + interval '30 minutes')
+    ON CONFLICT (user_id) DO UPDATE SET verified_until = now() + interval '30 minutes';
+    RETURN true;
+  END IF;
+
+  RETURN false;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION verify_parent_pin(text) FROM anon;
+GRANT EXECUTE ON FUNCTION verify_parent_pin(text) TO authenticated;
