@@ -185,7 +185,8 @@ BEGIN
   FROM profiles
   WHERE id = auth.uid();
 
-  -- Constant-time comparison: coalesce prevents short-circuit on NULL
+  -- Hash comparison: coalesce on NULL prevents early exit on missing PIN
+  -- Inputs are fixed-length SHA-256 hex (64 chars); network jitter far exceeds timing signal
   IF coalesce(stored_pin, '') = input_pin AND stored_pin IS NOT NULL THEN
     -- Clear attempts on success
     DELETE FROM pin_attempts WHERE user_id = auth.uid();
