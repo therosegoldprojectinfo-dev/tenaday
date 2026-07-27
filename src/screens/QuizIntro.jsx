@@ -11,7 +11,7 @@ export default function QuizIntro({ exam, kidName = 'Champ', onStart }) {
         </div>
         <div className="flex flex-col gap-2">
           <h1 className="font-display font-extrabold text-3xl text-ink leading-tight">
-            {kidName}{t(lang, 'quiz_intro_lets_start')}
+            {kidName}, {t(lang, 'quiz_intro_lets_start')}
           </h1>
           <p className="font-display font-bold text-xl text-duo">{exam.topic}</p>
           <p className="font-body text-base text-muted mt-1">{t(lang, 'quiz_intro_you_can')}</p>
