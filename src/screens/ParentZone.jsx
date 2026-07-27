@@ -12,14 +12,14 @@ function CoinIcon({ size = 24 }) {
 
 const PLANET_AVATARS = ['🪐', '🌍', '🌙', '⭐', '🌟', '☀️', '🌎', '🌏', '🌑', '💫']
 
-export default function ParentZone() {
+export default function ParentZone({ defaultTab = 'rewards' }) {
   const lang = useLang()
   const { kids } = useKid()
   const [rewards, setRewards]     = useState([])
   const [claims, setClaims]       = useState([])
   const [kidBalances, setKidBalances] = useState({})
   const [loading, setLoading]     = useState(true)
-  const [tab, setTab]             = useState('rewards')
+  const [tab, setTab]             = useState(defaultTab)
   const [showModal, setShowModal] = useState(false)
   const [approving, setApproving] = useState(null)
   const [rejecting, setRejecting] = useState(null)
