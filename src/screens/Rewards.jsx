@@ -46,7 +46,7 @@ function Confetti() {
 }
 
 // ── Celebration Screen ────────────────────────────────────────────
-function CelebrationScreen({ rewardName, onGoShow, onParentZone, lang }) {
+function CelebrationScreen({ rewardName, onParentZone, lang }) {
   const [showParentModal, setShowParentModal] = useState(false)
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
 
@@ -145,7 +145,7 @@ export default function Rewards({ kidId, onNavigateToParentZone }) {
     setClaiming(reward.id)
     setClaimError('')
     try {
-      const { newBalance } = await claimReward(reward.id, reward.cost, kidId)
+      const { newBalance } = await claimReward(reward.id, kidId)
       setBalance(newBalance)
       await load()
       // 🎉 Show celebration screen
@@ -163,7 +163,7 @@ export default function Rewards({ kidId, onNavigateToParentZone }) {
       <CelebrationScreen
         rewardName={celebration.rewardName}
         lang={lang}
-        onGoShow={() => {/* modal closes, celebration stays */}}
+
         onParentZone={() => {
           setCelebration(null)
           onNavigateToParentZone?.()
