@@ -100,7 +100,7 @@ function CelebrationScreen({ rewardName, onGoShow, onParentZone, lang }) {
               {lang === 'ar' ? 'نعم، أنا الوالد' : "Yes, I'm the parent"}
             </button>
             <button
-              onClick={onGoShow}
+              onClick={() => setShowParentModal(false)}
               className="w-full py-3 bg-gray-100 text-ink font-display font-bold text-base rounded-2xl active:opacity-80">
               {lang === 'ar' ? 'سأذهب لأريه للوالدين' : "I'll go show it"}
             </button>
@@ -163,7 +163,7 @@ export default function Rewards({ kidId, onNavigateToParentZone }) {
       <CelebrationScreen
         rewardName={celebration.rewardName}
         lang={lang}
-        onGoShow={() => setCelebration(null)}
+        onGoShow={() => {/* modal closes, celebration stays */}}
         onParentZone={() => {
           setCelebration(null)
           onNavigateToParentZone?.()
