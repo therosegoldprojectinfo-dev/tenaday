@@ -143,10 +143,10 @@ function ChapterModal({ lang, onConfirm, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/40 flex items-end"
+      className="fixed inset-0 z-50 bg-black/40 flex items-end md:items-center md:justify-center"
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="w-full bg-white rounded-t-3xl flex flex-col" style={{ maxHeight: '90dvh' }}>
+      <div className="w-full md:max-w-lg md:rounded-3xl bg-white rounded-t-3xl flex flex-col" style={{ maxHeight: '90dvh' }}>
         <div className="flex-shrink-0 pt-3 pb-1 flex justify-center">
           <div className="w-10 h-1 rounded-full bg-gray-200" />
         </div>
@@ -170,7 +170,7 @@ function ChapterModal({ lang, onConfirm, onClose }) {
             <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">
               {t(lang, 'chapters_modal_icon_label')}
             </label>
-            <div className="grid grid-cols-6 gap-2">
+            <div className="grid grid-cols-6 md:grid-cols-8 gap-2">
               {EMOJI_OPTIONS.map(e => (
                 <button
                   key={e}
