@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getRewards, createReward, deleteReward, getClaims, approveClaim } from '../lib/economy'
+import { getRewards, createReward, deleteReward, getClaims, approveClaim, rejectClaim } from '../lib/economy'
 import { getKids } from '../lib/kids'
 import { useLang } from '../lib/LangContext'
 import { useKid } from '../lib/KidContext'
@@ -34,17 +34,17 @@ export default function ParentZone() {
       setRewards(r)
       setClaims(c)
 
-      // Load real balance per kid
-      const balances = {}
-      for (const kid of kids) {
-        const { data } = await supabase
+      // Load all kid balances in a single query
+      if (kids.length > 0) {
+        const kidIds = kids.map(k => k.id)
+        const { data: kidData } = await supabase
           .from('kid_profiles')
-          .select('coin_balance')
-          .eq('id', kid.id)
-          .single()
-        balances[kid.id] = data?.coin_balance || 0
+          .select('id, coin_balance')
+          .in('id', kidIds)
+        const balances = {}
+        for (const k of (kidData || [])) balances[k.id] = k.coin_balance || 0
+        setKidBalances(balances)
       }
-      setKidBalances(balances)
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
   }
@@ -73,7 +73,7 @@ export default function ParentZone() {
   async function handleReject(claimId) {
     setRejecting(claimId)
     try {
-      await supabase.rpc('reject_claim_for_family', { p_claim_id: claimId })
+      await rejectClaim(claimId)
       await load()
     } catch (e) { console.error(e) }
     finally { setRejecting(null) }
@@ -206,7 +206,7 @@ export default function ParentZone() {
                             onClick={() => handleReject(claim.id)}
                             disabled={approving === claim.id || rejecting === claim.id}
                             className="px-3 py-2 rounded-xl bg-red-100 text-red-500 font-display font-bold text-xs transition-all active:translate-y-0.5">
-                            {rejecting === claim.id ? '...' : (lang === 'ar' ? 'رفض' : 'Deny')}
+                            {rejecting === claim.id ? '...' : t(lang, 'parent_deny')}
                           </button>
                         </div>
                       )}
