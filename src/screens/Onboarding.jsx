@@ -123,7 +123,7 @@ function firePixel(event, params = {}) {
 }
 
 export default function Onboarding({ onComplete, onLanguageChange }) {
-  const [screen, setScreen]         = useState('welcome')
+  const [screen, setScreen]         = useState('language')
   const [mascotSmall, setMascotSmall] = useState(false)
   const [language, setLanguage]     = useState('en')
   const [goal, setGoal]             = useState(null)
@@ -228,38 +228,11 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
 
   // ── Pixel: fire ViewContent when welcome screen appears ──
   useEffect(() => {
-    if (screen === 'welcome') firePixel('ViewContent', { content_name: 'Onboarding Welcome' })
+    if (screen === 'language') firePixel('ViewContent', { content_name: 'Onboarding Welcome' })
     if (screen === 'account' && !isSignIn) firePixel('InitiateCheckout', { content_name: 'Account Creation' })
   }, [screen, isSignIn])
 
   // ── WELCOME ───────────────────────────────────────────────────────
-  if (screen === 'welcome') {
-    return (
-      <OnboardingShell dir="ltr">
-        <div className="flex flex-col items-center justify-center flex-1 px-8 gap-8 py-10">
-          <div className="transition-all duration-500" style={{ transform: mascotSmall ? 'scale(0.4) translateY(-120px)' : 'scale(1)', opacity: mascotSmall ? 0 : 1 }}>
-            <img src="/mascot.png" alt="Numio" className="w-40 h-auto" />
-          </div>
-          <div className="text-center" style={{ opacity: mascotSmall ? 0 : 1, transition: 'opacity 0.3s' }}>
-            <h1 className="font-display font-extrabold text-4xl text-ink">Welcome to Numio!</h1>
-            <p className="font-body text-base text-muted mt-2">Snap. Learn. Earn rewards. 📸</p>
-          </div>
-          <button onClick={handleStart}
-            className="w-full bg-duo text-white font-display font-bold text-xl rounded-2xl py-5 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all"
-            style={{ opacity: mascotSmall ? 0 : 1, transition: 'opacity 0.3s' }}>
-            Let's start →
-          </button>
-          <button
-            onClick={() => { setIsSignIn(true); setScreen('account') }}
-            className="font-body font-bold text-sm text-muted"
-            style={{ opacity: mascotSmall ? 0 : 1, transition: 'opacity 0.3s' }}>
-            Already have an account? Log in
-          </button>
-        </div>
-      </OnboardingShell>
-    )
-  }
-
   // ── LANGUAGE ──────────────────────────────────────────────────────
   if (screen === 'language') {
     return (
@@ -280,6 +253,11 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
             <button onClick={() => setScreen('goal')} disabled={!language}
               className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-4 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all">
               Continue →
+            </button>
+            <button
+              onClick={() => { setIsSignIn(true); setScreen('account') }}
+              className="w-full text-center font-body font-bold text-sm text-muted py-2">
+              Already have an account? Log in
             </button>
           </div>
         </div>
