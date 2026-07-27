@@ -83,7 +83,7 @@ export async function getClaims(kidId) {
   return data
 }
 
-export async function claimReward(rewardId, rewardCost, kidId) {
+export async function claimReward(rewardId, kidId) {
   if (!kidId) throw new Error('kidId is required')
   const { data, error } = await supabase.rpc('claim_reward_for_kid', {
     p_reward_id: rewardId,
