@@ -222,8 +222,8 @@ function FireModeOverlay({ streakKey, consecutiveCorrect }) {
         const size     = 28 + Math.random() * 32
         return (
           <div key={`fire-${i}`} style={{
-            position: 'absolute', bottom: -40, left: `${left}%`,
-            fontSize: size,
+            position: 'absolute', bottom: -80, left: `${left}%`,
+            fontSize: size, opacity: 0,
             animation: `fire-rise ${duration}s ${delay}s ease-out both`,
           }}>🔥</div>
         )
@@ -237,8 +237,8 @@ function FireModeOverlay({ streakKey, consecutiveCorrect }) {
         const rotate   = ((Math.random() - 0.5) * 60).toFixed(1)
         return (
           <div key={`head-${i}`} style={{
-            position: 'absolute', bottom: -60, left: `${left}%`,
-            width: size, height: size,
+            position: 'absolute', bottom: -100, left: `${left}%`,
+            width: size, height: size, opacity: 0,
             transform: `rotate(${rotate}deg)`,
             animation: `fire-rise ${duration}s ${delay}s ease-out both`,
           }}>
@@ -252,6 +252,7 @@ function FireModeOverlay({ streakKey, consecutiveCorrect }) {
           80%  { opacity: 0.9; }
           100% { transform: translateY(-110vh) rotate(180deg) scale(0.5); opacity: 0; }
         }
+        .fire-particle { opacity: 0; }
       `}</style>
     </div>
   )
