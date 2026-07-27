@@ -23,7 +23,6 @@ async function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
 
 export default function Home({ chapter, onExamReady, onBack, kidId }) {
   const lang = useLang()
-  const fileInputRef = useRef(null)
   const cameraInputRef = useRef(null)
   const [status, setStatus]   = useState('idle') // idle | review | loading | error
   const [error, setError]     = useState(null)
@@ -56,28 +55,6 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
     const newImages = files.map(file => ({ file, preview: URL.createObjectURL(file) }))
     setImages(prev => [...prev, ...newImages])
     setStatus('review')
-  }
-
-  // Called when user takes a photo with camera
-  async function handleCameraSelected(e) {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    if (images.length >= MAX_IMAGES) {
-      setError(lang === 'ar' ? `الحد الأقصى ${MAX_IMAGES} صور` : `Max ${MAX_IMAGES} images allowed`)
-      setStatus('error')
-      return
-    }
-
-    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-      setError(lang === 'ar' ? `حجم الصورة كبير جداً (الحد ${MAX_SIZE_MB}MB)` : `Image too large (max ${MAX_SIZE_MB}MB each)`)
-      setStatus('error')
-      return
-    }
-
-    setImages(prev => [...prev, { file, preview: URL.createObjectURL(file) }])
-    setStatus('review')
-    setInputKey(k => k + 1)
   }
 
   function removeImage(index) {
@@ -154,25 +131,15 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
           {/* IDLE or REVIEW state */}
           {(status === 'idle' || status === 'review') && (
             <>
-              {/* Add more pages buttons */}
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={() => { setInputKey(k => k + 1); setTimeout(() => cameraInputRef.current?.click(), 10) }}
-                  className="w-full bg-white border-2 border-gray-200 text-ink font-display font-bold text-base rounded-2xl py-4 transition-all active:translate-y-0.5 flex flex-col items-center gap-1"
-                  style={{ boxShadow: '0 3px 0 #e5e7eb' }}
-                >
-                  <span style={{ fontSize: 28 }}>📷</span>
-                  {lang === 'ar' ? 'التقط صورة' : 'Take photo'}
-                </button>
-                <button
-                  onClick={() => { setInputKey(k => k + 1); setTimeout(() => fileInputRef.current?.click(), 10) }}
-                  className="w-full bg-white border-2 border-gray-200 text-ink font-display font-bold text-base rounded-2xl py-4 transition-all active:translate-y-0.5 flex flex-col items-center gap-1"
-                  style={{ boxShadow: '0 3px 0 #e5e7eb' }}
-                >
-                  <span style={{ fontSize: 28 }}>🖼️</span>
-                  {lang === 'ar' ? 'اختر من المعرض' : 'Choose from gallery'}
-                </button>
-              </div>
+              {/* Single smart photo button */}
+              <button
+                onClick={() => { setInputKey(k => k + 1); setTimeout(() => cameraInputRef.current?.click(), 10) }}
+                className="w-full bg-duo text-white font-display font-bold text-xl rounded-2xl py-6 transition-all active:translate-y-1 flex flex-col items-center gap-2"
+                style={{ boxShadow: '0 4px 0 #46a302' }}
+              >
+                <span style={{ fontSize: 36 }}>📸</span>
+                {lang === 'ar' ? 'التقط صورة' : 'Take a photo'}
+              </button>
 
               {images.length > 0 && (
                 <>
@@ -225,21 +192,10 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
         </div>
       </div>
 
-      {/* Camera input */}
+      {/* Photo input — no capture attr: mobile shows camera+gallery sheet, desktop shows file picker */}
       <input
         key={`cam-${inputKey}`}
         ref={cameraInputRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        className="hidden"
-        onChange={handleCameraSelected}
-      />
-
-      {/* Gallery input — multiple */}
-      <input
-        key={`gal-${inputKey}`}
-        ref={fileInputRef}
         type="file"
         accept="image/*"
         multiple
