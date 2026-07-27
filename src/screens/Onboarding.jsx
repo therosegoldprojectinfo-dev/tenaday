@@ -117,6 +117,11 @@ function OptionCard({ label, icon, selected, onSelect }) {
 }
 
 // flow: welcome → language → goal → how → account → graffiti → name
+// ── Meta Pixel helper (onboarding only, stops after account creation) ──
+function firePixel(event, params = {}) {
+  try { if (window.fbq) window.fbq('track', event, params) } catch (_) {}
+}
+
 export default function Onboarding({ onComplete, onLanguageChange }) {
   const [screen, setScreen]         = useState('welcome')
   const [mascotSmall, setMascotSmall] = useState(false)
@@ -134,6 +139,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
   const dir = s.dir
 
   function handleStart() {
+    firePixel('Lead', { content_name: 'Started Onboarding' })
     setMascotSmall(true)
     setTimeout(() => setScreen('language'), 600)
   }
@@ -192,6 +198,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
         const pinHash = await hashPin(pin)
         await supabase.from('profiles').upsert({ id: user.id, parent_pin: pinHash })
       }
+      firePixel('CompleteRegistration', { content_name: 'Family Account Created' })
       setScreen('graffiti')
     } catch (e) {
       setAuthError(e.message || 'Something went wrong')
@@ -218,6 +225,12 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
   useEffect(() => {
     // no auto-advance — user taps Continue
   }, [screen])
+
+  // ── Pixel: fire ViewContent when welcome screen appears ──
+  useEffect(() => {
+    if (screen === 'welcome') firePixel('ViewContent', { content_name: 'Onboarding Welcome' })
+    if (screen === 'account' && !isSignIn) firePixel('InitiateCheckout', { content_name: 'Account Creation' })
+  }, [screen, isSignIn])
 
   // ── WELCOME ───────────────────────────────────────────────────────
   if (screen === 'welcome') {
