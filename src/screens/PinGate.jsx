@@ -30,11 +30,20 @@ export default function PinGate({ onSuccess, onBack }) {
     if (e.key === 'Backspace' && !pin[i] && i > 0) inputs.current[i - 1]?.focus()
   }
 
+  async function hashPin(pinRaw) {
+    const input = `numio-pin:${pinRaw}`
+    const encoded = new TextEncoder().encode(input)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encoded)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+  }
+
   async function verify(code) {
     setLoading(true)
     try {
-      // PIN verified server-side — PIN value never sent to client
-      const { data, error } = await supabase.rpc('verify_parent_pin', { input_pin: code })
+      // Hash PIN client-side before sending — plaintext PIN never leaves the device
+      const pinHash = await hashPin(code)
+      const { data, error } = await supabase.rpc('verify_parent_pin', { input_pin: pinHash })
       if (error) throw error
       if (data === true) {
         onSuccess()
