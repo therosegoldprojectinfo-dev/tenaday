@@ -129,3 +129,56 @@ GRANT EXECUTE ON FUNCTION add_coins_to_kid(uuid, int) TO authenticated;
 GRANT EXECUTE ON FUNCTION deduct_coins_from_kid(uuid, int) TO authenticated;
 GRANT EXECUTE ON FUNCTION update_kid_streak(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION claim_reward_for_kid(uuid, uuid) TO authenticated;
+
+-- ── Complete quiz and award coins (server-derived amount) ────────
+-- Replaces the client-supplied addCoins() call.
+-- Verifies the exam belongs to this family, derives coin amount
+-- from question count server-side — client cannot supply amount.
+-- COINS_PER_QUESTION = 2 (matches Quiz.jsx constant)
+CREATE OR REPLACE FUNCTION complete_quiz_and_award_coins(
+  p_exam_id uuid,
+  p_kid_id  uuid
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  question_count int;
+  coins_to_award int;
+  new_balance    int;
+BEGIN
+  -- Verify exam belongs to this authenticated user's family
+  SELECT jsonb_array_length(questions) INTO question_count
+  FROM exams
+  WHERE id = p_exam_id AND user_id = auth.uid();
+
+  IF NOT FOUND OR question_count IS NULL THEN
+    RAISE EXCEPTION 'Exam not found or unauthorized';
+  END IF;
+
+  -- Verify kid belongs to this family
+  IF NOT EXISTS (
+    SELECT 1 FROM kid_profiles WHERE id = p_kid_id AND user_id = auth.uid()
+  ) THEN
+    RAISE EXCEPTION 'Unauthorized';
+  END IF;
+
+  -- Derive coins server-side (2 per question) — client never supplies amount
+  coins_to_award := question_count * 2;
+
+  UPDATE kid_profiles
+  SET coin_balance = GREATEST(0, coin_balance + coins_to_award)
+  WHERE id = p_kid_id
+  RETURNING coin_balance INTO new_balance;
+
+  RETURN jsonb_build_object(
+    'coinsAwarded', coins_to_award,
+    'newBalance',   new_balance
+  );
+END;
+$$;
+
+REVOKE ALL ON FUNCTION complete_quiz_and_award_coins(uuid, uuid) FROM anon;
+GRANT EXECUTE ON FUNCTION complete_quiz_and_award_coins(uuid, uuid) TO authenticated;
