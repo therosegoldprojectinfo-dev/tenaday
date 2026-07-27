@@ -32,18 +32,6 @@ export async function getKidProfile(kidId) {
   return data
 }
 
-export async function addCoinsToKid(kidId, amount) {
-  const { data, error } = await supabase.rpc('add_coins_to_kid', { kid_id: kidId, amount })
-  if (error) throw error
-  return { coin_balance: data }
-}
-
-export async function deductCoinsFromKid(kidId, amount) {
-  const { data, error } = await supabase.rpc('deduct_coins_from_kid', { kid_id: kidId, amount })
-  if (error) throw error
-  return { newBalance: data }
-}
-
 export async function updateKidStreak(kidId) {
   const { data, error } = await supabase.rpc('update_kid_streak', { kid_id: kidId })
   if (error) throw error
