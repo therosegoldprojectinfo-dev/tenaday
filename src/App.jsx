@@ -14,6 +14,7 @@ import ParentZone from './screens/ParentZone'
 import PinGate from './screens/PinGate'
 import QuizIntro from './screens/QuizIntro'
 import Profile from './screens/Profile'
+import Privacy from './screens/Privacy'
 import { LangContext } from './lib/LangContext'
 import { KidContext } from './lib/KidContext'
 
@@ -74,6 +75,11 @@ export default function App() {
     if (!activeKid) return
     getStreak(activeKid.id).then(s => setStreak(s.count)).catch(() => {})
   }, [activeKid?.id])
+
+  // Handle /privacy route
+  if (window.location.pathname === '/privacy') {
+    return <Privacy />
+  }
 
   if (!authReady || onboarded === null) {
     return (
