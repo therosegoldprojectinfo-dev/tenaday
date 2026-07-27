@@ -138,6 +138,26 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
     setTimeout(() => setScreen('language'), 600)
   }
 
+  // Derive a high-entropy password from phone + PIN using SHA-256
+  // This means the Auth password is never guessable from PIN alone
+  async function derivePassword(phoneRaw, pinRaw) {
+    const normalized = phoneRaw.replace(/\s+/g, '')
+    const input = `numio:${normalized}:${pinRaw}:v2`
+    const encoded = new TextEncoder().encode(input)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encoded)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+  }
+
+  // Hash PIN with SHA-256 before storing in DB (never store plaintext)
+  async function hashPin(pinRaw) {
+    const input = `numio-pin:${pinRaw}`
+    const encoded = new TextEncoder().encode(input)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encoded)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+  }
+
   async function handleSignIn() {
     if (phone.length < 8)  { setAuthError(s.error_phone); return }
     if (pin.length !== 4)  { setAuthError(s.error_pin_length); return }
@@ -145,10 +165,8 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
     setAuthError('')
     try {
       const fakeEmail = `${phone.replace(/\s+/g, '')}@numio.app`
-      const { error } = await supabase.auth.signInWithPassword({
-        email: fakeEmail,
-        password: pin + pin.slice(0, 2),
-      })
+      const password = await derivePassword(phone, pin)
+      const { error } = await supabase.auth.signInWithPassword({ email: fakeEmail, password })
       if (error) throw error
       onComplete(null)
     } catch (e) {
@@ -166,13 +184,14 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
     setAuthError('')
     try {
       const fakeEmail = `${phone.replace(/\s+/g, '')}@numio.app`
-      const { error } = await supabase.auth.signUp({
-        email: fakeEmail,
-        password: pin + pin.slice(0, 2),
-      })
+      const password = await derivePassword(phone, pin)
+      const { error } = await supabase.auth.signUp({ email: fakeEmail, password })
       if (error) throw error
       const { data: { user } } = await supabase.auth.getUser()
-      if (user) await supabase.from('profiles').upsert({ id: user.id, parent_pin: pin })
+      if (user) {
+        const pinHash = await hashPin(pin)
+        await supabase.from('profiles').upsert({ id: user.id, parent_pin: pinHash })
+      }
       setScreen('graffiti')
     } catch (e) {
       setAuthError(e.message || 'Something went wrong')
