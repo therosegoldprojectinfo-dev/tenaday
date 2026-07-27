@@ -185,7 +185,8 @@ BEGIN
   FROM profiles
   WHERE id = auth.uid();
 
-  IF stored_pin IS NOT NULL AND stored_pin = input_pin THEN
+  -- Constant-time comparison: coalesce prevents short-circuit on NULL
+  IF coalesce(stored_pin, '') = input_pin AND stored_pin IS NOT NULL THEN
     -- Clear attempts on success
     DELETE FROM pin_attempts WHERE user_id = auth.uid();
     RETURN true;
