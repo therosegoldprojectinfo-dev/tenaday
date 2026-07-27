@@ -14,6 +14,7 @@ export default function Rewards({ kidId }) {
   const [balance, setBalance]   = useState(0)
   const [loading, setLoading]   = useState(true)
   const [claiming, setClaiming] = useState(null)
+  const [claimError, setClaimError] = useState('')
   const [tab, setTab]           = useState('rewards')
 
   useEffect(() => { load() }, [kidId])
@@ -26,8 +27,6 @@ export default function Rewards({ kidId }) {
     finally { setLoading(false) }
   }
 
-  const [claimError, setClaimError] = useState('')
-
   async function handleClaim(reward) {
     if (balance < reward.cost) return
     setClaiming(reward.id)
@@ -39,7 +38,8 @@ export default function Rewards({ kidId }) {
     } catch (e) {
       setClaimError(lang === 'ar' ? 'فشل الاستبدال، حاول مرة أخرى' : 'Failed to claim, please try again')
     } finally {
-      setClaiming(null) }
+      setClaiming(null)
+    }
   }
 
   if (loading) return (
@@ -79,10 +79,11 @@ export default function Rewards({ kidId }) {
           {tab === 'rewards' && (
             <>
               {claimError && (
-            <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 text-center">
-              <p className="font-body text-sm text-red-500 font-bold">{claimError}</p>
-            </div>
-          )}
+                <div className="bg-red-50 border border-red-200 rounded-2xl px-4 py-3 text-center mb-3">
+                  <p className="font-body text-sm text-red-500 font-bold">{claimError}</p>
+                </div>
+              )}
+              {rewards.length === 0 ? (
                 <div className="flex flex-col items-center justify-center pt-20 gap-4 text-center">
                   <span style={{ fontSize: 64 }}>🎁</span>
                   <p className="font-display font-extrabold text-xl text-ink">{t(lang, 'rewards_empty_title')}</p>
@@ -135,11 +136,15 @@ export default function Rewards({ kidId }) {
                 <div className="flex flex-col gap-3">
                   {claims.map(claim => (
                     <div key={claim.id} className="bg-white border-2 border-gray-100 rounded-2xl px-5 py-4 flex items-center gap-4">
-                      <span style={{ fontSize: 32 }}>{claim.status === 'approved' ? '✅' : '⏳'}</span>
+                      <span style={{ fontSize: 32 }}>{claim.status === 'approved' ? '✅' : claim.status === 'rejected' ? '❌' : '⏳'}</span>
                       <div className="flex-1 min-w-0">
                         <p className="font-display font-bold text-base text-ink truncate">{claim.rewards?.name}</p>
                         <p className="font-body text-xs text-muted">
-                          {claim.status === 'approved' ? t(lang, 'rewards_approved') : t(lang, 'rewards_pending')}
+                          {claim.status === 'approved'
+                            ? t(lang, 'rewards_approved')
+                            : claim.status === 'rejected'
+                              ? (lang === 'ar' ? 'تم الرفض من أحد الوالدين' : 'Denied by parent')
+                              : t(lang, 'rewards_pending')}
                         </p>
                       </div>
                       <div className="flex items-center gap-1">
