@@ -201,7 +201,7 @@ export default function App() {
               />
             )}
 
-            {screen === 'rewards'     && <Rewards kidId={activeKid?.id} onNavigateToParentZone={() => { setParentZoneDefaultTab('claims'); go({ screen: 'parent_zone' }) }} />}
+            {screen === 'rewards'     && <Rewards kidId={activeKid?.id} onNavigateToParentZone={() => { setParentZoneDefaultTab('claims'); setTab('parent_zone'); go({ screen: 'parent_zone' }) }} />}
 
             {screen === 'parent_zone' && !pinUnlocked && (
               <PinGate onSuccess={() => setPinUnlocked(true)} onBack={() => go({ screen: 'chapters' })} />
