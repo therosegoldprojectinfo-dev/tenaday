@@ -28,6 +28,18 @@ export async function addCoins(amount, kidId) {
   return addCoinsToKid(kidId, amount)
 }
 
+// Server-derives coin amount from exam's question count — client cannot supply amount
+export async function completeQuiz(examId, kidId) {
+  if (!examId) throw new Error('examId is required')
+  if (!kidId) throw new Error('kidId is required')
+  const { data, error } = await supabase.rpc('complete_quiz_and_award_coins', {
+    p_exam_id: examId,
+    p_kid_id: kidId,
+  })
+  if (error) throw new Error(error.message)
+  return data // { coinsAwarded, newBalance }
+}
+
 export async function getCoinBalance(kidId) {
   if (!kidId) throw new Error('kidId is required')
   const profile = await getKidProfile(kidId)
