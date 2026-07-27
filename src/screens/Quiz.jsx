@@ -208,38 +208,49 @@ function XIcon() {
 // ── Main Quiz ─────────────────────────────────────────────────────
 
 // ── Fire Mode Overlay ─────────────────────────────────────────────
-function FireModeOverlay() {
-  const pieces = Array.from({ length: 60 }, (_, i) => ({
-    id: i,
-    left: Math.random() * 100,
-    delay: (Math.random() * 0.3).toFixed(2),
-    duration: (1.3 + Math.random() * 0.4).toFixed(2),
-    size: i < 30 ? 80 + Math.random() * 40 : 80 + Math.random() * 40,
-    isMascot: i < 30,
-  }))
+function FireModeOverlay({ streakKey, consecutiveCorrect }) {
+  const fireCount = Math.min(6 + consecutiveCorrect * 3, 30)
+  const headCount = Math.min(2 + consecutiveCorrect * 2, 15)
 
   return (
-    <div className="fixed inset-0 pointer-events-none z-30 overflow-hidden">
-      {pieces.map(p => (
-        <div key={p.id} style={{
-          position: 'absolute',
-          left: `${p.left}%`,
-          bottom: '-60px',
-          fontSize: p.isMascot ? undefined : p.size,
-          width: p.isMascot ? p.size : undefined,
-          animation: `fire-float ${p.duration}s ${p.delay}s ease-out forwards`,
-        }}>
-          {p.isMascot
-            ? <img src="/mascot.png" alt="" style={{ width: p.size, height: p.size, objectFit: 'contain' }} />
-            : '🔥'
-          }
-        </div>
-      ))}
+    <div className="fixed inset-0 pointer-events-none z-30 overflow-hidden" key={streakKey}>
+      {/* Fire emojis */}
+      {Array.from({ length: fireCount }).map((_, i) => {
+        const left     = Math.random() * 100
+        const delay    = (Math.random() * 0.5).toFixed(2)
+        const duration = (0.8 + Math.random() * 0.8).toFixed(2)
+        const size     = 28 + Math.random() * 32
+        return (
+          <div key={`fire-${i}`} style={{
+            position: 'absolute', bottom: -40, left: `${left}%`,
+            fontSize: size,
+            animation: `fire-rise ${duration}s ${delay}s ease-out both`,
+          }}>🔥</div>
+        )
+      })}
+      {/* Flying mascots */}
+      {Array.from({ length: headCount }).map((_, i) => {
+        const left     = Math.random() * 95
+        const delay    = (Math.random() * 0.6).toFixed(2)
+        const duration = (0.9 + Math.random() * 1.0).toFixed(2)
+        const size     = 50 + Math.random() * 60
+        const rotate   = ((Math.random() - 0.5) * 60).toFixed(1)
+        return (
+          <div key={`head-${i}`} style={{
+            position: 'absolute', bottom: -60, left: `${left}%`,
+            width: size, height: size,
+            transform: `rotate(${rotate}deg)`,
+            animation: `fire-rise ${duration}s ${delay}s ease-out both`,
+          }}>
+            <img src="/mascot.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+          </div>
+        )
+      })}
       <style>{`
-        @keyframes fire-float {
-          0%   { transform: translateY(0) scale(1); opacity: 1; }
-          80%  { opacity: 0.8; }
-          100% { transform: translateY(-110vh) scale(0.6); opacity: 0; }
+        @keyframes fire-rise {
+          0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+          80%  { opacity: 0.9; }
+          100% { transform: translateY(-110vh) rotate(180deg) scale(0.5); opacity: 0; }
         }
       `}</style>
     </div>
@@ -275,6 +286,7 @@ export default function Quiz({ exam, onDone, kidId }) {
   const [coinSaveError, setCoinSaveError] = useState(false)
   const [coinsEarned,  setCoinsEarned]  = useState(0)
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0)
+  const [fireKey, setFireKey] = useState(0)
 
   const onFire = consecutiveCorrect >= 2
 
@@ -308,8 +320,13 @@ export default function Quiz({ exam, onDone, kidId }) {
     }
 
     // Track consecutive correct for fire mode
-    if (checkCorrect(q.type === 'fill_blank' ? typedValue : selected)) {
-      setConsecutiveCorrect(c => c + 1)
+    const wasCorrect = checkCorrect(q.type === 'fill_blank' ? typedValue : selected)
+    if (wasCorrect) {
+      setConsecutiveCorrect(c => {
+        const next = c + 1
+        if (next >= 2) setFireKey(k => k + 1) // new burst each correct answer in streak
+        return next
+      })
     } else {
       setConsecutiveCorrect(0)
     }
@@ -392,7 +409,7 @@ export default function Quiz({ exam, onDone, kidId }) {
         onLeave={onDone}
       />
 
-      {onFire && <FireModeOverlay key={idx} />}
+      {onFire && <FireModeOverlay streakKey={fireKey} consecutiveCorrect={consecutiveCorrect} />}
 
       <div className="flex flex-col bg-white w-full max-w-sm" style={{ height: '100dvh' }}>
 
