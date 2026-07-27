@@ -182,3 +182,11 @@ $$;
 
 REVOKE ALL ON FUNCTION complete_quiz_and_award_coins(uuid, uuid) FROM anon;
 GRANT EXECUTE ON FUNCTION complete_quiz_and_award_coins(uuid, uuid) TO authenticated;
+
+-- ── Revoke direct client access to raw coin mutation RPCs ────────
+-- add_coins_to_kid and deduct_coins_from_kid are no longer called
+-- from any app code path. Only complete_quiz_and_award_coins and
+-- claim_reward_for_kid (via economy.js) are the live coin paths.
+-- Revoking authenticated access closes the devtools farming vector.
+REVOKE EXECUTE ON FUNCTION add_coins_to_kid(uuid, int) FROM authenticated;
+REVOKE EXECUTE ON FUNCTION deduct_coins_from_kid(uuid, int) FROM authenticated;
