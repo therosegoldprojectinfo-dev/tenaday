@@ -206,6 +206,46 @@ function XIcon() {
 }
 
 // ── Main Quiz ─────────────────────────────────────────────────────
+
+// ── Fire Mode Overlay ─────────────────────────────────────────────
+function FireModeOverlay() {
+  const pieces = Array.from({ length: 60 }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    delay: (Math.random() * 2).toFixed(2),
+    duration: (1.5 + Math.random() * 1.5).toFixed(2),
+    size: 20 + Math.random() * 20,
+    isMascot: i < 30,
+  }))
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-30 overflow-hidden">
+      {pieces.map(p => (
+        <div key={p.id} style={{
+          position: 'absolute',
+          left: `${p.left}%`,
+          bottom: '-60px',
+          fontSize: p.isMascot ? undefined : p.size,
+          width: p.isMascot ? p.size : undefined,
+          animation: `fire-float ${p.duration}s ${p.delay}s ease-out infinite`,
+        }}>
+          {p.isMascot
+            ? <img src="/mascot.png" alt="" style={{ width: p.size, height: p.size, objectFit: 'contain' }} />
+            : '🔥'
+          }
+        </div>
+      ))}
+      <style>{`
+        @keyframes fire-float {
+          0%   { transform: translateY(0) scale(1); opacity: 1; }
+          80%  { opacity: 0.8; }
+          100% { transform: translateY(-110vh) scale(0.6); opacity: 0; }
+        }
+      `}</style>
+    </div>
+  )
+}
+
 export default function Quiz({ exam, onDone, kidId }) {
   const lang = useLang()
   const questions = exam.questions || []
@@ -234,6 +274,9 @@ export default function Quiz({ exam, onDone, kidId }) {
 
   const [coinSaveError, setCoinSaveError] = useState(false)
   const [coinsEarned,  setCoinsEarned]  = useState(0)
+  const [consecutiveCorrect, setConsecutiveCorrect] = useState(0)
+
+  const onFire = consecutiveCorrect >= 2
 
   async function handleContinue() {
     const answer    = q.type === 'fill_blank' ? typedValue : selected
@@ -262,6 +305,13 @@ export default function Quiz({ exam, onDone, kidId }) {
       }
       setSaving(false)
       return
+    }
+
+    // Track consecutive correct for fire mode
+    if (checkCorrect(q.type === 'fill_blank' ? typedValue : selected)) {
+      setConsecutiveCorrect(c => c + 1)
+    } else {
+      setConsecutiveCorrect(0)
     }
 
     setIdx(i => i + 1)
@@ -342,6 +392,8 @@ export default function Quiz({ exam, onDone, kidId }) {
         onLeave={onDone}
       />
 
+      {onFire && <FireModeOverlay />}
+
       <div className="flex flex-col bg-white w-full max-w-sm" style={{ height: '100dvh' }}>
 
         {/* Top bar */}
@@ -351,8 +403,12 @@ export default function Quiz({ exam, onDone, kidId }) {
             <XIcon />
           </button>
           <div className="flex-1 h-5 rounded-full overflow-hidden bg-gray-100">
-            <div className="h-full rounded-full bg-duo origin-left"
-              style={{ transform: `scaleX(${progressScale})`, transition: 'transform 350ms cubic-bezier(0.4,0,0.2,1)' }} />
+            <div className="h-full rounded-full origin-left"
+              style={{
+                transform: `scaleX(${progressScale})`,
+                transition: 'transform 350ms cubic-bezier(0.4,0,0.2,1)',
+                background: onFire ? 'linear-gradient(90deg, #ff4b4b, #ff9600)' : '#58cc02',
+              }} />
           </div>
           <div className="flex items-center gap-1">
             <CoinIcon size={24} />
