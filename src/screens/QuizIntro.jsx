@@ -1,10 +1,17 @@
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
 
-export default function QuizIntro({ exam, kidName = 'Champ', onStart }) {
+export default function QuizIntro({ exam, kidName = 'Champ', onStart, onBack }) {
   const lang = useLang()
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 text-center" style={{ height: '100dvh' }}>
+      {/* Back button */}
+      <button
+        onClick={onBack}
+        className="absolute top-12 left-5 flex items-center gap-1 text-muted font-body font-bold text-sm active:opacity-60"
+      >
+        ← {lang === 'ar' ? 'رجوع' : 'Back'}
+      </button>
       <div className="w-full max-w-sm flex flex-col items-center gap-6">
         <div style={{ animation: 'mascot-float 2s ease-in-out infinite' }}>
           <img src="/mascot-run.png" alt="Numio mascot" className="w-52 h-auto" />
