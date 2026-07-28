@@ -186,6 +186,7 @@ export default function App() {
                 exam={exam}
                 kidName={activeKid?.name}
                 onStart={() => go({ screen: 'quiz' })}
+                onBack={() => go({ screen: 'current_chapter' })}
               />
             )}
 
