@@ -4,10 +4,10 @@ import { supabase } from '../lib/supabaseClient'
 const STRINGS = {
   en: {
     dir: 'ltr',
-    welcome_title: 'Welcome to Numio!',
+    welcome_title: "Turn your kid's lessons into custom quizzes for free.",
     welcome_sub: 'Snap. Learn. Earn rewards. 📸',
     welcome_cta: "Let's start →",
-    lang_question: 'What language do you prefer?',
+    lang_question: 'Select a language to start',
     goal_question: 'Why do you want to use Numio?',
     goal_options: [
       { label: 'Help my child do better at school', icon: '📈', value: 'improve' },
@@ -19,7 +19,7 @@ const STRINGS = {
     how_sub: '3 simple steps to learning 🚀',
     how_steps: [
       { icon: '📸', title: 'Take a picture', desc: 'Snap any textbook page or notes.' },
-      { icon: '🧠', title: 'Practice', desc: 'Answer a quiz Claude built just for you.' },
+      { icon: '🧠', title: 'Practice', desc: 'Answer a quiz Numio built just for you.' },
       { icon: '🎁', title: 'Earn & claim rewards', desc: 'Collect coins and claim rewards set by your parents.' },
     ],
     how_cta: "Let's go! 🚀",
@@ -238,12 +238,12 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
         <div className="flex flex-col flex-1 px-6 overflow-y-auto">
           <div className="flex-shrink-0 pt-6 pb-4"><ProgressBar step={1} /></div>
           <div className="flex-shrink-0 mb-4">
-            <h1 className="font-display font-extrabold text-3xl text-ink">Welcome to Numio! 👋</h1>
+            <h1 className="font-display font-extrabold text-3xl text-ink">Turn your kid's lessons into custom quizzes for free.</h1>
           </div>
           <div className="flex-shrink-0 flex items-start gap-3 mb-6">
             <img src="/mascot.png" alt="" className="w-12 h-12 object-contain flex-shrink-0" />
             <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3">
-              <p className="font-display font-bold text-base text-ink">What language do you prefer?</p>
+              <p className="font-display font-bold text-base text-ink">Select a language to start</p>
             </div>
           </div>
           <div className="flex flex-col gap-3 flex-1">
