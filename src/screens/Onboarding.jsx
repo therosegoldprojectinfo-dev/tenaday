@@ -235,13 +235,13 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
   if (screen === 'language') {
     return (
       <OnboardingShell dir="ltr">
-        <div className="flex flex-col flex-1 px-6 overflow-y-auto">
+        <div className="flex flex-col flex-1 px-6 overflow-x-hidden overflow-y-auto">
           {/* Hook — top of page */}
           <div className="flex-shrink-0 pt-6 pb-2">
             <h1 className="font-display font-extrabold text-2xl text-ink">Get better at school with just a picture! 📸</h1>
           </div>
-          {/* Hero image — bigger, negative margin to bleed to edges */}
-          <div className="flex-shrink-0 mb-4 -mx-6">
+          {/* Hero image */}
+          <div className="flex-shrink-0 mb-4">
             <img src="/onboarding-hero.png" alt="Take a photo, get a quiz" className="w-full object-contain" style={{ maxHeight: 260 }} />
           </div>
           {/* Progress bar */}
@@ -250,7 +250,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
           <div className="flex-shrink-0 flex items-start gap-3 mb-6">
             <img src="/mascot.png" alt="" className="w-16 h-16 object-contain flex-shrink-0" />
             <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3">
-              <p className="font-display font-bold text-base text-ink">Select a language to start for free</p>
+              <p className="font-display font-bold text-base text-ink">Select your language — it's free!</p>
             </div>
           </div>
           <div className="flex flex-col gap-3 flex-1">
