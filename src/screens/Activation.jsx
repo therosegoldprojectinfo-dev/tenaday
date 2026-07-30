@@ -29,6 +29,15 @@ async function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
 async function saveActivationExam(exam, kidId) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not authenticated')
+
+  // Create a hidden activation chapter to satisfy the NOT NULL constraint
+  const { data: chapter, error: chErr } = await supabase
+    .from('chapters')
+    .insert({ name: 'First Challenge', emoji: '📸', user_id: user.id, kid_id: kidId, is_activation: true })
+    .select()
+    .single()
+  if (chErr) throw chErr
+
   const { data, error } = await supabase
     .from('exams')
     .insert({
@@ -36,7 +45,7 @@ async function saveActivationExam(exam, kidId) {
       kid_id: kidId,
       topic: exam.topic,
       questions: exam.questions,
-      chapter_id: null,
+      chapter_id: chapter.id,
     })
     .select()
     .single()
