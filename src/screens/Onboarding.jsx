@@ -64,7 +64,7 @@ export default function Onboarding({ onComplete }) {
           display_name: username.trim(),
         })
       }
-      firePixel('track', 'CompleteRegistration', { content_name: 'Family Account Created' })
+      firePixel('track', 'CompleteRegistration', { content_name: 'Try For Free' })
       fireGtag('account_created')
       setSavedName(username.trim())
       setScreen('how')
@@ -130,7 +130,7 @@ export default function Onboarding({ onComplete }) {
           <img src="/mascot.png" alt="" className="w-14 h-14 object-contain flex-shrink-0" />
           <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3">
             <p className="font-display font-bold text-base text-ink">
-              {isSignIn ? 'Welcome back! 👋' : 'Select a username to start for free'}
+              {isSignIn ? 'Welcome back! 👋' : 'Select a username to try Numio for free.'}
             </p>
           </div>
         </div>
@@ -178,7 +178,7 @@ export default function Onboarding({ onComplete }) {
             className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
             style={{ boxShadow: '0 4px 0 #46a302' }}
           >
-            {loading ? 'Loading...' : isSignIn ? 'Log in →' : "Let's start →"}
+            {loading ? 'Loading...' : isSignIn ? 'Log in →' : "Try for free now →"}
           </button>
 
           <button
