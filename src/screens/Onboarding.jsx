@@ -240,7 +240,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
           <div className="flex-shrink-0 pt-6 pb-4"><ProgressBar step={1} /></div>
           {/* Hook — centered */}
           <div className="flex-shrink-0 pb-2 text-center">
-            <h1 className="font-display font-extrabold text-2xl text-ink">Get better at school with just a picture! 📸</h1>
+            <h1 className="font-display font-extrabold text-3xl text-ink">Get better at school with just a picture! 📸</h1>
           </div>
           {/* Hero image */}
           <div className="flex-shrink-0 mb-4">
