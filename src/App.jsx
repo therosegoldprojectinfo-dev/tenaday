@@ -133,7 +133,7 @@ export default function App() {
               if (user) await supabase.from('profiles').update({ activated: true }).eq('id', user.id)
             } catch (e) { console.error('activation update failed:', e) }
             setActivationExam(exam)
-            setNav({ screen: 'quiz', chapter: null, exam, revisionExams: [] })
+            setNav({ screen: 'quiz', chapter: null, exam: null, revisionExams: [] })
             setActivated(true)
           }}
         />
@@ -184,7 +184,7 @@ export default function App() {
               />
             )}
 
-            {screen === 'current_chapter' && (
+            {screen === 'current_chapter' && chapter && (
               <CurrentChapter
                 chapter={chapter}
                 kidId={activeKid?.id}
