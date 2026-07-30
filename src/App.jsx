@@ -219,8 +219,10 @@ export default function App() {
                 exam={exam || activationExam}
                 kidId={activeKid?.id}
                 onDone={() => {
-                  go({ screen: 'current_chapter' })
-                  // Refresh streak
+                  // If coming from activation flow, go to chapters not current_chapter
+                  const dest = activationExam && !exam ? 'chapters' : 'current_chapter'
+                  setActivationExam(null)
+                  go({ screen: dest })
                   if (activeKid) getStreak(activeKid.id).then(s => setStreak(s.count)).catch(() => {})
                 }}
               />
