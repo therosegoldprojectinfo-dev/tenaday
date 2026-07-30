@@ -124,10 +124,10 @@ export default function App() {
             const { supabase } = await import('./lib/supabaseClient')
             const { data: { user } } = await supabase.auth.getUser()
             if (user) await supabase.from('profiles').update({ activated: true }).eq('id', user.id)
-            setActivated(true)
+            // Set exam in nav state FIRST, then activate
+            setNav(prev => ({ ...prev, screen: 'quiz', exam }))
             setActivationExam(exam)
-            // Go straight to quiz
-            go({ screen: 'quiz', exam })
+            setActivated(true)
           }}
         />
       </LangContext.Provider>
@@ -216,7 +216,7 @@ export default function App() {
 
             {screen === 'quiz' && (exam || activationExam) && (
               <Quiz
-                exam={exam}
+                exam={exam || activationExam}
                 kidId={activeKid?.id}
                 onDone={() => {
                   go({ screen: 'current_chapter' })
