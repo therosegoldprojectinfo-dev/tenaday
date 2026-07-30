@@ -241,7 +241,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
             <h1 className="font-display font-extrabold text-2xl text-ink">Get better at school with just a picture! 📸</h1>
           </div>
           {/* Hero image */}
-          <div className="flex-shrink-0 mb-4">
+          <div className="flex-shrink-0 mb-6">
             <img src="/onboarding-hero.png" alt="Take a photo, get a quiz" className="w-full rounded-2xl object-cover" style={{ maxHeight: 220 }} />
           </div>
           {/* Progress bar */}
@@ -250,7 +250,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
           <div className="flex-shrink-0 flex items-start gap-3 mb-6">
             <img src="/mascot.png" alt="" className="w-12 h-12 object-contain flex-shrink-0" />
             <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3">
-              <p className="font-display font-bold text-base text-ink">Select a language to start</p>
+              <p className="font-display font-bold text-base text-ink">Select a language to start for free</p>
             </div>
           </div>
           <div className="flex flex-col gap-3 flex-1">
