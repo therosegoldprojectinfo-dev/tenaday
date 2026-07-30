@@ -116,6 +116,11 @@ export default function Onboarding({ onComplete }) {
           <img src="/onboarding-hero.png" alt="Take a photo, get a quiz" className="w-full object-contain" style={{ maxHeight: 200 }} />
         </div>
 
+        {/* Hook */}
+        <div className="flex-shrink-0 pb-4 text-center">
+          <h1 className="font-display font-extrabold text-3xl text-ink">Get better at school with just a picture! 📸</h1>
+        </div>
+
         {/* Mascot bubble */}
         <div className="flex items-start gap-3 mb-6">
           <img src="/mascot.png" alt="" className="w-14 h-14 object-contain flex-shrink-0" />
