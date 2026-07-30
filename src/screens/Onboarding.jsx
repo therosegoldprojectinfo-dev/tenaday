@@ -85,8 +85,8 @@ const TOTAL_QUESTIONS = 3
 // Centered card shell for desktop
 function OnboardingShell({ children, dir = 'ltr' }) {
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center" style={{ height: '100dvh' }} dir={dir}>
-      <div className="w-full max-w-md bg-white flex flex-col overflow-hidden" style={{ maxHeight: '100dvh', minHeight: 500 }}>
+    <div className="bg-white w-full" style={{ minHeight: '100dvh' }} dir={dir}>
+      <div className="w-full max-w-md mx-auto flex flex-col" style={{ minHeight: '100dvh' }}>
         {children}
       </div>
     </div>
