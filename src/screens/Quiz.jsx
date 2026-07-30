@@ -106,22 +106,15 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned }) {
           </div>
         </div>
 
-        {/* Score */}
-        <div className="w-full bg-gray-50 rounded-2xl px-5 py-3 flex items-center justify-between">
-          <span className="font-body font-bold text-sm text-muted">{t(lang, 'quiz_results_score')}</span>
-          <span className="font-display font-bold text-lg text-ink">{correct}/{total} · {pct}%</span>
-        </div>
-
-        {/* Wrong answers to review */}
+        {/* Wrong answers to review — no score, just show question = answer */}
         {wrong.length > 0 && (
           <div className="w-full flex flex-col gap-2">
             <p className="font-body font-bold text-xs text-muted uppercase tracking-widest">
               {t(lang, 'quiz_results_review')}
             </p>
             {wrong.map((q, i) => (
-              <div key={i} className="bg-red-50 border border-red-100 rounded-2xl px-4 py-3">
-                <p className="font-body text-sm text-ink font-semibold leading-snug">{q.question}</p>
-                <p className="font-body text-xs text-duo font-bold mt-1">✓ {q.correct_answer}</p>
+              <div key={i} className="bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3">
+                <p className="font-body text-sm text-ink font-semibold leading-snug">{q.question} = <span className="text-duo font-bold">{q.correct_answer}</span></p>
               </div>
             ))}
           </div>
