@@ -122,6 +122,11 @@ function firePixel(type, event, params = {}) {
   try { if (window.fbq) window.fbq(type, event, params) } catch (_) {}
 }
 
+// ── Google Analytics helper ──────────────────────────────────────
+function fireGtag(eventName, params = {}) {
+  try { if (window.gtag) window.gtag('event', eventName, params) } catch (_) {}
+}
+
 export default function Onboarding({ onComplete, onLanguageChange }) {
   const [screen, setScreen]         = useState('language')
   const [language, setLanguage]     = useState('en')
@@ -191,7 +196,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
         const pinHash = await hashPin(pin)
         await supabase.from('profiles').upsert({ id: user.id, parent_pin: pinHash })
       }
-      firePixel('track', 'CompleteRegistration', { content_name: 'Family Account Created' })
+      firePixel('track', 'CompleteRegistration', { content_name: 'Family Account Created' }); fireGtag('account_created')
       setScreen('graffiti')
     } catch (e) {
       setAuthError(e.message || 'Something went wrong')
@@ -246,7 +251,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
             <OptionCard label="العربية" icon="🇸🇦" selected={language === 'ar'} onSelect={() => { setLanguage('ar'); onLanguageChange?.('ar') }} />
           </div>
           <div className="flex-shrink-0 py-6">
-            <button onClick={() => { firePixel('trackCustom', 'LanguageSelected', { language }); setScreen('goal') }} disabled={!language}
+            <button onClick={() => { firePixel('trackCustom', 'LanguageSelected', { language }); fireGtag('language_selected', { language }); setScreen('goal') }} disabled={!language}
               className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-4 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all">
               Continue →
             </button>
@@ -279,7 +284,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
             ))}
           </div>
           <div className="flex-shrink-0 py-6">
-            <button onClick={() => { firePixel('trackCustom', 'GoalSelected', { goal }); setScreen('how') }} disabled={!goal}
+            <button onClick={() => { firePixel('trackCustom', 'GoalSelected', { goal }); fireGtag('goal_selected', { goal }); setScreen('how') }} disabled={!goal}
               className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-4 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all">
               {s.continue}
             </button>
@@ -312,7 +317,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
               </div>
             ))}
           </div>
-          <button onClick={() => { firePixel('trackCustom', 'HowItWorksUnderstood'); setScreen('account') }}
+          <button onClick={() => { firePixel('trackCustom', 'HowItWorksUnderstood'); fireGtag('how_it_works_understood'); setScreen('account') }}
             className="w-full bg-duo text-white font-display font-bold text-xl rounded-2xl py-4 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all mt-auto">
             {s.how_cta}
           </button>
