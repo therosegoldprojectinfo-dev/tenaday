@@ -238,7 +238,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
         <div className="flex flex-col flex-1 px-6 overflow-y-auto">
           <div className="flex-shrink-0 pt-6 pb-4"><ProgressBar step={1} /></div>
           <div className="flex-shrink-0 mb-4">
-            <h1 className="font-display font-extrabold text-2xl text-ink">Turn your kid's lessons into custom quizzes for free.</h1>
+            <h1 className="font-display font-extrabold text-2xl text-ink">Turn your kid's lessons into custom quizzes for free!</h1>
           </div>
           <div className="flex-shrink-0 flex items-start gap-3 mb-6">
             <img src="/mascot.png" alt="" className="w-12 h-12 object-contain flex-shrink-0" />
