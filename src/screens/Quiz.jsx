@@ -106,20 +106,6 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned }) {
           </div>
         </div>
 
-        {/* Wrong answers to review — no score, just show question = answer */}
-        {wrong.length > 0 && (
-          <div className="w-full flex flex-col gap-2">
-            <p className="font-body font-bold text-xs text-muted uppercase tracking-widest">
-              {t(lang, 'quiz_results_review')}
-            </p>
-            {wrong.map((q, i) => (
-              <div key={i} className="bg-gray-50 border border-gray-100 rounded-2xl px-4 py-3">
-                <p className="font-body text-sm text-ink font-semibold leading-snug">{q.question} = <span className="text-duo font-bold">{q.correct_answer}</span></p>
-              </div>
-            ))}
-          </div>
-        )}
-
         <button
           onClick={onDone}
           className="w-full bg-duo active:bg-duo-dark text-white font-display font-bold text-xl rounded-2xl py-5 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all"
