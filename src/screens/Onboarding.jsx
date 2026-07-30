@@ -242,7 +242,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
           </div>
           {/* Hero image */}
           <div className="flex-shrink-0 mb-6">
-            <img src="/onboarding-hero.jpg" alt="Take a photo, get a quiz" className="w-full rounded-2xl object-cover" style={{ maxHeight: 220 }} />
+            <img src="/onboarding-hero.png" alt="Take a photo, get a quiz" className="w-full object-contain" style={{ maxHeight: 200 }} />
           </div>
           {/* Progress bar */}
           <div className="flex-shrink-0 pb-4"><ProgressBar step={1} /></div>
