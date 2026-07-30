@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ensureAuth } from './lib/auth'
 import Onboarding from './screens/Onboarding'
+import Activation from './screens/Activation'
 import { getStreak } from './lib/economy'
 import { getKids, createKid } from './lib/kids'
 import Nav from './components/Nav'
@@ -30,6 +31,8 @@ export default function App() {
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
   }, [lang])
   const [onboarded, setOnboarded]     = useState(null)
+  const [activated, setActivated]     = useState(false)
+  const [activationExam, setActivationExam] = useState(null)
   const [tab, setTab]                 = useState('chapters')
   const [pinUnlocked, setPinUnlocked] = useState(false)
   const [parentZoneDefaultTab, setParentZoneDefaultTab] = useState('rewards')
@@ -47,8 +50,9 @@ export default function App() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user || user.is_anonymous) { setOnboarded(false); return }
 
-        const { data } = await supabase.from('profiles').select('display_name, language').eq('id', user.id).single()
+        const { data } = await supabase.from('profiles').select('display_name, language, activated').eq('id', user.id).single()
         setOnboarded(!!data?.display_name)
+        if (data?.activated) setActivated(true)
         if (data?.language) setLang(data.language)
 
         if (data?.display_name) {
@@ -106,6 +110,26 @@ export default function App() {
             onLanguageChange={setLang}
           />
         </div>
+      </LangContext.Provider>
+    )
+  }
+
+  if (!activated) {
+    return (
+      <LangContext.Provider value={lang}>
+        <Activation
+          kidId={activeKid?.id}
+          onComplete={async (exam) => {
+            // Mark activated in profiles
+            const { supabase } = await import('./lib/supabaseClient')
+            const { data: { user } } = await supabase.auth.getUser()
+            if (user) await supabase.from('profiles').update({ activated: true }).eq('id', user.id)
+            setActivated(true)
+            setActivationExam(exam)
+            // Go straight to quiz
+            go({ screen: 'quiz', exam })
+          }}
+        />
       </LangContext.Provider>
     )
   }
@@ -183,14 +207,14 @@ export default function App() {
 
             {screen === 'quiz_intro' && exam && (
               <QuizIntro
-                exam={exam}
+                exam={exam || activationExam}
                 kidName={activeKid?.name}
                 onStart={() => go({ screen: 'quiz' })}
                 onBack={() => go({ screen: 'current_chapter' })}
               />
             )}
 
-            {screen === 'quiz' && exam && (
+            {screen === 'quiz' && (exam || activationExam) && (
               <Quiz
                 exam={exam}
                 kidId={activeKid?.id}
