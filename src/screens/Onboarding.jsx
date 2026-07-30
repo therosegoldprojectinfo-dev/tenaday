@@ -58,7 +58,11 @@ export default function Onboarding({ onComplete }) {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const pinHash = await hashPin(pin)
-        await supabase.from('profiles').upsert({ id: user.id, parent_pin: pinHash })
+        await supabase.from('profiles').upsert({
+          id: user.id,
+          parent_pin: pinHash,
+          display_name: username.trim(),
+        })
       }
       firePixel('track', 'CompleteRegistration', { content_name: 'Family Account Created' })
       fireGtag('account_created')
