@@ -26,18 +26,22 @@ async function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
   })
 }
 
-async function saveTestQuiz(exam) {
-  try {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    await supabase.from('test_quizzes').insert({
+async function saveActivationExam(exam, kidId) {
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not authenticated')
+  const { data, error } = await supabase
+    .from('exams')
+    .insert({
       user_id: user.id,
-      exam_data: exam,
-      created_at: new Date().toISOString(),
+      kid_id: kidId,
+      topic: exam.topic,
+      questions: exam.questions,
+      chapter_id: null,
     })
-  } catch (e) {
-    console.error('Failed to save test quiz:', e)
-  }
+    .select()
+    .single()
+  if (error) throw error
+  return data
 }
 
 export default function Activation({ onComplete, kidId }) {
@@ -58,13 +62,23 @@ export default function Activation({ onComplete, kidId }) {
       const compressed = await compressImage(file)
       const result = await generateExam([compressed])
 
-      // Save silently as test_quiz — not shown to user
-      await saveTestQuiz(result)
+      // Save to exams table to get a real id (needed for completeQuiz RPC)
+      const savedExam = await saveActivationExam(result, kidId)
+
+      // Also save silently to test_quizzes for analytics
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) await supabase.from('test_quizzes').insert({
+          user_id: user.id,
+          exam_data: result,
+          created_at: new Date().toISOString(),
+        })
+      } catch (e) { console.error('test_quiz save failed:', e) }
 
       firePixel('trackCustom', 'ChallengeGenerated')
       fireGtag('challenge_generated')
 
-      setExam(result)
+      setExam(savedExam)
       setStatus('ready')
     } catch (err) {
       setErrorMsg('Something went wrong. Please try again.')
