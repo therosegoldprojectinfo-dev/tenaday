@@ -130,7 +130,7 @@ export default function Onboarding({ onComplete }) {
           <img src="/mascot.png" alt="" className="w-14 h-14 object-contain flex-shrink-0" />
           <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3">
             <p className="font-display font-bold text-base text-ink">
-              {isSignIn ? 'Welcome back! 👋' : 'Select a username to try Numio for free.'}
+              {isSignIn ? 'Welcome back! 👋' : 'Select a username to try Numio for free. — No email needed'}
             </p>
           </div>
         </div>
