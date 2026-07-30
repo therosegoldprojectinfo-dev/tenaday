@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabaseClient'
 const STRINGS = {
   en: {
     dir: 'ltr',
-    welcome_title: "Turn your kid's lessons into custom quizzes for free !",
+    welcome_title: "Turn your kid's lessons into custom quizzes for free!",
     welcome_sub: 'Snap. Learn. Earn rewards. 📸',
     welcome_cta: "Let's start →",
     lang_question: 'Select a language to start',
