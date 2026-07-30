@@ -66,8 +66,7 @@ export default function Onboarding({ onComplete }) {
       }
       firePixel('track', 'CompleteRegistration', { content_name: 'Try For Free' })
       fireGtag('account_created')
-      setSavedName(username.trim())
-      setScreen('how')
+      onComplete(username.trim())
     } catch (e) {
       setAuthError(e.message || 'Something went wrong')
     } finally { setLoading(false) }
