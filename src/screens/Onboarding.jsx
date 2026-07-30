@@ -250,7 +250,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
           <div className="flex-shrink-0 flex items-start gap-3 mb-6">
             <img src="/mascot.png" alt="" className="w-16 h-16 object-contain flex-shrink-0" />
             <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3">
-              <p className="font-display font-bold text-base text-ink">Select your language — it's free!</p>
+              <p className="font-display font-bold text-base text-ink">Select a language to start for free</p>
             </div>
           </div>
           <div className="flex flex-col gap-3 flex-1">
