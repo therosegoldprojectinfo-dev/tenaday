@@ -79,10 +79,9 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
     try {
       // Compress all images before sending
       const compressed = await Promise.all(images.map(img => compressImage(img.file)))
-      const exam = await generateExam(compressed)
-      onExamReady(exam)
-      saveExam({ chapterId: chapter.id, topic: exam.topic, questions: exam.questions, kidId })
-        .catch(err => console.error('Failed to save exam:', err))
+      const generated = await generateExam(compressed)
+      const saved = await saveExam({ chapterId: chapter.id, topic: generated.topic, questions: generated.questions, kidId })
+      onExamReady(saved)
     } catch (err) {
       setError(err.message)
       setStatus('error')
