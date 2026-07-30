@@ -8,7 +8,7 @@ export default function CurrentChapter({ chapter, onNew, onRevision, onBack }) {
   const [exams, setExams]     = useState([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => { loadExams() }, [chapter.id])
+  useEffect(() => { if (chapter?.id) loadExams() }, [chapter?.id])
 
   async function loadExams() {
     try {
