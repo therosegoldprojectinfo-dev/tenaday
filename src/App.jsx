@@ -115,18 +115,25 @@ export default function App() {
   }
 
   if (!activated) {
+    if (!activeKid) {
+      return (
+        <div className="min-h-screen bg-white flex items-center justify-center" style={{ height: '100dvh' }}>
+          <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-duo animate-spin" />
+        </div>
+      )
+    }
     return (
       <LangContext.Provider value={lang}>
         <Activation
-          kidId={activeKid?.id}
+          kidId={activeKid.id}
           onComplete={async (exam) => {
-            // Mark activated in profiles
-            const { supabase } = await import('./lib/supabaseClient')
-            const { data: { user } } = await supabase.auth.getUser()
-            if (user) await supabase.from('profiles').update({ activated: true }).eq('id', user.id)
-            // Set exam in nav state FIRST, then activate
-            setNav(prev => ({ ...prev, screen: 'quiz', exam }))
+            try {
+              const { supabase } = await import('./lib/supabaseClient')
+              const { data: { user } } = await supabase.auth.getUser()
+              if (user) await supabase.from('profiles').update({ activated: true }).eq('id', user.id)
+            } catch (e) { console.error('activation update failed:', e) }
             setActivationExam(exam)
+            setNav({ screen: 'quiz', chapter: null, exam, revisionExams: [] })
             setActivated(true)
           }}
         />
@@ -214,7 +221,7 @@ export default function App() {
               />
             )}
 
-            {screen === 'quiz' && (exam || activationExam) && (
+            {screen === 'quiz' && (exam || activationExam) && activeKid && (
               <Quiz
                 exam={exam || activationExam}
                 kidId={activeKid?.id}
