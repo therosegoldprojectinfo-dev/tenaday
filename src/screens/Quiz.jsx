@@ -98,13 +98,24 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned }) {
         </div>
 
         {/* Coins earned */}
-        <div className="flex items-center gap-3 bg-amber-50 border-2 border-amber-200 rounded-2xl px-6 py-4">
-          <CoinIcon size={40} />
-          <div>
-            <p className="font-body text-xs text-amber-600 font-bold uppercase tracking-widest">{t(lang, 'quiz_results_coins')}</p>
-            <p className="font-display font-extrabold text-3xl text-amber-500">+{coinsEarned}</p>
+        {coinsEarned > 0 ? (
+          <div className="flex items-center gap-3 bg-amber-50 border-2 border-amber-200 rounded-2xl px-6 py-4">
+            <CoinIcon size={40} />
+            <div>
+              <p className="font-body text-xs text-amber-600 font-bold uppercase tracking-widest">{t(lang, 'quiz_results_coins')}</p>
+              <p className="font-display font-extrabold text-3xl text-amber-500">+{coinsEarned}</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 text-center">
+            <p className="font-display font-bold text-base text-muted">
+              {lang === 'ar' ? '✅ لقد أكملت هذا التحدي من قبل' : '✅ You already completed this quiz'}
+            </p>
+            <p className="font-body text-xs text-muted mt-1">
+              {lang === 'ar' ? 'العملات تُمنح مرة واحدة فقط لكل تحدٍّ' : 'Coins are awarded once per quiz'}
+            </p>
+          </div>
+        )}
 
         <button
           onClick={onDone}
