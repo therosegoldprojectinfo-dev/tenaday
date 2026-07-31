@@ -262,7 +262,7 @@ function FireModeOverlay({ streakKey, consecutiveCorrect }) {
   )
 }
 
-export default function Quiz({ exam, onDone, kidId }) {
+export default function Quiz({ exam, onDone, kidId, isTrial = false }) {
   const lang = useLang()
   const questions = exam.questions || []
   const topic     = exam.topic || 'Quiz'
@@ -302,11 +302,16 @@ export default function Quiz({ exam, onDone, kidId }) {
     setAnswers(newAnswers)
 
     if (idx === total - 1) {
-      // Last question — award coins + update streak, then show results
+      // Last question — in trial mode skip coin/streak RPCs entirely
+      if (isTrial) {
+        setShowResults(true)
+        return
+      }
+
+      // Award coins + update streak, then show results
       setSaving(true)
       setCoinSaveError(false)
       try {
-        // Compute score from all answers including this last one
         const correctCount = questions.filter((q, i) => {
           const a = i === idx ? answer : answers[i]
           return normalize(a) === normalize(q.correct_answer)
@@ -331,7 +336,6 @@ export default function Quiz({ exam, onDone, kidId }) {
         }
       } catch (e) {
         console.error('End of quiz error:', e)
-        // Don't show results with misleading coin count — show retry
         setCoinSaveError(true)
         setSaving(false)
       }
