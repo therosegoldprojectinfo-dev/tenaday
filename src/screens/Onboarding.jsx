@@ -61,12 +61,13 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const pwHash = await hashPassword(password)
-        await supabase.from('profiles').upsert({
+        const { error: upsertErr } = await supabase.from('profiles').upsert({
           id: user.id,
           parent_pin: pwHash,
           display_name: username.trim(),
           language: lang,
         })
+        if (upsertErr) throw upsertErr
       }
       firePixel('track', 'CompleteRegistration', { content_name: 'Try For Free' })
       fireGtag('account_created')
