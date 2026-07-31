@@ -39,7 +39,7 @@
 
     <h2>2. What Data We Collect</h2>
     <ul>
-      <li>Phone number (used as account identifier — never shared)</li>
+      <li>Username (chosen by the parent, used as account identifier — never shared)</li>
       <li>Children's first names (entered by parent)</li>
       <li>Images of educational materials (processed by AI, not stored permanently)</li>
       <li>Quiz results and coin balances</li>
@@ -47,7 +47,7 @@
     </ul>
 
     <h2>3. How We Use Your Data</h2>
-    <p>We use your data solely to provide the Numio service: generating educational quizzes, tracking learning progress, and managing the family reward system. We do not sell or rent your data. We share anonymised analytics data (page URL, timestamp, device type, IP address) with Meta Platforms, Inc. solely to measure advertising effectiveness during parent onboarding — see Section 5a for full details. We do not share your data with any other third party for marketing or advertising purposes.</p>
+    <p>We use your data solely to provide the Numio service: generating educational quizzes, tracking learning progress, and managing the family reward system. We do not sell or rent your data. We share anonymised analytics data (page URL, timestamp, device type, IP address) with Meta Platforms, Inc. and Google LLC to measure advertising effectiveness and app performance during parent onboarding and first-time activation — see Section 5a for full details. We do not share your data with any other third party for marketing or advertising purposes.</p>
 
     <h2>4. Children's Privacy (COPPA & PDPL)</h2>
     <p>Numio is designed for use by children under parental supervision. We do not collect personal data from children beyond their first name. All account management is handled by the parent. We comply with the U.S. Children's Online Privacy Protection Act (COPPA), the EU GDPR for children, and the Saudi Arabia Personal Data Protection Law (PDPL) issued by the National Data Management Office (NDMO).</p>
@@ -59,7 +59,7 @@
     <p>Numio uses the Meta Pixel (Facebook) to measure the effectiveness of our advertising campaigns. Here is exactly what the pixel does and does not do:</p>
     <ul>
       <li><strong>App-wide base tracking:</strong> The Meta Pixel script loads every time the app is opened by anyone — parent or child — and sends a <em>PageView</em> event to Meta. This event contains only: the app URL (numiomath.app), a timestamp, device type, and IP address. It contains no name, no quiz data, no coins, and no information about who is using the app.</li>
-      <li><strong>Onboarding conversion events:</strong> Additional named events (ViewContent, Lead, InitiateCheckout, CompleteRegistration) fire only during the parent account creation flow — specifically on the welcome, language selection, and phone/PIN screens. These events stop permanently once the account is created.</li>
+      <li><strong>Account creation event:</strong> A <em>CompleteRegistration</em> event fires when a parent completes account creation (username + PIN screen). After account creation, additional events (FirstChallengeStarted, LessonPhotoUploaded, ChallengeGenerated, ChallengeStarted) fire during the first-time activation flow where the parent photographs their child's lesson. These events measure whether parents successfully experience the product's core value.</li>
       <li><strong>What is never sent to Meta:</strong> Child names, quiz questions or answers, coin balances, reward activity, or any in-app behaviour after signup.</li>
     </ul>
     <p>Data collected by the Meta Pixel is processed by Meta Platforms, Inc. under their data policy. Parents can opt out at any time via <a href="https://www.facebook.com/privacy/explanation">Meta's privacy settings</a>.</p>
@@ -69,7 +69,8 @@
     <ul>
       <li><strong>Supabase (United States)</strong> — stores account data, children's names, quiz results, and coin balances. Supabase is SOC 2 Type II certified and applies industry-standard security controls.</li>
       <li><strong>Anthropic (United States)</strong> — receives images you photograph solely to generate quiz questions. Images are not retained by Anthropic beyond the duration of the API request.</li>
-      <li><strong>Meta Platforms, Inc. (United States)</strong> — receives anonymised analytics data (page URL, timestamp, device type, IP address) via the Meta Pixel during parent onboarding. No child names, quiz data, or post-signup activity is shared. Meta is GDPR-certified under the EU–US Data Privacy Framework.</li>
+      <li><strong>Meta Platforms, Inc. (United States)</strong> — receives anonymised analytics data (page URL, timestamp, device type, IP address) via the Meta Pixel during parent onboarding and first-time activation. No child names or quiz answers are shared.</li>
+      <li><strong>Google LLC (United States)</strong> — receives anonymised analytics data via Google Analytics (GA4) during parent onboarding and first-time activation, including the same event types disclosed above for Meta. Google operates under standard contractual clauses and the EU–US Data Privacy Framework.</li>
     </ul>
     <p>By creating a Numio account, you acknowledge and consent to this cross-border transfer of personal data as required under PDPL Article 29. We take all reasonable contractual and technical measures to ensure your data receives a level of protection equivalent to that required under Saudi law.</p>
 
@@ -106,7 +107,7 @@
 
       <h2>٢. البيانات التي نجمعها</h2>
       <ul>
-        <li>رقم الهاتف (يُستخدم كمعرّف للحساب — لا يُشارَك أبدًا)</li>
+        <li>اسم المستخدم (يختاره الوالد، ويُستخدم كمعرّف للحساب — لا يُشارَك أبدًا)</li>
         <li>أسماء الأطفال الأولى (يُدخلها الوالد)</li>
         <li>صور المواد التعليمية (تُعالج بالذكاء الاصطناعي ولا تُحفظ بشكل دائم)</li>
         <li>نتائج الاختبارات وأرصدة العملات</li>
@@ -126,7 +127,7 @@
       <p>يستخدم Numio أداة Meta Pixel (فيسبوك) لقياس فاعلية حملاتنا الإعلانية. فيما يلي بالضبط ما تفعله هذه الأداة وما لا تفعله:</p>
       <ul>
         <li><strong>التتبع الأساسي على مستوى التطبيق:</strong> يتم تحميل سكريبت Meta Pixel في كل مرة يُفتح فيها التطبيق — سواء من قِبل الوالد أو الطفل — ويُرسل حدث <em>PageView</em> إلى Meta. يحتوي هذا الحدث فقط على: عنوان URL للتطبيق (numiomath.app) والتوقيت ونوع الجهاز وعنوان IP. لا يحتوي على أي اسم أو بيانات اختبار أو عملات أو أي معلومات تخص مستخدم التطبيق.</li>
-        <li><strong>أحداث تحويل التأهيل:</strong> تُطلَق أحداث محددة إضافية (ViewContent وLead وInitiateCheckout وCompleteRegistration) فقط خلال مرحلة إنشاء حساب الوالد — تحديدًا على شاشات الترحيب واختيار اللغة وإدخال الهاتف ورمز PIN. تتوقف هذه الأحداث نهائيًا بمجرد إنشاء الحساب.</li>
+        <li><strong>حدث إنشاء الحساب:</strong> يُطلَق حدث <em>CompleteRegistration</em> عند إتمام الوالد إنشاء الحساب (شاشة اسم المستخدم ورمز PIN). بعد إنشاء الحساب، تُطلَق أحداث إضافية (FirstChallengeStarted وLessonPhotoUploaded وChallengeGenerated وChallengeStarted) خلال تدفق التفعيل لأول مرة حيث يلتقط الوالد صورة لدرس طفله. تقيس هذه الأحداث ما إذا كان الوالدون يختبرون القيمة الجوهرية للمنتج بنجاح.</li>
         <li><strong>ما لا يُرسَل إلى Meta أبدًا:</strong> أسماء الأطفال أو أسئلة الاختبارات وإجاباتها أو أرصدة العملات أو نشاط المكافآت أو أي سلوك داخل التطبيق بعد التسجيل.</li>
       </ul>
       <p>تُعالَج البيانات التي يجمعها Meta Pixel من قِبل Meta Platforms, Inc. وفق سياسة بياناتهم. يمكن للوالدين إلغاء الاشتراك في أي وقت عبر <a href="https://www.facebook.com/privacy/explanation">إعدادات خصوصية Meta</a>.</p>
@@ -136,7 +137,8 @@
       <ul>
         <li><strong>Supabase (الولايات المتحدة الأمريكية)</strong> — يخزّن بيانات الحساب وأسماء الأطفال ونتائج الاختبارات وأرصدة العملات. يحمل Supabase شهادة SOC 2 Type II ويطبّق معايير أمان متوافقة مع المعايير الدولية.</li>
         <li><strong>Anthropic (الولايات المتحدة الأمريكية)</strong> — يستقبل الصور التي تلتقطها حصريًا لإنشاء أسئلة الاختبار. لا تحتفظ Anthropic بالصور بعد انتهاء طلب واجهة برمجة التطبيقات.</li>
-        <li><strong>Meta Platforms, Inc. (الولايات المتحدة الأمريكية)</strong> — تستقبل بيانات تحليلية مجهولة الهوية (عنوان URL للتطبيق، والتوقيت، ونوع الجهاز، وعنوان IP) عبر Meta Pixel خلال تأهيل الوالد. لا تُشارَك أسماء الأطفال أو بيانات الاختبارات أو أي نشاط بعد التسجيل. تمتثل Meta لإطار خصوصية البيانات بين الاتحاد الأوروبي والولايات المتحدة.</li>
+        <li><strong>Meta Platforms, Inc. (الولايات المتحدة الأمريكية)</strong> — تستقبل بيانات تحليلية مجهولة الهوية (عنوان URL للتطبيق، والتوقيت، ونوع الجهاز، وعنوان IP) عبر Meta Pixel خلال تأهيل الوالد وتدفق التفعيل الأول. لا تُشارَك أسماء الأطفال أو إجابات الاختبارات.</li>
+        <li><strong>Google LLC (الولايات المتحدة الأمريكية)</strong> — تستقبل بيانات تحليلية مجهولة الهوية عبر Google Analytics (GA4) خلال تأهيل الوالد وتدفق التفعيل الأول، بما في ذلك أنواع الأحداث المُفصَح عنها أعلاه لـ Meta. تعمل Google بموجب بنود تعاقدية قياسية وإطار خصوصية البيانات بين الاتحاد الأوروبي والولايات المتحدة.</li>
       </ul>
       <p>بإنشاء حساب Numio، تُقرّ وتوافق على نقل بياناتك الشخصية عبر الحدود وفق المادة ٢٩ من نظام PDPL. نتّخذ جميع التدابير التقنية والتعاقدية المعقولة لضمان حماية بياناتك بمستوى مكافئ لما يتطلبه النظام السعودي.</p>
 
