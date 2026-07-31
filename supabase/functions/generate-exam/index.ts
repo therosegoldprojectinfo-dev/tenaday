@@ -70,7 +70,7 @@ You MUST respond with ONLY a valid JSON object — no markdown, no backticks, no
   ]
 }
 
-Generate exactly 15 questions total.`
+Generate exactly ${questionCount} questions total.`
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS_HEADERS })
@@ -102,7 +102,18 @@ serve(async (req) => {
       )
     }
 
-    const { images } = await req.json()
+    const { images, is_trial } = await req.json()
+
+    // Trial mode: anonymous users get 5 questions max, 1 image max
+    const isTrial = is_trial === true || user.is_anonymous
+    const questionCount = isTrial ? 5 : 15
+
+    if (isTrial && images?.length > 1) {
+      return new Response(
+        JSON.stringify({ error: 'Trial mode allows 1 image only' }),
+        { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+      )
+    }
 
     if (!images || !images.length) {
       return new Response(
@@ -137,7 +148,7 @@ serve(async (req) => {
 
     content.push({
       type: 'text',
-      text: `Generate exactly 15 quiz questions from the educational content in ${images.length > 1 ? `these ${images.length} pages` : 'this image'}. Only ask about the actual subject matter — never about titles, headers, or document structure. Return only the JSON.`,
+      text: `Generate exactly ${questionCount} quiz questions from the educational content in ${images.length > 1 ? `these ${images.length} pages` : 'this image'}. Only ask about the actual subject matter — never about titles, headers, or document structure. Return only the JSON.`,
     })
 
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
