@@ -18,8 +18,8 @@ Run these files **in order** in the Supabase SQL Editor.
 
 ## Key Security Notes
 
-- **PIN hashing**: Client sends SHA-256("numio-pin:"+pin). DB stores and compares the same hash. Plaintext PIN never leaves the device.
-- **Auth password**: Derived via SHA-256("numio:"+phone+":"+pin+":v2") — not brute-forceable from PIN alone.
+- **Password hashing**: Client sends SHA-256("numio-pin:"+password). DB stores and compares the same hash. Plaintext password never leaves the device.
+- **Auth password**: Derived via SHA-256("numio:"+username+":"+password+":v3") — entropy comes from the user's real password, not a PIN.
 - **Coin awards**: `complete_quiz_and_award_coins(exam_id, kid_id)` derives coin amount server-side from `jsonb_array_length(questions)` — client cannot supply or inflate the amount.
 - **Parent session**: 30-minute session stored in `parent_sessions` after PIN verification. All parent RPCs call `is_parent_verified()` server-side — PIN gate cannot be bypassed from devtools.
 - **No negative balances**: `deduct_coins_from_kid` checks balance server-side. `claim_reward_for_kid` is fully atomic.
