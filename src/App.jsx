@@ -53,6 +53,7 @@ export default function App() {
         const { data } = await supabase.from('profiles').select('display_name, language, activated').eq('id', user.id).single()
         setOnboarded(!!data?.display_name)
         if (data?.activated) setActivated(true)
+        else setActivated(false)
         if (data?.language) setLang(data.language)
 
         if (data?.display_name) {
@@ -95,6 +96,16 @@ export default function App() {
           <Onboarding
             onComplete={async (kidName) => {
               setOnboarded(true)
+              // Reload profile to get activated + language state
+              try {
+                const { supabase } = await import('./lib/supabaseClient')
+                const { data: { user } } = await supabase.auth.getUser()
+                if (user) {
+                  const { data: prof } = await supabase.from('profiles').select('activated, language').eq('id', user.id).single()
+                  if (prof?.activated) setActivated(true)
+                  if (prof?.language) setLang(prof.language)
+                }
+              } catch (e) { console.error('profile reload failed:', e) }
               const kidList = await getKids()
               let kid
               if (kidList.length === 0) {
@@ -126,6 +137,15 @@ export default function App() {
       <LangContext.Provider value={lang}>
         <Activation
           kidId={activeKid.id}
+          onSkip={async () => {
+            try {
+              const { supabase } = await import('./lib/supabaseClient')
+              const { data: { user } } = await supabase.auth.getUser()
+              if (user) await supabase.from('profiles').update({ activated: true }).eq('id', user.id)
+            } catch (e) { console.error('skip activation failed:', e) }
+            setActivated(true)
+            go({ screen: 'chapters' })
+          }}
           onComplete={async (exam) => {
             try {
               const { supabase } = await import('./lib/supabaseClient')
