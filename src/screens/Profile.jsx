@@ -15,6 +15,7 @@ export default function Profile({ onLogout, onLanguageChange }) {
   const { activeKid, kids, setActiveKid, setKids } = useKid()
   const [showAddKid, setShowAddKid] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [langSaving, setLangSaving] = useState(false)
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -26,6 +27,23 @@ export default function Profile({ onLogout, onLanguageChange }) {
     setKids(prev => [...prev, newKid])
     setActiveKid(newKid)
     setShowAddKid(false)
+  }
+
+  // FIX #5: actually save language to DB and call onLanguageChange prop
+  async function handleLanguageChange(newLang) {
+    if (newLang === lang || langSaving) return
+    setLangSaving(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await supabase.from('profiles').update({ language: newLang }).eq('id', user.id)
+      }
+      onLanguageChange?.(newLang)
+    } catch (e) {
+      console.error('Language save failed:', e)
+    } finally {
+      setLangSaving(false)
+    }
   }
 
   const avatarIndex = kids.findIndex(k => k.id === activeKid?.id) % AVATARS.length
@@ -92,12 +110,38 @@ export default function Profile({ onLogout, onLanguageChange }) {
               )
             })}
 
-            {/* Add kid button */}
             <button
               onClick={() => setShowAddKid(true)}
               className="w-full py-4 rounded-2xl border-2 border-dashed border-gray-200 text-muted font-display font-bold text-base active:bg-gray-50 transition-colors"
             >
               {lang === 'ar' ? '+ إضافة طفل' : '+ Add a kid'}
+            </button>
+          </div>
+        </div>
+
+        {/* FIX #5: Language toggle — saves to DB and propagates up */}
+        <div className="mb-6">
+          <p className="font-body font-bold text-xs text-muted uppercase tracking-widest mb-3">
+            {lang === 'ar' ? 'اللغة' : 'Language'}
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => handleLanguageChange('en')}
+              disabled={langSaving}
+              className={`flex-1 py-3 rounded-2xl border-2 font-display font-bold text-base transition-all ${
+                lang === 'en' ? 'border-duo bg-green-50 text-duo' : 'border-gray-200 text-muted bg-white'
+              }`}
+            >
+              🇺🇸 English
+            </button>
+            <button
+              onClick={() => handleLanguageChange('ar')}
+              disabled={langSaving}
+              className={`flex-1 py-3 rounded-2xl border-2 font-display font-bold text-base transition-all ${
+                lang === 'ar' ? 'border-duo bg-green-50 text-duo' : 'border-gray-200 text-muted bg-white'
+              }`}
+            >
+              🇸🇦 عربي
             </button>
           </div>
         </div>
@@ -111,7 +155,6 @@ export default function Profile({ onLogout, onLanguageChange }) {
         </button>
       </div>
 
-      {/* Add kid modal */}
       {showAddKid && (
         <AddKidModal
           lang={lang}
@@ -120,7 +163,6 @@ export default function Profile({ onLogout, onLanguageChange }) {
         />
       )}
 
-      {/* Logout confirm */}
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4">
