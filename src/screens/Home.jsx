@@ -47,14 +47,14 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
     if (!files.length) return
 
     if (images.length + files.length > MAX_IMAGES) {
-      setError(lang === 'ar' ? `الحد الأقصى ${MAX_IMAGES} صور` : `Max ${MAX_IMAGES} images allowed`)
+      setError(new Error(lang === 'ar' ? `الحد الأقصى ${MAX_IMAGES} صور` : `Max ${MAX_IMAGES} images allowed`))
       setStatus('error')
       return
     }
 
     const tooBig = files.find(f => f.size > MAX_SIZE_MB * 1024 * 1024)
     if (tooBig) {
-      setError(lang === 'ar' ? `حجم الصورة كبير جداً (الحد ${MAX_SIZE_MB}MB)` : `Image too large (max ${MAX_SIZE_MB}MB each)`)
+      setError(new Error(lang === 'ar' ? `حجم الصورة كبير جداً (الحد ${MAX_SIZE_MB}MB)` : `Image too large (max ${MAX_SIZE_MB}MB each)`))
       setStatus('error')
       return
     }
