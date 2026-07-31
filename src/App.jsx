@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ensureAuth } from './lib/auth'
 import Onboarding from './screens/Onboarding'
+import TrialFlow from './screens/TrialFlow'
 import Activation from './screens/Activation'
 import { getStreak } from './lib/economy'
 import { getKids, createKid } from './lib/kids'
@@ -93,33 +94,69 @@ export default function App() {
     return (
       <LangContext.Provider value={lang}>
         <div dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-          <Onboarding
-            onComplete={async (kidName) => {
-              setOnboarded(true)
-              // Reload profile to get activated + language state
-              try {
-                const { supabase } = await import('./lib/supabaseClient')
-                const { data: { user } } = await supabase.auth.getUser()
-                if (user) {
-                  const { data: prof } = await supabase.from('profiles').select('activated, language').eq('id', user.id).single()
-                  if (prof?.activated) setActivated(true)
-                  if (prof?.language) setLang(prof.language)
-                }
-              } catch (e) { console.error('profile reload failed:', e) }
-              const kidList = await getKids()
-              let kid
-              if (kidList.length === 0) {
-                kid = await createKid(kidName || 'Kid 1')
-                setKids([kid])
-              } else {
-                setKids(kidList)
-                kid = kidList[0]
-              }
-              setActiveKid(kid)
-              getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
-            }}
+          <TrialFlow
+            lang={lang}
             onLanguageChange={setLang}
+            onSignup={() => {
+              // Mount the signup form
+              const root = document.getElementById('trial-to-signup')
+              if (root) root.style.display = 'flex'
+            }}
           />
+          {/* Signup form — hidden until user taps "Start for free" */}
+          <div id="trial-to-signup" style={{ display: 'none', position: 'fixed', inset: 0, zIndex: 50, background: 'white' }}>
+            <Onboarding
+              onComplete={async (kidName) => {
+                setOnboarded(true)
+                try {
+                  const { supabase } = await import('./lib/supabaseClient')
+                  const { data: { user } } = await supabase.auth.getUser()
+                  if (user) {
+                    const { data: prof } = await supabase.from('profiles').select('activated, language').eq('id', user.id).single()
+                    if (prof?.activated) setActivated(true)
+                    if (prof?.language) setLang(prof.language)
+                  }
+                } catch (e) { console.error('profile reload failed:', e) }
+                const kidList = await getKids()
+                let kid
+                if (kidList.length === 0) {
+                  kid = await createKid(kidName || 'Kid 1')
+                  setKids([kid])
+                } else {
+                  setKids(kidList)
+                  kid = kidList[0]
+                }
+                setActiveKid(kid)
+                getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+
+                // Migrate trial exam into their account if it exists
+                try {
+                  const trialExam = JSON.parse(localStorage.getItem('numio_trial_exam') || 'null')
+                  if (trialExam && trialExam.id === 'trial' && kid) {
+                    const { supabase } = await import('./lib/supabaseClient')
+                    const { data: { user } } = await supabase.auth.getUser()
+                    if (user) {
+                      // Save as a special "First Ever" chapter
+                      const { data: chapter } = await supabase.from('chapters')
+                        .insert({ name: lang === 'ar' ? '🎉 أول اختبار Numio' : '🎉 Your First Ever Numio Quiz', emoji: '🎉', user_id: user.id, kid_id: kid.id })
+                        .select().single()
+                      if (chapter) {
+                        await supabase.from('exams').insert({
+                          user_id: user.id, kid_id: kid.id,
+                          topic: trialExam.topic, questions: trialExam.questions,
+                          chapter_id: chapter.id,
+                        })
+                      }
+                    }
+                    // Clear trial localStorage
+                    ;['numio_trial_exam','numio_trial_answers','numio_trial_idx','numio_trial_done','numio_trial_used']
+                      .forEach(k => localStorage.removeItem(k))
+                  }
+                } catch (e) { console.error('trial migration failed:', e) }
+              }}
+              onLanguageChange={setLang}
+            />
+          </div>
         </div>
       </LangContext.Provider>
     )
