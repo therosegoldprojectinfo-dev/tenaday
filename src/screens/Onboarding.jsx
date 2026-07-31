@@ -62,16 +62,21 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       if (user) {
         const pwHash = await hashPassword(password)
         // INSERT only (not upsert) — v3 revoked UPDATE on parent_pin.
-        // display_name and language are safe to insert here.
         const { error: insertErr } = await supabase.from('profiles').insert({
           id: user.id,
           display_name: username.trim(),
           language: lang,
         })
         if (insertErr) throw insertErr
-        // parent_pin written via SECURITY DEFINER RPC (column not client-writable after v3)
+        // parent_pin via SECURITY DEFINER RPC (not client-writable after v3)
+        // p_old_pin_hash omitted — RPC allows free write when no PIN exists yet (signup only)
         const { error: pinErr } = await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
-        if (pinErr) throw pinErr
+        if (pinErr) {
+          // Partial failure: profile row created but PIN not set.
+          // Clean up the orphan profile row so the user can retry signup.
+          await supabase.from('profiles').delete().eq('id', user.id)
+          throw pinErr
+        }
       }
       firePixel('track', 'CompleteRegistration', { content_name: 'Try For Free' })
       fireGtag('account_created')
