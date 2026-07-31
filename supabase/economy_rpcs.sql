@@ -219,13 +219,7 @@ DECLARE
   coins_to_award int;
   new_balance    int;
 BEGIN
-  -- Idempotency: if already completed, return current balance with 0 coins
-  IF EXISTS (SELECT 1 FROM quiz_completions WHERE exam_id = p_exam_id AND kid_id = p_kid_id) THEN
-    SELECT coin_balance INTO new_balance FROM kid_profiles WHERE id = p_kid_id;
-    RETURN jsonb_build_object('coinsAwarded', 0, 'newBalance', COALESCE(new_balance, 0));
-  END IF;
-
-  -- Verify exam belongs to this authenticated user's family
+  -- Verify exam belongs to this authenticated user's family FIRST
   SELECT jsonb_array_length(questions) INTO question_count
   FROM exams
   WHERE id = p_exam_id AND user_id = auth.uid();
@@ -241,8 +235,16 @@ BEGIN
     RAISE EXCEPTION 'Unauthorized';
   END IF;
 
-  -- Mark as completed (before awarding to prevent race condition)
-  INSERT INTO quiz_completions (exam_id, kid_id) VALUES (p_exam_id, p_kid_id);
+  -- Idempotency: if already completed, return current balance with 0 coins
+  -- Auth checks above ensure we only read our own family's data
+  IF EXISTS (SELECT 1 FROM quiz_completions WHERE exam_id = p_exam_id AND kid_id = p_kid_id) THEN
+    SELECT coin_balance INTO new_balance FROM kid_profiles WHERE id = p_kid_id AND user_id = auth.uid();
+    RETURN jsonb_build_object('coinsAwarded', 0, 'newBalance', COALESCE(new_balance, 0));
+  END IF;
+
+  -- Mark as completed (ON CONFLICT DO NOTHING handles race conditions)
+  INSERT INTO quiz_completions (exam_id, kid_id) VALUES (p_exam_id, p_kid_id)
+  ON CONFLICT DO NOTHING;
 
   -- Derive coins server-side (2 per question)
   coins_to_award := question_count * 2;
