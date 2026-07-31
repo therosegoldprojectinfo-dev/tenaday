@@ -70,7 +70,7 @@ You MUST respond with ONLY a valid JSON object — no markdown, no backticks, no
   ]
 }
 
-Generate exactly ${questionCount} questions total.`
+Generate exactly {QUESTION_COUNT} questions total.`
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS_HEADERS })
@@ -167,7 +167,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 8000,
-        system: SYSTEM_PROMPT,
+        system: SYSTEM_PROMPT.replace('{QUESTION_COUNT}', String(questionCount)),
         messages: [{ role: 'user', content }],
       }),
     })
