@@ -1,176 +1,217 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Privacy Policy — Numio</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Inter', -apple-system, sans-serif; color: #3c3c3c; background: #fff; }
-    .container { max-width: 720px; margin: 0 auto; padding: 48px 24px; }
-    .logo { font-size: 28px; font-weight: 800; color: #58cc02; margin-bottom: 40px; display: block; text-decoration: none; }
-    h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
-    .date { color: #afafaf; font-size: 14px; margin-bottom: 40px; }
-    h2 { font-size: 18px; font-weight: 700; margin: 32px 0 10px; }
-    p, li { font-size: 15px; line-height: 1.7; color: #555; }
-    ul { padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
-    a { color: #58cc02; }
-    hr { border: none; border-top: 1px solid #f0f0f0; margin: 48px 0; }
-    .rtl { direction: rtl; text-align: right; font-family: 'Arial', sans-serif; }
-    .rtl ul { padding-right: 20px; padding-left: 0; }
-    .badge { display: inline-block; background: #f0fdf4; color: #58cc02; border: 1px solid #bbf7d0; border-radius: 8px; padding: 4px 12px; font-size: 13px; font-weight: 700; margin-bottom: 16px; }
-    .contact-box { background: #f9fafb; border-radius: 16px; padding: 20px; margin-top: 12px; }
-    .contact-box a { font-weight: 700; }
-    footer { margin-top: 64px; padding-top: 24px; border-top: 1px solid #f0f0f0; color: #afafaf; font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
-    footer a { color: #afafaf; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <a class="logo" href="https://numiomath.app">Numio</a>
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-    <!-- ENGLISH -->
-    <div class="badge">🇺🇸 English</div>
-    <h1>Privacy Policy</h1>
-    <p class="date">Last updated: July 2026</p>
+const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
+const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
-    <h2>1. Who We Are</h2>
-    <p>Numio (<strong>numiomath.app</strong>) is an educational app for children aged 6–12. Parents create a family account; children use the app to study by photographing school materials and completing AI-generated quizzes.</p>
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': 'https://numiomath.app',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
 
-    <h2>2. What Data We Collect</h2>
-    <ul>
-      <li>Username (chosen by the parent, used as account identifier — never shared)</li>
-      <li>Children's first names (entered by parent)</li>
-      <li>Images of educational materials (processed by AI, not stored permanently)</li>
-      <li>Quiz results and coin balances</li>
-      <li>App usage data (quizzes generated, anonymous analytics)</li>
-    </ul>
+const SYSTEM_PROMPT = `You are an exam generator for kids aged 6 to 12 years old.
 
-    <h2>3. How We Use Your Data</h2>
-    <p>We use your data solely to provide the Numio service: generating educational quizzes, tracking learning progress, and managing the family reward system. We do not sell or rent your data. We share anonymised analytics data (page URL, timestamp, device type, IP address) with Meta Platforms, Inc. and Google LLC to measure advertising effectiveness and app performance during parent onboarding and first-time activation — see Section 5a for full details. We do not share your data with any other third party for marketing or advertising purposes.</p>
+The user will send you one or more images of pages they want to learn from — textbook pages, handwritten notes, worksheets, diagrams, anything educational. Treat all images as one coherent document.
 
-    <h2>4. Children's Privacy (COPPA & PDPL)</h2>
-    <p>Numio is designed for use by children under parental supervision. We do not collect personal data from children beyond their first name. All account management is handled by the parent. We comply with the U.S. Children's Online Privacy Protection Act (COPPA), the EU GDPR for children, and the Saudi Arabia Personal Data Protection Law (PDPL) issued by the National Data Management Office (NDMO).</p>
+LANGUAGE RULE — THIS IS THE MOST IMPORTANT RULE:
+Detect the language of the educational content in the images. Write ALL questions, options, answers, and explanations in that SAME language.
+- If the image content is in French → everything in French, true/false answers must be "Vrai" or "Faux"
+- If the image content is in Arabic → everything in Arabic, true/false answers must be "صحيح" or "خطأ"
+- If the image content is in Spanish → everything in Spanish, true/false answers must be "Verdadero" or "Falso"
+- If the image content is in English → everything in English, true/false answers are "True" or "False"
+- Never mix languages. Never write "True" or "False" if the content is not in English.
 
-    <h2>5. AI Image Processing</h2>
-    <p>Images you upload are sent to Anthropic's Claude API solely to generate quiz questions. Images are not stored by Numio after the quiz is generated. Please do not photograph personal documents, faces, or sensitive information.</p>
+Your job is to:
+1. Analyze ALL images together as one document
+2. Detect the language of the content
+3. Generate exactly 15 questions covering the content across all pages
+4. Write EVERYTHING in the detected language
+5. Choose the best question format:
+   - Multiple choice (MCQ) for facts, definitions, math
+   - True/False for concepts and statements — answers MUST be in the image's language
+   - Fill in the blank for vocabulary or simple recall
+6. Make the language simple, fun, and encouraging
 
-    <h2>5a. Analytics & Advertising (Meta Pixel)</h2>
-    <p>Numio uses the Meta Pixel (Facebook) to measure the effectiveness of our advertising campaigns. Here is exactly what the pixel does and does not do:</p>
-    <ul>
-      <li><strong>App-wide base tracking:</strong> The Meta Pixel script loads every time the app is opened by anyone — parent or child — and sends a <em>PageView</em> event to Meta. This event contains only: the app URL (numiomath.app), a timestamp, device type, and IP address. It contains no name, no quiz data, no coins, and no information about who is using the app.</li>
-      <li><strong>Account creation event:</strong> A <em>CompleteRegistration</em> event fires when a parent completes account creation (username + PIN screen). After account creation, additional events (FirstChallengeStarted, LessonPhotoUploaded, ChallengeGenerated, ChallengeStarted) fire during the first-time activation flow where the parent photographs their child's lesson. These events measure whether parents successfully experience the product's core value.</li>
-      <li><strong>What is never sent to Meta:</strong> Child names, quiz questions or answers, coin balances, reward activity, or any in-app behaviour after signup.</li>
-    </ul>
-    <p>Data collected by the Meta Pixel is processed by Meta Platforms, Inc. under their data policy. Parents can opt out at any time via <a href="https://www.facebook.com/privacy/explanation">Meta's privacy settings</a>.</p>
-    <p><strong>Google Analytics (GA4):</strong> Google Analytics mirrors the same events listed above and also fires a PageView on every app load. Data is processed by Google LLC under their data policy. Parents can opt out via <a href="https://tools.google.com/dlpage/gaoptout">Google's opt-out tool</a>.</p>
+CRITICAL RULES:
+- ONLY ask questions about the actual knowledge/content (math concepts, facts, vocabulary, science, history, etc.)
+- NEVER ask about titles, page numbers, headers, footers, or document structure
+- Every question must help the child LEARN and UNDERSTAND the subject matter
+- Mix question types naturally (aim for roughly 7 MCQ, 4 true/false, 4 fill in the blank)
 
-    <h2>5b. Cross-Border Data Transfers (PDPL — Saudi Arabia)</h2>
-    <p>In accordance with the Saudi Arabia Personal Data Protection Law (PDPL), we disclose that your personal data is processed and stored outside the Kingdom of Saudi Arabia:</p>
-    <ul>
-      <li><strong>Supabase (United States)</strong> — stores account data, children's names, quiz results, and coin balances. Supabase is SOC 2 Type II certified and applies industry-standard security controls.</li>
-      <li><strong>Anthropic (United States)</strong> — receives images you photograph solely to generate quiz questions. Images are not retained by Anthropic beyond the duration of the API request.</li>
-      <li><strong>Meta Platforms, Inc. (United States)</strong> — receives anonymised analytics data (page URL, timestamp, device type, IP address) via the Meta Pixel during parent onboarding and first-time activation. No child names or quiz answers are shared.</li>
-      <li><strong>Google LLC (United States)</strong> — receives anonymised analytics data via Google Analytics (GA4) during parent onboarding and first-time activation, including the same event types disclosed above for Meta. Google operates under standard contractual clauses and the EU–US Data Privacy Framework.</li>
-    </ul>
-    <p>By creating a Numio account, you acknowledge and consent to this cross-border transfer of personal data as required under PDPL Article 29. We take all reasonable contractual and technical measures to ensure your data receives a level of protection equivalent to that required under Saudi law.</p>
+You MUST respond with ONLY a valid JSON object — no markdown, no backticks, no preamble.
 
-    <h2>6. Data Storage & Security</h2>
-    <p>Your data is stored on Supabase infrastructure (servers located in the United States) with row-level security. We use encrypted connections (HTTPS/TLS) for all data transfers. Access to data is restricted to authenticated users only.</p>
+{
+  "topic": "Short topic name in the image's language",
+  "questions": [
+    {
+      "id": 1,
+      "type": "mcq",
+      "question": "Question text?",
+      "options": ["A", "B", "C", "D"],
+      "correct_answer": "B",
+      "explanation": "Kid-friendly explanation."
+    },
+    {
+      "id": 2,
+      "type": "true_false",
+      "question": "Statement here.",
+      "correct_answer": "Vrai",
+      "explanation": "Explanation."
+    },
+    {
+      "id": 3,
+      "type": "fill_blank",
+      "question": "The ___ is the closest planet.",
+      "correct_answer": "Mercury",
+      "explanation": "Explanation."
+    }
+  ]
+}
 
-    <h2>7. Data Retention</h2>
-    <p>Your data is retained as long as your account is active. You may request full deletion of your account and all associated data at any time.</p>
+Generate exactly 15 questions total.`
 
-    <h2>8. Your Rights</h2>
-    <ul>
-      <li>Access your personal data</li>
-      <li>Request correction of inaccurate data</li>
-      <li>Request deletion of your account and data</li>
-      <li>Withdraw consent at any time</li>
-    </ul>
+serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response(null, { headers: CORS_HEADERS })
+  if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: CORS_HEADERS })
 
-    <h2>9. Contact Us</h2>
-    <div class="contact-box">
-      <p>For any privacy questions or data deletion requests, contact us on WhatsApp:</p>
-      <p style="margin-top:8px"><a href="https://wa.me/14384104068" target="_blank">📱 +1 (438) 410-4068</a></p>
-    </div>
+  try {
+    // ── Auth: verify real user session JWT ───────────────────────
+    const authHeader = req.headers.get('Authorization') || ''
+    const jwt = authHeader.replace('Bearer ', '')
 
-    <hr />
+    const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+    const { data: { user }, error: authError } = await sb.auth.getUser(jwt)
 
-    <!-- ARABIC -->
-    <div class="rtl">
-      <div class="badge">🇸🇦 العربية</div>
-      <h1>سياسة الخصوصية</h1>
-      <p class="date">آخر تحديث: يوليو ٢٠٢٦</p>
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+      )
+    }
 
-      <h2>١. من نحن</h2>
-      <p>Numio (<strong>numiomath.app</strong>) تطبيق تعليمي للأطفال من سن ٦ إلى ١٢ عامًا. يُنشئ الوالدان حسابًا عائليًا ويستخدم الأطفال التطبيق للدراسة عن طريق تصوير موادهم المدرسية وإجراء اختبارات مولّدة بالذكاء الاصطناعي.</p>
+    // ── Rate limit: atomic increment via RPC (no race condition) ──
+    const { error: rateLimitErr } = await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
+    if (rateLimitErr) {
+      const isRateLimit = rateLimitErr.message?.includes('Daily limit') || rateLimitErr.code === 'P0001'
+      return new Response(
+        JSON.stringify({ error: isRateLimit ? 'Daily limit reached. Try again tomorrow.' : 'Service error. Please try again.' }),
+        { status: isRateLimit ? 429 : 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+      )
+    }
 
-      <h2>٢. البيانات التي نجمعها</h2>
-      <ul>
-        <li>اسم المستخدم (يختاره الوالد، ويُستخدم كمعرّف للحساب — لا يُشارَك أبدًا)</li>
-        <li>أسماء الأطفال الأولى (يُدخلها الوالد)</li>
-        <li>صور المواد التعليمية (تُعالج بالذكاء الاصطناعي ولا تُحفظ بشكل دائم)</li>
-        <li>نتائج الاختبارات وأرصدة العملات</li>
-        <li>بيانات استخدام التطبيق (عدد الاختبارات المُنشأة، تحليلات مجهولة الهوية)</li>
-      </ul>
+    const { images } = await req.json()
 
-      <h2>٣. كيف نستخدم بياناتك</h2>
-      <p>نستخدم بياناتك حصريًا لتقديم خدمة Numio: إنشاء الاختبارات التعليمية وتتبع التقدم الدراسي وإدارة نظام المكافآت العائلي. لا نبيع بياناتك ولا نؤجّرها. نشارك بيانات تحليلية مجهولة الهوية (عنوان URL للتطبيق، والتوقيت، ونوع الجهاز، وعنوان IP) مع Meta Platforms, Inc. وGoogle LLC لقياس فاعلية الإعلانات وأداء التطبيق خلال تأهيل الوالد وتدفق التفعيل — راجع القسم 5أ للتفاصيل الكاملة. لا نشارك بياناتك مع أي طرف ثالث آخر لأغراض تسويقية أو إعلانية.</p>
+    if (!images || !images.length) {
+      return new Response(
+        JSON.stringify({ error: 'No images provided' }),
+        { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+      )
+    }
 
-      <h2>٤. خصوصية الأطفال (COPPA ونظام PDPL)</h2>
-      <p>صُمّم Numio للاستخدام من قِبل الأطفال تحت إشراف الوالدين. لا نجمع بيانات شخصية من الأطفال سوى أسمائهم الأولى. تتم إدارة الحساب بالكامل من قِبل الوالد. نلتزم بقانون حماية خصوصية الأطفال الأمريكي (COPPA) واللائحة الأوروبية العامة لحماية البيانات للأطفال (GDPR-K) ونظام حماية البيانات الشخصية السعودي (PDPL) الصادر عن الهيئة الوطنية لإدارة البيانات (NDMO).</p>
+    // Validate image count and mediaType
+    if (images.length > 5) {
+      return new Response(
+        JSON.stringify({ error: 'Max 5 images allowed' }),
+        { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+      )
+    }
 
-      <h2>٥. معالجة الصور بالذكاء الاصطناعي</h2>
-      <p>تُرسَل الصور التي ترفعها إلى واجهة برمجة Claude من Anthropic حصريًا لإنشاء أسئلة الاختبار. لا تُحفظ الصور لدى Numio بعد اكتمال إنشاء الاختبار. يُرجى عدم تصوير الوثائق الشخصية أو الوجوه أو أي معلومات حساسة.</p>
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    for (const img of images) {
+      if (!ALLOWED_TYPES.includes(img.mediaType)) {
+        return new Response(
+          JSON.stringify({ error: `Invalid image type: ${img.mediaType}` }),
+          { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
 
-      <h2>٥أ. التحليلات والإعلانات</h2>
-      <p>يستخدم Numio أداة Meta Pixel (فيسبوك) لقياس فاعلية حملاتنا الإعلانية. فيما يلي بالضبط ما تفعله هذه الأداة وما لا تفعله:</p>
-      <ul>
-        <li><strong>التتبع الأساسي على مستوى التطبيق:</strong> يتم تحميل سكريبت Meta Pixel في كل مرة يُفتح فيها التطبيق — سواء من قِبل الوالد أو الطفل — ويُرسل حدث <em>PageView</em> إلى Meta. يحتوي هذا الحدث فقط على: عنوان URL للتطبيق (numiomath.app) والتوقيت ونوع الجهاز وعنوان IP. لا يحتوي على أي اسم أو بيانات اختبار أو عملات أو أي معلومات تخص مستخدم التطبيق.</li>
-        <li><strong>حدث إنشاء الحساب:</strong> يُطلَق حدث <em>CompleteRegistration</em> عند إتمام الوالد إنشاء الحساب (شاشة اسم المستخدم ورمز PIN). بعد إنشاء الحساب، تُطلَق أحداث إضافية (FirstChallengeStarted وLessonPhotoUploaded وChallengeGenerated وChallengeStarted) خلال تدفق التفعيل لأول مرة حيث يلتقط الوالد صورة لدرس طفله. تقيس هذه الأحداث ما إذا كان الوالدون يختبرون القيمة الجوهرية للمنتج بنجاح.</li>
-        <li><strong>ما لا يُرسَل إلى Meta أبدًا:</strong> أسماء الأطفال أو أسئلة الاختبارات وإجاباتها أو أرصدة العملات أو نشاط المكافآت أو أي سلوك داخل التطبيق بعد التسجيل.</li>
-      </ul>
-      <p>تُعالَج البيانات التي يجمعها Meta Pixel من قِبل Meta Platforms, Inc. وفق سياسة بياناتهم. يمكن للوالدين إلغاء الاشتراك في أي وقت عبر <a href="https://www.facebook.com/privacy/explanation">إعدادات خصوصية Meta</a>.</p>
-      <p><strong>Google Analytics (GA4):</strong> يعكس Google Analytics الأحداث المذكورة أعلاه ويُطلق أيضاً حدث PageView عند كل تحميل للتطبيق. تُعالَج البيانات من قِبل Google LLC وفق سياسة بياناتهم. يمكن للوالدين إلغاء الاشتراك عبر <a href="https://tools.google.com/dlpage/gaoptout">أداة إلغاء اشتراك Google</a>.</p>
+    // Build content array — all images + instruction text
+    const content: any[] = images.map((img: { data: string; mediaType: string }) => ({
+      type: 'image',
+      source: { type: 'base64', media_type: img.mediaType || 'image/jpeg', data: img.data },
+    }))
 
-      <h2>٥ب. نقل البيانات عبر الحدود (نظام PDPL — المملكة العربية السعودية)</h2>
-      <p>وفقًا لنظام حماية البيانات الشخصية السعودي (PDPL)، نُفصح بأن بياناتك الشخصية تُعالَج وتُخزَّن خارج المملكة العربية السعودية:</p>
-      <ul>
-        <li><strong>Supabase (الولايات المتحدة الأمريكية)</strong> — يخزّن بيانات الحساب وأسماء الأطفال ونتائج الاختبارات وأرصدة العملات. يحمل Supabase شهادة SOC 2 Type II ويطبّق معايير أمان متوافقة مع المعايير الدولية.</li>
-        <li><strong>Anthropic (الولايات المتحدة الأمريكية)</strong> — يستقبل الصور التي تلتقطها حصريًا لإنشاء أسئلة الاختبار. لا تحتفظ Anthropic بالصور بعد انتهاء طلب واجهة برمجة التطبيقات.</li>
-        <li><strong>Meta Platforms, Inc. (الولايات المتحدة الأمريكية)</strong> — تستقبل بيانات تحليلية مجهولة الهوية (عنوان URL للتطبيق، والتوقيت، ونوع الجهاز، وعنوان IP) عبر Meta Pixel خلال تأهيل الوالد وتدفق التفعيل الأول. لا تُشارَك أسماء الأطفال أو إجابات الاختبارات.</li>
-        <li><strong>Google LLC (الولايات المتحدة الأمريكية)</strong> — تستقبل بيانات تحليلية مجهولة الهوية عبر Google Analytics (GA4) خلال تأهيل الوالد وتدفق التفعيل الأول، بما في ذلك أنواع الأحداث المُفصَح عنها أعلاه لـ Meta. تعمل Google بموجب بنود تعاقدية قياسية وإطار خصوصية البيانات بين الاتحاد الأوروبي والولايات المتحدة.</li>
-      </ul>
-      <p>بإنشاء حساب Numio، تُقرّ وتوافق على نقل بياناتك الشخصية عبر الحدود وفق المادة ٢٩ من نظام PDPL. نتّخذ جميع التدابير التقنية والتعاقدية المعقولة لضمان حماية بياناتك بمستوى مكافئ لما يتطلبه النظام السعودي.</p>
+    content.push({
+      type: 'text',
+      text: `Generate exactly 15 quiz questions from the educational content in ${images.length > 1 ? `these ${images.length} pages` : 'this image'}. Only ask about the actual subject matter — never about titles, headers, or document structure. Return only the JSON.`,
+    })
 
-      <h2>٦. تخزين البيانات وأمانها</h2>
-      <p>تُحفظ بياناتك على بنية Supabase التحتية (خوادم في الولايات المتحدة الأمريكية) مع أمان على مستوى الصف. نستخدم اتصالات مشفّرة (HTTPS/TLS) لجميع عمليات نقل البيانات. الوصول إلى البيانات مقيّد بالمستخدمين المصادق عليهم فقط.</p>
+    const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 8000,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content }],
+      }),
+    })
 
-    <h2>٧. الاحتفاظ بالبيانات</h2>
-      <p>تُحتفظ ببياناتك طالما حسابك نشط. يمكنك طلب الحذف الكامل لحسابك وجميع البيانات المرتبطة به في أي وقت.</p>
+    if (!claudeResponse.ok) {
+      const err = await claudeResponse.text()
+      console.error('Claude API error:', err)
+      return new Response(
+        JSON.stringify({ error: 'Claude API failed', detail: err }),
+        { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+      )
+    }
 
-      <h2>٨. حقوقك</h2>
-      <ul>
-        <li>الوصول إلى بياناتك الشخصية</li>
-        <li>طلب تصحيح البيانات غير الدقيقة</li>
-        <li>طلب حذف حسابك وبياناتك</li>
-        <li>سحب موافقتك في أي وقت</li>
-      </ul>
+    const claudeData = await claudeResponse.json()
+    const rawText = claudeData.content?.[0]?.text || ''
+    const usage = claudeData.usage || {}
 
-      <h2>٩. تواصل معنا</h2>
-      <div class="contact-box">
-        <p>لأي استفسارات تتعلق بالخصوصية أو طلبات حذف البيانات، تواصل معنا عبر واتساب:</p>
-        <p style="margin-top:8px"><a href="https://wa.me/14384104068" target="_blank">📱 +1 (438) 410-4068</a></p>
-      </div>
-    </div>
+    // ── Usage tracking ────────────────────────────────────────────
+    try {
+      // Sonnet 4.6 pricing: $3/M input, $15/M output
+      const costUsd =
+        ((usage.input_tokens || 0) * 3 / 1_000_000) +
+        ((usage.output_tokens || 0) * 15 / 1_000_000)
 
-    <footer>
-      <span>© 2026 Numio</span>
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/terms.html">Terms & Conditions</a>
-      <a href="https://numiomath.app">Back to App</a>
-    </footer>
-  </div>
-</body>
-</html>
+      await sb.from('usage_logs').insert({
+        user_id: user.id, // verified server-side, never trust client
+        image_count: images.length,
+        input_tokens: usage.input_tokens || 0,
+        output_tokens: usage.output_tokens || 0,
+        cost_usd: costUsd,
+      })
+    } catch (trackErr) {
+      console.error('Usage tracking failed (non-fatal):', trackErr)
+    }
+
+    // ── Parse exam JSON ───────────────────────────────────────────
+    let exam
+    try {
+      // Strip markdown code fences Claude sometimes adds around JSON
+      const clean = rawText
+        .replace(/^```(?:json)?[^\n]*\n?/i, '')  // opening fence
+        .replace(/\n?```\s*$/i, '')                // closing fence
+        .trim()
+      exam = JSON.parse(clean)
+    } catch {
+      console.error('Failed to parse Claude JSON:', rawText)
+      return new Response(
+        JSON.stringify({ error: 'Claude returned invalid JSON', raw: rawText }),
+        { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    return new Response(
+      JSON.stringify(exam),
+      { status: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+    )
+
+  } catch (err) {
+    console.error('Edge Function error:', err)
+    return new Response(
+      JSON.stringify({ error: err.message }),
+      { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+    )
+  }
+})
