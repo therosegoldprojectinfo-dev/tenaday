@@ -188,7 +188,9 @@ serve(async (req) => {
     // ── Parse exam JSON ───────────────────────────────────────────
     let exam
     try {
-      exam = JSON.parse(rawText)
+      // Strip markdown code fences if Claude wraps the JSON
+      const clean = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim()
+      exam = JSON.parse(clean)
     } catch {
       console.error('Failed to parse Claude JSON:', rawText)
       return new Response(
