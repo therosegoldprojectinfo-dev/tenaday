@@ -32,6 +32,7 @@ export default function App() {
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
   }, [lang])
   const [onboarded, setOnboarded]     = useState(null)
+  const [showOnboarding, setShowOnboarding] = useState(false)
   const [activated, setActivated]     = useState(false)
   const [activationExam, setActivationExam] = useState(null)
   const [tab, setTab]                 = useState('chapters')
@@ -97,66 +98,103 @@ export default function App() {
           <TrialFlow
             lang={lang}
             onLanguageChange={setLang}
-            onSignup={() => {
-              // Mount the signup form
-              const root = document.getElementById('trial-to-signup')
-              if (root) root.style.display = 'flex'
-            }}
-          />
-          {/* Signup form — hidden until user taps "Start for free" */}
-          <div id="trial-to-signup" style={{ display: 'none', position: 'fixed', inset: 0, zIndex: 50, background: 'white' }}>
-            <Onboarding
-              onComplete={async (kidName) => {
-                setOnboarded(true)
+            onSignup={async ({ username, password, lang: signupLang, trialExam, showLogin }) => {
+              // "Already have an account" → show Onboarding in login mode
+              if (showLogin) {
+                setShowOnboarding(true)
+                return
+              }
+
+              // Derive credentials same way as Onboarding.jsx
+              const hashBuffer = async (input) => {
+                const encoded = new TextEncoder().encode(input)
+                const buf = await crypto.subtle.digest('SHA-256', encoded)
+                return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
+              }
+
+              const fakeEmail  = `${username.toLowerCase().replace(/\s+/g, '_')}@numio.app`
+              const derivedPw  = await hashBuffer(`numio:${username.trim().toLowerCase()}:${password}:v3`)
+              const pwHash     = await hashBuffer(`numio-pin:${password}`)
+
+              const { supabase } = await import('./lib/supabaseClient')
+              const { error: signUpErr } = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
+              if (signUpErr) throw new Error(signUpErr.message)
+
+              const { data: { user } } = await supabase.auth.getUser()
+              if (!user) throw new Error('Signup failed')
+
+              const { error: insertErr } = await supabase.from('profiles').insert({
+                id: user.id, display_name: username.trim(), language: signupLang || lang,
+              })
+              if (insertErr) throw new Error(insertErr.message)
+
+              const { error: pinErr } = await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
+              if (pinErr) {
+                await supabase.from('profiles').delete().eq('id', user.id)
+                throw new Error(pinErr.message)
+              }
+
+              // Migrate trial exam → "🎉 Your First Ever Numio Quiz" chapter
+              if (trialExam && trialExam.id === 'trial') {
                 try {
-                  const { supabase } = await import('./lib/supabaseClient')
-                  const { data: { user } } = await supabase.auth.getUser()
-                  if (user) {
-                    const { data: prof } = await supabase.from('profiles').select('activated, language').eq('id', user.id).single()
-                    if (prof?.activated) setActivated(true)
-                    if (prof?.language) setLang(prof.language)
+                  const kid = await createKid(username.trim())
+                  const { data: chapter } = await supabase.from('chapters')
+                    .insert({ name: lang === 'ar' ? '🎉 أول اختبار Numio' : '🎉 Your First Ever Numio Quiz', emoji: '🎉', user_id: user.id, kid_id: kid.id })
+                    .select().single()
+                  if (chapter) {
+                    await supabase.from('exams').insert({
+                      user_id: user.id, kid_id: kid.id,
+                      topic: trialExam.topic, questions: trialExam.questions,
+                      chapter_id: chapter.id,
+                    })
                   }
-                } catch (e) { console.error('profile reload failed:', e) }
+                  ;['numio_trial_exam','numio_trial_done','numio_trial_used'].forEach(k => localStorage.removeItem(k))
+
+                  await supabase.rpc('set_profile_activated')
+                  setActivated(true)
+                  setKids([kid])
+                  setActiveKid(kid)
+                  getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+                } catch (e) { console.error('trial migration failed:', e) }
+              } else {
                 const kidList = await getKids()
                 let kid
-                if (kidList.length === 0) {
-                  kid = await createKid(kidName || 'Kid 1')
-                  setKids([kid])
-                } else {
-                  setKids(kidList)
-                  kid = kidList[0]
-                }
+                if (kidList.length === 0) { kid = await createKid(username.trim()); setKids([kid]) }
+                else { setKids(kidList); kid = kidList[0] }
                 setActiveKid(kid)
                 getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+              }
 
-                // Migrate trial exam into their account if it exists
-                try {
-                  const trialExam = JSON.parse(localStorage.getItem('numio_trial_exam') || 'null')
-                  if (trialExam && trialExam.id === 'trial' && kid) {
+              if (signupLang) setLang(signupLang)
+              setOnboarded(true)
+            }}
+          />
+          {showOnboarding && (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'white' }}>
+              <Onboarding
+                onComplete={async (kidName) => {
+                  setOnboarded(true)
+                  setShowOnboarding(false)
+                  try {
                     const { supabase } = await import('./lib/supabaseClient')
                     const { data: { user } } = await supabase.auth.getUser()
                     if (user) {
-                      // Save as a special "First Ever" chapter
-                      const { data: chapter } = await supabase.from('chapters')
-                        .insert({ name: lang === 'ar' ? '🎉 أول اختبار Numio' : '🎉 Your First Ever Numio Quiz', emoji: '🎉', user_id: user.id, kid_id: kid.id })
-                        .select().single()
-                      if (chapter) {
-                        await supabase.from('exams').insert({
-                          user_id: user.id, kid_id: kid.id,
-                          topic: trialExam.topic, questions: trialExam.questions,
-                          chapter_id: chapter.id,
-                        })
-                      }
+                      const { data: prof } = await supabase.from('profiles').select('activated, language').eq('id', user.id).single()
+                      if (prof?.activated) setActivated(true)
+                      if (prof?.language) setLang(prof.language)
                     }
-                    // Clear trial localStorage
-                    ;['numio_trial_exam','numio_trial_answers','numio_trial_idx','numio_trial_done','numio_trial_used']
-                      .forEach(k => localStorage.removeItem(k))
-                  }
-                } catch (e) { console.error('trial migration failed:', e) }
-              }}
-              onLanguageChange={setLang}
-            />
-          </div>
+                  } catch (e) { console.error(e) }
+                  const kidList = await getKids()
+                  let kid
+                  if (kidList.length === 0) { kid = await createKid(kidName || 'Kid 1'); setKids([kid]) }
+                  else { setKids(kidList); kid = kidList[0] }
+                  setActiveKid(kid)
+                  getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+                }}
+                onLanguageChange={setLang}
+              />
+            </div>
+          )}
         </div>
       </LangContext.Provider>
     )
