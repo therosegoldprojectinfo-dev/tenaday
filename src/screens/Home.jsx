@@ -28,6 +28,8 @@ function getErrorMessage(err, lang) {
       ? 'لقد وصلت إلى الحد اليومي للاختبارات. حاول مجدداً غداً. 🌙'
       : "You've reached today's quiz limit. Try again tomorrow. 🌙"
   }
+  // Return the specific error message (e.g. "Max 5 images allowed", "Image too large")
+  if (err?.message) return err.message
   return lang === 'ar' ? 'حدث خطأ ما. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'
 }
 
