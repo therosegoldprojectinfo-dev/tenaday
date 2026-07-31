@@ -88,6 +88,13 @@ async function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
   })
 }
 
+function firePixel(type, event, params = {}) {
+  try { if (window.fbq) window.fbq(type, event, params) } catch (_) {}
+}
+function fireGtag(eventName, params = {}) {
+  try { if (window.gtag) window.gtag('event', eventName, params) } catch (_) {}
+}
+
 export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
   const s   = strings[lang] || strings.en
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
@@ -114,23 +121,33 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
     const file = e.target.files?.[0]
     if (!file) return
     setStatus('loading')
+    firePixel('trackCustom', 'TrialPhotoUploaded')
+    fireGtag('trial_photo_uploaded')
     try {
       const compressed = await compressImage(file)
       const result = await generateExam([compressed], { isTrial: true })
-      // Mark trial as used AFTER successful generation
       localStorage.setItem(LS_TRIAL_USED, 'true')
+      firePixel('trackCustom', 'TrialQuizGenerated')
+      fireGtag('trial_quiz_generated')
       const trialExam = { id: 'trial', topic: result.topic, questions: result.questions, isTrial: true }
       setExam(trialExam)
       localStorage.setItem(LS_TRIAL_EXAM, JSON.stringify(trialExam))
       setStatus('ready')
     } catch (err) {
-      setErrorMsg(lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Please try again.')
-      setStatus('error')
+      const isTrialUsed = err.message?.includes('Trial already used')
+      setErrorMsg(isTrialUsed
+        ? (lang === 'ar' ? 'لقد استخدمت تجربتك المجانية. أنشئ حساباً للمتابعة.' : 'You already used your free trial. Create an account to continue.')
+        : (lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Please try again.')
+      )
+      if (isTrialUsed) setStatus('used')
+      else setStatus('error')
     }
   }
 
   function handleQuizDone() {
     localStorage.setItem(LS_TRIAL_DONE, 'true')
+    firePixel('trackCustom', 'TrialQuizCompleted')
+    fireGtag('trial_quiz_completed')
     setStatus('congrats')
   }
 
@@ -146,6 +163,8 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
     setSigning(true); setSignupErr('')
     try {
       await onSignup({ username: username.trim(), password, lang, trialExam: exam })
+      firePixel('track', 'CompleteRegistration', { content_name: 'Trial Signup' })
+      fireGtag('trial_account_created')
     } catch (e) {
       setSignupErr(e.message || (lang === 'ar' ? 'حدث خطأ ما' : 'Something went wrong'))
       setSigning(false)
@@ -186,11 +205,23 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
 
         {/* CTA */}
         <button
-          onClick={() => inputRef.current?.click()}
+          onClick={() => {
+            firePixel('trackCustom', 'TrialStarted')
+            fireGtag('trial_started')
+            inputRef.current?.click()
+          }}
           className="w-full bg-duo text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1 flex-shrink-0"
           style={{ boxShadow: '0 4px 0 #46a302' }}>
           {s.hook_cta}
         </button>
+
+        {/* Policy links — shown before any data is collected */}
+        <p className="font-body text-xs text-muted text-center flex-shrink-0">
+          {lang === 'ar'
+            ? <> بالمتابعة، أنت توافق على <a href="/privacy.html" target="_blank" className="text-duo underline">سياسة الخصوصية</a> و<a href="/terms.html" target="_blank" className="text-duo underline">شروط الاستخدام</a></>
+            : <> By continuing, you agree to our <a href="/privacy.html" target="_blank" className="text-duo underline">Privacy Policy</a> and <a href="/terms.html" target="_blank" className="text-duo underline">Terms of Use</a></>
+          }
+        </p>
 
         <button
           onClick={() => onSignup({ showLogin: true })}
