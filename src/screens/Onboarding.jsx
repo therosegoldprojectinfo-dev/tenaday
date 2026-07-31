@@ -1,317 +1,229 @@
-import { useEffect, useState } from 'react'
-import { ensureAuth } from './lib/auth'
-import Onboarding from './screens/Onboarding'
-import TrialFlow from './screens/TrialFlow'
-import Activation from './screens/Activation'
-import { getStreak } from './lib/economy'
-import { getKids, createKid } from './lib/kids'
-import Nav from './components/Nav'
-import Chapters from './screens/Chapters'
-import CurrentChapter from './screens/CurrentChapter'
-import Home from './screens/Home'
-import Revision from './screens/Revision'
-import Quiz from './screens/Quiz'
-import Rewards from './screens/Rewards'
-import ParentZone from './screens/ParentZone'
-import PinGate from './screens/PinGate'
-import QuizIntro from './screens/QuizIntro'
-import Profile from './screens/Profile'
-import { LangContext } from './lib/LangContext'
-import { KidContext } from './lib/KidContext'
+import { useState } from 'react'
+import { supabase } from '../lib/supabaseClient'
 
-const HIDE_NAV = ['quiz', 'scan', 'quiz_intro']
+function firePixel(type, event, params = {}) {
+  try { if (window.fbq) window.fbq(type, event, params) } catch (_) {}
+}
+function fireGtag(eventName, params = {}) {
+  try { if (window.gtag) window.gtag('event', eventName, params) } catch (_) {}
+}
 
-export default function App() {
-  const [authReady, setAuthReady]     = useState(false)
-  const [streak, setStreak]           = useState(0)
-  const [lang, setLang]               = useState('en')
+export default function Onboarding({ onComplete, onLanguageChange }) {
+  const [screen,    setScreen]   = useState('account')
+  const [username,  setUsername] = useState('')
+  const [password,  setPassword] = useState('')
+  const [isSignIn,  setIsSignIn] = useState(false)
+  const [loading,   setLoading]  = useState(false)
+  const [authError, setAuthError] = useState('')
+  const [savedName, setSavedName] = useState('')
+  const [lang,      setLang]      = useState('en')
 
-  // Sync html element lang + dir for screen readers and SEO
-  useEffect(() => {
-    document.documentElement.lang = lang
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
-  }, [lang])
-  const [onboarded, setOnboarded]     = useState(null)
-  const [activated, setActivated]     = useState(false)
-  const [activationExam, setActivationExam] = useState(null)
-  const [tab, setTab]                 = useState('chapters')
-  const [pinUnlocked, setPinUnlocked] = useState(false)
-  const [parentZoneDefaultTab, setParentZoneDefaultTab] = useState('rewards')
-  const [kids, setKids]               = useState([])
-  const [activeKid, setActiveKid]     = useState(null)
+  function switchLang(l) { setLang(l); onLanguageChange?.(l) }
 
-  const [nav, setNav] = useState({
-    screen: 'chapters', chapter: null, exam: null, revisionExams: [],
-  })
+  async function derivePassword(usernameRaw, pinRaw) {
+    const input = `numio:${usernameRaw.trim().toLowerCase()}:${pinRaw}:v3`
+    const encoded = new TextEncoder().encode(input)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encoded)
+    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('')
+  }
 
-  useEffect(() => {
-    ensureAuth().then(async () => {
-      try {
-        const { supabase } = await import('./lib/supabaseClient')
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user || user.is_anonymous) { setOnboarded(false); return }
+  async function hashPassword(pwRaw) {
+    const input = `numio-pin:${pwRaw}`
+    const encoded = new TextEncoder().encode(input)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encoded)
+    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('')
+  }
 
-        const { data } = await supabase.from('profiles').select('display_name, language, activated').eq('id', user.id).single()
-        setOnboarded(!!data?.display_name)
-        if (data?.activated) setActivated(true)
-        else setActivated(false)
-        if (data?.language) setLang(data.language)
+  async function handleSignIn() {
+    if (!username.trim()) { setAuthError(lang === 'ar' ? 'أدخل اسم المستخدم' : 'Enter your username'); return }
+    if (password.length < 6) { setAuthError(lang === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters'); return }
+    setLoading(true); setAuthError('')
+    try {
+      const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
+      const derivedPw = await derivePassword(username, password)
+      const { error } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: derivedPw })
+      if (error) throw error
+      onComplete(null)
+    } catch {
+      setAuthError(lang === 'ar' ? 'اسم المستخدم أو كلمة المرور غير صحيحة' : 'Wrong username or password')
+    } finally { setLoading(false) }
+  }
 
-        if (data?.display_name) {
-          // Load kids
-          const kidList = await getKids()
-          if (kidList.length === 0) {
-            // Migrate: create first kid from display_name
-            const firstKid = await createKid(data.display_name)
-            setKids([firstKid])
-            setActiveKid(firstKid)
-            getStreak(firstKid.id).then(s => setStreak(s.count)).catch(() => {})
-          } else {
-            setKids(kidList)
-            setActiveKid(kidList[0])
-            getStreak(kidList[0].id).then(s => setStreak(s.count)).catch(() => {})
-          }
+  async function handleCreateAccount() {
+    if (!username.trim()) { setAuthError(lang === 'ar' ? 'أدخل اسم مستخدم' : 'Enter a username'); return }
+    if (password.length < 6) { setAuthError(lang === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters'); return }
+    setLoading(true); setAuthError('')
+    try {
+      const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
+      const derivedPw = await derivePassword(username, password)
+      const { error } = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
+      if (error) throw error
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const pwHash = await hashPassword(password)
+        // INSERT only (not upsert) — v3 revoked UPDATE on parent_pin.
+        const { error: insertErr } = await supabase.from('profiles').insert({
+          id: user.id,
+          display_name: username.trim(),
+          language: lang,
+        })
+        if (insertErr) throw insertErr
+        // parent_pin via SECURITY DEFINER RPC (not client-writable after v3)
+        // p_old_pin_hash omitted — RPC allows free write when no PIN exists yet (signup only)
+        const { error: pinErr } = await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
+        if (pinErr) {
+          // Partial failure: profile row created but PIN not set.
+          // Clean up the orphan profile row so the user can retry signup.
+          await supabase.from('profiles').delete().eq('id', user.id)
+          throw pinErr
         }
-      } catch { setOnboarded(false) }
-    }).finally(() => setAuthReady(true))
-  }, [])
+      }
+      firePixel('track', 'CompleteRegistration', { content_name: 'Try For Free' })
+      fireGtag('account_created')
+      onComplete(username.trim())
+    } catch (e) {
+      setAuthError(lang === 'ar' ? 'حدث خطأ ما' : (e.message || 'Something went wrong'))
+    } finally { setLoading(false) }
+  }
 
-  // When active kid changes, reload streak
-  useEffect(() => {
-    if (!activeKid) return
-    getStreak(activeKid.id).then(s => setStreak(s.count)).catch(() => {})
-  }, [activeKid?.id])
-
-  if (!authReady || onboarded === null) {
+  // ── HOW IT WORKS ──────────────────────────────────────────────────
+  if (screen === 'how') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-duo animate-spin" />
+      <div className="bg-white w-full" style={{ minHeight: '100dvh' }}>
+        <div className="w-full max-w-md mx-auto flex flex-col items-center justify-center px-6 gap-8" style={{ minHeight: '100dvh' }}>
+          <img src="/mascot.png" alt="Numio" className="w-28 h-auto" />
+          <div className="text-center">
+            <h1 className="font-display font-extrabold text-3xl text-ink mb-1">Here's how it works</h1>
+            <p className="font-body text-muted text-base">3 simple steps 🚀</p>
+          </div>
+          <div className="flex flex-col gap-4 w-full">
+            {[
+              { icon: '📸', title: 'Take a picture', desc: 'Snap any textbook page or notes.' },
+              { icon: '🧠', title: 'Practice', desc: 'Answer a quiz Numio built just for you.' },
+              { icon: '🎁', title: 'Earn & claim rewards', desc: 'Collect coins and claim rewards set by your parents.' },
+            ].map((step, i) => (
+              <div key={i} className="flex items-center gap-4 bg-gray-50 rounded-2xl px-5 py-4">
+                <span style={{ fontSize: 36 }}>{step.icon}</span>
+                <div>
+                  <p className="font-display font-bold text-base text-ink">{step.title}</p>
+                  <p className="font-body text-sm text-muted">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            onClick={() => onComplete(savedName)}
+            className="w-full bg-duo text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
+            style={{ boxShadow: '0 4px 0 #46a302' }}
+          >
+            Let's start 🚀
+          </button>
+        </div>
       </div>
     )
   }
 
-  if (!onboarded) {
-    return (
-      <LangContext.Provider value={lang}>
-        <div dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-          <TrialFlow
-            lang={lang}
-            onLanguageChange={setLang}
-            onSignup={() => {
-              // Mount the signup form
-              const root = document.getElementById('trial-to-signup')
-              if (root) root.style.display = 'flex'
-            }}
-          />
-          {/* Signup form — hidden until user taps "Start for free" */}
-          <div id="trial-to-signup" style={{ display: 'none', position: 'fixed', inset: 0, zIndex: 50, background: 'white' }}>
-            <Onboarding
-              onComplete={async (kidName) => {
-                setOnboarded(true)
-                try {
-                  const { supabase } = await import('./lib/supabaseClient')
-                  const { data: { user } } = await supabase.auth.getUser()
-                  if (user) {
-                    const { data: prof } = await supabase.from('profiles').select('activated, language').eq('id', user.id).single()
-                    if (prof?.activated) setActivated(true)
-                    if (prof?.language) setLang(prof.language)
-                  }
-                } catch (e) { console.error('profile reload failed:', e) }
-                const kidList = await getKids()
-                let kid
-                if (kidList.length === 0) {
-                  kid = await createKid(kidName || 'Kid 1')
-                  setKids([kid])
-                } else {
-                  setKids(kidList)
-                  kid = kidList[0]
-                }
-                setActiveKid(kid)
-                getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+  // ── ACCOUNT SCREEN ────────────────────────────────────────────────
+  return (
+    <div className="bg-white w-full" style={{ minHeight: '100dvh' }} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+      <div className="w-full max-w-md mx-auto flex flex-col px-6" style={{ minHeight: '100dvh' }}>
 
-                // Migrate trial exam into their account if it exists
-                try {
-                  const trialExam = JSON.parse(localStorage.getItem('numio_trial_exam') || 'null')
-                  if (trialExam && trialExam.id === 'trial' && kid) {
-                    const { supabase } = await import('./lib/supabaseClient')
-                    const { data: { user } } = await supabase.auth.getUser()
-                    if (user) {
-                      // Save as a special "First Ever" chapter
-                      const { data: chapter } = await supabase.from('chapters')
-                        .insert({ name: lang === 'ar' ? '🎉 أول اختبار Numio' : '🎉 Your First Ever Numio Quiz', emoji: '🎉', user_id: user.id, kid_id: kid.id })
-                        .select().single()
-                      if (chapter) {
-                        await supabase.from('exams').insert({
-                          user_id: user.id, kid_id: kid.id,
-                          topic: trialExam.topic, questions: trialExam.questions,
-                          chapter_id: chapter.id,
-                        })
-                      }
-                    }
-                    // Clear trial localStorage
-                    ;['numio_trial_exam','numio_trial_answers','numio_trial_idx','numio_trial_done','numio_trial_used']
-                      .forEach(k => localStorage.removeItem(k))
-                  }
-                } catch (e) { console.error('trial migration failed:', e) }
-              }}
-              onLanguageChange={setLang}
-            />
+        {/* Language toggle */}
+        <div className="flex-shrink-0 pt-6 flex justify-end gap-2">
+          <button onClick={() => switchLang('en')}
+            className={`px-3 py-1 rounded-full font-body font-bold text-sm transition-all ${lang === 'en' ? 'bg-duo text-white' : 'bg-gray-100 text-muted'}`}>
+            EN
+          </button>
+          <button onClick={() => switchLang('ar')}
+            className={`px-3 py-1 rounded-full font-body font-bold text-sm transition-all ${lang === 'ar' ? 'bg-duo text-white' : 'bg-gray-100 text-muted'}`}>
+            عربي
+          </button>
+        </div>
+
+        {/* Hook */}
+        <div className="flex-shrink-0 pt-4 pb-4 text-center">
+          <h1 className="font-display font-extrabold text-3xl text-ink">
+            {lang === 'ar' ? 'تحسَّن في المدرسة بصورة واحدة! 📸' : 'Get better at school with just a picture! 📸'}
+          </h1>
+        </div>
+
+        {/* Hero image */}
+        <div className="flex-shrink-0 pb-4">
+          <img src="/onboarding-hero.png" alt="Take a photo, get a quiz" className="w-full object-contain" style={{ maxHeight: 200 }} />
+        </div>
+
+        {/* Mascot bubble */}
+        <div className="flex items-start gap-3 mb-6">
+          <img src="/mascot.png" alt="" className="w-14 h-14 object-contain flex-shrink-0" />
+          <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3">
+            <p className="font-display font-bold text-base text-ink">
+              {isSignIn
+                ? (lang === 'ar' ? 'مرحباً بعودتك! 👋' : 'Welcome back! 👋')
+                : (lang === 'ar' ? 'اختر اسم مستخدم لتجربة Numio مجاناً — لا بريد إلكتروني مطلوب' : 'Select a username to try Numio for free. — No email needed')}
+            </p>
           </div>
         </div>
-      </LangContext.Provider>
-    )
-  }
 
-  if (!activated) {
-    if (!activeKid) {
-      return (
-        <div className="min-h-screen bg-white flex items-center justify-center" style={{ height: '100dvh' }}>
-          <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-duo animate-spin" />
-        </div>
-      )
-    }
-    return (
-      <LangContext.Provider value={lang}>
-        <Activation
-          kidId={activeKid.id}
-          onSkip={async () => {
-            try {
-              const { supabase } = await import('./lib/supabaseClient')
-              const { data: { user } } = await supabase.auth.getUser()
-              if (user) await supabase.rpc('set_profile_activated')
-            } catch (e) { console.error('skip activation failed:', e) }
-            setActivated(true)
-            go({ screen: 'chapters' })
-          }}
-          onComplete={async (exam) => {
-            try {
-              const { supabase } = await import('./lib/supabaseClient')
-              const { data: { user } } = await supabase.auth.getUser()
-              if (user) await supabase.rpc('set_profile_activated')
-            } catch (e) { console.error('activation update failed:', e) }
-            setActivationExam(exam)
-            setNav({ screen: 'quiz', chapter: null, exam: null, revisionExams: [] })
-            setActivated(true)
-          }}
-        />
-      </LangContext.Provider>
-    )
-  }
+        {/* Form */}
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">
+              {isSignIn ? (lang === 'ar' ? 'اسم المستخدم' : 'Username') : (lang === 'ar' ? 'اختر اسم مستخدم' : 'Choose a username')}
+            </label>
+            <input
+              type="text"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+              placeholder={lang === "ar" ? "مثال: sarah_mom" : "e.g. sarah_mom"}
+              className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none focus:border-duo transition-colors"
+            />
+          </div>
 
-  const { screen, chapter, exam, revisionExams } = nav
+          <div className="flex flex-col gap-1.5">
+            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">
+              {lang === 'ar' ? 'كلمة المرور' : 'Password'}
+            </label>
+            <input
+              type="password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder={lang === 'ar' ? 'أدخل كلمة المرور' : 'Enter a password'}
+              className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none focus:border-duo transition-colors"
+            />
+            <p className="font-body text-xs text-muted">
+              {lang === 'ar' ? '٦ أحرف على الأقل' : 'At least 6 characters'}
+            </p>
+          </div>
 
-  function go(updates) { setNav(prev => ({ ...prev, ...updates })) }
+          {!isSignIn && (
+            <p className="font-body text-xs text-muted text-center">
+              {lang === 'ar'
+                ? <> بالمتابعة، أنت توافق على <a href="/privacy.html" target="_blank" className="text-duo underline">سياسة الخصوصية</a> و<a href="/terms.html" target="_blank" className="text-duo underline">شروط الاستخدام</a></>
+                : <> By continuing, you agree to our <a href="/privacy.html" target="_blank" className="text-duo underline">Privacy Policy</a> and <a href="/terms.html" target="_blank" className="text-duo underline">Terms of Use</a></>
+              }
+            </p>
+          )}
 
-  function handleTabChange(newTab) {
-    setTab(newTab)
-    if (newTab !== 'parent_zone') { setPinUnlocked(false); setParentZoneDefaultTab('rewards') }
-    go({ screen: newTab, chapter: null, exam: null, revisionExams: [] })
-  }
+          {authError && <p className="font-body text-sm text-red-500 font-bold text-center">{authError}</p>}
 
-  const showNav = !HIDE_NAV.includes(screen)
-
-  const kidContextValue = {
-    activeKid,
-    kids,
-    setActiveKid: (kid) => {
-      setActiveKid(kid)
-      // Reset to chapters when switching kid
-      go({ screen: 'chapters', chapter: null, exam: null, revisionExams: [] })
-      setTab('chapters')
-    },
-    setKids,
-  }
-
-  return (
-    <LangContext.Provider value={lang}>
-      <KidContext.Provider value={kidContextValue}>
-        <div className="flex" dir={lang === 'ar' ? 'rtl' : 'ltr'}
-          style={{ overflow: 'hidden', maxWidth: '100vw', width: '100%' }}>
-
-          {showNav && <Nav active={tab} onChange={handleTabChange} streak={streak} />}
-
-          <main
-            className={`flex-1 ${showNav ? 'md:ms-56' : ''}`}
-            style={{ paddingBottom: showNav ? 'calc(64px + env(safe-area-inset-bottom))' : 0, overflow: 'hidden', minWidth: 0, width: '100%' }}
+          <button
+            onClick={isSignIn ? handleSignIn : handleCreateAccount}
+            disabled={loading || !username.trim() || password.length < 6}
+            className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
+            style={{ boxShadow: '0 4px 0 #46a302' }}
           >
-            {screen === 'chapters' && (
-              <Chapters
-                kidId={activeKid?.id}
-                onSelectChapter={c => go({ screen: 'current_chapter', chapter: c })}
-              />
-            )}
+            {loading ? lang === 'ar' ? 'جاري التحميل...' : 'Loading...' : isSignIn ? 'Log in →' : lang === "ar" ? "جرّب مجاناً الآن ←" : "Try for free now →"}
+          </button>
 
-            {screen === 'current_chapter' && chapter && (
-              <CurrentChapter
-                chapter={chapter}
-                kidId={activeKid?.id}
-                onNew={c => go({ screen: 'scan', chapter: c, exam: null })}
-                onRevision={(c, exams) => go({ screen: 'revision', chapter: c, revisionExams: exams })}
-                onBack={() => go({ screen: 'chapters' })}
-              />
-            )}
-
-            {screen === 'scan' && (
-              <Home
-                chapter={chapter}
-                kidId={activeKid?.id}
-                onExamReady={freshExam => go({ screen: 'quiz_intro', exam: freshExam })}
-                onBack={() => go({ screen: 'current_chapter' })}
-              />
-            )}
-
-            {screen === 'revision' && (
-              <Revision
-                chapter={chapter}
-                exams={revisionExams}
-                onSelectExam={e => go({ screen: 'quiz_intro', exam: e })}
-                onBack={() => go({ screen: 'current_chapter' })}
-              />
-            )}
-
-            {screen === 'quiz_intro' && exam && (
-              <QuizIntro
-                exam={exam || activationExam}
-                kidName={activeKid?.name}
-                onStart={() => go({ screen: 'quiz' })}
-                onBack={() => go({ screen: 'current_chapter' })}
-              />
-            )}
-
-            {screen === 'quiz' && (exam || activationExam) && activeKid && (
-              <Quiz
-                exam={exam || activationExam}
-                kidId={activeKid?.id}
-                onDone={() => {
-                  // If coming from activation flow, go to chapters not current_chapter
-                  const dest = activationExam && !exam ? 'chapters' : 'current_chapter'
-                  setActivationExam(null)
-                  go({ screen: dest })
-                  if (activeKid) getStreak(activeKid.id).then(s => setStreak(s.count)).catch(() => {})
-                }}
-              />
-            )}
-
-            {screen === 'rewards'     && <Rewards kidId={activeKid?.id} onNavigateToParentZone={() => { setParentZoneDefaultTab('claims'); setTab('parent_zone'); go({ screen: 'parent_zone' }) }} />}
-
-            {screen === 'parent_zone' && !pinUnlocked && (
-              <PinGate onSuccess={() => setPinUnlocked(true)} onBack={() => go({ screen: 'chapters' })} />
-            )}
-            {screen === 'parent_zone' && pinUnlocked && <ParentZone defaultTab={parentZoneDefaultTab} />}
-
-            {screen === 'profile' && (
-              <Profile
-                onLogout={() => {
-                  setOnboarded(false)
-                  setKids([])
-                  setActiveKid(null)
-                }}
-                onLanguageChange={setLang}
-              />
-            )}
-          </main>
+          {/* FIX #1: was calling setPin('') which no longer exists — now clears password correctly */}
+          <button
+            onClick={() => { setIsSignIn(!isSignIn); setAuthError(''); setPassword('') }}
+            className="w-full text-muted font-body font-bold text-sm py-2 text-center"
+          >
+            {isSignIn ? lang === "ar" ? "ليس لديك حساب؟ أنشئ واحداً" : "Don't have an account? Create one" : lang === "ar" ? "لديك حساب بالفعل؟ سجّل الدخول" : "Already have an account? Log in"}
+          </button>
         </div>
-      </KidContext.Provider>
-    </LangContext.Provider>
+      </div>
+    </div>
   )
 }
