@@ -10,7 +10,7 @@ function CoinIcon({ size = 24 }) {
 
 const AVATARS = ['🪐', '🌍', '🌙', '⭐', '🌟', '☀️', '🌎', '🌏', '🌑', '💫']
 
-export default function Profile({ onLogout }) {
+export default function Profile({ onLogout, onLanguageChange }) {
   const lang = useLang()
   const { activeKid, kids, setActiveKid, setKids } = useKid()
   const [showAddKid, setShowAddKid] = useState(false)
@@ -128,7 +128,7 @@ export default function Profile({ onLogout }) {
               {lang === 'ar' ? 'تسجيل الخروج؟' : 'Log out?'}
             </h2>
             <p className="font-body text-sm text-muted text-center">
-              {lang === 'ar' ? 'ستحتاج إلى اسم المستخدم ورمز PIN لتسجيل الدخول مرة أخرى.' : "You'll need your username and PIN to log back in."}
+              {lang === 'ar' ? 'ستحتاج إلى اسم المستخدم وكلمة المرور لتسجيل الدخول مرة أخرى.' : "You'll need your username and password to log back in."}
             </p>
             <button
               onClick={handleLogout}
