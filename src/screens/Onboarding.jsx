@@ -222,6 +222,18 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
           >
             {isSignIn ? lang === "ar" ? "ليس لديك حساب؟ أنشئ واحداً" : "Don't have an account? Create one" : lang === "ar" ? "لديك حساب بالفعل؟ سجّل الدخول" : "Already have an account? Log in"}
           </button>
+
+          {/* Forgot password — only shown in login mode */}
+          {isSignIn && (
+            <a
+              href="https://wa.me/14384104068?text=Hi%2C%20I%20forgot%20my%20Numio%20password.%20My%20username%20is%3A%20"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full text-duo font-body font-bold text-sm py-1 text-center block"
+            >
+              {lang === 'ar' ? 'نسيت كلمة المرور؟ تواصل معنا' : 'Forgot password? Contact us on WhatsApp'}
+            </a>
+          )}
         </div>
       </div>
     </div>
