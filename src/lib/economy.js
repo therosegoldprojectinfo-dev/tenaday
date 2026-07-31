@@ -31,7 +31,8 @@ export async function completeQuiz(examId, kidId) {
     p_exam_id: examId,
     p_kid_id: kidId,
   })
-  if (error) throw new Error(error.message)
+  // FIX #2: preserve full error object instead of throwing new Error(error.message)
+  if (error) throw error
   return data // { coinsAwarded, newBalance }
 }
 
@@ -59,13 +60,15 @@ export async function createReward({ name, cost }) {
     p_name: name,
     p_cost: cost,
   })
-  if (error) throw new Error(error.message)
+  // FIX #2: preserve full error object
+  if (error) throw error
   return { id: data, name, cost }
 }
 
 export async function deleteReward(id) {
   const { error } = await supabase.rpc('delete_reward_for_family', { p_reward_id: id })
-  if (error) throw new Error(error.message)
+  // FIX #2: preserve full error object
+  if (error) throw error
 }
 
 // ── Claims (per kid) ─────────────────────────────────────────────
@@ -89,19 +92,22 @@ export async function claimReward(rewardId, kidId) {
     p_reward_id: rewardId,
     p_kid_id: kidId,
   })
-  if (error) throw new Error(error.message)
+  // FIX #2: preserve full error object
+  if (error) throw error
   const profile = await getKidProfile(kidId)
   return { claim: { id: data }, newBalance: profile.coin_balance }
 }
 
 export async function approveClaim(claimId) {
   const { error } = await supabase.rpc('approve_claim_for_family', { p_claim_id: claimId })
-  if (error) throw new Error(error.message)
+  // FIX #2: preserve full error object
+  if (error) throw error
 }
 
 export async function rejectClaim(claimId) {
   const { error } = await supabase.rpc('reject_claim_for_family', { p_claim_id: claimId })
-  if (error) throw new Error(error.message)
+  // FIX #2: preserve full error object
+  if (error) throw error
 }
 
 // ── Streak (per kid) ─────────────────────────────────────────────
@@ -115,4 +121,17 @@ export async function getStreak(kidId) {
 export async function updateStreak(kidId) {
   if (!kidId) throw new Error('kidId is required')
   return updateKidStreak(kidId)
+}
+
+// ── Parent session error helper ───────────────────────────────────
+
+// Returns true if this error means the parent session expired
+// Postgres RAISE EXCEPTION 'Parent verification required' comes through as:
+//   error.message = 'Parent verification required'  (from the RPC)
+//   error.code    = 'P0001'                          (Postgres raised_exception)
+export function isParentSessionError(error) {
+  if (!error) return false
+  const msg = (error.message || '').toLowerCase()
+  const code = error.code || ''
+  return code === 'P0001' && msg.includes('parent verification required')
 }
