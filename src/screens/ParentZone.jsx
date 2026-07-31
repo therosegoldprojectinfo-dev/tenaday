@@ -67,8 +67,12 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
     try {
       await approveClaim(claimId)
       await load()
-    } catch (e) { console.error(e) }
-    finally { setApproving(null) }
+    } catch (e) {
+      if (e.message?.includes('session') || e.message?.includes('unauthorized') || e.code === 'PGRST301') {
+        alert(lang === 'ar' ? 'انتهت جلسة الوالدين. يرجى التحقق مرة أخرى.' : 'Parent session expired. Please verify again.')
+        window.location.reload()
+      } else { console.error(e) }
+    } finally { setApproving(null) }
   }
 
   async function handleReject(claimId) {
@@ -76,8 +80,12 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
     try {
       await rejectClaim(claimId)
       await load()
-    } catch (e) { console.error(e) }
-    finally { setRejecting(null) }
+    } catch (e) {
+      if (e.message?.includes('session') || e.message?.includes('unauthorized') || e.code === 'PGRST301') {
+        alert(lang === 'ar' ? 'انتهت جلسة الوالدين. يرجى التحقق مرة أخرى.' : 'Parent session expired. Please verify again.')
+        window.location.reload()
+      } else { console.error(e) }
+    } finally { setRejecting(null) }
   }
 
   function getKidName(kidId) {
