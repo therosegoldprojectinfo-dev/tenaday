@@ -137,3 +137,13 @@ export function isParentSessionError(error) {
   const code = error.code || ''
   return code === 'P0001' && msg.includes('parent verification required')
 }
+
+
+// ── Quiz Results (parent visibility) ─────────────────────────
+
+export async function getQuizResults(kidId) {
+  if (!kidId) throw new Error('kidId is required')
+  const { data, error } = await supabase.rpc('get_quiz_results', { p_kid_id: kidId })
+  if (error) throw error
+  return data || []
+}
