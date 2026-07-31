@@ -8,7 +8,7 @@ function fireGtag(eventName, params = {}) {
   try { if (window.gtag) window.gtag('event', eventName, params) } catch (_) {}
 }
 
-export default function Onboarding({ onComplete }) {
+export default function Onboarding({ onComplete, onLanguageChange }) {
   const [screen,    setScreen]   = useState('account')
   const [username,  setUsername] = useState('')
   const [pin,       setPin]      = useState('')
@@ -16,6 +16,9 @@ export default function Onboarding({ onComplete }) {
   const [loading,   setLoading]  = useState(false)
   const [authError, setAuthError] = useState('')
   const [savedName, setSavedName] = useState('')
+  const [lang,      setLang]      = useState('en')
+
+  function switchLang(l) { setLang(l); onLanguageChange?.(l) }
 
   async function derivePassword(usernameRaw, pinRaw) {
     const input = `numio:${usernameRaw.trim().toLowerCase()}:${pinRaw}:v2`
@@ -62,6 +65,7 @@ export default function Onboarding({ onComplete }) {
           id: user.id,
           parent_pin: pinHash,
           display_name: username.trim(),
+          language: lang,
         })
       }
       firePixel('track', 'CompleteRegistration', { content_name: 'Try For Free' })
@@ -111,12 +115,26 @@ export default function Onboarding({ onComplete }) {
 
   // ── ACCOUNT SCREEN ────────────────────────────────────────────────
   return (
-    <div className="bg-white w-full" style={{ minHeight: '100dvh' }}>
+    <div className="bg-white w-full" style={{ minHeight: '100dvh' }} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
       <div className="w-full max-w-md mx-auto flex flex-col px-6" style={{ minHeight: '100dvh' }}>
 
+        {/* Language toggle */}
+        <div className="flex-shrink-0 pt-6 flex justify-end gap-2">
+          <button onClick={() => switchLang('en')}
+            className={`px-3 py-1 rounded-full font-body font-bold text-sm transition-all ${lang === 'en' ? 'bg-duo text-white' : 'bg-gray-100 text-muted'}`}>
+            EN
+          </button>
+          <button onClick={() => switchLang('ar')}
+            className={`px-3 py-1 rounded-full font-body font-bold text-sm transition-all ${lang === 'ar' ? 'bg-duo text-white' : 'bg-gray-100 text-muted'}`}>
+            عربي
+          </button>
+        </div>
+
         {/* Hook */}
-        <div className="flex-shrink-0 pt-10 pb-4 text-center">
-          <h1 className="font-display font-extrabold text-3xl text-ink">Get better at school with just a picture! 📸</h1>
+        <div className="flex-shrink-0 pt-4 pb-4 text-center">
+          <h1 className="font-display font-extrabold text-3xl text-ink">
+            {lang === 'ar' ? 'تحسَّن في المدرسة بصورة واحدة! 📸' : 'Get better at school with just a picture! 📸'}
+          </h1>
         </div>
 
         {/* Hero image */}
@@ -129,7 +147,9 @@ export default function Onboarding({ onComplete }) {
           <img src="/mascot.png" alt="" className="w-14 h-14 object-contain flex-shrink-0" />
           <div className="bg-gray-100 rounded-2xl rounded-tl-none px-4 py-3">
             <p className="font-display font-bold text-base text-ink">
-              {isSignIn ? 'Welcome back! 👋' : 'Select a username to try Numio for free. — No email needed'}
+              {isSignIn
+                ? (lang === 'ar' ? 'مرحباً بعودتك! 👋' : 'Welcome back! 👋')
+                : (lang === 'ar' ? 'اختر اسم مستخدم لتجربة Numio مجاناً — لا بريد إلكتروني مطلوب' : 'Select a username to try Numio for free. — No email needed')}
             </p>
           </div>
         </div>
@@ -138,7 +158,7 @@ export default function Onboarding({ onComplete }) {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">
-              {isSignIn ? 'Username' : 'Choose a username'}
+              {isSignIn ? (lang === 'ar' ? 'اسم المستخدم' : 'Username') : (lang === 'ar' ? 'اختر اسم مستخدم' : 'Choose a username')}
             </label>
             <input
               type="text"
@@ -177,14 +197,14 @@ export default function Onboarding({ onComplete }) {
             className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
             style={{ boxShadow: '0 4px 0 #46a302' }}
           >
-            {loading ? 'Loading...' : isSignIn ? 'Log in →' : "Try for free now →"}
+            {loading ? 'Loading...' : isSignIn ? 'Log in →' : lang === "ar" ? "جرّب مجاناً الآن ←" : "Try for free now →"}
           </button>
 
           <button
             onClick={() => { setIsSignIn(!isSignIn); setAuthError(''); setPin('') }}
             className="w-full text-muted font-body font-bold text-sm py-2 text-center"
           >
-            {isSignIn ? "Don't have an account? Create one" : 'Already have an account? Log in'}
+            {isSignIn ? lang === "ar" ? "ليس لديك حساب؟ أنشئ واحداً" : "Don't have an account? Create one" : lang === "ar" ? "لديك حساب بالفعل؟ سجّل الدخول" : "Already have an account? Log in"}
           </button>
         </div>
       </div>
