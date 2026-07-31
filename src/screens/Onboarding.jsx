@@ -11,7 +11,7 @@ function fireGtag(eventName, params = {}) {
 export default function Onboarding({ onComplete, onLanguageChange }) {
   const [screen,    setScreen]   = useState('account')
   const [username,  setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [password,  setPassword] = useState('')
   const [isSignIn,  setIsSignIn] = useState(false)
   const [loading,   setLoading]  = useState(false)
   const [authError, setAuthError] = useState('')
@@ -205,8 +205,9 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
             {loading ? lang === 'ar' ? 'جاري التحميل...' : 'Loading...' : isSignIn ? 'Log in →' : lang === "ar" ? "جرّب مجاناً الآن ←" : "Try for free now →"}
           </button>
 
+          {/* FIX #1: was calling setPin('') which no longer exists — now clears password correctly */}
           <button
-            onClick={() => { setIsSignIn(!isSignIn); setAuthError(''); setPin('') }}
+            onClick={() => { setIsSignIn(!isSignIn); setAuthError(''); setPassword('') }}
             className="w-full text-muted font-body font-bold text-sm py-2 text-center"
           >
             {isSignIn ? lang === "ar" ? "ليس لديك حساب؟ أنشئ واحداً" : "Don't have an account? Create one" : lang === "ar" ? "لديك حساب بالفعل؟ سجّل الدخول" : "Already have an account? Log in"}
