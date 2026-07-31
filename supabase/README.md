@@ -38,6 +38,11 @@ Run these files **in order** in the Supabase SQL Editor.
 - **Activated flag**: Set via set_profile_activated() RPC only — not directly writable by client after v3.
 - **Column locks**: After v3, coin_balance, streak, parent_pin, activated are RPC-only. Client UPDATE is restricted to name, display_name, language.
 
+7. **`set_parent_pin.sql`** — PIN write RPC (run after rls_hardening_v3.sql)
+   Adds set_parent_pin(p_pin_hash) SECURITY DEFINER function.
+   Required because v3 revoked direct UPDATE on parent_pin.
+   Called once at signup from Onboarding.jsx after the profile INSERT.
+
 ## Verification after running v3
 
 Run these in the SQL editor to confirm everything took effect:
