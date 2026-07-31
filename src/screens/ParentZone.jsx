@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getRewards, createReward, deleteReward, getClaims, approveClaim, rejectClaim } from '../lib/economy'
+import { getRewards, createReward, deleteReward, getClaims, approveClaim, rejectClaim, isParentSessionError } from '../lib/economy'
 import { getKids } from '../lib/kids'
 import { useLang } from '../lib/LangContext'
 import { useKid } from '../lib/KidContext'
@@ -11,6 +11,14 @@ function CoinIcon({ size = 24 }) {
 }
 
 const PLANET_AVATARS = ['🪐', '🌍', '🌙', '⭐', '🌟', '☀️', '🌎', '🌏', '🌑', '💫']
+
+// FIX #3: unified session-expiry handler — shows alert + reloads
+function handleSessionExpiry(lang) {
+  alert(lang === 'ar'
+    ? 'انتهت جلسة الوالدين. يرجى التحقق مرة أخرى.'
+    : 'Parent session expired. Please verify again.')
+  window.location.reload()
+}
 
 export default function ParentZone({ defaultTab = 'rewards' }) {
   const lang = useLang()
@@ -30,12 +38,10 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
 
   async function load() {
     try {
-      // Load rewards + ALL claims (no kidId filter — parent sees all)
       const [r, c] = await Promise.all([getRewards(), getClaims()])
       setRewards(r)
       setClaims(c)
 
-      // Load all kid balances in a single query
       if (kids.length > 0) {
         const kidIds = kids.map(k => k.id)
         const { data: kidData } = await supabase
@@ -50,16 +56,36 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
     finally { setLoading(false) }
   }
 
+  // FIX #3: handleCreate now has try/catch so the modal never hangs on "Creating..."
   async function handleCreate(name, cost) {
-    await createReward({ name, cost })
-    setShowModal(false)
-    await load()
+    try {
+      await createReward({ name, cost })
+      setShowModal(false)
+      await load()
+    } catch (e) {
+      if (isParentSessionError(e)) {
+        handleSessionExpiry(lang)
+      } else {
+        console.error(e)
+        throw e // re-throw so RewardModal can reset its saving state
+      }
+    }
   }
 
+  // FIX #3: confirmDelete now has try/catch so the dialog never stays open on error
   async function confirmDelete() {
-    await deleteReward(confirmDeleteId)
-    setConfirmDeleteId(null)
-    await load()
+    try {
+      await deleteReward(confirmDeleteId)
+      setConfirmDeleteId(null)
+      await load()
+    } catch (e) {
+      setConfirmDeleteId(null)
+      if (isParentSessionError(e)) {
+        handleSessionExpiry(lang)
+      } else {
+        console.error(e)
+      }
+    }
   }
 
   async function handleApprove(claimId) {
@@ -68,10 +94,14 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
       await approveClaim(claimId)
       await load()
     } catch (e) {
-      if (e.message?.includes('session') || e.message?.includes('unauthorized') || e.code === 'PGRST301') {
-        alert(lang === 'ar' ? 'انتهت جلسة الوالدين. يرجى التحقق مرة أخرى.' : 'Parent session expired. Please verify again.')
-        window.location.reload()
-      } else { console.error(e) }
+      // FIX #3: detect real session expiry via isParentSessionError (checks P0001 + message)
+      // "Claim not found, already approved, or unauthorized" does NOT trigger this —
+      // it's a different P0001 message so it falls to the else branch correctly
+      if (isParentSessionError(e)) {
+        handleSessionExpiry(lang)
+      } else {
+        console.error(e)
+      }
     } finally { setApproving(null) }
   }
 
@@ -81,10 +111,11 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
       await rejectClaim(claimId)
       await load()
     } catch (e) {
-      if (e.message?.includes('session') || e.message?.includes('unauthorized') || e.code === 'PGRST301') {
-        alert(lang === 'ar' ? 'انتهت جلسة الوالدين. يرجى التحقق مرة أخرى.' : 'Parent session expired. Please verify again.')
-        window.location.reload()
-      } else { console.error(e) }
+      if (isParentSessionError(e)) {
+        handleSessionExpiry(lang)
+      } else {
+        console.error(e)
+      }
     } finally { setRejecting(null) }
   }
 
@@ -185,12 +216,10 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
                   <div key={claim.id} className={`border-2 rounded-2xl px-5 py-4 flex flex-col gap-3 ${
                     claim.status === 'pending' ? 'border-amber-200 bg-amber-50' : 'border-gray-100 bg-white'
                   }`}>
-                    {/* Kid info */}
                     <div className="flex items-center gap-2">
                       <span style={{ fontSize: 18 }}>{getKidAvatar(claim.kid_id)}</span>
                       <span className="font-body font-bold text-sm text-muted">{getKidName(claim.kid_id)}</span>
                     </div>
-                    {/* Claim row */}
                     <div className="flex items-center gap-4">
                       <span style={{ fontSize: 24 }}>
                         {claim.status === 'approved' ? '✅' : claim.status === 'rejected' ? '❌' : '⏳'}
@@ -280,13 +309,22 @@ function RewardModal({ lang, onConfirm, onClose }) {
   const [name, setName]     = useState('')
   const [cost, setCost]     = useState(50)
   const [saving, setSaving] = useState(false)
+  const [error, setError]   = useState('')
   const PRESETS = t(lang, 'parent_presets')
 
   async function handleSubmit() {
     if (!name.trim()) return
     setSaving(true)
-    await onConfirm(name.trim(), cost)
-    setSaving(false)
+    setError('')
+    try {
+      await onConfirm(name.trim(), cost)
+      // onConfirm handles closing the modal on success
+    } catch (e) {
+      // FIX #3: if session expired, onConfirm already reloaded the page.
+      // For any other error, show it and reset the button.
+      setError(lang === 'ar' ? 'حدث خطأ ما. حاول مجدداً.' : 'Something went wrong. Try again.')
+      setSaving(false)
+    }
   }
 
   return (
@@ -329,6 +367,7 @@ function RewardModal({ lang, onConfirm, onClose }) {
               </div>
             </div>
           </div>
+          {error && <p className="font-body text-sm text-red-500 font-bold text-center">{error}</p>}
           <button onClick={handleSubmit} disabled={!name.trim() || saving}
             className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:translate-y-1"
             style={{ boxShadow: '0 4px 0 #46a302' }}>
