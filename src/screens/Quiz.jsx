@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { completeQuiz, updateStreak } from '../lib/economy'
 import StreakPopup from './StreakPopup'
 import { useLang } from '../lib/LangContext'
@@ -60,14 +60,14 @@ function QuitPopup({ visible, onStay, onLeave }) {
 }
 
 // ── Results screen ────────────────────────────────────────────────
-function ResultsScreen({ questions, answers, topic, onDone, coinsEarned }) {
+function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial = false }) {
   const lang = useLang()
   const correct = questions.filter((q, i) => {
     const a = answers[i]
-    return normalize(a) === normalize(q.correct_answer)
+    return answersMatch(a, q.correct_answer)
   }).length
   const total   = questions.length
-  const wrong   = questions.filter((q, i) => normalize(answers[i]) !== normalize(q.correct_answer))
+  const wrong   = questions.filter((q, i) => !answersMatch(answers[i], q.correct_answer))
   const pct = Math.round((correct / total) * 100)
 
   let emoji, headlineKey, subKey
@@ -97,8 +97,18 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned }) {
           <p className="font-body text-base text-muted mt-1">{t(lang, subKey)}</p>
         </div>
 
-        {/* Coins earned */}
-        {coinsEarned > 0 ? (
+        {/* Score / Coins */}
+        {isTrial ? (
+          <div className="flex items-center gap-4 bg-green-50 border-2 border-green-200 rounded-2xl px-6 py-4 w-full">
+            <span style={{ fontSize: 40 }}>🎯</span>
+            <div>
+              <p className="font-body text-xs text-green-600 font-bold uppercase tracking-widest">
+                {lang === 'ar' ? 'نتيجتك' : 'Your score'}
+              </p>
+              <p className="font-display font-extrabold text-3xl text-green-600">{correct}/{total}</p>
+            </div>
+          </div>
+        ) : coinsEarned > 0 ? (
           <div className="flex items-center gap-3 bg-amber-50 border-2 border-amber-200 rounded-2xl px-6 py-4">
             <CoinIcon size={40} />
             <div>
@@ -151,24 +161,24 @@ function normalize(str) {
   return (str || '')
     .trim()
     .toLowerCase()
-    // Strip Latin diacritics
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    // Strip Arabic harakat (tashkeel) U+064B–U+0652 + tatweel U+0640
     .replace(/[\u064B-\u0652\u0640]/g, '')
-    // Normalize Arabic alef variants
     .replace(/[\u0622\u0623\u0625]/g, '\u0627')
-    // Fold ta marbuta (ة) → heh (ه) — most common Saudi child spelling variant
     .replace(/\u0629/g, '\u0647')
-    // Fold alef maqsura (ى) → yeh (ي) — second most common variant
     .replace(/\u0649/g, '\u064a')
-    // Strip Arabic definite article
     .replace(/^\u0627\u0644/, '')
-    // Fold Arabic-Indic digits to Western
     .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660))
-    // Strip Latin articles
     .replace(/^(les|des|un|une|le|la|l'|the|a|an)\s+/i, '')
-    .replace(/s$/, '')
     .trim()
+}
+
+// Plural tolerance for Latin-script only — Arabic/French science vocab not mangled
+function answersMatch(a, b) {
+  const na = normalize(a), nb = normalize(b)
+  if (na === nb) return true
+  const isLatin = s => /^[\x20-\x7E]+$/.test(s)
+  if (isLatin(na) && isLatin(nb)) return na.replace(/s$/, '') === nb.replace(/s$/, '')
+  return false
 }
 
 // ── MCQ Card ──────────────────────────────────────────────────────
@@ -216,40 +226,41 @@ function FireModeOverlay({ streakKey, consecutiveCorrect }) {
   const fireCount = Math.min(6 + consecutiveCorrect * 3, 30)
   const headCount = Math.min(2 + consecutiveCorrect * 2, 15)
 
+  const { fires, heads } = useMemo(() => ({
+    fires: Array.from({ length: fireCount }, () => ({
+      left:     Math.random() * 100,
+      delay:    (Math.random() * 0.5).toFixed(2),
+      duration: (0.8 + Math.random() * 0.8).toFixed(2),
+      size:     28 + Math.random() * 32,
+    })),
+    heads: Array.from({ length: headCount }, () => ({
+      left:     Math.random() * 95,
+      delay:    (Math.random() * 0.6).toFixed(2),
+      duration: (0.9 + Math.random() * 1.0).toFixed(2),
+      size:     50 + Math.random() * 60,
+      rotate:   ((Math.random() - 0.5) * 60).toFixed(1),
+    })),
+  }), [streakKey, fireCount, headCount])
+
   return (
     <div className="fixed inset-0 pointer-events-none z-30 overflow-hidden" key={streakKey}>
-      {/* Fire emojis */}
-      {Array.from({ length: fireCount }).map((_, i) => {
-        const left     = Math.random() * 100
-        const delay    = (Math.random() * 0.5).toFixed(2)
-        const duration = (0.8 + Math.random() * 0.8).toFixed(2)
-        const size     = 28 + Math.random() * 32
-        return (
-          <div key={`fire-${i}`} style={{
-            position: 'absolute', bottom: -80, left: `${left}%`,
-            fontSize: size, opacity: 0,
-            animation: `fire-rise ${duration}s ${delay}s ease-out both`,
-          }}>🔥</div>
-        )
-      })}
-      {/* Flying mascots */}
-      {Array.from({ length: headCount }).map((_, i) => {
-        const left     = Math.random() * 95
-        const delay    = (Math.random() * 0.6).toFixed(2)
-        const duration = (0.9 + Math.random() * 1.0).toFixed(2)
-        const size     = 50 + Math.random() * 60
-        const rotate   = ((Math.random() - 0.5) * 60).toFixed(1)
-        return (
-          <div key={`head-${i}`} style={{
-            position: 'absolute', bottom: -100, left: `${left}%`,
-            width: size, height: size, opacity: 0,
-            transform: `rotate(${rotate}deg)`,
-            animation: `fire-rise ${duration}s ${delay}s ease-out both`,
-          }}>
-            <img src="/mascot.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-          </div>
-        )
-      })}
+      {fires.map((p, i) => (
+        <div key={`fire-${i}`} style={{
+          position: 'absolute', bottom: -80, left: `${p.left}%`,
+          fontSize: p.size, opacity: 0,
+          animation: `fire-rise ${p.duration}s ${p.delay}s ease-out both`,
+        }}>🔥</div>
+      ))}
+      {heads.map((p, i) => (
+        <div key={`head-${i}`} style={{
+          position: 'absolute', bottom: -100, left: `${p.left}%`,
+          width: p.size, height: p.size, opacity: 0,
+          transform: `rotate(${p.rotate}deg)`,
+          animation: `fire-rise ${p.duration}s ${p.delay}s ease-out both`,
+        }}>
+          <img src="/mascot.png" alt="" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        </div>
+      ))}
       <style>{`
         @keyframes fire-rise {
           0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
@@ -283,7 +294,7 @@ export default function Quiz({ exam, onDone, kidId, isTrial = false }) {
   const progressScale = (idx + (revealed ? 1 : 0)) / Math.max(total, 1)
 
   function checkCorrect(answer) {
-    return normalize(answer) === normalize(q?.correct_answer)
+    return answersMatch(answer, q?.correct_answer)
   }
 
   const isCorrect = revealed && checkCorrect(q?.type === 'fill_blank' ? typedValue : selected)
@@ -302,9 +313,9 @@ export default function Quiz({ exam, onDone, kidId, isTrial = false }) {
     setAnswers(newAnswers)
 
     if (idx === total - 1) {
-      // Last question — in trial mode skip results + coin/streak RPCs entirely
+      // Last question — in trial mode show results but skip coin/streak RPCs
       if (isTrial) {
-        onDone()
+        setShowResults(true)
         return
       }
 
@@ -314,11 +325,11 @@ export default function Quiz({ exam, onDone, kidId, isTrial = false }) {
       try {
         const correctCount = questions.filter((q, i) => {
           const a = i === idx ? answer : answers[i]
-          return normalize(a) === normalize(q.correct_answer)
+          return answersMatch(a, q.correct_answer)
         }).length
         const wrongIds = questions
           .map((q, i) => ({ q, a: i === idx ? answer : answers[i] }))
-          .filter(({ q, a }) => normalize(a) !== normalize(q.correct_answer))
+          .filter(({ q, a }) => !answersMatch(a, q.correct_answer))
           .map(({ q }) => q.id)
         const { coinsAwarded } = await completeQuiz(exam.id, kidId, {
           correct: correctCount,
@@ -391,7 +402,7 @@ export default function Quiz({ exam, onDone, kidId, isTrial = false }) {
               setCoinSaveError(false)
               setSaving(true)
               try {
-                const correctCount = questions.filter((q, i) => normalize(answers[i]) === normalize(q.correct_answer)).length; const wrongIds = questions.filter((q, i) => normalize(answers[i]) !== normalize(q.correct_answer)).map(q => q.id); const { coinsAwarded } = await completeQuiz(exam.id, kidId, { correct: correctCount, total, wrongIds })
+                const correctCount = questions.filter((q, i) => answersMatch(answers[i], q.correct_answer)).length; const wrongIds = questions.filter((q, i) => !answersMatch(answers[i], q.correct_answer)).map(q => q.id); const { coinsAwarded } = await completeQuiz(exam.id, kidId, { correct: correctCount, total, wrongIds })
                 setCoinsEarned(coinsAwarded)
                 if (coinsAwarded === 0) setIsReplay(true)
                 const { streakCount: sc, isNewDay } = await updateStreak(kidId)
@@ -417,7 +428,7 @@ export default function Quiz({ exam, onDone, kidId, isTrial = false }) {
         answers={answers}
         topic={topic}
         onDone={onDone}
-        coinsEarned={coinsEarned}
+        coinsEarned={coinsEarned} isTrial={isTrial}
       />
     )
   }
