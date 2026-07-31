@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { ensureAuth } from './lib/auth'
 import Onboarding from './screens/Onboarding'
 import TrialFlow from './screens/TrialFlow'
-import Activation from './screens/Activation'
 import { getStreak } from './lib/economy'
 import { getKids, createKid } from './lib/kids'
 import Nav from './components/Nav'
@@ -33,8 +32,6 @@ export default function App() {
   }, [lang])
   const [onboarded, setOnboarded]     = useState(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
-  const [activated, setActivated]     = useState(false)
-  const [activationExam, setActivationExam] = useState(null)
   const [tab, setTab]                 = useState('chapters')
   const [pinUnlocked, setPinUnlocked] = useState(false)
   const [parentZoneDefaultTab, setParentZoneDefaultTab] = useState('rewards')
@@ -52,10 +49,8 @@ export default function App() {
         const { data: { user } } = await supabase.auth.getUser()
         if (!user || user.is_anonymous) { setOnboarded(false); return }
 
-        const { data } = await supabase.from('profiles').select('display_name, language, activated').eq('id', user.id).single()
+        const { data } = await supabase.from('profiles').select('display_name, language').eq('id', user.id).single()
         setOnboarded(!!data?.display_name)
-        if (data?.activated) setActivated(true)
-        else setActivated(false)
         if (data?.language) setLang(data.language)
 
         if (data?.display_name) {
@@ -150,8 +145,6 @@ export default function App() {
                   }
                   ;['numio_trial_exam','numio_trial_done','numio_trial_used'].forEach(k => localStorage.removeItem(k))
 
-                  await supabase.rpc('set_profile_activated')
-                  setActivated(true)
                   setKids([kid])
                   setActiveKid(kid)
                   getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
@@ -166,7 +159,6 @@ export default function App() {
               }
 
               if (signupLang) setLang(signupLang)
-              setActivated(true)
               setOnboarded(true)
             }}
           />
@@ -180,8 +172,7 @@ export default function App() {
                     const { supabase } = await import('./lib/supabaseClient')
                     const { data: { user } } = await supabase.auth.getUser()
                     if (user) {
-                      const { data: prof } = await supabase.from('profiles').select('activated, language').eq('id', user.id).single()
-                      if (prof?.activated) setActivated(true)
+                      const { data: prof } = await supabase.from('profiles').select('language').eq('id', user.id).single()
                       if (prof?.language) setLang(prof.language)
                     }
                   } catch (e) { console.error(e) }
@@ -201,41 +192,6 @@ export default function App() {
     )
   }
 
-  if (!activated) {
-    if (!activeKid) {
-      return (
-        <div className="min-h-screen bg-white flex items-center justify-center" style={{ height: '100dvh' }}>
-          <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-duo animate-spin" />
-        </div>
-      )
-    }
-    return (
-      <LangContext.Provider value={lang}>
-        <Activation
-          kidId={activeKid.id}
-          onSkip={async () => {
-            try {
-              const { supabase } = await import('./lib/supabaseClient')
-              const { data: { user } } = await supabase.auth.getUser()
-              if (user) await supabase.rpc('set_profile_activated')
-            } catch (e) { console.error('skip activation failed:', e) }
-            setActivated(true)
-            go({ screen: 'chapters' })
-          }}
-          onComplete={async (exam) => {
-            try {
-              const { supabase } = await import('./lib/supabaseClient')
-              const { data: { user } } = await supabase.auth.getUser()
-              if (user) await supabase.rpc('set_profile_activated')
-            } catch (e) { console.error('activation update failed:', e) }
-            setActivationExam(exam)
-            setNav({ screen: 'quiz', chapter: null, exam: null, revisionExams: [] })
-            setActivated(true)
-          }}
-        />
-      </LangContext.Provider>
-    )
-  }
 
   const { screen, chapter, exam, revisionExams } = nav
 
@@ -310,22 +266,20 @@ export default function App() {
 
             {screen === 'quiz_intro' && exam && (
               <QuizIntro
-                exam={exam || activationExam}
+                exam={exam}
                 kidName={activeKid?.name}
                 onStart={() => go({ screen: 'quiz' })}
                 onBack={() => go({ screen: 'current_chapter' })}
               />
             )}
 
-            {screen === 'quiz' && (exam || activationExam) && activeKid && (
+            {screen === 'quiz' && exam && activeKid && (
               <Quiz
-                exam={exam || activationExam}
+                exam={exam}
                 kidId={activeKid?.id}
                 onDone={() => {
                   // If coming from activation flow, go to chapters not current_chapter
-                  const dest = activationExam && !exam ? 'chapters' : 'current_chapter'
-                  setActivationExam(null)
-                  go({ screen: dest })
+                  go({ screen: 'current_chapter' })
                   if (activeKid) getStreak(activeKid.id).then(s => setStreak(s.count)).catch(() => {})
                 }}
               />
