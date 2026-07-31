@@ -35,8 +35,8 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
   }
 
   async function handleSignIn() {
-    if (!username.trim()) { setAuthError('Enter your username'); return }
-    if (pin.length !== 4) { setAuthError('PIN must be 4 digits'); return }
+    if (!username.trim()) { setAuthError(lang === 'ar' ? 'أدخل اسم المستخدم' : 'Enter your username'); return }
+    if (pin.length !== 4) { setAuthError(lang === 'ar' ? 'يجب أن يتكون الرمز من 4 أرقام' : 'PIN must be 4 digits'); return }
     setLoading(true); setAuthError('')
     try {
       const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
@@ -45,13 +45,13 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       if (error) throw error
       onComplete(null)
     } catch {
-      setAuthError('Wrong username or PIN')
+      setAuthError(lang === 'ar' ? 'اسم المستخدم أو الرمز السري غير صحيح' : 'Wrong username or PIN')
     } finally { setLoading(false) }
   }
 
   async function handleCreateAccount() {
-    if (!username.trim()) { setAuthError('Enter a username'); return }
-    if (pin.length !== 4) { setAuthError('PIN must be 4 digits'); return }
+    if (!username.trim()) { setAuthError(lang === 'ar' ? 'أدخل اسم مستخدم' : 'Enter a username'); return }
+    if (pin.length !== 4) { setAuthError(lang === 'ar' ? 'يجب أن يتكون الرمز من 4 أرقام' : 'PIN must be 4 digits'); return }
     setLoading(true); setAuthError('')
     try {
       const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
@@ -72,7 +72,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       fireGtag('account_created')
       onComplete(username.trim())
     } catch (e) {
-      setAuthError(e.message || 'Something went wrong')
+      setAuthError(lang === 'ar' ? 'حدث خطأ ما' : (e.message || 'Something went wrong'))
     } finally { setLoading(false) }
   }
 
@@ -164,7 +164,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
               type="text"
               value={username}
               onChange={e => setUsername(e.target.value)}
-              placeholder="e.g. sarah_mom"
+              placeholder={lang === "ar" ? "مثال: sarah_mom" : "e.g. sarah_mom"}
               className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none focus:border-duo transition-colors"
             />
           </div>
@@ -184,8 +184,10 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
 
           {!isSignIn && (
             <p className="font-body text-xs text-muted text-center">
-              By continuing, you agree to our{' '}
-              <a href="/privacy.html" target="_blank" className="text-duo underline">Privacy Policy</a>
+              {lang === 'ar'
+                ? <> بالمتابعة، أنت توافق على <a href="/privacy.html" target="_blank" className="text-duo underline">سياسة الخصوصية</a></>
+                : <> By continuing, you agree to our <a href="/privacy.html" target="_blank" className="text-duo underline">Privacy Policy</a></>
+              }
             </p>
           )}
 
@@ -197,7 +199,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
             className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
             style={{ boxShadow: '0 4px 0 #46a302' }}
           >
-            {loading ? 'Loading...' : isSignIn ? 'Log in →' : lang === "ar" ? "جرّب مجاناً الآن ←" : "Try for free now →"}
+            {loading ? lang === 'ar' ? 'جاري التحميل...' : 'Loading...' : isSignIn ? 'Log in →' : lang === "ar" ? "جرّب مجاناً الآن ←" : "Try for free now →"}
           </button>
 
           <button
