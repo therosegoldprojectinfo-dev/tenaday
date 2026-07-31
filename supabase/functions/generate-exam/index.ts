@@ -94,9 +94,10 @@ serve(async (req) => {
     // ── Rate limit: atomic increment via RPC (no race condition) ──
     const { error: rateLimitErr } = await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
     if (rateLimitErr) {
+      const isRateLimit = rateLimitErr.message?.includes('Daily limit') || rateLimitErr.code === 'P0001'
       return new Response(
-        JSON.stringify({ error: 'Daily limit reached. Try again tomorrow.' }),
-        { status: 429, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: isRateLimit ? 'Daily limit reached. Try again tomorrow.' : 'Service error. Please try again.' }),
+        { status: isRateLimit ? 429 : 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
       )
     }
 
