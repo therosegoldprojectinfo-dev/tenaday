@@ -188,8 +188,8 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
           {!isSignIn && (
             <p className="font-body text-xs text-muted text-center">
               {lang === 'ar'
-                ? <> بالمتابعة، أنت توافق على <a href="/privacy.html" target="_blank" className="text-duo underline">سياسة الخصوصية</a></>
-                : <> By continuing, you agree to our <a href="/privacy.html" target="_blank" className="text-duo underline">Privacy Policy</a></>
+                ? <> بالمتابعة، أنت توافق على <a href="/privacy.html" target="_blank" className="text-duo underline">سياسة الخصوصية</a> و<a href="/terms.html" target="_blank" className="text-duo underline">شروط الاستخدام</a></>
+                : <> By continuing, you agree to our <a href="/privacy.html" target="_blank" className="text-duo underline">Privacy Policy</a> and <a href="/terms.html" target="_blank" className="text-duo underline">Terms of Use</a></>
               }
             </p>
           )}
