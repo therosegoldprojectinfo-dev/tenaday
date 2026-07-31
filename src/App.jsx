@@ -141,7 +141,7 @@ export default function App() {
             try {
               const { supabase } = await import('./lib/supabaseClient')
               const { data: { user } } = await supabase.auth.getUser()
-              if (user) await supabase.from('profiles').update({ activated: true }).eq('id', user.id)
+              if (user) await supabase.rpc('set_profile_activated')
             } catch (e) { console.error('skip activation failed:', e) }
             setActivated(true)
             go({ screen: 'chapters' })
@@ -150,7 +150,7 @@ export default function App() {
             try {
               const { supabase } = await import('./lib/supabaseClient')
               const { data: { user } } = await supabase.auth.getUser()
-              if (user) await supabase.from('profiles').update({ activated: true }).eq('id', user.id)
+              if (user) await supabase.rpc('set_profile_activated')
             } catch (e) { console.error('activation update failed:', e) }
             setActivationExam(exam)
             setNav({ screen: 'quiz', chapter: null, exam: null, revisionExams: [] })
