@@ -18,11 +18,12 @@ export default function Profile({ onLogout, onLanguageChange }) {
   const [langSaving, setLangSaving] = useState(false)
 
   // Refresh coin balances on mount so Profile matches ParentZone
+  // Only calls setKids (safe — no navigation side effect)
+  // Never calls context's setActiveKid which navigates to Chapters
   useEffect(() => {
     getKids().then(fresh => {
       if (!fresh.length) return
       setKids(fresh)
-      setActiveKid(prev => fresh.find(k => k.id === prev?.id) || fresh[0])
     }).catch(() => {})
   }, [])
 
@@ -78,7 +79,7 @@ export default function Profile({ onLogout, onLanguageChange }) {
                 <div className="flex items-center gap-2 mt-1">
                   <CoinIcon size={20} />
                   <span className="font-display font-bold text-lg text-amber-500">
-                    {activeKid.coin_balance || 0} {lang === 'ar' ? 'عملات' : 'coins'}
+                    {(kids.find(k => k.id === activeKid.id) || activeKid).coin_balance || 0} {lang === 'ar' ? 'عملات' : 'coins'}
                   </span>
                 </div>
               </div>
