@@ -130,9 +130,10 @@ export default function App() {
               }
 
               // Migrate trial exam → "🎉 Your First Ever Numio Quiz" chapter
-              if (trialExam && trialExam.id === 'trial') {
-                try {
-                  const kid = await createKid(username.trim())
+              let kid
+              try {
+                kid = await createKid(username.trim())
+                if (trialExam && trialExam.id === 'trial') {
                   const { data: chapter } = await supabase.from('chapters')
                     .insert({ name: lang === 'ar' ? '🎉 أول اختبار Numio' : '🎉 Your First Ever Numio Quiz', emoji: '🎉', user_id: user.id, kid_id: kid.id })
                     .select().single()
@@ -144,20 +145,19 @@ export default function App() {
                     })
                   }
                   ;['numio_trial_exam','numio_trial_done','numio_trial_used'].forEach(k => localStorage.removeItem(k))
-
-                  setKids([kid])
-                  setActiveKid(kid)
-                  getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
-                } catch (e) { console.error('trial migration failed:', e) }
-              } else {
-                const kidList = await getKids()
-                let kid
-                if (kidList.length === 0) { kid = await createKid(username.trim()); setKids([kid]) }
-                else { setKids(kidList); kid = kidList[0] }
-                setActiveKid(kid)
-                getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+                }
+              } catch (e) {
+                console.error('kid/migration failed:', e)
+                // Still try to get/create kid so app is not broken
+                try {
+                  const kidList = await getKids()
+                  kid = kidList[0] || await createKid(username.trim())
+                } catch { throw new Error(lang === 'ar' ? 'حدث خطأ ما، حاول مجدداً' : 'Something went wrong, please try again') }
               }
 
+              setKids([kid])
+              setActiveKid(kid)
+              getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
               if (signupLang) setLang(signupLang)
               setOnboarded(true)
             }}
