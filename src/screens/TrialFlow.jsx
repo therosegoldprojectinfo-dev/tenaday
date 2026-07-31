@@ -116,8 +116,9 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
     setStatus('loading')
     try {
       const compressed = await compressImage(file)
-      localStorage.setItem(LS_TRIAL_USED, 'true')
       const result = await generateExam([compressed], { isTrial: true })
+      // Mark trial as used AFTER successful generation
+      localStorage.setItem(LS_TRIAL_USED, 'true')
       const trialExam = { id: 'trial', topic: result.topic, questions: result.questions, isTrial: true }
       setExam(trialExam)
       localStorage.setItem(LS_TRIAL_EXAM, JSON.stringify(trialExam))
