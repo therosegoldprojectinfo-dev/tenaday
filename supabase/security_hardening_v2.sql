@@ -1,213 +1,207 @@
 -- ============================================================
--- NUMIO — RLS HARDENING v3
--- Run this in Supabase SQL editor AFTER all previous SQL files.
--- This closes the direct-write vectors that rls_setup.sql left open.
+-- NUMIO — SECURITY HARDENING v2
+-- Run this in Supabase SQL editor AFTER economy_rpcs.sql
 -- ============================================================
 
--- ============================================================
--- 1. kid_profiles — revoke direct UPDATE entirely
---    Problem: rls_setup.sql grants open UPDATE with no column
---    restriction. Any authenticated user can set coin_balance,
---    streak_count, streak_last_date to any value from devtools.
---    Fix: drop the open UPDATE policy, replace with a strict
---    column whitelist (only name and emoji — safe fields kids
---    can edit). All coin/streak mutations go through RPCs only.
--- ============================================================
+-- ── 1. REWARDS: revoke direct insert/update/delete from clients ──
+-- Parents must use RPCs for create/delete, keeping audit trail
 
-DROP POLICY IF EXISTS "kid_profiles_update" ON kid_profiles;
-
--- Kids can only update their own display fields (name, emoji).
--- coin_balance, streak_count, streak_last_date are RPC-only.
-CREATE POLICY "kid_profiles_update" ON kid_profiles
-  FOR UPDATE
-  USING (auth.uid() = user_id)
-  WITH CHECK (auth.uid() = user_id);
-
--- Column-level: revoke UPDATE on sensitive columns entirely.
--- Only RPCs (SECURITY DEFINER) can touch these.
-REVOKE UPDATE (coin_balance, streak_count, streak_last_date) ON kid_profiles FROM authenticated;
-
-
--- ============================================================
--- 2. profiles — revoke UPDATE on parent_pin and activated
---    Problem: rls_setup.sql grants open UPDATE on profiles.
---    A kid can compute SHA-256("numio-pin:1234"), write it to
---    profiles.parent_pin, and enter Parent Zone with PIN "1234".
---    Also: client can set activated=true to skip activation exam.
---    Fix: column-level REVOKE on the dangerous columns.
---    language, display_name remain client-writable (Profile.jsx).
--- ============================================================
-
-REVOKE UPDATE (parent_pin, activated) ON profiles FROM authenticated;
-
-
--- ============================================================
--- 3. exams — revoke direct INSERT from client
---    Problem: rls_setup.sql grants client INSERT on exams.
---    Anyone can insert { questions: Array(500).fill({}) } and
---    call complete_quiz_and_award_coins → 1000 coins.
---    Fix: all exam creation goes through the edge function
---    (service role key). Client only needs SELECT.
--- ============================================================
-
-DROP POLICY IF EXISTS "exams_insert" ON exams;
-DROP POLICY IF EXISTS "exams_update" ON exams;
-
--- No direct insert/update from client — edge function uses service role.
--- Select and delete remain (kids read their own exams, can delete).
-
-
--- ============================================================
--- 4. claims — revoke direct INSERT from client
---    Problem: security_hardening_v2.sql dropped claims_update
---    and claims_delete but left claims_insert from rls_setup.sql.
---    A client can insert { status: 'approved' } directly,
---    bypassing coin deduction and parent approval entirely.
---    Fix: drop claims_insert. Only claim_reward_for_kid RPC
---    can create claims (it's SECURITY DEFINER).
--- ============================================================
-
-DROP POLICY IF EXISTS "claims_insert" ON claims;
-
--- No direct insert on claims — claim_reward_for_kid RPC only.
-
-
--- ============================================================
--- 5. rewards — revoke direct INSERT (already dropped in v2,
---    but rls_setup.sql runs first and re-adds it if re-run).
---    Belt-and-suspenders: ensure insert is gone.
--- ============================================================
-
-DROP POLICY IF EXISTS "rewards_insert" ON rewards;
-DROP POLICY IF EXISTS "rewards_update" ON rewards;
-
--- create_reward_for_family and delete_reward_for_family RPCs only.
-
-
--- ============================================================
--- 6. saveExam: the edge function inserts exams via service role.
---    But chapters.js:saveExam() inserts exams from the client
---    using the anon/user key. We need to allow this specific
---    insert pattern (user_id = auth.uid()) while blocking
---    the forgery vector (arbitrary questions count).
---
---    Solution: re-add a restricted INSERT policy that enforces
---    user_id = auth.uid() AND question count <= 20.
---    This allows saveExam() to work while blocking 500-question
---    forgeries. The edge function still uses service role
---    (bypasses RLS entirely) so it's unaffected.
--- ============================================================
-
-CREATE POLICY "exams_insert" ON exams
-  FOR INSERT
-  WITH CHECK (
-    auth.uid() = user_id
-    AND jsonb_array_length(questions) <= 20
-  );
-
-
--- ============================================================
--- 7. Update complete_quiz_and_award_coins to also validate
---    question count cap server-side (defense in depth).
--- ============================================================
-
-CREATE OR REPLACE FUNCTION complete_quiz_and_award_coins(
-  p_exam_id uuid,
-  p_kid_id  uuid
-)
-RETURNS jsonb
+CREATE OR REPLACE FUNCTION create_reward_for_family(p_name text, p_cost int)
+RETURNS uuid
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
-  question_count int;
-  coins_to_award int;
-  new_balance    int;
-  MAX_QUESTIONS  int := 20;
-  COINS_PER_Q    int := 2;
+  reward_id uuid;
 BEGIN
-  -- Verify exam belongs to this authenticated user's family
-  SELECT jsonb_array_length(questions) INTO question_count
-  FROM exams
-  WHERE id = p_exam_id AND user_id = auth.uid();
-
-  IF NOT FOUND OR question_count IS NULL THEN
-    RAISE EXCEPTION 'Exam not found or unauthorized';
+  IF p_cost < 1 OR p_cost > 10000 THEN
+    RAISE EXCEPTION 'Invalid cost';
+  END IF;
+  IF length(p_name) < 1 OR length(p_name) > 100 THEN
+    RAISE EXCEPTION 'Invalid name';
   END IF;
 
-  -- Cap question count — reject forged exams even if INSERT somehow passed
-  IF question_count > MAX_QUESTIONS THEN
-    RAISE EXCEPTION 'Invalid exam: question count exceeds maximum';
-  END IF;
+  INSERT INTO rewards (user_id, name, cost)
+  VALUES (auth.uid(), p_name, p_cost)
+  RETURNING id INTO reward_id;
 
-  -- Verify kid belongs to this family
-  IF NOT EXISTS (
-    SELECT 1 FROM kid_profiles WHERE id = p_kid_id AND user_id = auth.uid()
-  ) THEN
-    RAISE EXCEPTION 'Unauthorized';
-  END IF;
-
-  -- Idempotency: if already completed, return current balance with 0 coins
-  IF EXISTS (SELECT 1 FROM quiz_completions WHERE exam_id = p_exam_id AND kid_id = p_kid_id) THEN
-    SELECT coin_balance INTO new_balance FROM kid_profiles WHERE id = p_kid_id AND user_id = auth.uid();
-    RETURN jsonb_build_object('coinsAwarded', 0, 'newBalance', COALESCE(new_balance, 0));
-  END IF;
-
-  -- Mark as completed (ON CONFLICT DO NOTHING handles race conditions)
-  INSERT INTO quiz_completions (exam_id, kid_id) VALUES (p_exam_id, p_kid_id)
-  ON CONFLICT DO NOTHING;
-
-  -- Derive coins server-side — client never supplies amount
-  coins_to_award := question_count * COINS_PER_Q;
-
-  UPDATE kid_profiles
-  SET coin_balance = GREATEST(0, coin_balance + coins_to_award)
-  WHERE id = p_kid_id
-  RETURNING coin_balance INTO new_balance;
-
-  RETURN jsonb_build_object(
-    'coinsAwarded', coins_to_award,
-    'newBalance',   new_balance
-  );
+  RETURN reward_id;
 END;
 $$;
 
-REVOKE ALL ON FUNCTION complete_quiz_and_award_coins(uuid, uuid) FROM anon;
-GRANT EXECUTE ON FUNCTION complete_quiz_and_award_coins(uuid, uuid) TO authenticated;
+CREATE OR REPLACE FUNCTION delete_reward_for_family(p_reward_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  DELETE FROM rewards
+  WHERE id = p_reward_id AND user_id = auth.uid();
 
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Reward not found or unauthorized';
+  END IF;
+END;
+$$;
 
--- ============================================================
--- 8. Fix the regression from Round 33 Fix 4:
---    Home.jsx setError() calls for validation errors pass a
---    string, but getErrorMessage() reads err?.message which is
---    undefined on a string — falls through to generic copy.
---    Fix is in Home.jsx (see separate file), but document here.
--- ============================================================
+-- Approve claim RPC (only parent can approve, only pending claims)
+CREATE OR REPLACE FUNCTION approve_claim_for_family(p_claim_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  UPDATE claims
+  SET status = 'approved'
+  WHERE id = p_claim_id
+    AND user_id = auth.uid()
+    AND status = 'pending';
 
--- No SQL needed — see Home.jsx fix below.
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Claim not found, already approved, or unauthorized';
+  END IF;
+END;
+$$;
 
+-- ── 2. Tighten RLS: rewards — read-only for authenticated users ──
+-- (create/delete go through RPCs only)
 
--- ============================================================
--- VERIFICATION QUERIES
--- Run these after applying to confirm everything took effect.
--- ============================================================
+DROP POLICY IF EXISTS "rewards_insert" ON rewards;
+DROP POLICY IF EXISTS "rewards_update" ON rewards;
+DROP POLICY IF EXISTS "rewards_delete" ON rewards;
 
--- Should show NO update privilege on coin_balance for authenticated:
--- SELECT grantee, privilege_type, column_name
--- FROM information_schema.column_privileges
--- WHERE table_name = 'kid_profiles'
---   AND column_name IN ('coin_balance','streak_count','streak_last_date')
---   AND grantee = 'authenticated';
+-- No direct insert/update/delete from client — RPCs only
+-- Select remains (users need to read their own rewards)
 
--- Should show NO insert policy on claims:
--- SELECT policyname, cmd FROM pg_policies
--- WHERE tablename = 'claims' AND cmd = 'INSERT';
+-- ── 3. Tighten RLS: claims — no direct update from client ────────
+-- (approve goes through RPC only)
 
--- Should show NO insert policy on rewards:
--- SELECT policyname, cmd FROM pg_policies
--- WHERE tablename = 'rewards' AND cmd = 'INSERT';
+DROP POLICY IF EXISTS "claims_update" ON claims;
+DROP POLICY IF EXISTS "claims_delete" ON claims;
 
--- Should show exams_insert WITH CHECK includes question count:
--- SELECT policyname, with_check FROM pg_policies
--- WHERE tablename = 'exams' AND cmd = 'INSERT';
+-- No direct update/delete on claims — use RPCs
+
+-- ── 4. Add per-query ownership filter on claims select ───────────
+DROP POLICY IF EXISTS "claims_select" ON claims;
+CREATE POLICY "claims_select" ON claims
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- ── 5. Add per-query ownership filter on rewards select ──────────
+DROP POLICY IF EXISTS "rewards_select" ON rewards;
+CREATE POLICY "rewards_select" ON rewards
+  FOR SELECT USING (auth.uid() = user_id);
+
+-- ── 6. Fix rate limit race condition in edge function ─────────────
+-- Atomic counter per user per day using a separate table
+
+CREATE TABLE IF NOT EXISTS daily_quiz_counts (
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  date date NOT NULL DEFAULT CURRENT_DATE,
+  count int NOT NULL DEFAULT 0,
+  PRIMARY KEY (user_id, date)
+);
+
+ALTER TABLE daily_quiz_counts ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON daily_quiz_counts FROM anon, authenticated;
+
+CREATE OR REPLACE FUNCTION increment_daily_quiz_count(p_user_id uuid)
+RETURNS int
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  new_count int;
+  max_daily int := 20;
+BEGIN
+  INSERT INTO daily_quiz_counts (user_id, date, count)
+  VALUES (p_user_id, CURRENT_DATE, 1)
+  ON CONFLICT (user_id, date)
+  DO UPDATE SET count = daily_quiz_counts.count + 1
+  RETURNING count INTO new_count;
+
+  IF new_count > max_daily THEN
+    -- Rollback the increment
+    UPDATE daily_quiz_counts
+    SET count = count - 1
+    WHERE user_id = p_user_id AND date = CURRENT_DATE;
+    RAISE EXCEPTION 'Daily limit reached';
+  END IF;
+
+  RETURN new_count;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION increment_daily_quiz_count(uuid) FROM anon, authenticated;
+GRANT EXECUTE ON FUNCTION increment_daily_quiz_count(uuid) TO service_role;
+
+-- ── 7. Permissions for new RPCs ──────────────────────────────────
+REVOKE ALL ON FUNCTION create_reward_for_family(text, int) FROM anon;
+REVOKE ALL ON FUNCTION delete_reward_for_family(uuid) FROM anon;
+REVOKE ALL ON FUNCTION approve_claim_for_family(uuid) FROM anon;
+
+GRANT EXECUTE ON FUNCTION create_reward_for_family(text, int) TO authenticated;
+GRANT EXECUTE ON FUNCTION delete_reward_for_family(uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION approve_claim_for_family(uuid) TO authenticated;
+
+-- ── 8. Add PIN attempt throttling to verify_parent_pin ───────────
+CREATE TABLE IF NOT EXISTS pin_attempts (
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+  attempt_time timestamptz DEFAULT now(),
+  PRIMARY KEY (user_id, attempt_time)
+);
+
+ALTER TABLE pin_attempts ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON pin_attempts FROM anon, authenticated;
+
+CREATE OR REPLACE FUNCTION verify_parent_pin(input_pin text)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  stored_pin text;
+  recent_attempts int;
+BEGIN
+  -- Rate limit: max 5 attempts in last 15 minutes
+  SELECT COUNT(*) INTO recent_attempts
+  FROM pin_attempts
+  WHERE user_id = auth.uid()
+    AND attempt_time > now() - interval '15 minutes';
+
+  IF recent_attempts >= 5 THEN
+    RAISE EXCEPTION 'Too many attempts. Try again in 15 minutes.';
+  END IF;
+
+  -- Record this attempt
+  INSERT INTO pin_attempts (user_id) VALUES (auth.uid());
+
+  -- Check PIN
+  SELECT parent_pin INTO stored_pin
+  FROM profiles
+  WHERE id = auth.uid();
+
+  -- Hash comparison: coalesce on NULL prevents early exit on missing PIN
+  -- Inputs are fixed-length SHA-256 hex (64 chars); network jitter far exceeds timing signal
+  IF coalesce(stored_pin, '') = input_pin AND stored_pin IS NOT NULL THEN
+    -- Clear attempts on success
+    DELETE FROM pin_attempts WHERE user_id = auth.uid();
+    RETURN true;
+  END IF;
+
+  RETURN false;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION verify_parent_pin(text) FROM anon;
+GRANT EXECUTE ON FUNCTION verify_parent_pin(text) TO authenticated;
+
+-- ── 9. Fix html lang — add language column to profiles query ─────
+-- (handled in App.jsx already, this is a reminder)
+
+-- ── 10. CORS tightening — handled in edge function ───────────────
+-- (see generate-exam/index.ts update)
