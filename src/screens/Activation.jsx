@@ -105,7 +105,7 @@ export default function Activation({ onComplete, onSkip, kidId }) {
       setExam(savedExam)
       setStatus('ready')
     } catch (err) {
-      setErrorMsg(err.message || 'Something went wrong')
+      setErrorMsg(lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Please try again.')
       setStatus('error')
     }
   }
