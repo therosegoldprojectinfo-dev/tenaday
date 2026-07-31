@@ -286,6 +286,7 @@ export default function Quiz({ exam, onDone, kidId }) {
 
   const [coinSaveError, setCoinSaveError] = useState(false)
   const [coinsEarned,  setCoinsEarned]  = useState(0)
+  const [isReplay,     setIsReplay]     = useState(false) // true when quiz was already completed
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0)
   const [fireKey, setFireKey] = useState(0)
 
@@ -303,6 +304,7 @@ export default function Quiz({ exam, onDone, kidId }) {
       try {
         const { coinsAwarded } = await completeQuiz(exam.id, kidId)
         setCoinsEarned(coinsAwarded)
+        if (coinsAwarded === 0) setIsReplay(true)
         const { streakCount: sc, isNewDay } = await updateStreak(kidId)
         if (isNewDay) {
           setStreakCount(sc)
@@ -370,6 +372,7 @@ export default function Quiz({ exam, onDone, kidId }) {
               try {
                 const { coinsAwarded } = await completeQuiz(exam.id, kidId)
                 setCoinsEarned(coinsAwarded)
+                if (coinsAwarded === 0) setIsReplay(true)
                 const { streakCount: sc, isNewDay } = await updateStreak(kidId)
                 if (isNewDay) { setStreakCount(sc); setShowStreak(true) }
                 else setShowResults(true)
@@ -427,10 +430,8 @@ export default function Quiz({ exam, onDone, kidId }) {
               }} />
           </div>
           <div className="flex items-center gap-1">
-            <CoinIcon size={24} />
-            <span className="font-display font-bold text-sm text-amber-500">{coinsEarned > 0 ? `+${coinsEarned}` : '🔁'}</span>
+            <span className="font-display font-bold text-sm text-muted">{idx + 1}/{total}</span>
           </div>
-          <span className="font-display font-bold text-sm text-muted">{idx + 1}/{total}</span>
         </div>
 
         {/* Topic */}
