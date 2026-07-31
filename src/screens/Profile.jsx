@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useLang } from '../lib/LangContext'
 import { useKid } from '../lib/KidContext'
-import { createKid } from '../lib/kids'
+import { createKid, getKids } from '../lib/kids'
 
 function CoinIcon({ size = 24 }) {
   return <img src="/coin.png" width={size} height={size} alt="coin" style={{ objectFit: 'contain' }} />
@@ -16,6 +16,15 @@ export default function Profile({ onLogout, onLanguageChange }) {
   const [showAddKid, setShowAddKid] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [langSaving, setLangSaving] = useState(false)
+
+  // Refresh coin balances on mount so Profile matches ParentZone
+  useEffect(() => {
+    getKids().then(fresh => {
+      if (!fresh.length) return
+      setKids(fresh)
+      setActiveKid(prev => fresh.find(k => k.id === prev?.id) || fresh[0])
+    }).catch(() => {})
+  }, [])
 
   async function handleLogout() {
     await supabase.auth.signOut()
