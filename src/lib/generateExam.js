@@ -42,6 +42,9 @@ export async function generateExam(files) {
 
   if (!response.ok) {
     const err = await response.json().catch(() => ({ error: 'Unknown error' }))
+    if (response.status === 429) {
+      throw new Error('RATE_LIMIT')
+    }
     throw new Error(err.error || 'Failed to generate exam')
   }
 
