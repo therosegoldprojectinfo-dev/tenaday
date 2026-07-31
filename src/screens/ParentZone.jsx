@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getRewards, createReward, deleteReward, getClaims, approveClaim, rejectClaim, isParentSessionError } from '../lib/economy'
+import { getRewards, createReward, deleteReward, getClaims, approveClaim, rejectClaim, isParentSessionError, getQuizResults } from '../lib/economy'
 import { getKids } from '../lib/kids'
 import { useLang } from '../lib/LangContext'
 import { useKid } from '../lib/KidContext'
@@ -23,8 +23,9 @@ function handleSessionExpiry(lang) {
 export default function ParentZone({ defaultTab = 'rewards' }) {
   const lang = useLang()
   const { kids } = useKid()
-  const [rewards, setRewards]     = useState([])
-  const [claims, setClaims]       = useState([])
+  const [rewards, setRewards]         = useState([])
+  const [claims, setClaims]           = useState([])
+  const [quizResults, setQuizResults] = useState({}) // kidId → results[]
   const [kidBalances, setKidBalances] = useState({})
   const [loading, setLoading]     = useState(true)
   const [tab, setTab]             = useState(defaultTab)
@@ -51,6 +52,15 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
         const balances = {}
         for (const k of (kidData || [])) balances[k.id] = k.coin_balance || 0
         setKidBalances(balances)
+
+        // Load quiz results per kid
+        const resultsMap = {}
+        await Promise.all(kidIds.map(async kidId => {
+          try {
+            resultsMap[kidId] = await getQuizResults(kidId)
+          } catch { resultsMap[kidId] = [] }
+        }))
+        setQuizResults(resultsMap)
       }
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
@@ -171,12 +181,14 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
         )}
 
         <div className="flex-shrink-0 flex gap-2 mb-4">
-          {['rewards', 'claims'].map(tabId => (
+          {['rewards', 'claims', 'progress'].map(tabId => (
             <button key={tabId} onClick={() => setTab(tabId)}
               className={`flex-1 py-2 rounded-xl font-display font-bold text-sm transition-all relative ${
                 tab === tabId ? 'bg-duo text-white' : 'bg-gray-100 text-muted'
               }`}>
-              {tabId === 'rewards' ? t(lang, 'parent_tab_rewards') : t(lang, 'parent_tab_claims', pendingClaims.length)}
+              {tabId === 'rewards' ? t(lang, 'parent_tab_rewards')
+                : tabId === 'claims' ? t(lang, 'parent_tab_claims', pendingClaims.length)
+                : lang === 'ar' ? '📊 التقدم' : '📊 Progress'}
             </button>
           ))}
         </div>
@@ -251,6 +263,92 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
                     </div>
                   </div>
                 ))
+              )}
+            </div>
+          )}
+
+          {tab === 'progress' && (
+            <div className="flex flex-col gap-6">
+              {kids.length === 0 ? (
+                <div className="flex flex-col items-center justify-center pt-20 gap-4 text-center">
+                  <span style={{ fontSize: 64 }}>📊</span>
+                  <p className="font-display font-extrabold text-xl text-ink">
+                    {lang === 'ar' ? 'لا يوجد أطفال بعد' : 'No kids yet'}
+                  </p>
+                </div>
+              ) : (
+                kids.map((kid, i) => {
+                  const results = quizResults[kid.id] || []
+                  const avg = results.length > 0
+                    ? Math.round(results.reduce((sum, r) => sum + r.score_pct, 0) / results.length)
+                    : null
+
+                  return (
+                    <div key={kid.id} className="flex flex-col gap-3">
+                      {/* Kid header */}
+                      <div className="flex items-center gap-3">
+                        <span style={{ fontSize: 24 }}>{PLANET_AVATARS[i % PLANET_AVATARS.length]}</span>
+                        <div className="flex-1">
+                          <p className="font-display font-bold text-base text-ink">{kid.name}</p>
+                          <p className="font-body text-xs text-muted">
+                            {results.length === 0
+                              ? (lang === 'ar' ? 'لا توجد اختبارات بعد' : 'No quizzes yet')
+                              : lang === 'ar'
+                                ? `${results.length} اختبار · متوسط ${avg}%`
+                                : `${results.length} quiz${results.length > 1 ? 'zes' : ''} · Avg ${avg}%`
+                            }
+                          </p>
+                        </div>
+                        {avg !== null && (
+                          <div className={`px-3 py-1 rounded-xl font-display font-bold text-sm ${
+                            avg >= 80 ? 'bg-green-100 text-green-600'
+                            : avg >= 60 ? 'bg-amber-100 text-amber-600'
+                            : 'bg-red-100 text-red-500'
+                          }`}>
+                            {avg}%
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Results list */}
+                      {results.length === 0 ? (
+                        <div className="bg-gray-50 rounded-2xl px-5 py-6 text-center">
+                          <p className="font-body text-sm text-muted">
+                            {lang === 'ar' ? 'سيظهر تقدم طفلك هنا بعد إكمال اختباراتهم.' : "Your child's progress will appear here after they complete quizzes."}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col gap-2">
+                          {results.map(r => {
+                            const date = new Date(r.created_at).toLocaleDateString(
+                              lang === 'ar' ? 'ar-SA' : 'en', { month: 'short', day: 'numeric' }
+                            )
+                            const pct = r.score_pct
+                            return (
+                              <div key={r.id} className="bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 flex items-center gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-display font-bold text-sm text-ink truncate">{r.topic}</p>
+                                  <p className="font-body text-xs text-muted">{r.correct}/{r.total} · {date}</p>
+                                </div>
+                                {/* Score bar */}
+                                <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                                  <span className={`font-display font-bold text-sm ${
+                                    pct >= 80 ? 'text-green-500' : pct >= 60 ? 'text-amber-500' : 'text-red-400'
+                                  }`}>{pct}%</span>
+                                  <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div className={`h-full rounded-full ${
+                                      pct >= 80 ? 'bg-green-400' : pct >= 60 ? 'bg-amber-400' : 'bg-red-400'
+                                    }`} style={{ width: `${pct}%` }} />
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })
               )}
             </div>
           )}
