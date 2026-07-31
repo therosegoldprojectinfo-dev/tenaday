@@ -269,6 +269,7 @@ export default function App() {
                   setKids([])
                   setActiveKid(null)
                 }}
+                onLanguageChange={setLang}
               />
             )}
           </main>
