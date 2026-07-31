@@ -112,29 +112,41 @@ export default function App() {
               const pwHash     = await hashBuffer(`numio-pin:${password}`)
 
               const { supabase } = await import('./lib/supabaseClient')
+              let isNewAccount = true
               const { error: signUpErr } = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
 
-              // Reconciliation: if signUp fails, try signing in
-              // (prior attempt may have created auth row but failed on profile/PIN)
               if (signUpErr) {
+                // Prior attempt created auth row but failed on profile/PIN — recover it
                 const { error: signInErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: derivedPw })
                 if (signInErr) throw new Error(lang === 'ar' ? 'اسم المستخدم مستخدم بالفعل' : 'That username is already taken')
+                isNewAccount = false // reconciling an existing account
               }
 
               const { data: { user } } = await supabase.auth.getUser()
               if (!user) throw new Error('Signup failed')
 
-              // upsert instead of insert — safe on retry
-              const { error: insertErr } = await supabase.from('profiles').upsert({
+              // Only write profile if new account — upsert only updates safe columns
+              // Use INSERT, and on conflict update only the columns we have grant for
+              const { error: insertErr } = await supabase.from('profiles').insert({
                 id: user.id, display_name: username.trim(), language: signupLang || lang,
               })
-              if (insertErr) throw new Error(insertErr.message)
+              // 23505 = unique violation = profile already exists, update safe columns only
+              if (insertErr && insertErr.code !== '23505') throw new Error(insertErr.message)
+              if (insertErr?.code === '23505') {
+                await supabase.from('profiles').update({
+                  display_name: username.trim(), language: signupLang || lang,
+                }).eq('id', user.id)
+              }
 
-              const { error: pinErr } = await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
-              if (pinErr) {
-                // Only delete profile if this is a fresh signup (no prior profile)
-                await supabase.from('profiles').delete().eq('id', user.id)
-                throw new Error(pinErr.message)
+              // Only set PIN if this is a genuinely new account
+              // On reconciliation the PIN already exists — don't overwrite or delete
+              if (isNewAccount) {
+                const { error: pinErr } = await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
+                if (pinErr) {
+                  // Fresh signup failed on PIN — safe to clean up the profile row
+                  await supabase.from('profiles').delete().eq('id', user.id)
+                  throw new Error(pinErr.message)
+                }
               }
 
               // Migrate trial exam → "🎉 Your First Ever Numio Quiz" chapter
