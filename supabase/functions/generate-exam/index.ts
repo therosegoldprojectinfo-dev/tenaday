@@ -92,9 +92,8 @@ serve(async (req) => {
     }
 
     // ── Rate limit: atomic increment via RPC (no race condition) ──
-    try {
-      await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
-    } catch (rateLimitErr) {
+    const { error: rateLimitErr } = await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
+    if (rateLimitErr) {
       return new Response(
         JSON.stringify({ error: 'Daily limit reached. Try again tomorrow.' }),
         { status: 429, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
