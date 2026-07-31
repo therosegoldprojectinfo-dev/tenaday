@@ -40,29 +40,31 @@ export default function CurrentChapter({ chapter, onNew, onRevision, onBack }) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <button
-            onClick={() => onNew(chapter)}
-            className="w-full bg-duo text-white font-display font-extrabold text-2xl rounded-3xl py-10 transition-all flex flex-col items-center gap-2 active:translate-y-1"
-            style={{ boxShadow: '0 5px 0 #46a302' }}
-            onMouseDown={e => e.currentTarget.style.boxShadow = 'none'}
-            onMouseUp={e => e.currentTarget.style.boxShadow = '0 5px 0 #46a302'}
-            onTouchStart={e => e.currentTarget.style.boxShadow = 'none'}
-            onTouchEnd={e => e.currentTarget.style.boxShadow = '0 5px 0 #46a302'}
-          >
-            <span style={{ fontSize: 40 }}>📸</span>
-            {t(lang, 'current_new')}
-          </button>
+          {!chapter.is_activation && (
+            <button
+              onClick={() => onNew(chapter)}
+              className="w-full bg-duo text-white font-display font-extrabold text-2xl rounded-3xl py-10 transition-all flex flex-col items-center gap-2 active:translate-y-1"
+              style={{ boxShadow: '0 5px 0 #46a302' }}
+              onMouseDown={e => e.currentTarget.style.boxShadow = 'none'}
+              onMouseUp={e => e.currentTarget.style.boxShadow = '0 5px 0 #46a302'}
+              onTouchStart={e => e.currentTarget.style.boxShadow = 'none'}
+              onTouchEnd={e => e.currentTarget.style.boxShadow = '0 5px 0 #46a302'}
+            >
+              <span style={{ fontSize: 40 }}>📸</span>
+              {t(lang, 'current_new')}
+            </button>
+          )}
 
           <button
             onClick={() => onRevision(chapter, exams)}
             disabled={exams.length === 0}
-            className="w-full bg-gray-100 disabled:opacity-40 text-gray-500 font-display font-extrabold text-2xl rounded-3xl py-10 transition-all flex flex-col items-center gap-2 disabled:cursor-not-allowed active:translate-y-1"
-            style={{ boxShadow: exams.length === 0 ? 'none' : '0 5px 0 #d1d5db' }}
+            className={`w-full ${chapter.is_activation ? 'bg-duo text-white' : 'bg-gray-100 text-gray-500'} disabled:opacity-40 font-display font-extrabold text-2xl rounded-3xl py-10 transition-all flex flex-col items-center gap-2 disabled:cursor-not-allowed active:translate-y-1`}
+            style={{ boxShadow: exams.length === 0 ? 'none' : chapter.is_activation ? '0 5px 0 #46a302' : '0 5px 0 #d1d5db' }}
           >
             <span style={{ fontSize: 40 }}>📋</span>
             {t(lang, 'current_revision')}
             {exams.length === 0 && (
-              <span className="font-body font-normal text-sm text-gray-400">{t(lang, 'current_no_exams')}</span>
+              <span className="font-body font-normal text-sm opacity-70">{t(lang, 'current_no_exams')}</span>
             )}
           </button>
         </div>
