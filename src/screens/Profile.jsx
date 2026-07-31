@@ -36,7 +36,8 @@ export default function Profile({ onLogout, onLanguageChange }) {
     try {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        await supabase.from('profiles').update({ language: newLang }).eq('id', user.id)
+        const { error: updateErr } = await supabase.from('profiles').update({ language: newLang }).eq('id', user.id)
+        if (updateErr) throw updateErr
       }
       onLanguageChange?.(newLang)
     } catch (e) {
