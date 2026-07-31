@@ -5,10 +5,11 @@ export default function QuizIntro({ exam, kidName = 'Champ', onStart, onBack }) 
   const lang = useLang()
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 text-center" style={{ height: '100dvh' }}>
-      {/* Back button */}
+      {/* Back button — RTL aware */}
       <button
         onClick={onBack}
-        className="absolute top-12 left-5 flex items-center gap-1 text-muted font-body font-bold text-sm active:opacity-60"
+        className="absolute top-12 flex items-center gap-1 text-muted font-body font-bold text-sm active:opacity-60"
+        style={{ insetInlineStart: 20 }}
       >
         ← {lang === 'ar' ? 'رجوع' : 'Back'}
       </button>
@@ -18,7 +19,7 @@ export default function QuizIntro({ exam, kidName = 'Champ', onStart, onBack }) 
         </div>
         <div className="flex flex-col gap-2">
           <h1 className="font-display font-extrabold text-3xl text-ink leading-tight">
-            {kidName}, {t(lang, 'quiz_intro_lets_start')}
+            {kidName}{lang !== 'ar' ? ',' : ''} {t(lang, 'quiz_intro_lets_start')}
           </h1>
           <p className="font-display font-bold text-xl text-duo">{exam.topic}</p>
           <p className="font-body text-base text-muted mt-1">{t(lang, 'quiz_intro_you_can')}</p>
