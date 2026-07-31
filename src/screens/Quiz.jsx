@@ -157,6 +157,10 @@ function normalize(str) {
     .replace(/[\u064B-\u0652\u0640]/g, '')
     // Normalize Arabic alef variants
     .replace(/[\u0622\u0623\u0625]/g, '\u0627')
+    // Fold ta marbuta (ة) → heh (ه) — most common Saudi child spelling variant
+    .replace(/\u0629/g, '\u0647')
+    // Fold alef maqsura (ى) → yeh (ي) — second most common variant
+    .replace(/\u0649/g, '\u064a')
     // Strip Arabic definite article
     .replace(/^\u0627\u0644/, '')
     // Fold Arabic-Indic digits to Western
@@ -302,7 +306,20 @@ export default function Quiz({ exam, onDone, kidId }) {
       setSaving(true)
       setCoinSaveError(false)
       try {
-        const { coinsAwarded } = await completeQuiz(exam.id, kidId)
+        // Compute score from all answers including this last one
+        const correctCount = questions.filter((q, i) => {
+          const a = i === idx ? answer : answers[i]
+          return normalize(a) === normalize(q.correct_answer)
+        }).length
+        const wrongIds = questions
+          .map((q, i) => ({ q, a: i === idx ? answer : answers[i] }))
+          .filter(({ q, a }) => normalize(a) !== normalize(q.correct_answer))
+          .map(({ q }) => q.id)
+        const { coinsAwarded } = await completeQuiz(exam.id, kidId, {
+          correct: correctCount,
+          total,
+          wrongIds,
+        })
         setCoinsEarned(coinsAwarded)
         if (coinsAwarded === 0) setIsReplay(true)
         const { streakCount: sc, isNewDay } = await updateStreak(kidId)
@@ -370,7 +387,7 @@ export default function Quiz({ exam, onDone, kidId }) {
               setCoinSaveError(false)
               setSaving(true)
               try {
-                const { coinsAwarded } = await completeQuiz(exam.id, kidId)
+                const correctCount = questions.filter((q, i) => normalize(answers[i]) === normalize(q.correct_answer)).length; const wrongIds = questions.filter((q, i) => normalize(answers[i]) !== normalize(q.correct_answer)).map(q => q.id); const { coinsAwarded } = await completeQuiz(exam.id, kidId, { correct: correctCount, total, wrongIds })
                 setCoinsEarned(coinsAwarded)
                 if (coinsAwarded === 0) setIsReplay(true)
                 const { streakCount: sc, isNewDay } = await updateStreak(kidId)
