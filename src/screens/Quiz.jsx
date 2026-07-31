@@ -302,9 +302,9 @@ export default function Quiz({ exam, onDone, kidId, isTrial = false }) {
     setAnswers(newAnswers)
 
     if (idx === total - 1) {
-      // Last question — in trial mode skip coin/streak RPCs entirely
+      // Last question — in trial mode skip results + coin/streak RPCs entirely
       if (isTrial) {
-        setShowResults(true)
+        onDone()
         return
       }
 
