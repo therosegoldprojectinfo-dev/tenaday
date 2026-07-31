@@ -51,7 +51,13 @@ Run these files **in order** in the Supabase SQL Editor.
     Called by ParentZone.jsx Progress tab.
     Run AFTER quiz_results.sql.
 
-11. **`fix_quiz_results_grant.sql`** — quiz_results SELECT grant
+12. **`security_patch_v1.sql`** — Parent PIN column security
+    REVOKE SELECT (parent_pin) ON profiles FROM authenticated.
+    Prevents client from reading the PIN hash and replaying it to
+    verify_parent_pin to bypass the Parent Zone gate.
+    Run AFTER rls_hardening_v3.sql.
+
+13. **`fix_quiz_results_grant.sql`** — quiz_results SELECT grant
     Grants SELECT on quiz_results to authenticated (belt-and-suspenders for RPC).
     Run AFTER get_quiz_results_rpc.sql.
 
