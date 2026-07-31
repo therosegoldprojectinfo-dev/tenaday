@@ -24,16 +24,18 @@ export async function getProfile() {
 // ── Coins (per kid) ───────────────────────────────────────────────
 
 // Server-derives coin amount from exam's question count — client cannot supply amount
-export async function completeQuiz(examId, kidId) {
+export async function completeQuiz(examId, kidId, { correct, total, wrongIds } = {}) {
   if (!examId) throw new Error('examId is required')
   if (!kidId) throw new Error('kidId is required')
   const { data, error } = await supabase.rpc('complete_quiz_and_award_coins', {
-    p_exam_id: examId,
-    p_kid_id: kidId,
+    p_exam_id:   examId,
+    p_kid_id:    kidId,
+    p_correct:   correct  ?? null,
+    p_total:     total    ?? null,
+    p_wrong_ids: wrongIds ? JSON.stringify(wrongIds) : '[]',
   })
-  // FIX #2: preserve full error object instead of throwing new Error(error.message)
   if (error) throw error
-  return data // { coinsAwarded, newBalance }
+  return data // { coinsAwarded, newBalance, scorePct }
 }
 
 export async function getCoinBalance(kidId) {
