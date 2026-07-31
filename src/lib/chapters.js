@@ -7,7 +7,7 @@ export async function getChapters(kidId) {
     .from('chapters')
     .select('*')
     .eq('kid_id', kidId)
-    .not('is_activation', 'eq', true)
+    .or('is_activation.is.null,is_activation.eq.false')
     .order('created_at', { ascending: true })
   if (error) throw error
   return data
