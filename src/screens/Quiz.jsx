@@ -428,7 +428,7 @@ export default function Quiz({ exam, onDone, kidId }) {
           </div>
           <div className="flex items-center gap-1">
             <CoinIcon size={24} />
-            <span className="font-display font-bold text-sm text-amber-500">{coinsEarned > 0 ? coinsEarned : COINS_PER_QUESTION * total}</span>
+            <span className="font-display font-bold text-sm text-amber-500">{coinsEarned > 0 ? `+${coinsEarned}` : '🔁'}</span>
           </div>
           <span className="font-display font-bold text-sm text-muted">{idx + 1}/{total}</span>
         </div>
