@@ -151,7 +151,17 @@ function normalize(str) {
   return (str || '')
     .trim()
     .toLowerCase()
+    // Strip Latin diacritics
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    // Strip Arabic harakat (tashkeel) U+064B–U+0652 + tatweel U+0640
+    .replace(/[\u064B-\u0652\u0640]/g, '')
+    // Normalize Arabic alef variants
+    .replace(/[\u0622\u0623\u0625]/g, '\u0627')
+    // Strip Arabic definite article
+    .replace(/^\u0627\u0644/, '')
+    // Fold Arabic-Indic digits to Western
+    .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660))
+    // Strip Latin articles
     .replace(/^(les|des|un|une|le|la|l'|the|a|an)\s+/i, '')
     .replace(/s$/, '')
     .trim()
