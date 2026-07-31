@@ -113,18 +113,26 @@ export default function App() {
 
               const { supabase } = await import('./lib/supabaseClient')
               const { error: signUpErr } = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
-              if (signUpErr) throw new Error(signUpErr.message)
+
+              // Reconciliation: if signUp fails, try signing in
+              // (prior attempt may have created auth row but failed on profile/PIN)
+              if (signUpErr) {
+                const { error: signInErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: derivedPw })
+                if (signInErr) throw new Error(lang === 'ar' ? 'اسم المستخدم مستخدم بالفعل' : 'That username is already taken')
+              }
 
               const { data: { user } } = await supabase.auth.getUser()
               if (!user) throw new Error('Signup failed')
 
-              const { error: insertErr } = await supabase.from('profiles').insert({
+              // upsert instead of insert — safe on retry
+              const { error: insertErr } = await supabase.from('profiles').upsert({
                 id: user.id, display_name: username.trim(), language: signupLang || lang,
               })
               if (insertErr) throw new Error(insertErr.message)
 
               const { error: pinErr } = await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
               if (pinErr) {
+                // Only delete profile if this is a fresh signup (no prior profile)
                 await supabase.from('profiles').delete().eq('id', user.id)
                 throw new Error(pinErr.message)
               }
