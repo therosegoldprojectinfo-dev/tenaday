@@ -11,7 +11,7 @@ function fireGtag(eventName, params = {}) {
 export default function Onboarding({ onComplete, onLanguageChange }) {
   const [screen,    setScreen]   = useState('account')
   const [username,  setUsername] = useState('')
-  const [pin,       setPin]      = useState('')
+  const [password, setPassword] = useState('')
   const [isSignIn,  setIsSignIn] = useState(false)
   const [loading,   setLoading]  = useState(false)
   const [authError, setAuthError] = useState('')
@@ -21,14 +21,14 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
   function switchLang(l) { setLang(l); onLanguageChange?.(l) }
 
   async function derivePassword(usernameRaw, pinRaw) {
-    const input = `numio:${usernameRaw.trim().toLowerCase()}:${pinRaw}:v2`
+    const input = `numio:${usernameRaw.trim().toLowerCase()}:${pinRaw}:v3`
     const encoded = new TextEncoder().encode(input)
     const hashBuffer = await crypto.subtle.digest('SHA-256', encoded)
     return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('')
   }
 
-  async function hashPin(pinRaw) {
-    const input = `numio-pin:${pinRaw}`
+  async function hashPassword(pwRaw) {
+    const input = `numio-pin:${pwRaw}`
     const encoded = new TextEncoder().encode(input)
     const hashBuffer = await crypto.subtle.digest('SHA-256', encoded)
     return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('')
@@ -36,34 +36,34 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
 
   async function handleSignIn() {
     if (!username.trim()) { setAuthError(lang === 'ar' ? 'أدخل اسم المستخدم' : 'Enter your username'); return }
-    if (pin.length !== 4) { setAuthError(lang === 'ar' ? 'يجب أن يتكون الرمز من 4 أرقام' : 'PIN must be 4 digits'); return }
+    if (password.length < 6) { setAuthError(lang === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters'); return }
     setLoading(true); setAuthError('')
     try {
       const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
-      const password = await derivePassword(username, pin)
-      const { error } = await supabase.auth.signInWithPassword({ email: fakeEmail, password })
+      const derivedPw = await derivePassword(username, password)
+      const { error } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: derivedPw })
       if (error) throw error
       onComplete(null)
     } catch {
-      setAuthError(lang === 'ar' ? 'اسم المستخدم أو الرمز السري غير صحيح' : 'Wrong username or PIN')
+      setAuthError(lang === 'ar' ? 'اسم المستخدم أو كلمة المرور غير صحيحة' : 'Wrong username or password')
     } finally { setLoading(false) }
   }
 
   async function handleCreateAccount() {
     if (!username.trim()) { setAuthError(lang === 'ar' ? 'أدخل اسم مستخدم' : 'Enter a username'); return }
-    if (pin.length !== 4) { setAuthError(lang === 'ar' ? 'يجب أن يتكون الرمز من 4 أرقام' : 'PIN must be 4 digits'); return }
+    if (password.length < 6) { setAuthError(lang === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters'); return }
     setLoading(true); setAuthError('')
     try {
       const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
-      const password = await derivePassword(username, pin)
-      const { error } = await supabase.auth.signUp({ email: fakeEmail, password })
+      const derivedPw = await derivePassword(username, password)
+      const { error } = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
       if (error) throw error
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        const pinHash = await hashPin(pin)
+        const pwHash = await hashPassword(password)
         await supabase.from('profiles').upsert({
           id: user.id,
-          parent_pin: pinHash,
+          parent_pin: pwHash,
           display_name: username.trim(),
           language: lang,
         })
@@ -170,16 +170,19 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">4-digit PIN</label>
+            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">
+              {lang === 'ar' ? 'كلمة المرور' : 'Password'}
+            </label>
             <input
               type="password"
-              inputMode="numeric"
-              maxLength={4}
-              value={pin}
-              onChange={e => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-              placeholder="••••"
-              className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 font-display font-bold text-2xl text-ink outline-none focus:border-duo transition-colors tracking-[1rem]"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder={lang === 'ar' ? 'أدخل كلمة المرور' : 'Enter a password'}
+              className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none focus:border-duo transition-colors"
             />
+            <p className="font-body text-xs text-muted">
+              {lang === 'ar' ? '٦ أحرف على الأقل' : 'At least 6 characters'}
+            </p>
           </div>
 
           {!isSignIn && (
@@ -195,7 +198,7 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
 
           <button
             onClick={isSignIn ? handleSignIn : handleCreateAccount}
-            disabled={loading || !username.trim() || pin.length !== 4}
+            disabled={loading || !username.trim() || password.length < 6}
             className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
             style={{ boxShadow: '0 4px 0 #46a302' }}
           >
