@@ -19,3 +19,6 @@ ALTER TABLE trial_logs ENABLE ROW LEVEL SECURITY;
 
 -- No client access — service role only (edge function uses service key)
 REVOKE ALL ON trial_logs FROM anon, authenticated;
+
+-- Add unique index to prevent race conditions on trial limit
+CREATE UNIQUE INDEX IF NOT EXISTS trial_logs_anonymous_id_unique ON trial_logs (anonymous_id);
