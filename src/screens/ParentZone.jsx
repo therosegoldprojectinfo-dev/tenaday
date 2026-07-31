@@ -13,7 +13,7 @@ function CoinIcon({ size = 24 }) {
 const PLANET_AVATARS = ['🪐', '🌍', '🌙', '⭐', '🌟', '☀️', '🌎', '🌏', '🌑', '💫']
 
 // FIX #3: unified session-expiry handler — shows alert + reloads
-function handleSessionExpiry(lang) {
+function handleSessionExpiry() {
   alert(lang === 'ar'
     ? 'انتهت جلسة الوالدين. يرجى التحقق مرة أخرى.'
     : 'Parent session expired. Please verify again.')
@@ -25,15 +25,22 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
   const { kids } = useKid()
   const [rewards, setRewards]         = useState([])
   const [claims, setClaims]           = useState([])
-  const [quizResults, setQuizResults] = useState({}) // kidId → results[]
+  const [quizResults, setQuizResults] = useState({})
   const [kidBalances, setKidBalances] = useState({})
-  const [loading, setLoading]     = useState(true)
-  const [tab, setTab]             = useState(defaultTab)
-  const [showModal, setShowModal] = useState(false)
-  const [approving, setApproving] = useState(null)
-  const [rejecting, setRejecting] = useState(null)
-  const [confirmDeleteId,  setConfirmDeleteId]  = useState(null)
-  const [confirmRejectId,  setConfirmRejectId]  = useState(null)
+  const [loading, setLoading]         = useState(true)
+  const [tab, setTab]                 = useState(defaultTab)
+  const [showModal, setShowModal]     = useState(false)
+  const [approving, setApproving]     = useState(null)
+  const [rejecting, setRejecting]     = useState(null)
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null)
+  const [confirmRejectId, setConfirmRejectId] = useState(null)
+  const [deleteBusy, setDeleteBusy]   = useState(false)
+  const [rejectBusy, setRejectBusy]   = useState(false)
+  const [sessionExpired, setSessionExpired] = useState(false)
+
+  function handleSessionExpiry() {
+    setSessionExpired(true)
+  }
 
   useEffect(() => { load() }, [])
 
@@ -74,7 +81,7 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
       await load()
     } catch (e) {
       if (isParentSessionError(e)) {
-        handleSessionExpiry(lang)
+        handleSessionExpiry()
       } else {
         console.error(e)
         throw e // re-throw so RewardModal can reset its saving state
@@ -91,7 +98,7 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
     } catch (e) {
       setConfirmDeleteId(null)
       if (isParentSessionError(e)) {
-        handleSessionExpiry(lang)
+        handleSessionExpiry()
       } else {
         console.error(e)
       }
@@ -108,7 +115,7 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
       // "Claim not found, already approved, or unauthorized" does NOT trigger this —
       // it's a different P0001 message so it falls to the else branch correctly
       if (isParentSessionError(e)) {
-        handleSessionExpiry(lang)
+        handleSessionExpiry()
       } else {
         console.error(e)
       }
@@ -122,7 +129,7 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
       await load()
     } catch (e) {
       if (isParentSessionError(e)) {
-        handleSessionExpiry(lang)
+        handleSessionExpiry()
       } else {
         console.error(e)
       }
@@ -367,9 +374,15 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
               {lang === 'ar' ? 'سيُعاد رصيد العملات إلى الطفل.' : 'Coins will be refunded to the child.'}
             </p>
             <button
-              onClick={async () => { await handleReject(confirmRejectId); setConfirmRejectId(null) }}
-              className="w-full py-4 bg-red-500 text-white font-display font-bold text-lg rounded-2xl active:opacity-80">
-              {lang === 'ar' ? 'نعم، ارفض' : 'Yes, reject'}
+              disabled={rejectBusy}
+              onClick={async () => {
+                setRejectBusy(true)
+                await handleReject(confirmRejectId)
+                setRejectBusy(false)
+                setConfirmRejectId(null)
+              }}
+              className="w-full py-4 bg-red-500 disabled:opacity-50 text-white font-display font-bold text-lg rounded-2xl active:opacity-80">
+              {rejectBusy ? '...' : lang === 'ar' ? 'نعم، ارفض' : 'Yes, reject'}
             </button>
             <button onClick={() => setConfirmRejectId(null)}
               className="w-full py-3 text-muted font-body font-bold text-sm text-center">
@@ -388,13 +401,39 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
             <p className="font-body text-sm text-muted text-center">
               {lang === 'ar' ? 'لا يمكن التراجع عن هذا الإجراء.' : 'This cannot be undone.'}
             </p>
-            <button onClick={confirmDelete}
-              className="w-full py-4 bg-red-500 text-white font-display font-bold text-lg rounded-2xl active:opacity-80">
-              {lang === 'ar' ? 'نعم، احذف' : 'Yes, delete'}
+            <button
+              disabled={deleteBusy}
+              onClick={async () => {
+                setDeleteBusy(true)
+                await confirmDelete()
+                setDeleteBusy(false)
+              }}
+              className="w-full py-4 bg-red-500 disabled:opacity-50 text-white font-display font-bold text-lg rounded-2xl active:opacity-80">
+              {deleteBusy ? '...' : lang === 'ar' ? 'نعم، احذف' : 'Yes, delete'}
             </button>
             <button onClick={() => setConfirmDeleteId(null)}
               className="w-full py-3 text-muted font-body font-bold text-sm text-center">
               {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {sessionExpired && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
+          <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4 text-center">
+            <span style={{ fontSize: 48 }}>🔒</span>
+            <h2 className="font-display font-extrabold text-xl text-ink">
+              {lang === 'ar' ? 'انتهت جلسة الوالدين' : 'Parent session expired'}
+            </h2>
+            <p className="font-body text-sm text-muted">
+              {lang === 'ar' ? 'يرجى التحقق مرة أخرى للمتابعة.' : 'Please verify again to continue.'}
+            </p>
+            <button
+              onClick={() => { setSessionExpired(false); window.location.reload() }}
+              className="w-full py-4 bg-duo text-white font-display font-bold text-lg rounded-2xl"
+              style={{ boxShadow: '0 4px 0 #46a302' }}>
+              {lang === 'ar' ? 'تحقق مجدداً' : 'Verify again'}
             </button>
           </div>
         </div>
