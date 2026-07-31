@@ -21,6 +21,16 @@ async function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
   })
 }
 
+// FIX #4: returns a bilingual rate-limit message when the error is RATE_LIMIT
+function getErrorMessage(err, lang) {
+  if (err?.message === 'RATE_LIMIT') {
+    return lang === 'ar'
+      ? 'لقد وصلت إلى الحد اليومي للاختبارات. حاول مجدداً غداً. 🌙'
+      : "You've reached today's quiz limit. Try again tomorrow. 🌙"
+  }
+  return lang === 'ar' ? 'حدث خطأ ما. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'
+}
+
 export default function Home({ chapter, onExamReady, onBack, kidId }) {
   const lang = useLang()
   const cameraInputRef = useRef(null)
@@ -32,19 +42,16 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
   const MAX_IMAGES = 5
   const MAX_SIZE_MB = 10
 
-  // Called when user picks image(s) from gallery (multi-select)
   async function handleGallerySelected(e) {
     const files = Array.from(e.target.files || [])
     if (!files.length) return
 
-    // Count limit
     if (images.length + files.length > MAX_IMAGES) {
       setError(lang === 'ar' ? `الحد الأقصى ${MAX_IMAGES} صور` : `Max ${MAX_IMAGES} images allowed`)
       setStatus('error')
       return
     }
 
-    // Size limit
     const tooBig = files.find(f => f.size > MAX_SIZE_MB * 1024 * 1024)
     if (tooBig) {
       setError(lang === 'ar' ? `حجم الصورة كبير جداً (الحد ${MAX_SIZE_MB}MB)` : `Image too large (max ${MAX_SIZE_MB}MB each)`)
@@ -77,13 +84,13 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
     setStatus('loading')
     setError(null)
     try {
-      // Compress all images before sending
       const compressed = await Promise.all(images.map(img => compressImage(img.file)))
       const generated = await generateExam(compressed)
       const saved = await saveExam({ chapterId: chapter.id, topic: generated.topic, questions: generated.questions, kidId })
       onExamReady(saved)
     } catch (err) {
-      setError(err.message)
+      // FIX #4: store the raw error object so getErrorMessage can inspect it
+      setError(err)
       setStatus('error')
     }
   }
@@ -127,10 +134,8 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
 
         <div className="flex-1 flex flex-col justify-center gap-3 pb-10">
 
-          {/* IDLE or REVIEW state */}
           {(status === 'idle' || status === 'review') && (
             <>
-              {/* Single smart photo button */}
               <button
                 onClick={() => { setInputKey(k => k + 1); setTimeout(() => cameraInputRef.current?.click(), 10) }}
                 className="w-full bg-duo text-white font-display font-bold text-xl rounded-2xl py-6 transition-all active:translate-y-1 flex flex-col items-center gap-2"
@@ -161,7 +166,6 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
             </>
           )}
 
-          {/* LOADING */}
           {status === 'loading' && (
             <div className="flex flex-col items-center gap-4">
               <div className="w-14 h-14 rounded-full border-4 border-gray-100 border-t-duo animate-spin" />
@@ -170,28 +174,38 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
             </div>
           )}
 
-          {/* ERROR */}
+          {/* FIX #4: error message now reads the error object and shows rate-limit copy when appropriate */}
           {status === 'error' && (
             <div className="w-full flex flex-col gap-4">
               <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-center">
                 <p className="font-display font-bold text-xl text-duo-red">{t(lang, 'home_error_title')}</p>
                 <p className="text-sm text-muted mt-2">
-                  {lang === 'ar' ? 'حدث خطأ ما. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'}
+                  {getErrorMessage(error, lang)}
                 </p>
               </div>
-              <button
-                onClick={handleReset}
-                className="w-full bg-duo text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:translate-y-1"
-                style={{ boxShadow: '0 4px 0 #46a302' }}
-              >
-                {t(lang, 'home_try_again')}
-              </button>
+              {/* Only show Try Again if it's not a rate limit — retrying won't help */}
+              {error?.message !== 'RATE_LIMIT' && (
+                <button
+                  onClick={handleReset}
+                  className="w-full bg-duo text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:translate-y-1"
+                  style={{ boxShadow: '0 4px 0 #46a302' }}
+                >
+                  {t(lang, 'home_try_again')}
+                </button>
+              )}
+              {error?.message === 'RATE_LIMIT' && (
+                <button
+                  onClick={handleReset}
+                  className="w-full bg-gray-100 text-muted font-display font-bold text-base rounded-2xl py-4 transition-all active:translate-y-1"
+                >
+                  {lang === 'ar' ? 'رجوع' : 'Go back'}
+                </button>
+              )}
             </div>
           )}
         </div>
       </div>
 
-      {/* Photo input — no capture attr: mobile shows camera+gallery sheet, desktop shows file picker */}
       <input
         key={`cam-${inputKey}`}
         ref={cameraInputRef}
