@@ -61,13 +61,17 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         const pwHash = await hashPassword(password)
-        const { error: upsertErr } = await supabase.from('profiles').upsert({
+        // INSERT only (not upsert) — v3 revoked UPDATE on parent_pin.
+        // display_name and language are safe to insert here.
+        const { error: insertErr } = await supabase.from('profiles').insert({
           id: user.id,
-          parent_pin: pwHash,
           display_name: username.trim(),
           language: lang,
         })
-        if (upsertErr) throw upsertErr
+        if (insertErr) throw insertErr
+        // parent_pin written via SECURITY DEFINER RPC (column not client-writable after v3)
+        const { error: pinErr } = await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
+        if (pinErr) throw pinErr
       }
       firePixel('track', 'CompleteRegistration', { content_name: 'Try For Free' })
       fireGtag('account_created')
