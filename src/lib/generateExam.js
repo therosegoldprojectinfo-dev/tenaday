@@ -12,7 +12,7 @@ async function fileToBase64(file) {
   })
 }
 
-export async function generateExam(files) {
+export async function generateExam(files, { isTrial = false } = {}) {
   // Accept single file or array
   const fileArray = Array.isArray(files) ? files : [files]
 
@@ -37,7 +37,7 @@ export async function generateExam(files) {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${jwt}`,
     },
-    body: JSON.stringify({ images }),
+    body: JSON.stringify({ images, is_trial: isTrial }),
   })
 
   if (!response.ok) {
