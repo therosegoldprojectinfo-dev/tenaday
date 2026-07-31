@@ -166,6 +166,7 @@ export default function App() {
               }
 
               if (signupLang) setLang(signupLang)
+              setActivated(true)
               setOnboarded(true)
             }}
           />
