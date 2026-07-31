@@ -42,8 +42,18 @@ Run these files **in order** in the Supabase SQL Editor.
 
 9. **`trial_logs.sql`** — Anonymous trial cost tracking
    Stores cost per trial quiz (anonymous_id, tokens, cost_usd).
+   Unique index on anonymous_id prevents race conditions on trial limit.
    Service role only — no client access.
    Run AFTER rls_hardening_v3.sql.
+
+10. **`get_quiz_results_rpc.sql`** — Parent progress RPC
+    SECURITY DEFINER function returns quiz results per kid for parent visibility.
+    Called by ParentZone.jsx Progress tab.
+    Run AFTER quiz_results.sql.
+
+11. **`fix_quiz_results_grant.sql`** — quiz_results SELECT grant
+    Grants SELECT on quiz_results to authenticated (belt-and-suspenders for RPC).
+    Run AFTER get_quiz_results_rpc.sql.
 
 ## Key Security Notes
 
