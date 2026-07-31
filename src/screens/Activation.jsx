@@ -123,7 +123,7 @@ export default function Activation({ onComplete, onSkip, kidId }) {
           style={{ boxShadow: '0 4px 0 #46a302' }}>
           {s.cta}
         </button>
-        <button onClick={onSkip} className="font-body font-bold text-sm text-muted py-2">{s.skip}</button>
+        
         <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handlePhoto} />
         <style>{`@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }`}</style>
       </div>
@@ -155,7 +155,7 @@ export default function Activation({ onComplete, onSkip, kidId }) {
           style={{ boxShadow: '0 4px 0 #46a302' }}>
           {s.retry}
         </button>
-        <button onClick={onSkip} className="font-body font-bold text-sm text-muted py-2">{s.skip}</button>
+        
       </div>
     )
   }
