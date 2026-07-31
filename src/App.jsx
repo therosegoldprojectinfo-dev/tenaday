@@ -138,14 +138,20 @@ export default function App() {
                 }).eq('id', user.id)
               }
 
-              // Only set PIN if this is a genuinely new account
-              // On reconciliation the PIN already exists — don't overwrite or delete
+              // Set PIN if new account OR if reconciled account has no PIN yet
+              // (set_parent_pin allows free write when parent_pin IS NULL)
               if (isNewAccount) {
                 const { error: pinErr } = await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
                 if (pinErr) {
                   // Fresh signup failed on PIN — safe to clean up the profile row
                   await supabase.from('profiles').delete().eq('id', user.id)
                   throw new Error(pinErr.message)
+                }
+              } else {
+                // Reconciled account — only set PIN if it's currently NULL
+                const { data: prof } = await supabase.from('profiles').select('parent_pin').eq('id', user.id).single()
+                if (!prof?.parent_pin) {
+                  await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
                 }
               }
 
@@ -196,12 +202,19 @@ export default function App() {
                       if (prof?.language) setLang(prof.language)
                     }
                   } catch (e) { console.error(e) }
-                  const kidList = await getKids()
-                  let kid
-                  if (kidList.length === 0) { kid = await createKid(kidName || 'Kid 1'); setKids([kid]) }
-                  else { setKids(kidList); kid = kidList[0] }
-                  setActiveKid(kid)
-                  getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+                  try {
+                    const kidList = await getKids()
+                    let kid
+                    if (kidList.length === 0) { kid = await createKid(kidName || 'Kid 1'); setKids([kid]) }
+                    else { setKids(kidList); kid = kidList[0] }
+                    setActiveKid(kid)
+                    getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+                  } catch (e) {
+                    console.error('Failed to load kids:', e)
+                    // Don't leave user on infinite spinner — show error they can retry
+                    setOnboarded(false)
+                    setShowOnboarding(true)
+                  }
                 }}
                 onLanguageChange={setLang}
               />
