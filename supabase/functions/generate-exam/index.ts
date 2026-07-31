@@ -95,6 +95,23 @@ serve(async (req) => {
 
     const isAnonymous = user.is_anonymous === true
 
+    // ── Trial limit (anonymous users) ────────────────────────────
+    // Server-side: check trial_logs for existing row for this anonymous_id
+    // This closes the "repeat POST with same JWT" exploit
+    if (isAnonymous) {
+      const { data: existingTrial } = await sb
+        .from('trial_logs')
+        .select('id')
+        .eq('anonymous_id', user.id)
+        .maybeSingle()
+      if (existingTrial) {
+        return new Response(
+          JSON.stringify({ error: 'Trial already used. Create a free account to continue.' }),
+          { status: 403, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
     // ── Rate limit ────────────────────────────────────────────────
     // Anonymous trial users skip the RPC (no profile row exists yet)
     if (!isAnonymous) {
