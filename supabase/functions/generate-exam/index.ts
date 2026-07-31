@@ -84,28 +84,34 @@ serve(async (req) => {
     const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
     const { data: { user }, error: authError } = await sb.auth.getUser(jwt)
 
-    // P0 fix: reject anonymous users — they bypass signup but pass the !user check
-    if (authError || !user || user.is_anonymous) {
+    // P0 fix: block completely unauthenticated requests
+    // Allow anonymous users for trial (1 call, 5 questions max — enforced below)
+    if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
       )
     }
 
-    // ── Rate limit: atomic increment via RPC (no race condition) ──
-    const { error: rateLimitErr } = await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
-    if (rateLimitErr) {
-      const isRateLimit = rateLimitErr.message?.includes('Daily limit') || rateLimitErr.code === 'P0001'
-      return new Response(
-        JSON.stringify({ error: isRateLimit ? 'Daily limit reached. Try again tomorrow.' : 'Service error. Please try again.' }),
-        { status: isRateLimit ? 429 : 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
+    const isAnonymous = user.is_anonymous === true
+
+    // ── Rate limit ────────────────────────────────────────────────
+    // Anonymous trial users skip the RPC (no profile row exists yet)
+    if (!isAnonymous) {
+      const { error: rateLimitErr } = await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
+      if (rateLimitErr) {
+        const isRateLimit = rateLimitErr.message?.includes('Daily limit') || rateLimitErr.code === 'P0001'
+        return new Response(
+          JSON.stringify({ error: isRateLimit ? 'Daily limit reached. Try again tomorrow.' : 'Service error. Please try again.' }),
+          { status: isRateLimit ? 429 : 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        )
+      }
     }
 
     const { images, is_trial } = await req.json()
 
-    // Trial mode: anonymous users get 5 questions max, 1 image max
-    const isTrial = is_trial === true || user.is_anonymous
+    // Trial mode: 5 questions, 1 image max
+    const isTrial = is_trial === true || isAnonymous
     const questionCount = isTrial ? 5 : 15
 
     if (isTrial && images?.length > 1) {
@@ -186,13 +192,24 @@ serve(async (req) => {
         ((usage.input_tokens || 0) * 3 / 1_000_000) +
         ((usage.output_tokens || 0) * 15 / 1_000_000)
 
-      await sb.from('usage_logs').insert({
-        user_id: user.id, // verified server-side, never trust client
-        image_count: images.length,
-        input_tokens: usage.input_tokens || 0,
-        output_tokens: usage.output_tokens || 0,
-        cost_usd: costUsd,
-      })
+      // Log usage — real users to usage_logs, anonymous trials to trial_logs
+      if (isAnonymous) {
+        await sb.from('trial_logs').insert({
+          anonymous_id:  user.id,
+          image_count:   images.length,
+          input_tokens:  usage.input_tokens || 0,
+          output_tokens: usage.output_tokens || 0,
+          cost_usd:      costUsd,
+        })
+      } else {
+        await sb.from('usage_logs').insert({
+          user_id:       user.id,
+          image_count:   images.length,
+          input_tokens:  usage.input_tokens || 0,
+          output_tokens: usage.output_tokens || 0,
+          cost_usd:      costUsd,
+        })
+      }
     } catch (trackErr) {
       console.error('Usage tracking failed (non-fatal):', trackErr)
     }
