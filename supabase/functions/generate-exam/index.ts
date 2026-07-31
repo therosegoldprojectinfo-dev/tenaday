@@ -84,7 +84,8 @@ serve(async (req) => {
     const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
     const { data: { user }, error: authError } = await sb.auth.getUser(jwt)
 
-    if (authError || !user) {
+    // P0 fix: reject anonymous users — they bypass signup but pass the !user check
+    if (authError || !user || user.is_anonymous) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
         { status: 401, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
