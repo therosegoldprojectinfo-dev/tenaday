@@ -128,7 +128,7 @@ export default function Profile({ onLogout }) {
               {lang === 'ar' ? 'تسجيل الخروج؟' : 'Log out?'}
             </h2>
             <p className="font-body text-sm text-muted text-center">
-              {lang === 'ar' ? 'ستحتاج إلى رقم هاتفك ورمز PIN لتسجيل الدخول مرة أخرى.' : "You'll need your phone number and PIN to log back in."}
+              {lang === 'ar' ? 'ستحتاج إلى اسم المستخدم ورمز PIN لتسجيل الدخول مرة أخرى.' : "You'll need your username and PIN to log back in."}
             </p>
             <button
               onClick={handleLogout}
