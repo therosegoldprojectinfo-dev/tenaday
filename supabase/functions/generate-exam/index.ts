@@ -96,15 +96,14 @@ serve(async (req) => {
     const isAnonymous = user.is_anonymous === true
 
     // ── Trial limit (anonymous users) ────────────────────────────
-    // Server-side: check trial_logs for existing row for this anonymous_id
-    // This closes the "repeat POST with same JWT" exploit
+    // Use limit(1) instead of maybeSingle() — fails closed on duplicate rows
     if (isAnonymous) {
-      const { data: existingTrial } = await sb
+      const { data: existingTrials, error: trialErr } = await sb
         .from('trial_logs')
         .select('id')
         .eq('anonymous_id', user.id)
-        .maybeSingle()
-      if (existingTrial) {
+        .limit(1)
+      if (trialErr || (existingTrials && existingTrials.length > 0)) {
         return new Response(
           JSON.stringify({ error: 'Trial already used. Create a free account to continue.' }),
           { status: 403, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
@@ -112,19 +111,8 @@ serve(async (req) => {
       }
     }
 
-    // ── Rate limit ────────────────────────────────────────────────
-    // Anonymous trial users skip the RPC (no profile row exists yet)
-    if (!isAnonymous) {
-      const { error: rateLimitErr } = await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
-      if (rateLimitErr) {
-        const isRateLimit = rateLimitErr.message?.includes('Daily limit') || rateLimitErr.code === 'P0001'
-        return new Response(
-          JSON.stringify({ error: isRateLimit ? 'Daily limit reached. Try again tomorrow.' : 'Service error. Please try again.' }),
-          { status: isRateLimit ? 429 : 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
-
+    // ── Parse body + validate BEFORE rate limit ───────────────────
+    // So malformed requests don't burn the user's daily quota
     const { images, is_trial } = await req.json()
 
     // Trial mode: 5 questions, 1 image max
@@ -145,7 +133,6 @@ serve(async (req) => {
       )
     }
 
-    // Validate image count and mediaType
     if (images.length > 5) {
       return new Response(
         JSON.stringify({ error: 'Max 5 images allowed' }),
@@ -154,11 +141,30 @@ serve(async (req) => {
     }
 
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    const MAX_B64 = 7_000_000 // ~5MB decoded
     for (const img of images) {
       if (!ALLOWED_TYPES.includes(img.mediaType)) {
         return new Response(
-          JSON.stringify({ error: `Invalid image type: ${img.mediaType}` }),
+          JSON.stringify({ error: 'Invalid image type' }),
           { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        )
+      }
+      if (typeof img.data !== 'string' || img.data.length > MAX_B64) {
+        return new Response(
+          JSON.stringify({ error: 'Image too large' }),
+          { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // ── Rate limit (AFTER validation so bad requests don't burn quota) ──
+    if (!isAnonymous) {
+      const { error: rateLimitErr } = await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
+      if (rateLimitErr) {
+        const isRateLimit = rateLimitErr.message?.includes('Daily limit') || rateLimitErr.code === 'P0001'
+        return new Response(
+          JSON.stringify({ error: isRateLimit ? 'RATE_LIMIT' : 'Service error. Please try again.' }),
+          { status: isRateLimit ? 429 : 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
         )
       }
     }
@@ -193,7 +199,7 @@ serve(async (req) => {
       const err = await claudeResponse.text()
       console.error('Claude API error:', err)
       return new Response(
-        JSON.stringify({ error: 'Claude API failed', detail: err }),
+        JSON.stringify({ error: 'Quiz generation failed' }),
         { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
       )
     }
@@ -243,7 +249,7 @@ serve(async (req) => {
     } catch {
       console.error('Failed to parse Claude JSON:', rawText)
       return new Response(
-        JSON.stringify({ error: 'Claude returned invalid JSON', raw: rawText }),
+        JSON.stringify({ error: 'Quiz generation failed' }),
         { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
       )
     }
@@ -256,7 +262,7 @@ serve(async (req) => {
   } catch (err) {
     console.error('Edge Function error:', err)
     return new Response(
-      JSON.stringify({ error: err.message }),
+      JSON.stringify({ error: 'Service error. Please try again.' }),
       { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
     )
   }
