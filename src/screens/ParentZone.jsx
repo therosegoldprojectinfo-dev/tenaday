@@ -326,13 +326,12 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
                         </div>
                       ) : (
                         <div className="flex flex-col gap-2">
-                          {results.map(r => {
-                            const date = new Date(r.created_at).toLocaleDateString(
+                          {results.map(r => {                            const date = new Date(r.created_at).toLocaleDateString(
                               lang === 'ar' ? 'ar-SA' : 'en', { month: 'short', day: 'numeric' }
                             )
                             const pct = r.score_pct
                             return (
-                              <div key={r.id} className="bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 flex items-center gap-3">
+                              <div key={r.result_id} className="bg-white border-2 border-gray-100 rounded-2xl px-4 py-3 flex items-center gap-3">
                                 <div className="flex-1 min-w-0">
                                   <p className="font-display font-bold text-sm text-ink truncate">{r.topic}</p>
                                   <p className="font-body text-xs text-muted">{r.correct}/{r.total} · {date}</p>
