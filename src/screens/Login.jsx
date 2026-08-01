@@ -63,7 +63,7 @@ export default function Login({ lang = 'en', onSuccess, onTryFree, onLanguageCha
       const derivedPw = await derivePassword(username.trim(), password)
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: derivedPw })
       if (signInErr) { setError(s.err_wrong); return }
-      onSuccess()
+      await onSuccess(setError)
     } catch {
       setError(s.err_generic)
     } finally {
