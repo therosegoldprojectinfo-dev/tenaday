@@ -60,7 +60,7 @@ function QuitPopup({ visible, onStay, onLeave }) {
 }
 
 // ── Results screen ────────────────────────────────────────────────
-function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial = false }) {
+function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial = false, isReplay = false }) {
   const lang = useLang()
   const correct = questions.filter((q, i) => {
     const a = answers[i]
@@ -438,7 +438,7 @@ export default function Quiz({ exam, onDone, kidId, isTrial = false }) {
         answers={answers}
         topic={topic}
         onDone={onDone}
-        coinsEarned={coinsEarned} isTrial={isTrial}
+        coinsEarned={coinsEarned} isTrial={isTrial} isReplay={isReplay}
       />
     )
   }
