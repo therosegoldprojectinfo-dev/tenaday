@@ -33,8 +33,17 @@ export default function PinGate({ onSuccess, onBack }) {
         setPassword('')
         setTimeout(() => setShake(false), 600)
       }
-    } catch {
-      setError(lang === 'ar' ? 'حدث خطأ. حاول مرة أخرى.' : 'Something went wrong. Try again.')
+    } catch (e) {
+      const isLocked = e?.message?.toLowerCase().includes('locked') ||
+                       e?.message?.toLowerCase().includes('too many') ||
+                       e?.code === 'P0001'
+      if (isLocked) {
+        setError(lang === 'ar'
+          ? 'تم قفل الحساب مؤقتاً. انتظر 15 دقيقة أو تواصل معنا عبر واتساب.'
+          : 'Account temporarily locked. Wait 15 min or contact us on WhatsApp.')
+      } else {
+        setError(lang === 'ar' ? 'حدث خطأ. حاول مرة أخرى.' : 'Something went wrong. Try again.')
+      }
     } finally {
       setLoading(false)
     }
@@ -72,7 +81,21 @@ export default function PinGate({ onSuccess, onBack }) {
             error ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 focus:border-duo'
           }`}
         />
-        {error && <p className="font-body font-bold text-sm text-red-500 text-center">{error}</p>}
+        {error && (
+          <div className="text-center">
+            <p className="font-body font-bold text-sm text-red-500">{error}</p>
+            {(error.includes('locked') || error.includes('قفل')) && (
+              <a
+                href="https://wa.me/14384104068?text=Hi%2C%20I%20am%20locked%20out%20of%20my%20Numio%20Parent%20Zone."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-body font-bold text-sm text-duo underline mt-1 block"
+              >
+                {lang === 'ar' ? 'تواصل معنا عبر واتساب' : 'Contact us on WhatsApp'}
+              </a>
+            )}
+          </div>
+        )}
       </div>
 
       <button
