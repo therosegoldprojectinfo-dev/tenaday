@@ -96,8 +96,8 @@ serve(async (req) => {
     const isAnonymous = user.is_anonymous === true
 
     // ── Trial limit (anonymous users) ────────────────────────────
-    // Use limit(1) instead of maybeSingle() — fails closed on duplicate rows
     if (isAnonymous) {
+      // 1. Per-session limit: check if this anonymous_id already has a trial
       const { data: existingTrials, error: trialErr } = await sb
         .from('trial_logs')
         .select('id')
@@ -107,6 +107,20 @@ serve(async (req) => {
         return new Response(
           JSON.stringify({ error: 'Trial already used. Create a free account to continue.' }),
           { status: 403, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // 2. Global daily cap: max 100 trials per day across all anonymous users
+      // Prevents mass abuse when running paid ads
+      const today = new Date().toISOString().split('T')[0]
+      const { count: dailyTrials } = await sb
+        .from('trial_logs')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', `${today}T00:00:00Z`)
+      if (dailyTrials && dailyTrials >= 100) {
+        return new Response(
+          JSON.stringify({ error: 'Service temporarily unavailable. Please try again tomorrow.' }),
+          { status: 503, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
         )
       }
     }
