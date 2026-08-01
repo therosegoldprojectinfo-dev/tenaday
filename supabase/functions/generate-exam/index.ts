@@ -260,6 +260,25 @@ serve(async (req) => {
         .replace(/\n?```\s*$/i, '')                // closing fence
         .trim()
       exam = JSON.parse(clean)
+
+      // Schema validation — reject malformed or empty output before it reaches Quiz.jsx
+      if (!exam || !Array.isArray(exam.questions) || exam.questions.length === 0) {
+        console.error('Claude returned invalid schema:', JSON.stringify(exam).slice(0, 200))
+        return new Response(
+          JSON.stringify({ error: 'Quiz generation failed' }),
+          { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        )
+      }
+      // Validate each question has required fields
+      for (const q of exam.questions) {
+        if (!q.type || !q.question || !q.correct_answer) {
+          console.error('Claude returned malformed question:', JSON.stringify(q).slice(0, 200))
+          return new Response(
+            JSON.stringify({ error: 'Quiz generation failed' }),
+            { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+          )
+        }
+      }
     } catch {
       console.error('Failed to parse Claude JSON:', rawText)
       return new Response(
