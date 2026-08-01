@@ -116,7 +116,7 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial
               <p className="font-display font-extrabold text-3xl text-amber-500">+{coinsEarned}</p>
             </div>
           </div>
-        ) : (
+        ) : isReplay ? (
           <div className="bg-gray-50 border-2 border-gray-100 rounded-2xl px-6 py-4 text-center">
             <p className="font-display font-bold text-base text-muted">
               {lang === 'ar' ? '✅ لقد أكملت هذا التحدي من قبل' : '✅ You already completed this quiz'}
@@ -124,6 +124,16 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial
             <p className="font-body text-xs text-muted mt-1">
               {lang === 'ar' ? 'العملات تُمنح مرة واحدة فقط لكل تحدٍّ' : 'Coins are awarded once per quiz'}
             </p>
+          </div>
+        ) : (
+          <div className="flex items-center gap-4 bg-green-50 border-2 border-green-200 rounded-2xl px-6 py-4 w-full">
+            <span style={{ fontSize: 40 }}>🎯</span>
+            <div>
+              <p className="font-body text-xs text-green-600 font-bold uppercase tracking-widest">
+                {lang === 'ar' ? 'نتيجتك' : 'Your score'}
+              </p>
+              <p className="font-display font-extrabold text-3xl text-green-600">{correct}/{total}</p>
+            </div>
           </div>
         )}
 
