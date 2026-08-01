@@ -88,13 +88,6 @@ async function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
   })
 }
 
-function firePixel(type, event, params = {}) {
-  try { if (window.fbq) window.fbq(type, event, params) } catch (_) {}
-}
-function fireGtag(eventName, params = {}) {
-  try { if (window.gtag) window.gtag('event', eventName, params) } catch (_) {}
-}
-
 export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
   const s   = strings[lang] || strings.en
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
@@ -121,13 +114,11 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
     const file = e.target.files?.[0]
     if (!file) return
     setStatus('loading')
-    firePixel('trackCustom', 'TrialPhotoUploaded')
     fireGtag('trial_photo_uploaded')
     try {
       const compressed = await compressImage(file)
       const result = await generateExam([compressed], { isTrial: true })
       localStorage.setItem(LS_TRIAL_USED, 'true')
-      firePixel('trackCustom', 'TrialQuizGenerated')
       fireGtag('trial_quiz_generated')
       const trialExam = { id: 'trial', topic: result.topic, questions: result.questions, isTrial: true }
       setExam(trialExam)
@@ -146,7 +137,6 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
 
   function handleQuizDone() {
     localStorage.setItem(LS_TRIAL_DONE, 'true')
-    firePixel('trackCustom', 'TrialQuizCompleted')
     fireGtag('trial_quiz_completed')
     setStatus('congrats')
   }
@@ -163,7 +153,6 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
     setSigning(true); setSignupErr('')
     try {
       await onSignup({ username: username.trim(), password, lang, trialExam: exam })
-      firePixel('track', 'CompleteRegistration', { content_name: 'Trial Signup' })
       fireGtag('trial_account_created')
     } catch (e) {
       setSignupErr(e.message || (lang === 'ar' ? 'حدث خطأ ما' : 'Something went wrong'))
@@ -206,7 +195,6 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
         {/* CTA */}
         <button
           onClick={() => {
-            firePixel('trackCustom', 'TrialStarted')
             fireGtag('trial_started')
             inputRef.current?.click()
           }}
@@ -358,6 +346,13 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
             className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
             style={{ boxShadow: '0 4px 0 #46a302' }}>
             {signing ? s.loading_signup : s.cta}
+          </button>
+
+          {/* Fix #2 — login link for returning users */}
+          <button
+            onClick={() => onSignup({ showLogin: true })}
+            className="w-full font-body font-bold text-sm text-muted py-2 text-center">
+            {s.hook_login}
           </button>
         </div>
       </div>
