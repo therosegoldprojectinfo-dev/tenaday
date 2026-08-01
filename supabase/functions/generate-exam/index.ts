@@ -103,7 +103,7 @@ serve(async (req) => {
         .select('id')
         .eq('anonymous_id', user.id)
         .limit(1)
-      if (trialErr || (existingTrials && existingTrials.length > 0)) {
+      if (!trialErr && existingTrials && existingTrials.length > 0) {
         return new Response(
           JSON.stringify({ error: 'Trial already used. Create a free account to continue.' }),
           { status: 403, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
