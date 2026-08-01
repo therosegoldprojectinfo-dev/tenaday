@@ -61,7 +61,11 @@ Run these files **in order** in the Supabase SQL Editor.
     Grants SELECT on quiz_results to authenticated.
     Run AFTER get_quiz_results_rpc.sql.
 
-14. **`security_patch_v2.sql`** — Correct parent_pin SELECT revoke
+15. **`create_kid_rpc.sql`** — Secure kid creation RPC
+    Creates create_kid_for_family(p_name) SECURITY DEFINER function.
+    REVOKES INSERT ON kid_profiles FROM authenticated.
+    Closes the coin_balance exploit (client could previously INSERT with arbitrary balance).
+    Run AFTER rls_hardening_v3.sql.
     Revokes table-level SELECT on profiles, re-grants only safe columns.
     parent_pin is now unreadable by any client.
     Run AFTER security_patch_v1.sql.
