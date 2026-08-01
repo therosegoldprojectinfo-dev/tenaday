@@ -26,7 +26,13 @@ export default function Chapters({ onSelectChapter, kidId }) {
   const [loading, setLoading]     = useState(true)
   const [showModal, setShowModal] = useState(false)
 
-  useEffect(() => { if (kidId) loadChapters() }, [kidId])
+  useEffect(() => {
+    if (kidId) {
+      loadChapters()
+    } else {
+      setLoading(false)
+    }
+  }, [kidId])
 
   async function loadChapters() {
     try {
