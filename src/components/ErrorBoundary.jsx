@@ -37,8 +37,12 @@ export default class ErrorBoundary extends Component {
           </p>
           <button
             onClick={() => {
-              // Clear trial localStorage so a bad trial exam doesn't re-crash
-              ;['numio_trial_exam', 'numio_trial_done', 'numio_trial_used'].forEach(k => localStorage.removeItem(k))
+              // Only clear trial exam if the trial was already completed
+              // If trial was mid-quiz, keep localStorage so they can retry
+              const trialDone = localStorage.getItem('numio_trial_done') === 'true'
+              if (trialDone) {
+                ;['numio_trial_exam', 'numio_trial_done', 'numio_trial_used'].forEach(k => localStorage.removeItem(k))
+              }
               window.location.reload()
             }}
             style={{
