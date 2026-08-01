@@ -196,7 +196,7 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
 
         {/* Hero image */}
         <div className="flex-shrink-0 py-4">
-          <img src="/onboarding-hero.png" alt="" className="w-full object-contain" style={{ maxHeight: 220 }} />
+          <img src="/onboarding-hero.jpg" alt="" className="w-full object-contain" style={{ maxHeight: 220 }} />
         </div>
 
         {/* Sub */}
