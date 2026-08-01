@@ -60,7 +60,7 @@ export default function Login({ lang = 'en', onSuccess, onTryFree, onLanguageCha
     setLoading(true); setError('')
     try {
       const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
-      const derivedPw = await derivePassword(username, password)
+      const derivedPw = await derivePassword(username.trim(), password)
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: derivedPw })
       if (signInErr) { setError(s.err_wrong); return }
       onSuccess()
