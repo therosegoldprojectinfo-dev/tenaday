@@ -276,13 +276,12 @@ export default function App() {
             className={`flex-1 ${showNav ? 'md:ms-56' : ''}`}
             style={{ paddingBottom: showNav ? 'calc(64px + env(safe-area-inset-bottom))' : 0, overflow: 'hidden', minWidth: 0, width: '100%' }}
           >
-            {/* Fallback when activeKid is null — show spinner with retry */}
-            {!activeKid && screen !== 'parent_zone' && screen !== 'profile' && (
+            {!activeKid && screen !== 'parent_zone' && screen !== 'profile' ? (
               <div className="flex flex-col items-center justify-center gap-6 text-center" style={{ height: '100dvh' }}>
                 <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-duo animate-spin" />
                 <p className="font-body text-sm text-muted">Loading...</p>
               </div>
-            )}
+            ) : (<>
             {screen === 'chapters' && (
               <Chapters
                 kidId={activeKid?.id}
@@ -356,6 +355,9 @@ export default function App() {
                 onLanguageChange={setLang}
               />
             )}
+          </>
+          )}
+
           </main>
         </div>
       </KidContext.Provider>
