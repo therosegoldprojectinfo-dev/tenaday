@@ -12,13 +12,16 @@ export async function getKids() {
 }
 
 export async function createKid(name) {
-  const { data: { user } } = await supabase.auth.getUser()
-  const { data, error } = await supabase
-    .from('kid_profiles')
-    .insert({ user_id: user.id, name, coin_balance: 0, streak_count: 0 })
-    .select()
-    .single()
+  // Uses SECURITY DEFINER RPC — client cannot supply coin_balance
+  const { data: kidId, error } = await supabase.rpc('create_kid_for_family', { p_name: name })
   if (error) throw error
+  // Fetch the full kid row after creation
+  const { data, error: fetchErr } = await supabase
+    .from('kid_profiles')
+    .select('*')
+    .eq('id', kidId)
+    .single()
+  if (fetchErr) throw fetchErr
   return data
 }
 
