@@ -283,7 +283,7 @@ function FireModeOverlay({ streakKey, consecutiveCorrect }) {
   )
 }
 
-export default function Quiz({ exam, onDone, kidId, isTrial = false }) {
+export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   const lang = useLang()
   const questions = exam.questions || []
   const topic     = exam.topic || 'Quiz'
@@ -450,7 +450,7 @@ export default function Quiz({ exam, onDone, kidId, isTrial = false }) {
       <QuitPopup
         visible={showQuit}
         onStay={() => setShowQuit(false)}
-        onLeave={onDone}
+        onLeave={onQuit || onDone}
       />
 
       {onFire && <FireModeOverlay streakKey={fireKey} consecutiveCorrect={consecutiveCorrect} />}
