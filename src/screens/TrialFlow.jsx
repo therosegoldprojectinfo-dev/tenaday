@@ -88,6 +88,10 @@ async function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
   })
 }
 
+function fireGtag(event) {
+  try { window.gtag?.('event', event); window.fbq?.('trackCustom', event) } catch (_) {}
+}
+
 export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
   const s   = strings[lang] || strings.en
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
