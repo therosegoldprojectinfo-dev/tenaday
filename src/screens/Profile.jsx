@@ -29,6 +29,11 @@ export default function Profile({ onLogout, onLanguageChange }) {
 
   async function handleLogout() {
     await supabase.auth.signOut()
+    // Re-run anonymous auth so the trial CTA works after logout
+    try {
+      const { ensureAuth } = await import('../lib/auth')
+      await ensureAuth()
+    } catch (e) { console.error('ensureAuth after logout failed:', e) }
     onLogout()
   }
 
@@ -205,12 +210,19 @@ export default function Profile({ onLogout, onLanguageChange }) {
 function AddKidModal({ lang, onConfirm, onClose }) {
   const [name, setName] = useState('')
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
 
   async function handleSubmit() {
     if (!name.trim()) return
     setSaving(true)
-    await onConfirm(name.trim())
-    setSaving(false)
+    setError('')
+    try {
+      await onConfirm(name.trim())
+    } catch (e) {
+      console.error('Add kid failed:', e)
+      setError(lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Try again.')
+      setSaving(false)
+    }
   }
 
   return (
@@ -231,6 +243,7 @@ function AddKidModal({ lang, onConfirm, onClose }) {
           autoFocus
           className="w-full border-2 border-gray-200 rounded-2xl px-4 py-4 font-display font-bold text-xl text-ink outline-none focus:border-duo transition-colors mb-4"
         />
+        {error && <p className="font-body text-sm text-red-500 font-bold text-center mb-2">{error}</p>}
         <button
           onClick={handleSubmit}
           disabled={!name.trim() || saving}
