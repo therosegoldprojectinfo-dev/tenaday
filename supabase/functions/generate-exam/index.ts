@@ -181,6 +181,20 @@ serve(async (req) => {
           { status: isRateLimit ? 429 : 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
         )
       }
+
+      // Global authenticated ceiling — 500 quizzes/day across all real users
+      // Prevents unbounded API spend from free signups during soft launch
+      const today = new Date().toISOString().split('T')[0]
+      const { count: authCount } = await sb
+        .from('usage_logs')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', `${today}T00:00:00Z`)
+      if (authCount && authCount >= 500) {
+        return new Response(
+          JSON.stringify({ error: 'Service temporarily unavailable. Please try again tomorrow.' }),
+          { status: 503, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        )
+      }
     }
 
     // Build content array — all images + instruction text
@@ -221,35 +235,6 @@ serve(async (req) => {
     const claudeData = await claudeResponse.json()
     const rawText = claudeData.content?.[0]?.text || ''
     const usage = claudeData.usage || {}
-
-    // ── Usage tracking ────────────────────────────────────────────
-    try {
-      // Sonnet 4.6 pricing: $3/M input, $15/M output
-      const costUsd =
-        ((usage.input_tokens || 0) * 3 / 1_000_000) +
-        ((usage.output_tokens || 0) * 15 / 1_000_000)
-
-      // Log usage — real users to usage_logs, anonymous trials to trial_logs
-      if (isAnonymous) {
-        await sb.from('trial_logs').insert({
-          anonymous_id:  user.id,
-          image_count:   images.length,
-          input_tokens:  usage.input_tokens || 0,
-          output_tokens: usage.output_tokens || 0,
-          cost_usd:      costUsd,
-        })
-      } else {
-        await sb.from('usage_logs').insert({
-          user_id:       user.id,
-          image_count:   images.length,
-          input_tokens:  usage.input_tokens || 0,
-          output_tokens: usage.output_tokens || 0,
-          cost_usd:      costUsd,
-        })
-      }
-    } catch (trackErr) {
-      console.error('Usage tracking failed (non-fatal):', trackErr)
-    }
 
     // ── Parse exam JSON ───────────────────────────────────────────
     let exam
@@ -293,6 +278,35 @@ serve(async (req) => {
         JSON.stringify({ error: 'Quiz generation failed' }),
         { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
       )
+    }
+
+    // ── Usage tracking ────────────────────────────────────────────
+    try {
+      // Sonnet 4.6 pricing: $3/M input, $15/M output
+      const costUsd =
+        ((usage.input_tokens || 0) * 3 / 1_000_000) +
+        ((usage.output_tokens || 0) * 15 / 1_000_000)
+
+      // Log usage — real users to usage_logs, anonymous trials to trial_logs
+      if (isAnonymous) {
+        await sb.from('trial_logs').insert({
+          anonymous_id:  user.id,
+          image_count:   images.length,
+          input_tokens:  usage.input_tokens || 0,
+          output_tokens: usage.output_tokens || 0,
+          cost_usd:      costUsd,
+        })
+      } else {
+        await sb.from('usage_logs').insert({
+          user_id:       user.id,
+          image_count:   images.length,
+          input_tokens:  usage.input_tokens || 0,
+          output_tokens: usage.output_tokens || 0,
+          cost_usd:      costUsd,
+        })
+      }
+    } catch (trackErr) {
+      console.error('Usage tracking failed (non-fatal):', trackErr)
     }
 
     return new Response(
