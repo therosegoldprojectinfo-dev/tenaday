@@ -89,7 +89,15 @@ async function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
 }
 
 function fireGtag(event) {
-  try { window.gtag?.('event', event); window.fbq?.('trackCustom', event) } catch (_) {}
+  try {
+    window.gtag?.('event', event)
+    // CompleteRegistration is a Meta standard event — use track not trackCustom
+    if (event === 'CompleteRegistration') {
+      window.fbq?.('track', 'CompleteRegistration')
+    } else {
+      window.fbq?.('trackCustom', event)
+    }
+  } catch (_) {}
 }
 
 export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
