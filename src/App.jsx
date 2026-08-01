@@ -148,37 +148,48 @@ export default function App() {
                   throw new Error(pinErr.message)
                 }
               } else {
-                // Reconciled account — only set PIN if it's currently NULL
-                const { data: prof } = await supabase.from('profiles').select('parent_pin').eq('id', user.id).single()
-                if (!prof?.parent_pin) {
-                  await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
-                }
+                // Only check if PIN is NULL — parent_pin column not client-readable after v2
+                // set_parent_pin allows free write when PIN is NULL (set_parent_pin.sql:41)
+                // so calling it unconditionally on reconciliation is safe
+                await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
               }
 
-              // Migrate trial exam → "🎉 Your First Ever Numio Quiz" chapter
+              // Kid creation + trial migration — only for new accounts
+              // Reconciled accounts already have kids, chapters, and data
               let kid
-              try {
-                kid = await createKid(username.trim())
-                if (trialExam && trialExam.id === 'trial') {
-                  const { data: chapter } = await supabase.from('chapters')
-                    .insert({ name: lang === 'ar' ? '🎉 أول اختبار Numio' : '🎉 Your First Ever Numio Quiz', emoji: '🎉', user_id: user.id, kid_id: kid.id })
-                    .select().single()
-                  if (chapter) {
-                    await supabase.from('exams').insert({
-                      user_id: user.id, kid_id: kid.id,
-                      topic: trialExam.topic, questions: trialExam.questions,
-                      chapter_id: chapter.id,
-                    })
+              if (isNewAccount) {
+                try {
+                  kid = await createKid(username.trim())
+                  if (trialExam && trialExam.id === 'trial') {
+                    const { data: chapter } = await supabase.from('chapters')
+                      .insert({ name: lang === 'ar' ? '🎉 أول اختبار Numio' : '🎉 Your First Ever Numio Quiz', emoji: '🎉', user_id: user.id, kid_id: kid.id })
+                      .select().single()
+                    if (chapter) {
+                      await supabase.from('exams').insert({
+                        user_id: user.id, kid_id: kid.id,
+                        topic: trialExam.topic, questions: trialExam.questions,
+                        chapter_id: chapter.id,
+                      })
+                    }
+                    ;['numio_trial_exam','numio_trial_done','numio_trial_used'].forEach(k => localStorage.removeItem(k))
                   }
-                  ;['numio_trial_exam','numio_trial_done','numio_trial_used'].forEach(k => localStorage.removeItem(k))
+                } catch (e) {
+                  console.error('kid/migration failed:', e)
+                  try {
+                    const kidList = await getKids()
+                    kid = kidList[0] || await createKid(username.trim())
+                  } catch { throw new Error(lang === 'ar' ? 'حدث خطأ ما، حاول مجدداً' : 'Something went wrong, please try again') }
                 }
-              } catch (e) {
-                console.error('kid/migration failed:', e)
-                // Still try to get/create kid so app is not broken
+              } else {
+                // Reconciled account — load existing kids
                 try {
                   const kidList = await getKids()
-                  kid = kidList[0] || await createKid(username.trim())
-                } catch { throw new Error(lang === 'ar' ? 'حدث خطأ ما، حاول مجدداً' : 'Something went wrong, please try again') }
+                  kid = kidList[0]
+                  setKids(kidList)
+                } catch (e) {
+                  console.error('Failed to load kids on reconciliation:', e)
+                  throw new Error(lang === 'ar' ? 'حدث خطأ ما، حاول مجدداً' : 'Something went wrong, please try again')
+                }
               }
 
               setKids([kid])
