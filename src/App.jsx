@@ -229,7 +229,7 @@ export default function App() {
 
               setKids([kid])
               setActiveKid(kid)
-              getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+              if (kid) getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
               if (signupLang) setLang(signupLang)
               setOnboarded(true)
             }}
