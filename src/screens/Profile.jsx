@@ -162,6 +162,18 @@ export default function Profile({ onLogout, onLanguageChange }) {
           </div>
         </div>
 
+        {/* Privacy & Terms links */}
+        <div className="flex gap-4 justify-center pb-2">
+          <a href="/privacy.html" target="_blank" rel="noopener noreferrer"
+            className="font-body text-xs text-muted underline">
+            {lang === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'}
+          </a>
+          <a href="/terms.html" target="_blank" rel="noopener noreferrer"
+            className="font-body text-xs text-muted underline">
+            {lang === 'ar' ? 'شروط الاستخدام' : 'Terms of Use'}
+          </a>
+        </div>
+
         {/* Logout */}
         <button
           onClick={() => setShowLogoutConfirm(true)}
