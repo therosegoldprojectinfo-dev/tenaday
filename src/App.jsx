@@ -141,7 +141,7 @@ export default function App() {
                 return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
               }
 
-              const fakeEmail  = `${username.toLowerCase().replace(/\s+/g, '_')}@numio.app`
+              const fakeEmail  = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
               const derivedPw  = await hashBuffer(`numio:${username.trim().toLowerCase()}:${password}:v3`)
               const pwHash     = await hashBuffer(`numio-pin:${password}`)
 
