@@ -6,7 +6,7 @@
 
 CREATE OR REPLACE FUNCTION get_quiz_results(p_kid_id uuid)
 RETURNS TABLE (
-  id          uuid,
+  result_id   uuid,
   exam_id     uuid,
   topic       text,
   score_pct   int,
@@ -21,16 +21,16 @@ AS $$
 BEGIN
   -- Verify kid belongs to this family
   IF NOT EXISTS (
-    SELECT 1 FROM kid_profiles WHERE id = p_kid_id AND user_id = auth.uid()
+    SELECT 1 FROM kid_profiles kp WHERE kp.id = p_kid_id AND kp.user_id = auth.uid()
   ) THEN
     RAISE EXCEPTION 'Unauthorized';
   END IF;
 
   RETURN QUERY
     SELECT
-      qr.id,
+      qr.id        AS result_id,
       qr.exam_id,
-      COALESCE(e.topic, 'Quiz') as topic,
+      COALESCE(e.topic, 'Quiz') AS topic,
       qr.score_pct,
       qr.correct,
       qr.total,
