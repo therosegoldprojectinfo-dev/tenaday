@@ -58,8 +58,16 @@ Run these files **in order** in the Supabase SQL Editor.
     Run AFTER rls_hardening_v3.sql.
 
 13. **`fix_quiz_results_grant.sql`** — quiz_results SELECT grant
-    Grants SELECT on quiz_results to authenticated (belt-and-suspenders for RPC).
+    Grants SELECT on quiz_results to authenticated.
     Run AFTER get_quiz_results_rpc.sql.
+
+14. **`security_patch_v2.sql`** — Correct parent_pin SELECT revoke
+    Revokes table-level SELECT on profiles, re-grants only safe columns.
+    parent_pin is now unreadable by any client.
+    Run AFTER security_patch_v1.sql.
+    Verify: SELECT privilege_type FROM information_schema.role_table_grants
+    WHERE table_name='profiles' AND grantee='authenticated' AND privilege_type='SELECT';
+    Must return 0 rows.
 
 ## Key Security Notes
 
