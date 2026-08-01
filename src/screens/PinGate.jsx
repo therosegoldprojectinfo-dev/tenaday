@@ -73,7 +73,11 @@ export default function PinGate({ onSuccess, onBack }) {
         <input
           type="password"
           value={password}
-          onChange={e => { setPassword(e.target.value); setError('') }}
+          onChange={e => {
+            setPassword(e.target.value)
+            // Only clear non-lockout errors on keystroke
+            if (!error.includes('locked') && !error.includes('قفل')) setError('')
+          }}
           onKeyDown={e => e.key === 'Enter' && verify()}
           placeholder={lang === 'ar' ? 'كلمة المرور' : 'Password'}
           autoFocus
