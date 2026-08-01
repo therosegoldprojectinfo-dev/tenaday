@@ -148,6 +148,17 @@ export default function Login({ lang = 'en', onSuccess, onTryFree, onLanguageCha
             {s.forgot}
           </a>
 
+          {/* Policy links */}
+          <p className="font-body text-xs text-muted text-center">
+            <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="text-duo underline">
+              {lang === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'}
+            </a>
+            {' · '}
+            <a href="/terms.html" target="_blank" rel="noopener noreferrer" className="text-duo underline">
+              {lang === 'ar' ? 'شروط الاستخدام' : 'Terms of Use'}
+            </a>
+          </p>
+
           {/* Divider */}
           <div className="flex items-center gap-3 my-2">
             <div className="flex-1 h-px bg-gray-100" />
