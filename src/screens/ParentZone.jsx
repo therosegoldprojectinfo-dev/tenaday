@@ -42,7 +42,7 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
     setSessionExpired(true)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => { load() }, [kids.length])
 
   async function load() {
     try {
