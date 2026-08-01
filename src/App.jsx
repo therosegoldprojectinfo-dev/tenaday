@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ensureAuth } from './lib/auth'
-import Onboarding from './screens/Onboarding'
+import Login from './screens/Login'
 import TrialFlow from './screens/TrialFlow'
 import { getStreak } from './lib/economy'
 import { getKids, createKid } from './lib/kids'
@@ -32,7 +32,6 @@ export default function App() {
   }, [lang])
   const [onboarded, setOnboarded]     = useState(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
-  const [startLoginMode, setStartLoginMode] = useState(false)
   const [tab, setTab]                 = useState('chapters')
   const [pinUnlocked, setPinUnlocked] = useState(false)
   const [parentZoneDefaultTab, setParentZoneDefaultTab] = useState('rewards')
@@ -88,6 +87,40 @@ export default function App() {
   }
 
   if (!onboarded) {
+    // Show Login screen if user tapped "Already have an account"
+    if (showOnboarding) {
+      return (
+        <LangContext.Provider value={lang}>
+          <Login
+            lang={lang}
+            onLanguageChange={setLang}
+            onTryFree={() => setShowOnboarding(false)}
+            onSuccess={async () => {
+              try {
+                const { supabase } = await import('./lib/supabaseClient')
+                const { data: { user } } = await supabase.auth.getUser()
+                if (user) {
+                  const { data: prof } = await supabase.from('profiles').select('language').eq('id', user.id).single()
+                  if (prof?.language) setLang(prof.language)
+                }
+              } catch (e) { console.error(e) }
+              try {
+                const kidList = await getKids()
+                let kid
+                if (kidList.length === 0) { kid = await createKid('Kid 1'); setKids([kid]) }
+                else { setKids(kidList); kid = kidList[0] }
+                setActiveKid(kid)
+                getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+                setOnboarded(true)
+              } catch (e) {
+                console.error('Failed to load kids after login:', e)
+              }
+            }}
+          />
+        </LangContext.Provider>
+      )
+    }
+
     return (
       <LangContext.Provider value={lang}>
         <div dir={lang === 'ar' ? 'rtl' : 'ltr'}>
@@ -95,9 +128,8 @@ export default function App() {
             lang={lang}
             onLanguageChange={setLang}
             onSignup={async ({ username, password, lang: signupLang, trialExam, showLogin }) => {
-              // "Already have an account" → show Onboarding in login mode
+              // "Already have an account" → show Login screen
               if (showLogin) {
-                setStartLoginMode(true)
                 setShowOnboarding(true)
                 return
               }
@@ -201,39 +233,7 @@ export default function App() {
               setOnboarded(true)
             }}
           />
-          {showOnboarding && (
-            <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'white' }}>
-              <Onboarding
-                startInLoginMode={startLoginMode}
-                onComplete={async (kidName) => {
-                  setOnboarded(true)
-                  setShowOnboarding(false)
-                  try {
-                    const { supabase } = await import('./lib/supabaseClient')
-                    const { data: { user } } = await supabase.auth.getUser()
-                    if (user) {
-                      const { data: prof } = await supabase.from('profiles').select('language').eq('id', user.id).single()
-                      if (prof?.language) setLang(prof.language)
-                    }
-                  } catch (e) { console.error(e) }
-                  try {
-                    const kidList = await getKids()
-                    let kid
-                    if (kidList.length === 0) { kid = await createKid(kidName || 'Kid 1'); setKids([kid]) }
-                    else { setKids(kidList); kid = kidList[0] }
-                    setActiveKid(kid)
-                    getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
-                  } catch (e) {
-                    console.error('Failed to load kids:', e)
-                    // Don't leave user on infinite spinner — show error they can retry
-                    setOnboarded(false)
-                    setShowOnboarding(true)
-                  }
-                }}
-                onLanguageChange={setLang}
-              />
-            </div>
-          )}
+
         </div>
       </LangContext.Provider>
     )
