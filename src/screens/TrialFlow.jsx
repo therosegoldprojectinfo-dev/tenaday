@@ -251,7 +251,7 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
         <p className="font-body text-base text-muted">{s.ready_sub}</p>
       </div>
       <button
-        onClick={() => setStatus('quiz')}
+        onClick={() => { fireGtag('TrialQuizStarted'); setStatus('quiz') }}
         className="w-full max-w-xs bg-duo text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
         style={{ boxShadow: '0 4px 0 #46a302' }}>
         {s.ready_cta}
