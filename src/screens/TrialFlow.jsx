@@ -118,12 +118,12 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
     const file = e.target.files?.[0]
     if (!file) return
     setStatus('loading')
-    fireGtag('trial_photo_uploaded')
+    fireGtag('TrialPhotoUploaded')
     try {
       const compressed = await compressImage(file)
       const result = await generateExam([compressed], { isTrial: true })
       localStorage.setItem(LS_TRIAL_USED, 'true')
-      fireGtag('trial_quiz_generated')
+      fireGtag('TrialQuizGenerated')
       const trialExam = { id: 'trial', topic: result.topic, questions: result.questions, isTrial: true }
       setExam(trialExam)
       localStorage.setItem(LS_TRIAL_EXAM, JSON.stringify(trialExam))
@@ -141,7 +141,7 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
 
   function handleQuizDone() {
     localStorage.setItem(LS_TRIAL_DONE, 'true')
-    fireGtag('trial_quiz_completed')
+    fireGtag('TrialQuizCompleted')
     setStatus('congrats')
   }
 
@@ -157,7 +157,7 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
     setSigning(true); setSignupErr('')
     try {
       await onSignup({ username: username.trim(), password, lang, trialExam: exam })
-      fireGtag('trial_account_created')
+      fireGtag('CompleteRegistration')
     } catch (e) {
       setSignupErr(e.message || (lang === 'ar' ? 'حدث خطأ ما' : 'Something went wrong'))
       setSigning(false)
@@ -199,7 +199,7 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
         {/* CTA */}
         <button
           onClick={() => {
-            fireGtag('trial_started')
+            fireGtag('TrialStarted')
             inputRef.current?.click()
           }}
           className="w-full bg-duo text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1 flex-shrink-0"
