@@ -297,7 +297,7 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
 
   // ── QUIZ ──────────────────────────────────────────────────
   if (status === 'quiz' && exam) return (
-    <Quiz exam={exam} kidId={null} isTrial={true} onDone={handleQuizDone} onQuit={() => { clearTrial(); setStatus('hook') }} />
+    <Quiz exam={exam} kidId={null} isTrial={true} onDone={handleQuizDone} onQuit={() => setStatus('used')} />
   )
 
   // ── CONGRATS + SIGNUP (merged) ────────────────────────────
