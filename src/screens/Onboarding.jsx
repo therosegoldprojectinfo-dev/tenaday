@@ -1,18 +1,11 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-function firePixel(type, event, params = {}) {
-  try { if (window.fbq) window.fbq(type, event, params) } catch (_) {}
-}
-function fireGtag(eventName, params = {}) {
-  try { if (window.gtag) window.gtag('event', eventName, params) } catch (_) {}
-}
-
-export default function Onboarding({ onComplete, onLanguageChange }) {
+export default function Onboarding({ onComplete, onLanguageChange, startInLoginMode = false }) {
   const [screen,    setScreen]   = useState('account')
   const [username,  setUsername] = useState('')
   const [password,  setPassword] = useState('')
-  const [isSignIn,  setIsSignIn] = useState(false)
+  const [isSignIn,  setIsSignIn] = useState(startInLoginMode) // start in login mode if coming from "Already have an account"
   const [loading,   setLoading]  = useState(false)
   const [authError, setAuthError] = useState('')
   const [savedName, setSavedName] = useState('')
@@ -78,7 +71,6 @@ export default function Onboarding({ onComplete, onLanguageChange }) {
           throw pinErr
         }
       }
-      firePixel('track', 'CompleteRegistration', { content_name: 'Try For Free' })
       fireGtag('account_created')
       onComplete(username.trim())
     } catch (e) {
