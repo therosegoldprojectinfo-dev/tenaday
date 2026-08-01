@@ -490,8 +490,8 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
         <div className="px-4 mt-2 flex-1 overflow-y-auto">
           {q.type === 'mcq' && (
             <div className="flex flex-col gap-3">
-              {q.options.map(option => (
-                <MCQCard key={option} option={option} selected={selected}
+              {q.options.map((option, optIdx) => (
+                <MCQCard key={`${optIdx}-${option}`} option={option} selected={selected}
                   revealed={revealed} correct={q.correct_answer} onSelect={setSelected} />
               ))}
             </div>
