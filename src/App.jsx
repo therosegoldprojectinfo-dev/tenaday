@@ -32,6 +32,7 @@ export default function App() {
   }, [lang])
   const [onboarded, setOnboarded]     = useState(null)
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [startLoginMode, setStartLoginMode] = useState(false)
   const [tab, setTab]                 = useState('chapters')
   const [pinUnlocked, setPinUnlocked] = useState(false)
   const [parentZoneDefaultTab, setParentZoneDefaultTab] = useState('rewards')
@@ -96,6 +97,7 @@ export default function App() {
             onSignup={async ({ username, password, lang: signupLang, trialExam, showLogin }) => {
               // "Already have an account" → show Onboarding in login mode
               if (showLogin) {
+                setStartLoginMode(true)
                 setShowOnboarding(true)
                 return
               }
@@ -202,6 +204,7 @@ export default function App() {
           {showOnboarding && (
             <div style={{ position: 'fixed', inset: 0, zIndex: 50, background: 'white' }}>
               <Onboarding
+                startInLoginMode={startLoginMode}
                 onComplete={async (kidName) => {
                   setOnboarded(true)
                   setShowOnboarding(false)
