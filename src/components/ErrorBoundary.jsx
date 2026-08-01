@@ -12,6 +12,12 @@ export default class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     console.error('Numio crashed:', error, info)
+    // Send to Sentry so we get alerted on production crashes
+    try {
+      window.Sentry?.captureException(error, {
+        contexts: { react: { componentStack: info.componentStack } }
+      })
+    } catch (_) {}
   }
 
   render() {
