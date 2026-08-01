@@ -95,7 +95,7 @@ export default function App() {
             lang={lang}
             onLanguageChange={setLang}
             onTryFree={() => setShowOnboarding(false)}
-            onSuccess={async () => {
+            onSuccess={async (setLoginError) => {
               try {
                 const { supabase } = await import('./lib/supabaseClient')
                 const { data: { user } } = await supabase.auth.getUser()
@@ -114,6 +114,7 @@ export default function App() {
                 setOnboarded(true)
               } catch (e) {
                 console.error('Failed to load kids after login:', e)
+                setLoginError?.(lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Please try again.')
               }
             }}
           />
