@@ -284,7 +284,7 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
         <h1 className="font-display font-extrabold text-3xl text-ink mb-2">{s.resume_title}</h1>
         <p className="font-body text-base text-muted">{s.resume_sub}</p>
       </div>
-      <button onClick={() => setStatus('quiz')}
+      <button onClick={() => { fireGtag('TrialQuizStarted'); setStatus('quiz') }}
         className="w-full max-w-xs bg-duo text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
         style={{ boxShadow: '0 4px 0 #46a302' }}>
         {s.resume_cta}
