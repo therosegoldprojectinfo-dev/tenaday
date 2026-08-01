@@ -191,7 +191,7 @@ export const translations = {
     revision_exam: (n) => `${n} ${n === 1 ? 'اختبار' : 'اختبارات'}`,
 
     // QuizIntro
-    quiz_intro_lets_start: '، هيا نبدأ!',
+    quiz_intro_lets_start: 'هيا نبدأ!',
     quiz_intro_you_can: 'أنت تستطيع! 💪',
     quiz_intro_questions: (n) => `${n} أسئلة`,
     quiz_intro_start: '← ابدأ',
