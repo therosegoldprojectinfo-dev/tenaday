@@ -11,7 +11,7 @@ export default function QuizIntro({ exam, kidName = 'Champ', onStart, onBack }) 
         className="absolute top-12 flex items-center gap-1 text-muted font-body font-bold text-sm active:opacity-60"
         style={{ insetInlineStart: 20 }}
       >
-        ← {lang === 'ar' ? 'رجوع' : 'Back'}
+        {lang === 'ar' ? '→' : '←'} {lang === 'ar' ? 'رجوع' : 'Back'}
       </button>
       <div className="w-full max-w-sm flex flex-col items-center gap-6">
         <div style={{ animation: 'mascot-float 2s ease-in-out infinite' }}>
@@ -19,7 +19,7 @@ export default function QuizIntro({ exam, kidName = 'Champ', onStart, onBack }) 
         </div>
         <div className="flex flex-col gap-2">
           <h1 className="font-display font-extrabold text-3xl text-ink leading-tight">
-            {kidName}{lang !== 'ar' ? ',' : ''} {t(lang, 'quiz_intro_lets_start')}
+            {lang === 'ar' ? `${t(lang, 'quiz_intro_lets_start')} ${kidName}` : `${kidName}, ${t(lang, 'quiz_intro_lets_start')}`}
           </h1>
           <p className="font-display font-bold text-xl text-duo">{exam.topic}</p>
           <p className="font-body text-base text-muted mt-1">{t(lang, 'quiz_intro_you_can')}</p>
