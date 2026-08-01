@@ -278,6 +278,14 @@ serve(async (req) => {
             { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
           )
         }
+        // MCQ must have at least 2 options
+        if (q.type === 'mcq' && (!Array.isArray(q.options) || q.options.length < 2)) {
+          console.error('Claude returned MCQ without options:', JSON.stringify(q).slice(0, 200))
+          return new Response(
+            JSON.stringify({ error: 'Quiz generation failed' }),
+            { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+          )
+        }
       }
     } catch {
       console.error('Failed to parse Claude JSON:', rawText)
