@@ -407,7 +407,7 @@
         const { createClient } = supabase
         const sb = createClient(
           'https://lyedpfhzrvyaskmzhyhl.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY4OTI4NTQsImV4cCI6MjAyMjQ2ODg1NH0.abc'
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0'
         )
         await sb.from('event_registrations').insert({ name, email, time_slot: selectedTime })
       } catch (e) { console.error('Supabase error:', e) }
