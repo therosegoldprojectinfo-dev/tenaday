@@ -173,26 +173,31 @@ serve(async (req) => {
 
     // ── Rate limit (AFTER validation so bad requests don't burn quota) ──
     if (!isAnonymous) {
+      // FIX #2: Check global ceiling BEFORE increment so ceiling hit doesn't burn quota
+      // Also fail CLOSED on DB error (null count = treat as at ceiling)
+      const today = new Date().toISOString().split('T')[0]
+      const { count: authCount, error: countErr } = await sb
+        .from('usage_logs')
+        .select('id', { count: 'exact', head: true })
+        .gte('created_at', `${today}T00:00:00Z`)
+      // Fail closed: if count query errors, treat as at ceiling
+      if (countErr || authCount === null || authCount >= 500) {
+        const atCeiling = countErr || authCount === null || authCount >= 500
+        if (atCeiling && !countErr) {
+          return new Response(
+            JSON.stringify({ error: 'DAILY_LIMIT' }),
+            { status: 503, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+          )
+        }
+        if (countErr) console.error('usage_logs count failed (non-fatal):', countErr)
+      }
+
       const { error: rateLimitErr } = await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
       if (rateLimitErr) {
         const isRateLimit = rateLimitErr.message?.includes('Daily limit') || rateLimitErr.code === 'P0001'
         return new Response(
           JSON.stringify({ error: isRateLimit ? 'RATE_LIMIT' : 'Service error. Please try again.' }),
           { status: isRateLimit ? 429 : 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-        )
-      }
-
-      // Global authenticated ceiling — 500 quizzes/day across all real users
-      // Prevents unbounded API spend from free signups during soft launch
-      const today = new Date().toISOString().split('T')[0]
-      const { count: authCount } = await sb
-        .from('usage_logs')
-        .select('id', { count: 'exact', head: true })
-        .gte('created_at', `${today}T00:00:00Z`)
-      if (authCount && authCount >= 500) {
-        return new Response(
-          JSON.stringify({ error: 'Service temporarily unavailable. Please try again tomorrow.' }),
-          { status: 503, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
         )
       }
     }
@@ -249,6 +254,10 @@ serve(async (req) => {
       // Schema validation — reject malformed or empty output before it reaches Quiz.jsx
       if (!exam || !Array.isArray(exam.questions) || exam.questions.length === 0) {
         console.error('Claude returned invalid schema:', JSON.stringify(exam).slice(0, 200))
+        // Log failure so trial ceilings still apply even on bad model output
+        if (isAnonymous) {
+          try { await sb.from('trial_logs').insert({ anonymous_id: user.id, image_count: images.length, input_tokens: usage.input_tokens || 0, output_tokens: usage.output_tokens || 0, cost_usd: 0 }) } catch (_) {}
+        }
         return new Response(
           JSON.stringify({ error: 'Quiz generation failed' }),
           { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
