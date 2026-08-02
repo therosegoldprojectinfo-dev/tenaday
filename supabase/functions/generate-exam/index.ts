@@ -72,6 +72,18 @@ You MUST respond with ONLY a valid JSON object — no markdown, no backticks, no
 
 Generate exactly {QUESTION_COUNT} questions total.`
 
+// Helper: log a trial failure so ceilings apply even on bad model output
+async function logTrialFailure(sb: any, anonymousId: string, imageCount: number, usage: any) {
+  const costUsd = ((usage.input_tokens || 0) * 3 / 1_000_000) + ((usage.output_tokens || 0) * 15 / 1_000_000)
+  await sb.from('trial_logs').insert({
+    anonymous_id: anonymousId,
+    image_count: imageCount,
+    input_tokens: usage.input_tokens || 0,
+    output_tokens: usage.output_tokens || 0,
+    cost_usd: costUsd,
+  })
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS_HEADERS })
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: CORS_HEADERS })
@@ -180,16 +192,13 @@ serve(async (req) => {
         .from('usage_logs')
         .select('id', { count: 'exact', head: true })
         .gte('created_at', `${today}T00:00:00Z`)
-      // Fail closed: if count query errors, treat as at ceiling
+      // Fail CLOSED: DB error, null count, or at ceiling all block the request
       if (countErr || authCount === null || authCount >= 500) {
-        const atCeiling = countErr || authCount === null || authCount >= 500
-        if (atCeiling && !countErr) {
-          return new Response(
-            JSON.stringify({ error: 'DAILY_LIMIT' }),
-            { status: 503, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-          )
-        }
-        if (countErr) console.error('usage_logs count failed (non-fatal):', countErr)
+        if (countErr) console.error('usage_logs count error (failing closed):', countErr)
+        return new Response(
+          JSON.stringify({ error: 'DAILY_LIMIT' }),
+          { status: 503, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        )
       }
 
       const { error: rateLimitErr } = await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
@@ -255,9 +264,7 @@ serve(async (req) => {
       if (!exam || !Array.isArray(exam.questions) || exam.questions.length === 0) {
         console.error('Claude returned invalid schema:', JSON.stringify(exam).slice(0, 200))
         // Log failure so trial ceilings still apply even on bad model output
-        if (isAnonymous) {
-          try { await sb.from('trial_logs').insert({ anonymous_id: user.id, image_count: images.length, input_tokens: usage.input_tokens || 0, output_tokens: usage.output_tokens || 0, cost_usd: 0 }) } catch (_) {}
-        }
+        if (isAnonymous) { try { await logTrialFailure(sb, user.id, images.length, usage) } catch (_) {} }
         return new Response(
           JSON.stringify({ error: 'Quiz generation failed' }),
           { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
@@ -267,6 +274,7 @@ serve(async (req) => {
       for (const q of exam.questions) {
         if (!q.type || !q.question || !q.correct_answer) {
           console.error('Claude returned malformed question:', JSON.stringify(q).slice(0, 200))
+          if (isAnonymous) { try { await logTrialFailure(sb, user.id, images.length, usage) } catch (_) {} }
           return new Response(
             JSON.stringify({ error: 'Quiz generation failed' }),
             { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
@@ -275,6 +283,7 @@ serve(async (req) => {
         // MCQ must have at least 2 options
         if (q.type === 'mcq' && (!Array.isArray(q.options) || q.options.length < 2)) {
           console.error('Claude returned MCQ without options:', JSON.stringify(q).slice(0, 200))
+          if (isAnonymous) { try { await logTrialFailure(sb, user.id, images.length, usage) } catch (_) {} }
           return new Response(
             JSON.stringify({ error: 'Quiz generation failed' }),
             { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
@@ -283,6 +292,7 @@ serve(async (req) => {
       }
     } catch {
       console.error('Failed to parse Claude JSON:', rawText)
+      if (isAnonymous) { try { await logTrialFailure(sb, user.id, images.length, usage) } catch (_) {} }
       return new Response(
         JSON.stringify({ error: 'Quiz generation failed' }),
         { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
