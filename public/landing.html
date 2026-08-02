@@ -355,7 +355,7 @@
           <div class="confirm-emoji">🎉</div>
           <div class="confirm-headline" id="confirmHeadline">Can't wait to see you!</div>
           <div class="confirm-sub" id="confirmSub">We'll send you everything you need before the session.</div>
-          <div class="confirm-slot" id="confirmSlot">Monday, August 4th · 7:00 PM Riyadh Time</div>
+          <div class="confirm-slot" id="confirmSlot">Tuesday, August 4th · 7:00 PM Riyadh Time</div>
           <div class="confirm-sub" style="font-size:12px;color:#bbb;">📚 Make sure your child's textbook is nearby</div>
         </div>
       </div>
@@ -400,14 +400,14 @@
       const firstName = name.split(' ')[0]
       document.getElementById('confirmHeadline').textContent = `Can't wait to see you, ${firstName}! 🙌`
       document.getElementById('confirmSub').textContent = `We'll send everything you need to ${email} before the session.`
-      document.getElementById('confirmSlot').textContent = `Monday, August 4th · ${selectedTime} Riyadh Time`
+      document.getElementById('confirmSlot').textContent = `Tuesday, August 4th · ${selectedTime} Riyadh Time`
 
       // Save to Supabase
       try {
         const { createClient } = supabase
         const sb = createClient(
           'https://lyedpfhzrvyaskmzhyhl.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0'
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY4OTI4NTQsImV4cCI6MjAyMjQ2ODg1NH0.abc'
         )
         await sb.from('event_registrations').insert({ name, email, time_slot: selectedTime })
       } catch (e) { console.error('Supabase error:', e) }
