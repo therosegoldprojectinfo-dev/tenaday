@@ -300,7 +300,7 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
 
   // ── QUIZ ──────────────────────────────────────────────────
   if (status === 'quiz' && exam) return (
-    <Quiz exam={exam} kidId={null} isTrial={true} onDone={handleQuizDone} onQuit={() => setStatus('used')} />
+    <Quiz exam={exam} kidId={null} isTrial={true} onDone={handleQuizDone} onQuit={() => setStatus('capped')} />
   )
 
   // ── CAPPED (daily limit hit — never got a quiz) ──────────────
@@ -312,13 +312,10 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
         <p className="font-body text-base text-muted leading-relaxed">{s.capped_sub}</p>
       </div>
       <button
-        onClick={() => onSignup({ showLogin: false })}
+        onClick={() => onSignup({ showLogin: true })}
         className="w-full max-w-xs bg-duo text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
         style={{ boxShadow: '0 4px 0 #46a302' }}>
-        {s.used_cta}
-      </button>
-      <button onClick={() => onSignup({ showLogin: true })} className="font-body font-bold text-sm text-muted py-2 text-center">
-        {s.hook_login}
+        {lang === 'ar' ? 'سجّل الدخول أو أنشئ حساباً' : 'Log in or create account'}
       </button>
     </div>
   )
