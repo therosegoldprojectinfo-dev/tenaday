@@ -138,11 +138,14 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
       setStatus('ready')
     } catch (err) {
       const isTrialUsed = err.message?.includes('Trial already used')
+      const isCapHit = err.message?.includes('temporarily unavailable') || err.message?.includes('DAILY_LIMIT')
       setErrorMsg(isTrialUsed
         ? (lang === 'ar' ? 'لقد استخدمت تجربتك المجانية. أنشئ حساباً للمتابعة.' : 'You already used your free trial. Create an account to continue.')
-        : (lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Please try again.')
+        : isCapHit
+          ? (lang === 'ar' ? 'وصلنا للحد اليومي. عد غداً 🌙' : 'Daily limit reached. Come back tomorrow 🌙')
+          : (lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Please try again.')
       )
-      if (isTrialUsed) setStatus('used')
+      if (isTrialUsed || isCapHit) setStatus('used')
       else setStatus('error')
     }
   }
