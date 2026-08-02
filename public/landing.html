@@ -275,6 +275,8 @@
     /* ── FOOTER ── */
     .footer { padding: 16px; text-align: center; font-size: 12px; color: #ccc; }
   </style>
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
@@ -386,7 +388,7 @@
       document.getElementById('step1').classList.add('active')
     }
 
-    function submitForm() {
+    async function submitForm() {
       const name = document.getElementById('nameInput').value.trim()
       const email = document.getElementById('emailInput').value.trim()
       if (!name) { document.getElementById('nameInput').focus(); return }
@@ -400,7 +402,18 @@
       document.getElementById('confirmSub').textContent = `We'll send everything you need to ${email} before the session.`
       document.getElementById('confirmSlot').textContent = `Tomorrow · ${selectedTime} Riyadh Time`
 
-      console.log('Registration:', { name, email, slot: selectedTime })
+      // Save to Supabase
+      try {
+        const { createClient } = supabase
+        const sb = createClient(
+          'https://lyedpfhzrvyaskmzhyhl.supabase.co',
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY4OTI4NTQsImV4cCI6MjAyMjQ2ODg1NH0.abc'
+        )
+        await sb.from('event_registrations').insert({ name, email, time_slot: selectedTime })
+      } catch (e) { console.error('Supabase error:', e) }
+
+      // Meta Pixel — track booking as Lead
+      if (window.fbq) fbq('track', 'Lead', { content_name: 'Numio Free Call', content_category: selectedTime })
     }
   </script>
 
