@@ -28,7 +28,11 @@ function getErrorMessage(err, lang) {
       ? 'لقد وصلت إلى الحد اليومي للاختبارات. حاول مجدداً غداً. 🌙'
       : "You've reached today's quiz limit. Try again tomorrow. 🌙"
   }
-  // Return the specific error message (e.g. "Max 5 images allowed", "Image too large")
+  if (err?.message === 'DAILY_LIMIT' || err?.message?.includes('temporarily unavailable')) {
+    return lang === 'ar'
+      ? 'وصلنا للحد اليومي. عد غداً 🌙'
+      : 'Daily limit reached. Come back tomorrow 🌙'
+  }
   if (err?.message) return err.message
   return lang === 'ar' ? 'حدث خطأ ما. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'
 }
@@ -186,7 +190,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
                 </p>
               </div>
               {/* Only show Try Again if it's not a rate limit — retrying won't help */}
-              {error?.message !== 'RATE_LIMIT' && (
+              {error?.message !== 'RATE_LIMIT' && error?.message !== 'DAILY_LIMIT' && !error?.message?.includes('temporarily unavailable') && (
                 <button
                   onClick={handleReset}
                   className="w-full bg-duo text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:translate-y-1"
@@ -195,7 +199,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
                   {t(lang, 'home_try_again')}
                 </button>
               )}
-              {error?.message === 'RATE_LIMIT' && (
+              {(error?.message === 'RATE_LIMIT' || error?.message === 'DAILY_LIMIT' || error?.message?.includes('temporarily unavailable')) && (
                 <button
                   onClick={handleReset}
                   className="w-full bg-gray-100 text-muted font-display font-bold text-base rounded-2xl py-4 transition-all active:translate-y-1"
