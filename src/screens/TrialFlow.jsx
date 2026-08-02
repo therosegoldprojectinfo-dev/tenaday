@@ -22,6 +22,8 @@ const strings = {
     resume_sub:     'You have a quiz in progress.',
     resume_cta:     'Continue quiz →',
     resume_new:     'Start over',
+    capped_title:   'Come back tomorrow 🌙',
+    capped_sub:     "We've reached today's limit for free challenges. Create a free account to get unlimited quizzes any time.",
     used_title:     'Your trial is complete 🌟',
     used_sub:       'Create a free account to keep going with unlimited quizzes.',
     used_cta:       'Create free account →',
@@ -53,6 +55,8 @@ const strings = {
     resume_sub:     'لديك اختبار لم تكمله بعد.',
     resume_cta:     'أكمل الاختبار ←',
     resume_new:     'ابدأ من جديد',
+    capped_title:   'عد غداً 🌙',
+    capped_sub:     'وصلنا للحد اليومي للتحديات المجانية. أنشئ حساباً مجانياً للحصول على اختبارات غير محدودة في أي وقت.',
     used_title:     'انتهت تجربتك المجانية 🌟',
     used_sub:       'أنشئ حساباً مجانياً لتحصل على اختبارات غير محدودة.',
     used_cta:       'أنشئ حساباً مجانياً ←',
@@ -139,14 +143,10 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
     } catch (err) {
       const isTrialUsed = err.message?.includes('Trial already used')
       const isCapHit = err.message?.includes('temporarily unavailable') || err.message?.includes('DAILY_LIMIT')
-      setErrorMsg(isTrialUsed
-        ? (lang === 'ar' ? 'لقد استخدمت تجربتك المجانية. أنشئ حساباً للمتابعة.' : 'You already used your free trial. Create an account to continue.')
-        : isCapHit
-          ? (lang === 'ar' ? 'وصلنا للحد اليومي. عد غداً 🌙' : 'Daily limit reached. Come back tomorrow 🌙')
-          : (lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Please try again.')
-      )
-      if (isTrialUsed || isCapHit) setStatus('used')
+      if (isTrialUsed) setStatus('used')
+      else if (isCapHit) setStatus('capped')
       else setStatus('error')
+      setErrorMsg(isCapHit ? '' : isTrialUsed ? '' : (lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Please try again.'))
     }
   }
 
@@ -301,6 +301,26 @@ export default function TrialFlow({ lang = 'en', onSignup, onLanguageChange }) {
   // ── QUIZ ──────────────────────────────────────────────────
   if (status === 'quiz' && exam) return (
     <Quiz exam={exam} kidId={null} isTrial={true} onDone={handleQuizDone} onQuit={() => setStatus('used')} />
+  )
+
+  // ── CAPPED (daily limit hit — never got a quiz) ──────────────
+  if (status === 'capped') return (
+    <div className="bg-white w-full flex flex-col items-center justify-center px-6 gap-8 text-center" style={{ minHeight: '100dvh' }} dir={dir}>
+      <span style={{ fontSize: 80 }}>🌙</span>
+      <div>
+        <h1 className="font-display font-extrabold text-3xl text-ink mb-3">{s.capped_title}</h1>
+        <p className="font-body text-base text-muted leading-relaxed">{s.capped_sub}</p>
+      </div>
+      <button
+        onClick={() => onSignup({ showLogin: false })}
+        className="w-full max-w-xs bg-duo text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
+        style={{ boxShadow: '0 4px 0 #46a302' }}>
+        {s.used_cta}
+      </button>
+      <button onClick={() => onSignup({ showLogin: true })} className="font-body font-bold text-sm text-muted py-2 text-center">
+        {s.hook_login}
+      </button>
+    </div>
   )
 
   // ── CONGRATS + SIGNUP (merged) ────────────────────────────
