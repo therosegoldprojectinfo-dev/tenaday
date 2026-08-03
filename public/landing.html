@@ -304,9 +304,9 @@
   <!-- HERO -->
   <div class="hero">
     <h1 class="headline">
-      Help your child get better grades this year!
+      Better grades for your kids FREE EVENT !
     </h1>
-    <p class="subline">In this free event discover the scientific way to help your kid get better grades by only taking a picture!</p>
+    <p class="subline">Discover the scientific way to help your kid get better grades by only taking a picture!</p>
 
     <!-- Plain image, no glow -->
     <div class="hero-image">
@@ -434,7 +434,7 @@
         const { createClient } = supabase
         const sb = createClient(
           'https://lyedpfhzrvyaskmzhyhl.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0'
+          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY4OTI4NTQsImV4cCI6MjAyMjQ2ODg1NH0.abc'
         )
         await sb.from('event_registrations').insert({ name, email, time_slot: selectedTime })
       } catch (e) { console.error('Supabase error:', e) }
