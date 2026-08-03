@@ -178,7 +178,11 @@
       transition: all 0.15s;
     }
     .cta-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--green-dark); }
-    .cta-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; transform: none; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0) }
+      25% { transform: translateX(-6px) }
+      75% { transform: translateX(6px) }
+    }
 
     /* ── PSS ── */
     .pss {
@@ -345,7 +349,7 @@
           </button>
         </div>
         <div class="divider"></div>
-        <button class="cta-btn" id="nextBtn" disabled onclick="goToForm()">Book my free 15-minute call →</button>
+        <button class="cta-btn" id="nextBtn" onclick="goToForm()">Book my free 15-minute call →</button>
         <p class="pss">Pss: make sure your child will be with you 📚</p>
       </div>
 
@@ -393,7 +397,13 @@
     }
 
     function goToForm() {
-      if (!selectedTime) return
+      if (!selectedTime) {
+        document.querySelectorAll('.slot-btn').forEach(b => {
+          b.style.animation = 'shake 0.3s ease'
+          setTimeout(() => b.style.animation = '', 300)
+        })
+        return
+      }
       document.getElementById('step1').classList.remove('active')
       document.getElementById('step2').classList.add('active')
       document.getElementById('slotPill').textContent = '🕐 ' + selectedTime + ' · Riyadh Time'
