@@ -16,6 +16,8 @@
       --card:       #f7f9f4;
       --border:     #e8f0e0;
       --radius:     20px;
+      --wa:         #25D366;
+      --wa-dark:    #1da851;
     }
     body {
       font-family: 'Inter', sans-serif;
@@ -75,10 +77,7 @@
       color: var(--ink);
       margin-bottom: 10px;
     }
-    .headline em {
-      font-style: normal;
-      color: var(--green);
-    }
+    .headline em { font-style: normal; color: var(--green); }
     .subline {
       font-size: 19px;
       color: var(--muted);
@@ -87,18 +86,8 @@
       margin-bottom: 24px;
     }
 
-    /* ── HERO IMAGE — plain, no glow ── */
-    .hero-image {
-      width: 100%;
-      max-width: 360px;
-      margin-bottom: 32px;
-    }
-    .hero-image img {
-      width: 100%;
-      height: auto;
-      display: block;
-      border-radius: 16px;
-    }
+    .hero-image { width: 100%; max-width: 360px; margin-bottom: 32px; }
+    .hero-image img { width: 100%; height: auto; display: block; border-radius: 16px; }
 
     /* ── RESERVATION CARD ── */
     .reservation-card {
@@ -107,7 +96,6 @@
       margin: 0 24px 48px;
       padding: 0 24px 48px;
     }
-
     .res-card-inner {
       background: var(--card);
       border: 2px solid var(--border);
@@ -131,7 +119,6 @@
 
     /* ── SLOTS ── */
     .slots { display: flex; flex-direction: column; gap: 8px; }
-
     .slot-btn {
       width: 100%;
       background: white;
@@ -178,13 +165,35 @@
       transition: all 0.15s;
     }
     .cta-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--green-dark); }
+
+    /* ── WHATSAPP BUTTON ── */
+    .wa-btn {
+      width: 100%;
+      background: var(--wa);
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 17px;
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 17px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--wa-dark);
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .wa-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--wa-dark); }
+
     @keyframes shake {
       0%, 100% { transform: translateX(0) }
       25% { transform: translateX(-6px) }
       75% { transform: translateX(6px) }
     }
 
-    /* ── PSS ── */
     .pss {
       font-size: 12px;
       color: var(--muted);
@@ -193,12 +202,7 @@
       line-height: 1.5;
     }
 
-    /* ── DIVIDER ── */
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 0 -4px;
-    }
+    .divider { height: 1px; background: var(--border); margin: 0 -4px; }
 
     /* ── FORM ── */
     .slot-pill {
@@ -240,6 +244,40 @@
     .form-input:focus { border-color: var(--green); }
     .form-input::placeholder { color: #bbb; font-weight: 500; }
 
+    /* ── PHONE ROW ── */
+    .phone-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .phone-prefix {
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 13px 14px;
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--ink);
+      background: white;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .phone-input {
+      flex: 1;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 13px 16px;
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--ink);
+      outline: none;
+      background: white;
+      transition: border-color 0.15s;
+    }
+    .phone-input:focus { border-color: var(--green); }
+    .phone-input::placeholder { color: #bbb; font-weight: 500; }
+
     .back-link {
       font-size: 13px;
       color: var(--muted);
@@ -276,7 +314,6 @@
       color: var(--ink);
     }
 
-    /* ── FOOTER ── */
     .footer { padding: 16px; text-align: center; font-size: 12px; color: #ccc; }
   </style>
   <!-- Meta Pixel Code -->
@@ -295,7 +332,6 @@
   <noscript><img height="1" width="1" style="display:none"
   src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"
   /></noscript>
-  <!-- End Meta Pixel Code -->
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
@@ -303,18 +339,14 @@
 
   <!-- HERO -->
   <div class="hero">
-    <h1 class="headline">
-      Better grades for your kids - FREE EVENT !
-    </h1>
+    <h1 class="headline">Better grades for your kids - FREE EVENT!</h1>
     <p class="subline">Discover the scientific way to help your kid get better grades by only taking a picture!</p>
-
-    <!-- Plain image, no glow -->
     <div class="hero-image">
       <img src="https://numiomath.app/onboarding-hero.jpg" alt="Take a photo, get a quiz" />
     </div>
   </div>
 
-  <!-- RESERVATION CARD — all steps grouped -->
+  <!-- RESERVATION CARD -->
   <div class="reservation-card">
     <div class="res-card-inner">
 
@@ -353,7 +385,7 @@
         <p class="pss">Pss: make sure your child will be with you 📚</p>
       </div>
 
-      <!-- STEP 2: Name + Email -->
+      <!-- STEP 2: Name + Phone -->
       <div class="step" id="step2">
         <div class="slot-pill" id="slotPill">🕐 7:00 PM · Riyadh Time</div>
         <div class="step-label">Almost there! 🎉</div>
@@ -362,22 +394,28 @@
           <input class="form-input" id="nameInput" type="text" placeholder="e.g. Sarah" autocomplete="name" />
         </div>
         <div class="form-group">
-          <label class="form-label">Email address</label>
-          <input class="form-input" id="emailInput" type="email" placeholder="you@example.com" autocomplete="email" oninput="checkEmail(this.value)" />
-          <div id="emailHint" style="display:none;font-size:13px;color:var(--green-dark);font-weight:600;margin-top:4px;padding:8px 12px;background:#f0fae6;border-radius:10px;cursor:pointer;" onclick="fixEmail()"></div>
+          <label class="form-label">WhatsApp number</label>
+          <div class="phone-row">
+            <div class="phone-prefix">🇸🇦 +966</div>
+            <input class="phone-input" id="phoneInput" type="tel" placeholder="5xxxxxxxx" autocomplete="tel" />
+          </div>
         </div>
         <div class="divider"></div>
         <button class="cta-btn" onclick="submitForm()">Confirm my spot ✓</button>
         <span class="back-link" onclick="goBack()">← Change time</span>
       </div>
 
-      <!-- STEP 3: Confirmation -->
+      <!-- STEP 3: Confirmation + WhatsApp button -->
       <div class="step" id="step3">
         <div class="confirm-inner">
           <div class="confirm-emoji">🎉</div>
           <div class="confirm-headline" id="confirmHeadline">Can't wait to see you!</div>
-          <div class="confirm-sub" id="confirmSub">We'll send you everything you need before the session.</div>
+          <div class="confirm-sub">Your spot is reserved! Now confirm on WhatsApp to get your reminders 👇</div>
           <div class="confirm-slot" id="confirmSlot">Thursday, August 6th · 7:00 PM Riyadh Time</div>
+          <a class="wa-btn" id="waBtn" href="#" target="_blank">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+            ✅ Confirm your spot on WhatsApp
+          </a>
           <div class="confirm-sub" style="font-size:12px;color:#bbb;">📚 Make sure your child's textbook is nearby</div>
         </div>
       </div>
@@ -389,6 +427,8 @@
 
   <script>
     let selectedTime = ''
+    let registrantName = ''
+    let registrantPhone = ''
 
     function selectSlot(btn) {
       document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'))
@@ -416,66 +456,29 @@
       document.getElementById('step1').classList.add('active')
     }
 
-    // ── Friendly email validation ──────────────────────────────
-    const TYPO_MAP = {
-      'gmil.com': 'gmail.com', 'gmai.com': 'gmail.com', 'gamil.com': 'gmail.com',
-      'gmail.co': 'gmail.com', 'gmaill.com': 'gmail.com', 'gmal.com': 'gmail.com',
-      'gmail.comm': 'gmail.com', 'gnail.com': 'gmail.com', 'gemail.com': 'gmail.com',
-      'hotmial.com': 'hotmail.com', 'hotmai.com': 'hotmail.com', 'hotmali.com': 'hotmail.com',
-      'hotmail.co': 'hotmail.com', 'hotnail.com': 'hotmail.com',
-      'yaho.com': 'yahoo.com', 'yahooo.com': 'yahoo.com', 'yahoo.co': 'yahoo.com',
-      'outlok.com': 'outlook.com', 'outllok.com': 'outlook.com', 'outook.com': 'outlook.com',
-      'outlook.co': 'outlook.com', 'outloook.com': 'outlook.com', 'otlook.com': 'outlook.com',
-      'livee.com': 'live.com', 'live.co': 'live.com', 'lve.com': 'live.com', 'liv.com': 'live.com',
-      'iclod.com': 'icloud.com', 'icould.com': 'icloud.com',
-    }
-    let suggestedEmail = ''
-
-    function checkEmail(value) {
-      const hint = document.getElementById('emailHint')
-      suggestedEmail = ''
-      if (!value.includes('@')) { hint.style.display = 'none'; return }
-      const [user, domain] = value.split('@')
-      if (!domain) { hint.style.display = 'none'; return }
-      const fix = TYPO_MAP[domain.toLowerCase()]
-      if (fix) {
-        suggestedEmail = `${user}@${fix}`
-        hint.textContent = `✏️ Did you mean ${suggestedEmail}? Tap to fix`
-        hint.style.display = 'block'
-      } else {
-        hint.style.display = 'none'
-      }
-    }
-
-    function fixEmail() {
-      if (!suggestedEmail) return
-      document.getElementById('emailInput').value = suggestedEmail
-      document.getElementById('emailHint').style.display = 'none'
-      suggestedEmail = ''
-    }
-
     async function submitForm() {
       const name = document.getElementById('nameInput').value.trim()
-      const email = document.getElementById('emailInput').value.trim()
+      const phone = document.getElementById('phoneInput').value.trim().replace(/\s+/g, '')
+
       if (!name) { document.getElementById('nameInput').focus(); return }
-      if (!email || !email.includes('@')) { document.getElementById('emailInput').focus(); return }
+      if (!phone || phone.length < 9) { document.getElementById('phoneInput').focus(); return }
 
-      // If there's an active typo suggestion, nudge them to fix it first
-      if (suggestedEmail) {
-        const hint = document.getElementById('emailHint')
-        hint.textContent = `✏️ Looks like a typo — tap here to use ${suggestedEmail} instead 👆`
-        hint.style.background = '#fff3cd'
-        hint.style.color = '#b7720a'
-        return
-      }
+      registrantName = name
+      registrantPhone = '+966' + phone
 
+      // Build WhatsApp pre-filled message
+      const msg = encodeURIComponent(
+        `Hello Numio, I am ${name} and I confirm my spot for the Numio event at Aug 6 - ${selectedTime} Riyadh Time. I guarantee we'll be there 😊`
+      )
+      document.getElementById('waBtn').href = `https://wa.me/14384099964?text=${msg}`
+
+      // Show step 3
       document.getElementById('step2').classList.remove('active')
       document.getElementById('step3').classList.add('active')
 
       const firstName = name.split(' ')[0]
-      document.getElementById('confirmHeadline').textContent = `Can't wait to see you, ${firstName}! 🙌`
-      document.getElementById('confirmSub').textContent = `We'll send everything you need to ${email} before the session.`
-      document.getElementById('confirmSlot').textContent = `Thursday, August 6th · ${selectedTime} Riyadh Time`
+      document.getElementById('confirmHeadline').textContent = `You're in, ${firstName}! 🙌`
+      document.getElementById('confirmSlot').textContent = `Wednesday, August 6th · ${selectedTime} Riyadh Time`
 
       // Save to Supabase
       try {
@@ -484,10 +487,10 @@
           'https://lyedpfhzrvyaskmzhyhl.supabase.co',
           'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0'
         )
-        await sb.from('event_registrations').insert({ name, email, time_slot: selectedTime })
+        await sb.from('event_registrations').insert({ name, phone: registrantPhone, time_slot: selectedTime })
       } catch (e) { console.error('Supabase error:', e) }
 
-      // Meta Pixel — track booking as Lead
+      // Meta Pixel
       if (window.fbq) fbq('track', 'Lead', { content_name: 'Numio Free Call', content_category: selectedTime })
     }
   </script>
