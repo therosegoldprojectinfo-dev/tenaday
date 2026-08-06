@@ -479,7 +479,7 @@
       }
     }
 
-    async function submitForm() {
+    function submitForm() {
       const name = document.getElementById('nameInput').value.trim()
       const phoneRaw = document.getElementById('phoneInput').value.trim()
       const country = document.getElementById('countrySelect').value
@@ -500,31 +500,22 @@
       errorEl.style.display = 'none'
       const fullPhone = country + cleanedPhone
 
-      try {
-        const { createClient } = supabase
-        const sb = createClient(
-          'https://lyedpfhzrvyaskmzhyhl.supabase.co',
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0'
-        )
-        await sb.from('event_registrations').insert({ name, phone: fullPhone, time_slot: selectedTime })
+      // Fire and forget Supabase — no await so mobile doesn't block WhatsApp
+      const { createClient } = supabase
+      const sb = createClient(
+        'https://lyedpfhzrvyaskmzhyhl.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0'
+      )
+      sb.from('event_registrations').insert({ name, phone: fullPhone, time_slot: selectedTime })
 
-        // Pixel fires ONLY after successful Supabase insert
-        if (window.fbq) fbq('track', 'Lead', { content_name: 'Numio Free Call', content_category: selectedTime })
+      // Pixel fires immediately
+      if (window.fbq) fbq('track', 'Lead', { content_name: 'Numio Free Call', content_category: selectedTime })
 
-        // Open WhatsApp directly (mobile safe)
-        const msg = encodeURIComponent(
-          `Hello Numio, I am ${name} and I confirm my spot for the Numio event at Aug 7 - ${selectedTime} Riyadh Time. I guarantee we'll be there 😊`
-        )
-        const a = document.createElement('a')
-        a.href = `https://wa.me/14384099964?text=${msg}`
-        a.target = '_blank'
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-
-      } catch (e) {
-        console.error('Supabase error:', e)
-      }
+      // Open WhatsApp immediately — most reliable on mobile
+      const msg = encodeURIComponent(
+        `Hello Numio, I am ${name} and I confirm my spot for the Numio event at Aug 7 - ${selectedTime} Riyadh Time. I guarantee we'll be there 😊`
+      )
+      window.location.href = `https://wa.me/14384099964?text=${msg}`
     }
   </script>
 
