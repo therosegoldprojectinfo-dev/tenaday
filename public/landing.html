@@ -511,11 +511,16 @@
         // Pixel fires ONLY after successful Supabase insert
         if (window.fbq) fbq('track', 'Lead', { content_name: 'Numio Free Call', content_category: selectedTime })
 
-        // Open WhatsApp directly
+        // Open WhatsApp directly (mobile safe)
         const msg = encodeURIComponent(
           `Hello Numio, I am ${name} and I confirm my spot for the Numio event at Aug 7 - ${selectedTime} Riyadh Time. I guarantee we'll be there 😊`
         )
-        window.open(`https://wa.me/14384099964?text=${msg}`, '_blank')
+        const a = document.createElement('a')
+        a.href = `https://wa.me/14384099964?text=${msg}`
+        a.target = '_blank'
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
 
       } catch (e) {
         console.error('Supabase error:', e)
