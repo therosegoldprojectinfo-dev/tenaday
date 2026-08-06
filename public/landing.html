@@ -500,22 +500,25 @@
       errorEl.style.display = 'none'
       const fullPhone = country + cleanedPhone
 
-      // Fire and forget Supabase — no await so mobile doesn't block WhatsApp
       const { createClient } = supabase
       const sb = createClient(
         'https://lyedpfhzrvyaskmzhyhl.supabase.co',
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0'
       )
-      sb.from('event_registrations').insert({ name, phone: fullPhone, time_slot: selectedTime })
 
-      // Pixel fires immediately
-      if (window.fbq) fbq('track', 'Lead', { content_name: 'Numio Free Call', content_category: selectedTime })
-
-      // Open WhatsApp immediately — most reliable on mobile
       const msg = encodeURIComponent(
         `Hello Numio, I am ${name} and I confirm my spot for the Numio event at Aug 7 - ${selectedTime} Riyadh Time. I guarantee we'll be there 😊`
       )
-      window.location.href = `https://wa.me/14384099964?text=${msg}`
+      const waUrl = `https://wa.me/14384099964?text=${msg}`
+
+      // Save to Supabase first, then open WhatsApp after short delay
+      sb.from('event_registrations').insert({ name, phone: fullPhone, time_slot: selectedTime }).then(() => {
+        if (window.fbq) fbq('track', 'Lead', { content_name: 'Numio Free Call', content_category: selectedTime })
+        window.location.href = waUrl
+      }).catch(() => {
+        // Even if Supabase fails, still open WhatsApp
+        window.location.href = waUrl
+      })
     }
   </script>
 
