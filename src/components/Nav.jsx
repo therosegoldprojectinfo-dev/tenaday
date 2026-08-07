@@ -40,14 +40,16 @@ export default function Nav({ active, onChange, streak = 0 }) {
             <button
               key={id}
               onClick={() => onChange(id)}
-              className="flex-1 flex items-center justify-center py-3 transition-colors active:bg-gray-50"
+              className="flex-1 flex items-center justify-center py-3 transition-colors"
             >
-              <div className="w-10 h-10 flex items-center justify-center">
+              <div
+                className="w-14 h-10 flex items-center justify-center rounded-2xl transition-all"
+                style={{ background: isActive ? '#ede9fe' : 'transparent' }}
+              >
                 <img
                   src={NAV_ICONS[id]}
                   alt={label}
-                  className="w-full h-full object-contain transition-all"
-                  style={{ opacity: isActive ? 1 : 0.35, filter: isActive ? 'none' : 'grayscale(0.3)' }}
+                  className="w-9 h-9 object-contain"
                 />
               </div>
             </button>
@@ -98,8 +100,7 @@ export default function Nav({ active, onChange, streak = 0 }) {
                   <img
                     src={NAV_ICONS[id]}
                     alt=""
-                    className="w-full h-full object-contain transition-all"
-                    style={{ opacity: isActive ? 1 : 0.35 }}
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 {label}
