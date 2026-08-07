@@ -285,6 +285,7 @@ export default function App() {
             {screen === 'chapters' && (
               <Chapters
                 kidId={activeKid?.id}
+                streak={streak}
                 onSelectChapter={c => go({ screen: 'current_chapter', chapter: c })}
               />
             )}
