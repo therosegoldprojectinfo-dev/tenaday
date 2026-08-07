@@ -26,9 +26,8 @@ function getLast7Days() {
   return days
 }
 
-function StreakRow({ streak, lang }) {
+function StreakRow({ streak, lang, coinBalance }) {
   const days = getLast7Days()
-  // How many of the last days are "active" based on streak count
   const activeCount = Math.min(streak, 7)
 
   return (
@@ -36,24 +35,45 @@ function StreakRow({ streak, lang }) {
       {/* Headline */}
       <div className="mb-4">
         {streak > 0 ? (
-          <>
-            <h2 className="font-display font-extrabold text-2xl text-ink">
-              {lang === 'ar' ? `أنت على سلسلة ${streak} أيام 🔥` : `You're on a ${streak} day streak 🔥`}
-            </h2>
-            <p className="font-body text-sm text-muted mt-0.5">
-              {lang === 'ar' ? 'استمر في التعلم كل يوم!' : 'Keep learning every day!'}
-            </p>
-          </>
+          <h2 className="font-display font-extrabold text-2xl text-ink">
+            {lang === 'ar' ? 'استمر في التعلم كل يوم!' : 'Keep learning every day!'}
+          </h2>
         ) : (
-          <>
-            <h2 className="font-display font-extrabold text-2xl text-ink">
-              {lang === 'ar' ? 'ابدأ سلسلتك اليوم! ⚡' : 'Start your streak today! ⚡'}
-            </h2>
-            <p className="font-body text-sm text-muted mt-0.5">
-              {lang === 'ar' ? 'أكمل اختباراً كل يوم لبناء سلسلة' : 'Complete a quiz daily to build a streak'}
-            </p>
-          </>
+          <h2 className="font-display font-extrabold text-2xl text-ink">
+            {lang === 'ar' ? 'ابدأ سلسلتك اليوم!' : 'Start your streak today!'}
+          </h2>
         )}
+        <p className="font-body text-sm text-muted mt-0.5">
+          {lang === 'ar' ? 'أكمل اختباراً كل يوم لبناء سلسلة' : 'Complete a quiz daily to build a streak'}
+        </p>
+      </div>
+
+      {/* Streak + Coins stats */}
+      <div className="flex gap-3 mb-4">
+        {/* Streak stat */}
+        <div className="flex items-center gap-2 rounded-2xl px-4 py-3 flex-1"
+          style={{ background: streak > 0 ? '#fff0f6' : '#f9fafb', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
+          <img
+            src="/streak-fire.png"
+            alt="streak"
+            className="w-10 h-10 object-contain flex-shrink-0"
+            style={{ filter: streak === 0 ? 'grayscale(1) opacity(0.4)' : 'none' }}
+          />
+          <div>
+            <p className="font-display font-extrabold text-2xl" style={{ color: streak > 0 ? '#ff2d78' : '#d1d5db', lineHeight: 1 }}>{streak}</p>
+            <p className="font-body text-xs text-muted">{lang === 'ar' ? 'أيام' : 'day streak'}</p>
+          </div>
+        </div>
+
+        {/* Coins stat */}
+        <div className="flex items-center gap-2 rounded-2xl px-4 py-3 flex-1"
+          style={{ background: '#fffbeb', boxShadow: '0 2px 12px rgba(0,0,0,0.05)' }}>
+          <img src="/coin-flower.png" alt="coins" className="w-10 h-10 object-contain flex-shrink-0" />
+          <div>
+            <p className="font-display font-extrabold text-2xl text-amber-500" style={{ lineHeight: 1 }}>{coinBalance ?? 0}</p>
+            <p className="font-body text-xs text-muted">{lang === 'ar' ? 'عملات' : 'coins'}</p>
+          </div>
+        </div>
       </div>
 
       {/* Day pills row */}
@@ -66,10 +86,7 @@ function StreakRow({ streak, lang }) {
               <div
                 className="flex items-center justify-center font-display font-extrabold transition-all"
                 style={{
-                  width: 44,
-                  height: 52,
-                  borderRadius: 20,
-                  fontSize: 18,
+                  width: 44, height: 52, borderRadius: 20, fontSize: 18,
                   background: isToday && isActive ? '#7c3aed'
                     : isToday ? '#f5f3ff'
                     : isActive ? '#ede9fe'
@@ -94,7 +111,7 @@ function StreakRow({ streak, lang }) {
   )
 }
 
-export default function Chapters({ onSelectChapter, kidId, streak = 0 }) {
+export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid }) {
   const lang = useLang()
   const [chapters, setChapters]   = useState([])
   const [loading, setLoading]     = useState(true)
@@ -134,7 +151,7 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0 }) {
         <div className="max-w-2xl mx-auto">
 
           {/* Streak row */}
-          <StreakRow streak={streak} lang={lang} />
+          <StreakRow streak={streak} lang={lang} coinBalance={activeKid?.coin_balance} />
 
           {/* Section title */}
           <div className="mb-4">
