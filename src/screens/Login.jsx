@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 
 const strings = {
   en: {
-    title:       'Welcome back! 👋',
+    title:       'Welcome back!',
     sub:         'Log in to continue with your child.',
     username:    'USERNAME',
     password:    'PASSWORD',
@@ -20,7 +20,7 @@ const strings = {
     err_generic: 'Something went wrong. Try again.',
   },
   ar: {
-    title:       'مرحباً بعودتك! 👋',
+    title:       'مرحباً بعودتك!',
     sub:         'سجّل الدخول لمتابعة رحلة طفلك.',
     username:    'اسم المستخدم',
     password:    'كلمة المرور',
@@ -77,104 +77,84 @@ export default function Login({ lang = 'en', onSuccess, onTryFree, onLanguageCha
 
         {/* Language toggle */}
         <div className="flex gap-2 justify-end pt-6 flex-shrink-0">
-          <button onClick={() => onLanguageChange?.('en')}
-            className={`px-3 py-1 rounded-full font-body font-bold text-sm transition-all ${lang === 'en' ? 'bg-duo text-white' : 'bg-gray-100 text-muted'}`}>
-            EN
-          </button>
-          <button onClick={() => onLanguageChange?.('ar')}
-            className={`px-3 py-1 rounded-full font-body font-bold text-sm transition-all ${lang === 'ar' ? 'bg-duo text-white' : 'bg-gray-100 text-muted'}`}>
-            عربي
-          </button>
+          {['en', 'ar'].map(code => (
+            <button key={code} onClick={() => onLanguageChange?.(code)}
+              className="px-4 py-1.5 rounded-full font-body font-bold text-sm transition-all"
+              style={{ background: lang === code ? '#7c3aed' : '#f3f4f6', color: lang === code ? 'white' : '#AFAFAF' }}>
+              {code === 'en' ? 'EN' : 'عربي'}
+            </button>
+          ))}
         </div>
 
         {/* Header */}
-        <div className="flex-shrink-0 pt-12 pb-10">
-          <img src="/mascot.png" alt="Numio" className="w-20 h-auto mb-6" />
-          <h1 className="font-display font-extrabold text-3xl text-ink mb-2">{s.title}</h1>
+        <div className="flex-shrink-0 pt-10 pb-8">
+          <img src="/nav-logo.png" alt="Numio" className="h-10 w-auto mb-8" />
+          <h1 className="font-display font-extrabold text-3xl text-ink mb-2">{s.title} 👋</h1>
           <p className="font-body text-base text-muted">{s.sub}</p>
         </div>
 
         {/* Form */}
-        <div className="flex flex-col gap-5 flex-1">
+        <div className="flex flex-col gap-4 flex-1">
           <div className="flex flex-col gap-1.5">
-            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">
-              {s.username}
-            </label>
-            <input
-              type="text"
-              value={username}
+            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">{s.username}</label>
+            <input type="text" value={username}
               onChange={e => { setUsername(e.target.value); setError('') }}
-              placeholder={s.username_ph}
-              autoCapitalize="none"
-              autoCorrect="off"
-              className="w-full border-2 border-gray-200 rounded-2xl px-4 py-4 font-display font-bold text-lg text-ink outline-none focus:border-duo transition-colors"
-            />
+              placeholder={s.username_ph} autoCapitalize="none" autoCorrect="off"
+              className="w-full rounded-2xl px-4 py-4 font-display font-bold text-lg text-ink outline-none transition-colors"
+              style={{ border: '2px solid #e5e7eb', background: '#fafafa' }}
+              onFocus={e => e.target.style.borderColor = '#7c3aed'}
+              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">
-              {s.password}
-            </label>
-            <input
-              type="password"
-              value={password}
+            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">{s.password}</label>
+            <input type="password" value={password}
               onChange={e => { setPassword(e.target.value); setError('') }}
               placeholder={s.password_ph}
               onKeyDown={e => e.key === 'Enter' && handleLogin()}
-              className="w-full border-2 border-gray-200 rounded-2xl px-4 py-4 font-display font-bold text-lg text-ink outline-none focus:border-duo transition-colors"
-            />
+              className="w-full rounded-2xl px-4 py-4 font-display font-bold text-lg text-ink outline-none transition-colors"
+              style={{ border: '2px solid #e5e7eb', background: '#fafafa' }}
+              onFocus={e => e.target.style.borderColor = '#7c3aed'}
+              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
           </div>
 
-          {error && (
-            <p className="font-body text-sm text-red-500 font-bold text-center">{error}</p>
-          )}
+          {error && <p className="font-body text-sm text-red-500 font-bold text-center">{error}</p>}
 
-          <button
-            onClick={handleLogin}
-            disabled={loading || !username.trim() || !password}
-            className="w-full bg-duo disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
-            style={{ boxShadow: '0 4px 0 #46a302' }}
-          >
+          <button onClick={handleLogin} disabled={loading || !username.trim() || !password}
+            className="w-full disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:scale-95"
+            style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}>
             {loading ? s.loading : s.cta}
           </button>
 
-          {/* Forgot password */}
-          <a
-            href={`https://wa.me/14384104068?text=${encodeURIComponent('Hi, I forgot my Numio password. My username is: ')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-duo font-body font-bold text-sm text-center py-1"
-          >
+          <a href={`https://wa.me/14384104068?text=${encodeURIComponent('Hi, I forgot my Numio password. My username is: ')}`}
+            target="_blank" rel="noopener noreferrer"
+            className="font-body font-bold text-sm text-center py-1"
+            style={{ color: '#7c3aed' }}>
             {s.forgot}
           </a>
 
-          {/* Policy links */}
           <p className="font-body text-xs text-muted text-center">
-            <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="text-duo underline">
+            <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: '#7c3aed' }}>
               {lang === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'}
             </a>
             {' · '}
-            <a href="/terms.html" target="_blank" rel="noopener noreferrer" className="text-duo underline">
+            <a href="/terms.html" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: '#7c3aed' }}>
               {lang === 'ar' ? 'شروط الاستخدام' : 'Terms of Use'}
             </a>
           </p>
 
-          {/* Divider */}
-          <div className="flex items-center gap-3 my-2">
+          <div className="flex items-center gap-3 my-1">
             <div className="flex-1 h-px bg-gray-100" />
             <span className="font-body text-xs text-muted">{s.no_account}</span>
             <div className="flex-1 h-px bg-gray-100" />
           </div>
 
-          {/* Try for free */}
-          <button
-            onClick={onTryFree}
-            className="w-full bg-white border-2 border-duo text-duo font-display font-bold text-lg rounded-2xl py-4 transition-all active:bg-green-50"
-          >
+          <button onClick={onTryFree}
+            className="w-full font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95"
+            style={{ background: '#f5f3ff', color: '#7c3aed', boxShadow: '0 2px 12px rgba(124,58,237,0.1)' }}>
             {s.try_free}
           </button>
         </div>
-
         <div className="pb-8" />
       </div>
     </div>
