@@ -109,21 +109,57 @@ export default function Rewards({ kidId, onNavigateToParentZone }) {
       <div className="w-full max-w-lg mx-auto px-5 flex flex-col flex-1">
 
         {/* Header */}
-        <div className="flex-shrink-0 pt-12 pb-6">
+        <div className="flex-shrink-0 pt-12 pb-3">
           <h1 className="font-display font-extrabold text-3xl text-ink">{t(lang, 'rewards_title')}</h1>
           <p className="font-body text-sm text-muted mt-1">{t(lang, 'rewards_sub')}</p>
         </div>
 
-        {/* Balance card — clean gradient card like inspo */}
-        <div className="flex-shrink-0 rounded-3xl px-6 py-5 mb-6 flex items-center justify-between"
-          style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)', boxShadow: '0 8px 32px rgba(124,58,237,0.25)' }}>
-          <div>
+        {/* Extra space so gift box overflowing out of card is visible */}
+        <div className="flex-shrink-0" style={{ paddingTop: 36 }}>
+
+        {/* Balance card — stacked coins + overflowing gift */}
+        <div className="flex-shrink-0 rounded-3xl px-6 py-5 mb-6 relative overflow-visible"
+          style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)', boxShadow: '0 8px 32px rgba(124,58,237,0.25)', minHeight: 110 }}>
+
+          {/* Text content */}
+          <div style={{ maxWidth: '60%' }}>
             <p className="font-body text-xs font-semibold uppercase tracking-widest text-white/70 mb-1">{t(lang, 'rewards_balance_label')}</p>
-            <p className="font-display font-extrabold text-4xl text-white">{balance}</p>
-            <p className="font-body text-sm text-white/70 mt-0.5">{t(lang, 'rewards_balance_unit')}</p>
+            <p className="font-display font-extrabold text-5xl text-white leading-none">{balance}</p>
+            <p className="font-body text-sm text-white/70 mt-1">{t(lang, 'rewards_balance_unit')}</p>
           </div>
-          <div style={{ fontSize: 64, opacity: 0.9 }}>🏆</div>
+
+          {/* Stacked coins */}
+          <div style={{ position: 'absolute', right: 100, bottom: 16, width: 56, height: 56 }}>
+            {[4, 3, 2, 1, 0].map(i => (
+              <img key={i} src="/coin-flower.png" alt=""
+                style={{
+                  position: 'absolute',
+                  width: 44,
+                  height: 44,
+                  objectFit: 'contain',
+                  bottom: i * 8,
+                  left: 0,
+                  filter: `brightness(${1 - i * 0.07})`,
+                  zIndex: i,
+                }} />
+            ))}
+          </div>
+
+          {/* Gift box — half outside the card at top right */}
+          <img src="/gift-3d.png" alt=""
+            style={{
+              position: 'absolute',
+              top: -36,
+              right: 12,
+              width: 90,
+              height: 'auto',
+              objectFit: 'contain',
+              zIndex: 10,
+              filter: 'drop-shadow(0 8px 16px rgba(124,58,237,0.4))',
+            }} />
         </div>
+
+        </div>{/* end overflow wrapper */}
 
         {/* Tabs */}
         <div className="flex-shrink-0 flex gap-2 mb-5 p-1 rounded-2xl" style={{ background: '#f5f3ff' }}>
