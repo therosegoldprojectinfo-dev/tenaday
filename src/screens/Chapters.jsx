@@ -9,15 +9,9 @@ const EMOJI_OPTIONS = [
   '🧪','🌊','🦁','🎯','🧩','🌸','⚽','🎸','🍎','🚀',
 ]
 
-const BANNER_COLORS = [
-  { bg: '#e0f2fe', border: '#7dd3fc' },
-  { bg: '#fce7f3', border: '#f9a8d4' },
-  { bg: '#dcfce7', border: '#86efac' },
-  { bg: '#fef9c3', border: '#fde047' },
-  { bg: '#ede9fe', border: '#c4b5fd' },
-  { bg: '#ffedd5', border: '#fdba74' },
-  { bg: '#ccfbf1', border: '#5eead4' },
-  { bg: '#fee2e2', border: '#fca5a5' },
+const CARD_ACCENTS = [
+  '#ede9fe', '#fce7f3', '#dbeafe', '#fef9c3',
+  '#dcfce7', '#ffedd5', '#ccfbf1', '#fee2e2',
 ]
 
 export default function Chapters({ onSelectChapter, kidId }) {
@@ -27,11 +21,8 @@ export default function Chapters({ onSelectChapter, kidId }) {
   const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
-    if (kidId) {
-      loadChapters()
-    } else {
-      setLoading(false)
-    }
+    if (kidId) loadChapters()
+    else setLoading(false)
   }, [kidId])
 
   async function loadChapters() {
@@ -58,27 +49,46 @@ export default function Chapters({ onSelectChapter, kidId }) {
   if (loading) return <LoadingScreen />
 
   return (
-    <div className="min-h-screen bg-white flex flex-col" style={{ height: '100dvh' }}>
+    <div className="bg-white flex flex-col" style={{ height: '100dvh' }}>
       <div className="flex-1 overflow-y-auto px-5 pt-12 pb-10">
         <div className="max-w-2xl mx-auto">
+
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="font-display font-extrabold text-3xl text-ink">
+              {lang === 'ar' ? 'فصولي' : 'My Chapters'}
+            </h1>
+            <p className="font-body text-sm text-muted mt-1">
+              {lang === 'ar' ? 'اختر فصلاً لتبدأ' : 'Pick a chapter to start learning'}
+            </p>
+          </div>
+
           {chapters.length === 0 ? (
             <EmptyState lang={lang} onAdd={() => setShowModal(true)} />
           ) : (
-            <div className="flex flex-col gap-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 {chapters.map((chapter, index) => (
                   <ChapterCard
                     key={chapter.id}
                     chapter={chapter}
-                    colorIndex={index}
+                    accent={CARD_ACCENTS[index % CARD_ACCENTS.length]}
                     lang={lang}
                     onClick={() => onSelectChapter(chapter)}
                   />
                 ))}
               </div>
+
+              {/* Add chapter button */}
               <button
                 onClick={() => setShowModal(true)}
-                className="w-full py-4 rounded-2xl border-2 border-dashed border-gray-200 text-muted font-display font-bold text-base active:bg-gray-50 hover:bg-gray-50 transition-colors"
+                className="w-full py-4 rounded-2xl font-display font-bold text-base transition-all active:scale-95"
+                style={{
+                  background: 'white',
+                  border: '2px dashed #e5e7eb',
+                  color: '#AFAFAF',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                }}
               >
                 {t(lang, 'chapters_add')}
               </button>
@@ -98,20 +108,24 @@ export default function Chapters({ onSelectChapter, kidId }) {
   )
 }
 
-function ChapterCard({ chapter, colorIndex, lang, onClick }) {
-  const color = BANNER_COLORS[colorIndex % BANNER_COLORS.length]
+function ChapterCard({ chapter, accent, lang, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left rounded-3xl bg-white overflow-hidden transition-all active:translate-y-1"
-      style={{ border: `2px solid ${color.border}`, boxShadow: `0 4px 0 ${color.border}` }}
+      className="w-full text-left rounded-3xl bg-white overflow-hidden transition-all active:scale-95"
+      style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
     >
-      <div className="relative flex items-center justify-center" style={{ background: color.bg, height: 140 }}>
-        <span style={{ fontSize: 72 }}>{chapter.emoji}</span>
+      {/* Emoji area */}
+      <div
+        className="flex items-center justify-center"
+        style={{ background: accent, height: 110, borderRadius: '24px 24px 0 0' }}
+      >
+        <span style={{ fontSize: 56 }}>{chapter.emoji}</span>
       </div>
-      <div className="px-5 py-4">
-        <p className="font-display font-extrabold text-xl text-ink">{chapter.name}</p>
-        <p className="font-body text-sm text-muted mt-0.5">{t(lang, 'chapters_tap')}</p>
+      {/* Text area */}
+      <div className="px-4 py-3">
+        <p className="font-display font-extrabold text-base text-ink truncate">{chapter.name}</p>
+        <p className="font-body text-xs text-muted mt-0.5">{t(lang, 'chapters_tap')}</p>
       </div>
     </button>
   )
@@ -119,18 +133,23 @@ function ChapterCard({ chapter, colorIndex, lang, onClick }) {
 
 function EmptyState({ lang, onAdd }) {
   return (
-    <div className="flex flex-col items-center justify-center pt-20 gap-6 text-center px-4">
-      <span style={{ fontSize: 72 }}>📭</span>
+    <div className="flex flex-col items-center justify-center pt-16 gap-6 text-center px-4">
+      {/* Floating mascot */}
+      <div style={{ animation: 'float 3s ease-in-out infinite' }}>
+        <img src="/mascot.png" alt="" className="w-32 h-auto" />
+      </div>
       <div>
         <p className="font-display font-extrabold text-2xl text-ink">{t(lang, 'chapters_empty_title')}</p>
         <p className="text-muted font-body text-base mt-2">{t(lang, 'chapters_empty_sub')}</p>
       </div>
       <button
         onClick={onAdd}
-        className="w-full max-w-xs bg-duo active:bg-duo-dark text-white font-display font-bold text-lg rounded-2xl py-5 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all"
+        className="w-full max-w-xs text-white font-display font-bold text-lg rounded-2xl py-5 transition-all active:scale-95"
+        style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}
       >
         {t(lang, 'chapters_empty_cta')}
       </button>
+      <style>{`@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`}</style>
     </div>
   )
 }
@@ -169,7 +188,10 @@ function ChapterModal({ lang, onConfirm, onClose }) {
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder={t(lang, 'chapters_modal_name_placeholder')}
-              className="w-full border-2 border-gray-200 rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none focus:border-duo transition-colors"
+              className="w-full border-2 border-gray-100 rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none transition-colors"
+              style={{ background: '#fafafa' }}
+              onFocus={e => e.target.style.borderColor = '#7c3aed'}
+              onBlur={e => e.target.style.borderColor = '#f3f4f6'}
             />
           </div>
           <div className="flex flex-col gap-2">
@@ -182,7 +204,7 @@ function ChapterModal({ lang, onConfirm, onClose }) {
                   key={e}
                   onClick={() => setEmoji(e)}
                   className={`h-11 w-full rounded-xl text-xl flex items-center justify-center border-2 transition-all ${
-                    emoji === e ? 'border-duo bg-green-50' : 'border-gray-100 bg-gray-50'
+                    emoji === e ? 'border-violet-400 bg-violet-50' : 'border-gray-100 bg-gray-50'
                   }`}
                 >
                   {e}
@@ -190,7 +212,8 @@ function ChapterModal({ lang, onConfirm, onClose }) {
               ))}
             </div>
           </div>
-          <div className="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3">
+          {/* Preview */}
+          <div className="flex items-center gap-3 bg-violet-50 rounded-2xl px-4 py-3">
             <span style={{ fontSize: 28 }}>{emoji}</span>
             <span className="font-display font-bold text-lg text-ink">
               {name || t(lang, 'chapters_modal_name_placeholder')}
@@ -199,7 +222,8 @@ function ChapterModal({ lang, onConfirm, onClose }) {
           <button
             onClick={handleSubmit}
             disabled={!name.trim() || saving}
-            className="w-full bg-duo active:bg-duo-dark disabled:opacity-40 text-white font-display font-bold text-lg rounded-2xl py-4 shadow-[0_4px_0_#58a700] active:shadow-none active:translate-y-1 transition-all"
+            className="w-full disabled:opacity-40 text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95"
+            style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}
           >
             {saving ? t(lang, 'chapters_modal_creating') : t(lang, 'chapters_modal_cta')}
           </button>
@@ -215,7 +239,7 @@ function ChapterModal({ lang, onConfirm, onClose }) {
 function LoadingScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center">
-      <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-duo animate-spin" />
+      <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-violet-500 animate-spin" />
     </div>
   )
 }
