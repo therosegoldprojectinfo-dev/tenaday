@@ -62,21 +62,19 @@ export default function Nav({ active, onChange, streak = 0 }) {
         style={{ insetInlineStart: 0 }}>
 
         {/* Logo area */}
-        <div className="relative flex items-center px-4 pt-4 pb-2 mb-4" style={{ height: 80 }}>
+        <div className="flex items-center gap-2 px-4 pt-4 pb-2 mb-4">
           <img
-            src="/mascot.png"
-            alt=""
+            src="/nav-logo.png"
+            alt="Numio"
             style={{
-              position: 'absolute',
-              insetInlineStart: -8,
-              bottom: -16,
-              height: 110,
+              height: 52,
               width: 'auto',
               objectFit: 'contain',
               zIndex: 0,
+              flexShrink: 0,
             }}
           />
-          <span className="font-display font-extrabold text-2xl relative z-10 ms-14" style={{ color: '#7c3aed' }}>
+          <span className="font-display font-extrabold text-2xl relative z-10" style={{ color: '#7c3aed' }}>
             Numio
           </span>
           <div className="ms-auto relative z-10">
