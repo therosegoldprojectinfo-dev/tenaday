@@ -62,24 +62,13 @@ export default function Nav({ active, onChange, streak = 0 }) {
         style={{ insetInlineStart: 0 }}>
 
         {/* Logo area */}
-        <div className="flex items-center gap-2 px-4 pt-4 pb-2 mb-4">
+        <div className="flex items-center justify-between px-4 pt-5 pb-2 mb-4">
           <img
             src="/nav-logo.png"
             alt="Numio"
-            style={{
-              height: 52,
-              width: 'auto',
-              objectFit: 'contain',
-              zIndex: 0,
-              flexShrink: 0,
-            }}
+            style={{ height: 36, width: 'auto', objectFit: 'contain' }}
           />
-          <span className="font-display font-extrabold text-2xl relative z-10" style={{ color: '#7c3aed' }}>
-            Numio
-          </span>
-          <div className="ms-auto relative z-10">
-            <StreakBadge count={streak} />
-          </div>
+          <StreakBadge count={streak} />
         </div>
 
         {/* Nav items */}
