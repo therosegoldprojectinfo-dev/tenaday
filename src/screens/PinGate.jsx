@@ -34,9 +34,7 @@ export default function PinGate({ onSuccess, onBack }) {
         setTimeout(() => setShake(false), 600)
       }
     } catch (e) {
-      const isLocked = e?.message?.toLowerCase().includes('locked') ||
-                       e?.message?.toLowerCase().includes('too many') ||
-                       e?.code === 'P0001'
+      const isLocked = e?.message?.toLowerCase().includes('locked') || e?.message?.toLowerCase().includes('too many') || e?.code === 'P0001'
       if (isLocked) {
         setError(lang === 'ar'
           ? 'تم قفل الحساب مؤقتاً. انتظر 15 دقيقة أو تواصل معنا عبر واتساب.'
@@ -51,13 +49,17 @@ export default function PinGate({ onSuccess, onBack }) {
 
   return (
     <div className="bg-white flex flex-col items-center justify-center px-6 gap-8" style={{ height: '100dvh' }} dir={dir}>
-      <button onClick={onBack}
+      <button
+        onClick={onBack}
         className="absolute top-12 text-muted font-body font-bold text-sm flex items-center gap-1 active:opacity-60"
-        style={{ insetInlineStart: 20 }}>
+        style={{ insetInlineStart: 20 }}
+      >
         {t(lang, 'pin_back')}
       </button>
 
-      <img src="/mascot.png" alt="Numio" className="w-28 h-auto" />
+      <div style={{ animation: 'float 3s ease-in-out infinite' }}>
+        <img src="/nav-parent.png" alt="" className="w-32 h-auto" />
+      </div>
 
       <div className="text-center">
         <h1 className="font-display font-extrabold text-3xl text-ink">
@@ -68,22 +70,27 @@ export default function PinGate({ onSuccess, onBack }) {
         </p>
       </div>
 
-      <div className="w-full max-w-xs flex flex-col gap-3"
-        style={{ animation: shake ? 'shake 0.5s ease-in-out' : 'none' }}>
+      <div
+        className="w-full max-w-xs flex flex-col gap-3"
+        style={{ animation: shake ? 'shake 0.5s ease-in-out' : 'none' }}
+      >
         <input
           type="password"
           value={password}
           onChange={e => {
             setPassword(e.target.value)
-            // Only clear non-lockout errors on keystroke
             if (!error.includes('locked') && !error.includes('قفل')) setError('')
           }}
           onKeyDown={e => e.key === 'Enter' && verify()}
           placeholder={lang === 'ar' ? 'كلمة المرور' : 'Password'}
           autoFocus
-          className={`w-full border-2 rounded-2xl px-4 py-4 font-display font-bold text-xl text-ink outline-none transition-all text-center ${
-            error ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 focus:border-duo'
-          }`}
+          className="w-full rounded-2xl px-4 py-4 font-display font-bold text-xl text-ink outline-none transition-all text-center"
+          style={{
+            border: `2px solid ${error ? '#fca5a5' : '#e5e7eb'}`,
+            background: error ? '#fff5f5' : '#fafafa',
+          }}
+          onFocus={e => { if (!error) e.target.style.borderColor = '#7c3aed' }}
+          onBlur={e => { if (!error) e.target.style.borderColor = '#e5e7eb' }}
         />
         {error && (
           <div className="text-center">
@@ -91,9 +98,9 @@ export default function PinGate({ onSuccess, onBack }) {
             {(error.includes('locked') || error.includes('قفل')) && (
               <a
                 href="https://wa.me/14384104068?text=Hi%2C%20I%20am%20locked%20out%20of%20my%20Numio%20Parent%20Zone."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-body font-bold text-sm text-duo underline mt-1 block"
+                target="_blank" rel="noopener noreferrer"
+                className="font-body font-bold text-sm underline mt-1 block"
+                style={{ color: '#7c3aed' }}
               >
                 {lang === 'ar' ? 'تواصل معنا عبر واتساب' : 'Contact us on WhatsApp'}
               </a>
@@ -105,8 +112,9 @@ export default function PinGate({ onSuccess, onBack }) {
       <button
         onClick={verify}
         disabled={!password || loading}
-        className="w-full max-w-xs bg-duo disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:translate-y-1"
-        style={{ boxShadow: password ? '0 4px 0 #46a302' : 'none' }}>
+        className="w-full max-w-xs disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:scale-95"
+        style={{ background: '#7c3aed', boxShadow: password ? '0 4px 0 #5b21b6' : 'none' }}
+      >
         {loading
           ? (lang === 'ar' ? 'جاري التحقق...' : 'Checking...')
           : (lang === 'ar' ? 'دخول' : 'Enter')}
@@ -114,12 +122,11 @@ export default function PinGate({ onSuccess, onBack }) {
 
       <style>{`
         @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          20%       { transform: translateX(-10px); }
-          40%       { transform: translateX(10px); }
-          60%       { transform: translateX(-10px); }
-          80%       { transform: translateX(10px); }
+          0%,100%{transform:translateX(0)} 20%{transform:translateX(-10px)}
+          40%{transform:translateX(10px)} 60%{transform:translateX(-10px)}
+          80%{transform:translateX(10px)}
         }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
       `}</style>
     </div>
   )
