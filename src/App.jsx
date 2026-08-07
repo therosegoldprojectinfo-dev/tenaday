@@ -197,7 +197,7 @@ export default function App() {
                   kid = await createKid(username.trim())
                   if (trialExam && trialExam.id === 'trial') {
                     const { data: chapter } = await supabase.from('chapters')
-                      .insert({ name: lang === 'ar' ? '🎉 أول اختبار Numio' : '🎉 Your First Ever Numio Quiz', emoji: '🎉', user_id: user.id, kid_id: kid.id })
+                      .insert({ name: lang === 'ar' ? 'أول اختبار Numio' : 'Your First Ever Numio Quiz', emoji: '🎉', user_id: user.id, kid_id: kid.id })
                       .select().single()
                     if (chapter) {
                       await supabase.from('exams').insert({
