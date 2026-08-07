@@ -66,7 +66,7 @@ export default function Nav({ active, onChange, streak = 0 }) {
           <img
             src="/nav-logo.png"
             alt="Numio"
-            style={{ height: 36, width: 'auto', objectFit: 'contain' }}
+            style={{ height: 50, width: 'auto', objectFit: 'contain' }}
           />
           <StreakBadge count={streak} />
         </div>
