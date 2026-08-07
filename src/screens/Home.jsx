@@ -21,7 +21,6 @@ async function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
   })
 }
 
-// FIX #4: returns a bilingual rate-limit message when the error is RATE_LIMIT
 function getErrorMessage(err, lang) {
   if (err?.message === 'RATE_LIMIT') {
     return lang === 'ar'
@@ -29,9 +28,7 @@ function getErrorMessage(err, lang) {
       : "You've reached today's quiz limit. Try again tomorrow. 🌙"
   }
   if (err?.message === 'DAILY_LIMIT' || err?.message?.includes('temporarily unavailable')) {
-    return lang === 'ar'
-      ? 'وصلنا للحد اليومي. عد غداً 🌙'
-      : 'Daily limit reached. Come back tomorrow 🌙'
+    return lang === 'ar' ? 'وصلنا للحد اليومي. عد غداً 🌙' : 'Daily limit reached. Come back tomorrow 🌙'
   }
   if (err?.message) return err.message
   return lang === 'ar' ? 'حدث خطأ ما. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'
@@ -40,9 +37,9 @@ function getErrorMessage(err, lang) {
 export default function Home({ chapter, onExamReady, onBack, kidId }) {
   const lang = useLang()
   const cameraInputRef = useRef(null)
-  const [status, setStatus]   = useState('idle') // idle | review | loading | error
+  const [status, setStatus]   = useState('idle')
   const [error, setError]     = useState(null)
-  const [images, setImages]   = useState([]) // array of { file, preview }
+  const [images, setImages]   = useState([])
   const [inputKey, setInputKey] = useState(0)
 
   const MAX_IMAGES = 5
@@ -57,14 +54,12 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
       setStatus('error')
       return
     }
-
     const tooBig = files.find(f => f.size > MAX_SIZE_MB * 1024 * 1024)
     if (tooBig) {
       setError(new Error(lang === 'ar' ? `حجم الصورة كبير جداً (الحد ${MAX_SIZE_MB}MB)` : `Image too large (max ${MAX_SIZE_MB}MB each)`))
       setStatus('error')
       return
     }
-
     const newImages = files.map(file => ({ file, preview: URL.createObjectURL(file) }))
     setImages(prev => [...prev, ...newImages])
     setStatus('review')
@@ -95,121 +90,155 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
       const saved = await saveExam({ chapterId: chapter.id, topic: generated.topic, questions: generated.questions, kidId })
       onExamReady(saved)
     } catch (err) {
-      // FIX #4: store the raw error object so getErrorMessage can inspect it
       setError(err)
       setStatus('error')
     }
   }
 
+  const isRateLimit = error?.message === 'RATE_LIMIT' || error?.message === 'DAILY_LIMIT' || error?.message?.includes('temporarily unavailable')
+
   return (
     <div className="bg-white flex flex-col" style={{ height: '100dvh' }}>
       <div className="w-full max-w-lg mx-auto px-5 flex flex-col flex-1">
 
+        {/* Back */}
         <button
           onClick={onBack}
-          className="flex-shrink-0 text-muted font-body font-bold text-sm mt-12 mb-6 flex items-center gap-1 active:opacity-60 self-start"
+          className="flex-shrink-0 text-muted font-body font-bold text-sm mt-12 mb-2 flex items-center gap-1 active:opacity-60 self-start"
         >
           {t(lang, 'home_back')}
         </button>
 
-        <div className="flex-shrink-0 text-center mb-6">
-          <span style={{ fontSize: 52 }}>{chapter.emoji}</span>
-          <h1 className="font-display font-extrabold text-3xl text-ink tracking-tight mt-2">{chapter.name}</h1>
-          <p className="mt-2 text-muted font-body text-base">{t(lang, 'home_snap')}</p>
+        {/* Chapter title */}
+        <div className="flex-shrink-0 flex items-center gap-3 mb-6">
+          <span style={{ fontSize: 32 }}>{chapter.emoji}</span>
+          <h1 className="font-display font-extrabold text-2xl text-ink">{chapter.name}</h1>
         </div>
 
-        {/* Image previews */}
-        {images.length > 0 && (
-          <div className="flex-shrink-0 mb-4 flex flex-wrap gap-3">
-            {images.map((img, i) => (
-              <div key={i} className="relative rounded-2xl overflow-hidden border-2 border-gray-100" style={{ width: 100, height: 100 }}>
-                <img src={img.preview} alt={`Page ${i + 1}`} className="w-full h-full object-cover" />
-                <button
-                  onClick={() => removeImage(i)}
-                  className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center font-bold leading-none"
-                >
-                  ×
-                </button>
-                <div className="absolute bottom-1 left-1 bg-black/50 text-white text-xs font-bold rounded px-1">
-                  {i + 1}
-                </div>
-              </div>
-            ))}
+        {/* IDLE — hero camera UI */}
+        {status === 'idle' && (
+          <div className="flex-1 flex flex-col items-center justify-center gap-8 pb-10">
+            {/* Mascot */}
+            <div style={{ animation: 'float 3s ease-in-out infinite' }}>
+              <img src="/mascot.png" alt="" className="w-28 h-auto" />
+            </div>
+
+            {/* Text */}
+            <div className="text-center px-4">
+              <p className="font-display font-extrabold text-2xl text-ink leading-snug">
+                {lang === 'ar'
+                  ? 'أعطني صورة وسأحوّلها إلى اختبار ممتع!'
+                  : 'Give me a photo, I\'ll turn it into a fun quiz!'}
+              </p>
+            </div>
+
+            {/* Big camera circle button */}
+            <button
+              onClick={() => { setInputKey(k => k + 1); setTimeout(() => cameraInputRef.current?.click(), 10) }}
+              className="flex items-center justify-center transition-all active:scale-95"
+              style={{
+                width: 110,
+                height: 110,
+                borderRadius: '50%',
+                background: '#7c3aed',
+                boxShadow: '0 8px 32px rgba(124,58,237,0.35)',
+              }}
+            >
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </button>
+
+            <p className="font-body text-sm text-muted">
+              {lang === 'ar' ? 'اضغط للتقاط صورة أو اختيار من معرضك' : 'Tap to take a photo or choose from gallery'}
+            </p>
           </div>
         )}
 
-        <div className="flex-1 flex flex-col justify-center gap-3 pb-10">
-
-          {(status === 'idle' || status === 'review') && (
-            <>
-              <button
-                onClick={() => { setInputKey(k => k + 1); setTimeout(() => cameraInputRef.current?.click(), 10) }}
-                className="w-full bg-duo text-white font-display font-bold text-xl rounded-2xl py-6 transition-all active:translate-y-1 flex flex-col items-center gap-2"
-                style={{ boxShadow: '0 4px 0 #46a302' }}
-              >
-                <span style={{ fontSize: 36 }}>📸</span>
-                {lang === 'ar' ? 'التقط صورة' : 'Take a photo'}
-              </button>
-
-              {images.length > 0 && (
-                <>
-                  <div className="flex items-center gap-2 my-1">
-                    <div className="flex-1 h-px bg-gray-100" />
-                    <span className="text-xs text-muted font-body font-bold">
-                      {images.length} {lang === 'ar' ? 'صفحة' : `page${images.length > 1 ? 's' : ''}`} {lang === 'ar' ? 'مضافة' : 'added'}
-                    </span>
-                    <div className="flex-1 h-px bg-gray-100" />
-                  </div>
+        {/* REVIEW — images added, ready to generate */}
+        {status === 'review' && (
+          <div className="flex-1 flex flex-col gap-5 pb-10">
+            {/* Image previews */}
+            <div className="flex flex-wrap gap-3">
+              {images.map((img, i) => (
+                <div key={i} className="relative rounded-2xl overflow-hidden border-2 border-gray-100" style={{ width: 90, height: 90 }}>
+                  <img src={img.preview} alt={`Page ${i + 1}`} className="w-full h-full object-cover" />
                   <button
-                    onClick={handleGenerate}
-                    className="w-full bg-duo text-white font-display font-bold text-lg rounded-2xl py-5 transition-all active:translate-y-1"
-                    style={{ boxShadow: '0 4px 0 #46a302' }}
-                  >
-                    {lang === 'ar' ? '✨ توليد الاختبار' : '✨ Generate quiz'}
-                  </button>
-                </>
-              )}
-            </>
-          )}
+                    onClick={() => removeImage(i)}
+                    className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center font-bold"
+                  >×</button>
+                  <div className="absolute bottom-1 left-1 bg-black/50 text-white text-xs font-bold rounded px-1">{i + 1}</div>
+                </div>
+              ))}
 
-          {status === 'loading' && (
-            <div className="flex flex-col items-center gap-4">
-              <div className="w-14 h-14 rounded-full border-4 border-gray-100 border-t-duo animate-spin" />
-              <p className="font-display font-bold text-lg text-ink">{t(lang, 'home_generating')}</p>
-              <p className="text-muted text-sm">{t(lang, 'home_reading')}</p>
-            </div>
-          )}
-
-          {/* FIX #4: error message now reads the error object and shows rate-limit copy when appropriate */}
-          {status === 'error' && (
-            <div className="w-full flex flex-col gap-4">
-              <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-center">
-                <p className="font-display font-bold text-xl text-duo-red">{t(lang, 'home_error_title')}</p>
-                <p className="text-sm text-muted mt-2">
-                  {getErrorMessage(error, lang)}
-                </p>
-              </div>
-              {/* Only show Try Again if it's not a rate limit — retrying won't help */}
-              {error?.message !== 'RATE_LIMIT' && error?.message !== 'DAILY_LIMIT' && !error?.message?.includes('temporarily unavailable') && (
+              {/* Add more */}
+              {images.length < MAX_IMAGES && (
                 <button
-                  onClick={handleReset}
-                  className="w-full bg-duo text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:translate-y-1"
-                  style={{ boxShadow: '0 4px 0 #46a302' }}
-                >
-                  {t(lang, 'home_try_again')}
-                </button>
-              )}
-              {(error?.message === 'RATE_LIMIT' || error?.message === 'DAILY_LIMIT' || error?.message?.includes('temporarily unavailable')) && (
-                <button
-                  onClick={handleReset}
-                  className="w-full bg-gray-100 text-muted font-display font-bold text-base rounded-2xl py-4 transition-all active:translate-y-1"
-                >
-                  {lang === 'ar' ? 'رجوع' : 'Go back'}
-                </button>
+                  onClick={() => { setInputKey(k => k + 1); setTimeout(() => cameraInputRef.current?.click(), 10) }}
+                  className="rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center text-muted text-2xl transition-all active:bg-gray-50"
+                  style={{ width: 90, height: 90 }}
+                >+</button>
               )}
             </div>
-          )}
-        </div>
+
+            <p className="font-body text-sm text-muted">
+              {images.length} {lang === 'ar' ? 'صفحة مضافة' : `page${images.length > 1 ? 's' : ''} added`}
+            </p>
+
+            {/* Generate button */}
+            <button
+              onClick={handleGenerate}
+              className="w-full text-white font-display font-bold text-lg rounded-2xl py-5 transition-all active:scale-95"
+              style={{ background: '#7c3aed', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}
+            >
+              {lang === 'ar' ? '✨ توليد الاختبار' : '✨ Generate quiz'}
+            </button>
+
+            <button onClick={handleReset} className="w-full text-muted font-body font-bold text-sm py-2 text-center">
+              {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+            </button>
+          </div>
+        )}
+
+        {/* LOADING */}
+        {status === 'loading' && (
+          <div className="flex-1 flex flex-col items-center justify-center gap-6 pb-10">
+            <div style={{ animation: 'float 2s ease-in-out infinite' }}>
+              <img src="/mascot.png" alt="" className="w-24 h-auto" />
+            </div>
+            <div className="text-center">
+              <p className="font-display font-bold text-xl text-ink">{t(lang, 'home_generating')}</p>
+              <p className="text-muted text-sm mt-1">{t(lang, 'home_reading')}</p>
+            </div>
+            <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-violet-500 animate-spin" />
+          </div>
+        )}
+
+        {/* ERROR */}
+        {status === 'error' && (
+          <div className="flex-1 flex flex-col items-center justify-center gap-6 pb-10 px-4">
+            <span style={{ fontSize: 64 }}>😅</span>
+            <div className="text-center">
+              <p className="font-display font-bold text-xl text-ink">{t(lang, 'home_error_title')}</p>
+              <p className="text-sm text-muted mt-2">{getErrorMessage(error, lang)}</p>
+            </div>
+            {!isRateLimit && (
+              <button
+                onClick={handleReset}
+                className="w-full text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95"
+                style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}
+              >
+                {t(lang, 'home_try_again')}
+              </button>
+            )}
+            {isRateLimit && (
+              <button onClick={handleReset} className="w-full bg-gray-100 text-muted font-display font-bold text-base rounded-2xl py-4">
+                {lang === 'ar' ? 'رجوع' : 'Go back'}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       <input
@@ -221,6 +250,8 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
         className="hidden"
         onChange={handleGallerySelected}
       />
+
+      <style>{`@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`}</style>
     </div>
   )
 }
