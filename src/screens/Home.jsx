@@ -120,7 +120,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
           <div className="flex-1 flex flex-col items-center justify-center gap-8 pb-10">
             {/* Mascot */}
             <div style={{ animation: 'float 3s ease-in-out infinite' }}>
-              <img src="/mascot.png" alt="" className="w-28 h-auto" />
+              <img src="/nav-profile.png" alt="" className="w-36 h-auto" />
             </div>
 
             {/* Text */}
@@ -205,7 +205,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
         {status === 'loading' && (
           <div className="flex-1 flex flex-col items-center justify-center gap-6 pb-10">
             <div style={{ animation: 'float 2s ease-in-out infinite' }}>
-              <img src="/mascot.png" alt="" className="w-24 h-auto" />
+              <img src="/nav-profile.png" alt="" className="w-28 h-auto" />
             </div>
             <div className="text-center">
               <p className="font-display font-bold text-xl text-ink">{t(lang, 'home_generating')}</p>
