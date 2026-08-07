@@ -65,11 +65,13 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial
             </div>
           </div>
         ) : coinsEarned > 0 ? (
-          <div className="flex items-center gap-3 rounded-2xl px-6 py-4" style={{ background: '#fffbeb', border: '2px solid #fde68a' }}>
-            <CoinIcon size={40} />
+          <div className="flex items-center gap-4 rounded-2xl px-6 py-4 w-full" style={{ background: '#1a1200', boxShadow: '0 4px 24px rgba(251,191,36,0.2)' }}>
+            <div style={{ animation: 'float 2s ease-in-out infinite' }}>
+              <img src="/coin-flower.png" alt="coins" className="w-14 h-14 object-contain" />
+            </div>
             <div>
-              <p className="font-body text-xs text-amber-600 font-bold uppercase tracking-widest">{t(lang, 'quiz_results_coins')}</p>
-              <p className="font-display font-extrabold text-3xl text-amber-500">+{coinsEarned}</p>
+              <p className="font-body text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(251,191,36,0.6)' }}>{t(lang, 'quiz_results_coins')}</p>
+              <p className="font-display font-extrabold text-4xl" style={{ color: '#fbbf24' }}>+{coinsEarned}</p>
             </div>
           </div>
         ) : isReplay ? (
