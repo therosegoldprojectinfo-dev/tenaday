@@ -4,22 +4,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        ink:   '#3C3C3C',
+        ink:   '#1a1a2e',
         muted: '#AFAFAF',
         duo: {
-          DEFAULT: '#58cc02',
-          dark:    '#58a700',
+          DEFAULT: '#7c3aed',
+          dark:    '#5b21b6',
           red:     '#ff4b4b',
           reddark: '#d93333',
         },
         brand: {
-          DEFAULT: '#58cc02',
-          dark:    '#58a700',
+          DEFAULT: '#7c3aed',
+          dark:    '#5b21b6',
         },
       },
       fontFamily: {
-        display: ['"Baloo 2"', 'sans-serif'],
-        body:    ['Inter', 'sans-serif'],
+        display: ['"Plus Jakarta Sans"', '"Baloo 2"', 'sans-serif'],
+        body:    ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
       },
     },
   },
