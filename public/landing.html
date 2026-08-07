@@ -4,23 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Numio — Free Event August 7</title>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --green:      #58cc02;
-      --green-dark: #46a302;
-      --ink:        #1a1a2e;
-      --muted:      #777;
-      --bg:         #ffffff;
-      --card:       #f7f9f4;
-      --border:     #e8f0e0;
-      --radius:     20px;
-      --wa:         #25D366;
-      --wa-dark:    #1da851;
+      --purple:      #7c3aed;
+      --purple-dark: #5b21b6;
+      --purple-light:#f5f3ff;
+      --ink:         #1a1a2e;
+      --muted:       #777;
+      --bg:          #ffffff;
+      --card:        #faf9ff;
+      --border:      #ede9fe;
+      --radius:      20px;
+      --wa:          #25D366;
+      --wa-dark:     #1da851;
     }
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       background: var(--bg);
       color: var(--ink);
       min-height: 100dvh;
@@ -32,19 +33,17 @@
     /* ── TOP BANNER ── */
     .top-banner {
       width: 100%;
-      background: var(--green);
+      background: var(--purple);
       padding: 14px 24px;
       text-align: center;
     }
     .top-banner-title {
-      font-family: 'Baloo 2', sans-serif;
       font-weight: 900;
       font-size: 22px;
       color: white;
       letter-spacing: 0.06em;
     }
     .top-banner-sub {
-      font-family: 'Baloo 2', sans-serif;
       font-size: 13px;
       color: rgba(255,255,255,0.85);
       margin-top: 2px;
@@ -61,7 +60,6 @@
       align-items: center;
     }
     .headline {
-      font-family: 'Baloo 2', sans-serif;
       font-weight: 900;
       font-size: clamp(32px, 9vw, 42px);
       line-height: 1.15;
@@ -69,7 +67,7 @@
       color: var(--ink);
       margin-bottom: 10px;
     }
-    .headline em { font-style: normal; color: var(--green); }
+    .headline em { font-style: normal; color: var(--purple); }
     .subline {
       font-size: 19px;
       color: var(--muted);
@@ -101,7 +99,6 @@
     .step.active { display: flex; }
 
     .step-label {
-      font-family: 'Baloo 2', sans-serif;
       font-weight: 800;
       font-size: 17px;
       color: var(--ink);
@@ -116,7 +113,7 @@
       border: 2px solid var(--border);
       border-radius: 16px;
       padding: 14px 16px;
-      font-family: 'Baloo 2', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-weight: 700;
       font-size: 16px;
       color: var(--ink);
@@ -127,35 +124,35 @@
       transition: all 0.15s;
       text-align: left;
     }
-    .slot-btn:hover { border-color: var(--green); background: #f7fef0; }
+    .slot-btn:hover { border-color: var(--purple); background: var(--purple-light); }
     .slot-btn.selected {
-      border-color: var(--green);
-      background: #f0fae6;
-      color: var(--green-dark);
-      box-shadow: 0 0 0 3px rgba(88,204,2,0.12);
+      border-color: var(--purple);
+      background: var(--purple-light);
+      color: var(--purple-dark);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.12);
     }
     .slot-icon { font-size: 20px; flex-shrink: 0; }
     .slot-info { display: flex; flex-direction: column; }
     .slot-time { font-size: 17px; font-weight: 800; }
     .slot-sub { font-size: 12px; color: var(--muted); font-weight: 500; }
-    .slot-btn.selected .slot-sub { color: var(--green-dark); }
+    .slot-btn.selected .slot-sub { color: var(--purple); }
 
     /* ── BUTTONS ── */
     .cta-btn {
       width: 100%;
-      background: var(--green);
+      background: var(--purple);
       color: white;
       border: none;
       border-radius: 16px;
       padding: 17px;
-      font-family: 'Baloo 2', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-weight: 800;
       font-size: 17px;
       cursor: pointer;
-      box-shadow: 0 4px 0 var(--green-dark);
+      box-shadow: 0 4px 0 var(--purple-dark);
       transition: all 0.15s;
     }
-    .cta-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--green-dark); }
+    .cta-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--purple-dark); }
 
     /* ── WHATSAPP BUTTON ── */
     .wa-btn {
@@ -165,7 +162,7 @@
       border: none;
       border-radius: 16px;
       padding: 17px;
-      font-family: 'Baloo 2', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-weight: 800;
       font-size: 17px;
       cursor: pointer;
@@ -204,17 +201,17 @@
       border: 1.5px solid var(--border);
       border-radius: 100px;
       padding: 6px 14px;
-      font-family: 'Baloo 2', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-weight: 700;
       font-size: 13px;
-      color: var(--green-dark);
+      color: var(--purple);
       align-self: center;
     }
 
     .form-group { display: flex; flex-direction: column; gap: 5px; }
     .form-label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.09em;
@@ -224,7 +221,7 @@
       border: 2px solid var(--border);
       border-radius: 14px;
       padding: 13px 16px;
-      font-family: 'Baloo 2', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-weight: 600;
       font-size: 16px;
       color: var(--ink);
@@ -232,20 +229,16 @@
       background: white;
       transition: border-color 0.15s;
     }
-    .form-input:focus { border-color: var(--green); }
+    .form-input:focus { border-color: var(--purple); }
     .form-input::placeholder { color: #bbb; font-weight: 500; }
 
     /* ── PHONE ROW ── */
-    .phone-row {
-      display: flex;
-      gap: 8px;
-      align-items: stretch;
-    }
+    .phone-row { display: flex; gap: 8px; align-items: stretch; }
     .country-select {
       border: 2px solid var(--border);
       border-radius: 14px;
       padding: 13px 12px;
-      font-family: 'Baloo 2', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-weight: 700;
       font-size: 15px;
       color: var(--ink);
@@ -257,13 +250,13 @@
       appearance: none;
       -webkit-appearance: none;
     }
-    .country-select:focus { border-color: var(--green); }
+    .country-select:focus { border-color: var(--purple); }
     .phone-input {
       flex: 1;
       border: 2px solid var(--border);
       border-radius: 14px;
       padding: 13px 16px;
-      font-family: 'Baloo 2', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-weight: 600;
       font-size: 16px;
       color: var(--ink);
@@ -271,7 +264,7 @@
       background: white;
       transition: border-color 0.15s;
     }
-    .phone-input:focus { border-color: var(--green); }
+    .phone-input:focus { border-color: var(--purple); }
     .phone-input::placeholder { color: #bbb; font-weight: 500; }
 
     .phone-error {
@@ -291,34 +284,6 @@
       cursor: pointer;
       text-decoration: underline;
       text-align: center;
-    }
-
-    /* ── CONFIRMATION ── */
-    .confirm-inner {
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-    }
-    .confirm-emoji { font-size: 52px; }
-    .confirm-headline {
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 900;
-      font-size: 22px;
-      color: var(--ink);
-      line-height: 1.2;
-    }
-    .confirm-sub { font-size: 14px; color: var(--muted); line-height: 1.6; }
-    .confirm-slot {
-      background: white;
-      border: 2px solid var(--border);
-      border-radius: 100px;
-      padding: 10px 20px;
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 800;
-      font-size: 15px;
-      color: var(--ink);
     }
 
     .footer { padding: 16px; text-align: center; font-size: 12px; color: #ccc; }
@@ -351,7 +316,7 @@
 
   <!-- HERO -->
   <div class="hero">
-    <h1 class="headline">Better grades for your kids - FREE EVENT!</h1>
+    <h1 class="headline">Better grades for your kids - <em>FREE EVENT!</em></h1>
     <p class="subline">Discover the scientific way to help your kid get better grades by only taking a picture!</p>
     <div class="hero-image">
       <img src="https://numiomath.app/onboarding-hero.jpg" alt="Take a photo, get a quiz" />
@@ -366,7 +331,7 @@
       <div class="step active" id="step1">
         <div style="display:flex;align-items:center;justify-content:center;gap:6px;background:#fff3cd;border:1.5px solid #ffd966;border-radius:100px;padding:6px 14px;align-self:center;">
           <span style="font-size:13px;">🚨</span>
-          <span style="font-family:'Baloo 2',sans-serif;font-weight:700;font-size:12px;color:#b7720a;">Only 10 spots available!</span>
+          <span style="font-weight:700;font-size:12px;color:#b7720a;">Only 10 spots available!</span>
         </div>
         <div class="step-label">📅 Pick a time below 👇</div>
         <div class="slots">
@@ -511,12 +476,10 @@
       )
       const waUrl = `https://wa.me/14384099964?text=${msg}`
 
-      // Save to Supabase first, then open WhatsApp after short delay
       sb.from('event_registrations').insert({ name, phone: fullPhone, time_slot: selectedTime }).then(() => {
         if (window.fbq) fbq('track', 'Lead', { content_name: 'Numio Free Call', content_category: selectedTime })
         window.location.href = waUrl
       }).catch(() => {
-        // Even if Supabase fails, still open WhatsApp
         window.location.href = waUrl
       })
     }
