@@ -14,21 +14,7 @@ const CARD_ACCENTS = [
   '#dcfce7', '#ffedd5', '#ccfbf1', '#fee2e2',
 ]
 
-// Generate the last 7 days for the streak row
-function getLast7Days() {
-  const days = []
-  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    days.push({ date: d.getDate(), day: dayNames[d.getDay()], isToday: i === 0 })
-  }
-  return days
-}
-
 function StreakRow({ streak, lang, coinBalance }) {
-  const days = getLast7Days()
-  const activeCount = Math.min(streak, 7)
 
   return (
     <div className="flex-shrink-0 mb-6">
@@ -76,37 +62,7 @@ function StreakRow({ streak, lang, coinBalance }) {
         </div>
       </div>
 
-      {/* Day pills row */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {days.map((d, i) => {
-          const isActive = i >= (7 - activeCount)
-          const isToday  = d.isToday
-          return (
-            <div key={i} className="flex flex-col items-center gap-1.5 flex-shrink-0">
-              <div
-                className="flex items-center justify-center font-display font-extrabold transition-all"
-                style={{
-                  width: 44, height: 52, borderRadius: 20, fontSize: 18,
-                  background: isToday && isActive ? '#7c3aed'
-                    : isToday ? '#f5f3ff'
-                    : isActive ? '#ede9fe'
-                    : '#f3f4f6',
-                  color: isToday && isActive ? 'white'
-                    : isToday ? '#7c3aed'
-                    : isActive ? '#7c3aed'
-                    : '#d1d5db',
-                  boxShadow: isToday && isActive ? '0 4px 12px rgba(124,58,237,0.35)' : 'none',
-                }}
-              >
-                {d.date}
-              </div>
-              <span className="font-body text-xs" style={{ color: isToday ? '#7c3aed' : '#AFAFAF' }}>
-                {d.day}
-              </span>
-            </div>
-          )
-        })}
-      </div>
+
     </div>
   )
 }
