@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Numio — Free Event August 9</title>
+  <title>Numio — Free Event August 10</title>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,8 +29,6 @@
       flex-direction: column;
       align-items: center;
     }
-
-    /* ── TOP BANNER ── */
     .top-banner {
       width: 100%;
       background: var(--purple);
@@ -43,8 +41,6 @@
       color: white;
       letter-spacing: 0.06em;
     }
-
-    /* ── HERO ── */
     .hero {
       width: 100%;
       max-width: 480px;
@@ -71,8 +67,6 @@
     }
     .hero-image { width: 100%; max-width: 360px; margin-bottom: 32px; }
     .hero-image img { width: 100%; height: auto; display: block; border-radius: 16px; }
-
-    /* ── RESERVATION CARD ── */
     .reservation-card {
       width: 100%;
       max-width: 480px;
@@ -88,18 +82,9 @@
       flex-direction: column;
       gap: 14px;
     }
-
     .step { display: none; flex-direction: column; gap: 12px; }
     .step.active { display: flex; }
-
-    .step-label {
-      font-weight: 800;
-      font-size: 17px;
-      color: var(--ink);
-      text-align: center;
-    }
-
-    /* ── SLOTS ── */
+    .step-label { font-weight: 800; font-size: 17px; color: var(--ink); text-align: center; }
     .slots { display: flex; flex-direction: column; gap: 8px; }
     .slot-btn {
       width: 100%;
@@ -130,8 +115,6 @@
     .slot-time { font-size: 17px; font-weight: 800; }
     .slot-sub { font-size: 12px; color: var(--muted); font-weight: 500; }
     .slot-btn.selected .slot-sub { color: var(--purple); }
-
-    /* ── BUTTONS ── */
     .cta-btn {
       width: 100%;
       background: var(--purple);
@@ -147,8 +130,6 @@
       transition: all 0.15s;
     }
     .cta-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--purple-dark); }
-
-    /* ── WHATSAPP BUTTON ── */
     .wa-btn {
       width: 100%;
       background: var(--wa);
@@ -169,24 +150,13 @@
       text-decoration: none;
     }
     .wa-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--wa-dark); }
-
     @keyframes shake {
       0%, 100% { transform: translateX(0) }
       25% { transform: translateX(-6px) }
       75% { transform: translateX(6px) }
     }
-
-    .pss {
-      font-size: 12px;
-      color: var(--muted);
-      text-align: center;
-      font-style: italic;
-      line-height: 1.5;
-    }
-
+    .pss { font-size: 12px; color: var(--muted); text-align: center; font-style: italic; line-height: 1.5; }
     .divider { height: 1px; background: var(--border); margin: 0 -4px; }
-
-    /* ── FORM ── */
     .slot-pill {
       display: inline-flex;
       align-items: center;
@@ -201,15 +171,8 @@
       color: var(--purple);
       align-self: center;
     }
-
     .form-group { display: flex; flex-direction: column; gap: 5px; }
-    .form-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-    }
+    .form-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; }
     .form-input {
       width: 100%;
       border: 2px solid var(--border);
@@ -225,8 +188,6 @@
     }
     .form-input:focus { border-color: var(--purple); }
     .form-input::placeholder { color: #bbb; font-weight: 500; }
-
-    /* ── PHONE ROW ── */
     .phone-row { display: flex; gap: 8px; align-items: stretch; }
     .country-select {
       border: 2px solid var(--border);
@@ -260,7 +221,6 @@
     }
     .phone-input:focus { border-color: var(--purple); }
     .phone-input::placeholder { color: #bbb; font-weight: 500; }
-
     .phone-error {
       display: none;
       font-size: 12px;
@@ -271,18 +231,9 @@
       background: #fff5f5;
       border-radius: 10px;
     }
-
-    .back-link {
-      font-size: 13px;
-      color: var(--muted);
-      cursor: pointer;
-      text-decoration: underline;
-      text-align: center;
-    }
-
+    .back-link { font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; text-align: center; }
     .footer { padding: 16px; text-align: center; font-size: 12px; color: #ccc; }
   </style>
-  <!-- Meta Pixel Code -->
   <script>
   !function(f,b,e,v,n,t,s)
   {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -298,17 +249,14 @@
   <noscript><img height="1" width="1" style="display:none"
   src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"
   /></noscript>
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
 
-  <!-- TOP BANNER -->
   <div class="top-banner">
-    <div class="top-banner-title">SUNDAY AUGUST 9</div>
+    <div class="top-banner-title">MONDAY AUGUST 10</div>
   </div>
 
-  <!-- HERO -->
   <div class="hero">
     <h1 class="headline">Better grades for your kids - <em>FREE EVENT!</em></h1>
     <p class="subline">Discover the scientific way to help your kid get better grades by only taking a picture!</p>
@@ -317,11 +265,9 @@
     </div>
   </div>
 
-  <!-- RESERVATION CARD -->
   <div class="reservation-card">
     <div class="res-card-inner">
 
-      <!-- STEP 1: Time slots -->
       <div class="step active" id="step1">
         <div style="display:flex;align-items:center;justify-content:center;gap:6px;background:#fff3cd;border:1.5px solid #ffd966;border-radius:100px;padding:6px 14px;align-self:center;">
           <span style="font-size:13px;">🚨</span>
@@ -333,21 +279,21 @@
             <span class="slot-icon">🌙</span>
             <span class="slot-info">
               <span class="slot-time">7:00 – 7:15 PM</span>
-              <span class="slot-sub">Aug 9, 2026 · Riyadh Time (KSA)</span>
+              <span class="slot-sub">Aug 10, 2026 · Riyadh Time (KSA)</span>
             </span>
           </button>
           <button class="slot-btn" data-time="8:00 – 8:15 PM" onclick="selectSlot(this)">
             <span class="slot-icon">⭐</span>
             <span class="slot-info">
               <span class="slot-time">8:00 – 8:15 PM</span>
-              <span class="slot-sub">Aug 9, 2026 · Riyadh Time (KSA)</span>
+              <span class="slot-sub">Aug 10, 2026 · Riyadh Time (KSA)</span>
             </span>
           </button>
           <button class="slot-btn" data-time="9:00 – 9:15 PM" onclick="selectSlot(this)">
             <span class="slot-icon">✨</span>
             <span class="slot-info">
               <span class="slot-time">9:00 – 9:15 PM</span>
-              <span class="slot-sub">Aug 9, 2026 · Riyadh Time (KSA)</span>
+              <span class="slot-sub">Aug 10, 2026 · Riyadh Time (KSA)</span>
             </span>
           </button>
         </div>
@@ -356,7 +302,6 @@
         <p class="pss">Pss: make sure your child will be with you 📚</p>
       </div>
 
-      <!-- STEP 2: Name + Phone -->
       <div class="step" id="step2">
         <div class="slot-pill" id="slotPill">🕐 7:00 PM · Riyadh Time</div>
         <div class="step-label">Almost there! 🎉</div>
@@ -466,7 +411,7 @@
       )
 
       const msg = encodeURIComponent(
-        `Hello Numio, I am ${name} and I confirm my spot for the Numio event at Aug 9 - ${selectedTime} Riyadh Time. I guarantee we'll be there 😊`
+        `Hello Numio, I am ${name} and I confirm my spot for the Numio event at Aug 10 - ${selectedTime} Riyadh Time. I guarantee we'll be there 😊`
       )
       const waUrl = `https://wa.me/14384099964?text=${msg}`
 
