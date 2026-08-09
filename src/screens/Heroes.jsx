@@ -62,7 +62,7 @@ function BadgeModal({ level, earned, daysLeft, onClose, lang }) {
           <p className="font-display font-extrabold text-2xl text-ink">{lang === 'ar' ? level.labelAr : level.label}</p>
           {earned ? (
             <p className="font-body text-sm mt-1" style={{ color: level.color }}>
-              {lang === 'ar' ? '🎉 لقد حصلت على هذا الشارة!' : '🎉 You earned this badge!'}
+              {lang === 'ar' ? 'لقد حصلت على هذا الشارة!' : 'You earned this badge!'}
             </p>
           ) : (
             <p className="font-body text-sm text-muted mt-1">
@@ -112,7 +112,7 @@ export default function Heroes({ totalDays = 5, onBack }) {
           {/* Header */}
           <div className="mb-6">
             <h1 className="font-display font-extrabold text-3xl text-ink">
-              {lang === 'ar' ? '🦸 أبطال Numio' : '🦸 Numio Heroes'}
+              {lang === 'ar' ? 'أبطال Numio' : 'Numio Heroes'}
             </h1>
             <p className="font-body text-sm text-muted mt-1">
               {lang === 'ar' ? 'تعلّم يومياً وكن بطلاً!' : 'Learn daily and become a hero!'}
@@ -131,7 +131,7 @@ export default function Heroes({ totalDays = 5, onBack }) {
                   {lang === 'ar' ? 'المستوى التالي' : 'Next level'}
                 </p>
                 <p className="font-display font-extrabold text-xl text-ink">
-                  {nextLevel ? (lang === 'ar' ? nextLevel.labelAr : nextLevel.label) : (lang === 'ar' ? 'أسطورة Numio 👑' : 'Numio Legend 👑')}
+                  {nextLevel ? (lang === 'ar' ? nextLevel.labelAr : nextLevel.label) : (lang === 'ar' ? 'أسطورة Numio' : 'Numio Legend')}
                 </p>
                 {nextLevel && (
                   <p className="font-body text-sm mt-0.5" style={{ color: nextLevel.color }}>
@@ -140,7 +140,7 @@ export default function Heroes({ totalDays = 5, onBack }) {
                 )}
                 {!nextLevel && (
                   <p className="font-body text-sm mt-0.5" style={{ color: '#e879a0' }}>
-                    {lang === 'ar' ? 'لقد وصلت للقمة! 👑' : 'You reached the top! 👑'}
+                    {lang === 'ar' ? 'لقد وصلت للقمة!' : 'You reached the top!'}
                   </p>
                 )}
               </div>
@@ -164,8 +164,8 @@ export default function Heroes({ totalDays = 5, onBack }) {
           {/* Tabs */}
           <div className="flex gap-1 mb-5 p-1 rounded-2xl" style={{ background: '#f5f3ff' }}>
             {[
-              { id: 'leaderboard', label: lang === 'ar' ? '🌍 المتصدرون' : '🌍 Leaderboard' },
-              { id: 'badges',      label: lang === 'ar' ? '🏅 شاراتي'    : '🏅 My Badges'  },
+              { id: 'leaderboard', label: lang === 'ar' ? 'المتصدرون' : 'Leaderboard' },
+              { id: 'badges',      label: lang === 'ar' ? 'شاراتي' : 'My Badges'  },
             ].map(({ id, label }) => (
               <button key={id} onClick={() => setTab(id)}
                 className="flex-1 py-2.5 rounded-xl font-display font-bold text-sm transition-all"
