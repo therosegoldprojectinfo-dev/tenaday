@@ -237,7 +237,7 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
             className="flex items-center gap-1.5 mb-4 active:opacity-60 transition-all"
           >
             <span className="font-body font-bold text-sm" style={{ color: '#7c3aed' }}>
-              {lang === 'ar' ? 'تحقق من لوحة المتصدرين' : 'Check the leaderboard'}
+              {lang === 'ar' ? 'تحقق من لوحة نجوم Numio' : 'Check the Numio Stars leaderboard'}
             </span>
             <span style={{ color: '#7c3aed', fontSize: 13 }}>→</span>
           </button>
