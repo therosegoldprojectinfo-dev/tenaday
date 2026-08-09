@@ -15,6 +15,7 @@ import ParentZone from './screens/ParentZone'
 import PinGate from './screens/PinGate'
 import QuizIntro from './screens/QuizIntro'
 import Profile from './screens/Profile'
+import Heroes from './screens/Heroes'
 import { LangContext } from './lib/LangContext'
 import { KidContext } from './lib/KidContext'
 
@@ -287,6 +288,7 @@ export default function App() {
                 kidId={activeKid?.id}
                 streak={streak}
                 activeKid={activeKid}
+                onLeaderboard={() => go({ screen: 'heroes' })}
                 onSelectChapter={c => go({ screen: 'current_chapter', chapter: c })}
               />
             )}
@@ -355,6 +357,13 @@ export default function App() {
                   setActiveKid(null)
                 }}
                 onLanguageChange={setLang}
+              />
+            )}
+
+            {screen === 'heroes' && (
+              <Heroes
+                totalDays={streak}
+                onBack={() => go({ screen: 'chapters' })}
               />
             )}
           </>
