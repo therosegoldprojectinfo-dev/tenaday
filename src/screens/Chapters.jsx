@@ -189,7 +189,7 @@ function StreakRow({ streak, lang, coinBalance }) {
   )
 }
 
-export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid }) {
+export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid, onLeaderboard }) {
   const lang = useLang()
   const [chapters, setChapters]   = useState([])
   const [loading, setLoading]     = useState(true)
@@ -230,6 +230,17 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
 
           {/* Streak row */}
           <StreakRow streak={streak} lang={lang} coinBalance={activeKid?.coin_balance} />
+
+          {/* Leaderboard link */}
+          <button
+            onClick={onLeaderboard}
+            className="flex items-center gap-1.5 mb-4 active:opacity-60 transition-all"
+          >
+            <span className="font-body font-bold text-sm" style={{ color: '#7c3aed' }}>
+              🏆 {lang === 'ar' ? 'تحقق من لوحة المتصدرين' : 'Check the leaderboard'}
+            </span>
+            <span style={{ color: '#7c3aed', fontSize: 13 }}>→</span>
+          </button>
 
           {/* Section title */}
           <div className="mb-4">
