@@ -258,10 +258,10 @@
   </div>
 
   <div class="hero">
-    <h1 class="headline">Better grades for your kids - <em>FREE EVENT!</em></h1>
-    <p class="subline">Discover the scientific way to help your kid get better grades by only taking a picture!</p>
+    <h1 class="headline">Try Numio for <em>FREE tomorrow</em> with us</h1>
+    <p class="subline">You will discover the scientific way to help your kid get better grades by only taking a picture!</p>
     <div class="hero-image">
-      <img src="https://numiomath.app/onboarding-hero.jpg" alt="Take a photo, get a quiz" />
+      <img src="/event-hero.png" alt="Numio Event - Better Grades" />
     </div>
   </div>
 
@@ -298,7 +298,7 @@
           </button>
         </div>
         <div class="divider"></div>
-        <button class="cta-btn" id="nextBtn" onclick="goToForm()">Join the free event!</button>
+        <button class="cta-btn" id="nextBtn" onclick="goToForm()">Join the free Zoom event!</button>
         <p class="pss">Pss: make sure your child will be with you 📚</p>
       </div>
 
@@ -353,9 +353,7 @@
       }
       document.getElementById('step1').classList.remove('active')
       document.getElementById('step2').classList.add('active')
-      const country = document.getElementById('countrySelect').value
-      const tz = country === '+63' ? 'Philippine Time' : country === '+966' ? 'Riyadh Time' : 'Eastern Time'
-      document.getElementById('slotPill').textContent = '🕐 ' + selectedTime + ' · ' + tz
+      document.getElementById('slotPill').textContent = '🕐 ' + selectedTime + ' · Philippine Time'
       document.getElementById('nameInput').focus()
     }
 
@@ -381,7 +379,6 @@
     function validatePhone(phone, country) {
       const digits = phone.replace(/\D/g, '')
       if (country === '+63') {
-        // Philippine: 10 digits starting with 9, or 09xxxxxxxxx (strip leading 0)
         const cleaned = digits.startsWith('0') ? digits.slice(1) : digits
         return cleaned.length === 10 && cleaned.startsWith('9') ? cleaned : null
       } else if (country === '+966') {
