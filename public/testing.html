@@ -306,31 +306,10 @@
   <!-- SCREEN 1: Pick subject -->
   <div class="screen active" id="screen-pick">
     <img class="pick-logo" src="/nav-logo.png" alt="Numio" />
-    <div class="pick-title">Pick a subject to<br/><span>try Numio!</span></div>
-    <div class="pick-sub">Select a textbook page and see how Numio generates a quiz for your child instantly.</div>
-    <div class="images-grid">
-      <div class="image-card" onclick="selectImage(this, 'math')">
-        <img src="/test-math.jpg" alt="Math" />
-        <div class="image-label">Math</div>
-        <div class="selected-check">✓</div>
-      </div>
-      <div class="image-card" onclick="selectImage(this, 'science')">
-        <img src="/test-science.jpg" alt="Science" />
-        <div class="image-label">Science</div>
-        <div class="selected-check">✓</div>
-      </div>
-      <div class="image-card" onclick="selectImage(this, 'english')">
-        <img src="/test-english.jpg" alt="English" />
-        <div class="image-label">English</div>
-        <div class="selected-check">✓</div>
-      </div>
-      <div class="image-card" onclick="selectImage(this, 'history')">
-        <img src="/test-history.jpg" alt="History" />
-        <div class="image-label">History</div>
-        <div class="selected-check">✓</div>
-      </div>
-    </div>
-    <button class="btn-purple" id="startBtn" disabled onclick="generateQuiz()">Generate my quiz ✨</button>
+    <div class="pick-title">Try <span>Numio</span></div>
+    <div class="pick-sub">See how Numio generates a quiz for your child instantly from a real textbook page.</div>
+    <img src="/test-science.jpg" alt="Science textbook" style="width:100%;max-width:400px;border-radius:20px;box-shadow:0 4px 20px rgba(0,0,0,0.08);object-fit:cover;max-height:220px;" />
+    <button class="btn-purple" id="startBtn" onclick="generateQuiz()">Generate my quiz ✨</button>
   </div>
 
   <!-- SCREEN 2: Loading -->
@@ -387,7 +366,7 @@
   </div>
 
   <script>
-    let selectedSubject = null
+    let selectedSubject = 'science'
     let questions = []
     let currentQ = 0
     let score = 0
