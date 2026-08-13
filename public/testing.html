@@ -4,21 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Try Numio Free</title>
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --purple: #7c3aed;
-      --purple-dark: #5b21b6;
+      --purple:       #7c3aed;
+      --purple-dark:  #5b21b6;
       --purple-light: #f5f3ff;
-      --ink: #1a1a2e;
-      --muted: #AFAFAF;
-      --border: #e5e7eb;
-      --bg: #ffffff;
-      --green: #58cc02;
-      --green-dark: #46a302;
-      --red: #ff4b4b;
-      --red-dark: #d93333;
+      --ink:          #1a1a2e;
+      --muted:        #AFAFAF;
+      --border:       #e5e7eb;
+      --bg:           #ffffff;
+      --amber:        #f59e0b;
+      --amber-dark:   #d97706;
+      --red:          #ef4444;
     }
     html, body {
       height: 100%;
@@ -37,9 +36,8 @@
       gap: 20px;
       overflow-y: auto;
     }
-    .pick-logo { width: 48px; height: 48px; object-fit: contain; }
+    .pick-logo { height: 36px; width: auto; object-fit: contain; }
     .pick-title {
-      font-family: 'Baloo 2', sans-serif;
       font-weight: 900;
       font-size: clamp(24px, 7vw, 32px);
       color: var(--ink);
@@ -52,6 +50,7 @@
       color: var(--muted);
       text-align: center;
       line-height: 1.6;
+      max-width: 340px;
     }
     .images-grid {
       display: grid;
@@ -61,21 +60,20 @@
       max-width: 400px;
     }
     .image-card {
-      border: 2.5px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 20px;
       overflow: hidden;
       cursor: pointer;
       transition: all 0.15s;
       background: white;
       position: relative;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
     }
     .image-card:active { transform: scale(0.97); }
     .image-card.selected { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(124,58,237,0.15); }
     .image-card img { width: 100%; height: 120px; object-fit: cover; display: block; }
     .image-label {
       padding: 8px 10px;
-      font-family: 'Baloo 2', sans-serif;
       font-weight: 800;
       font-size: 13px;
       color: var(--ink);
@@ -84,10 +82,8 @@
     .selected-check {
       display: none;
       position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 24px;
-      height: 24px;
+      top: 8px; right: 8px;
+      width: 24px; height: 24px;
       background: var(--purple);
       border-radius: 50%;
       align-items: center;
@@ -99,20 +95,18 @@
     .image-card.selected .selected-check { display: flex; }
 
     .btn-purple {
-      width: 100%;
-      max-width: 400px;
+      width: 100%; max-width: 400px;
       background: var(--purple);
       color: white;
       border: none;
       border-radius: 20px;
       padding: 18px;
-      font-family: 'Baloo 2', sans-serif;
+      font-family: 'Plus Jakarta Sans', sans-serif;
       font-weight: 800;
       font-size: 18px;
       cursor: pointer;
       box-shadow: 0 4px 0 var(--purple-dark);
       transition: all 0.15s;
-      letter-spacing: 0.02em;
     }
     .btn-purple:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--purple-dark); }
     .btn-purple:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: 0 4px 0 var(--purple-dark); }
@@ -123,28 +117,33 @@
       justify-content: center;
       gap: 24px;
     }
+    .loading-mascot {
+      width: 120px; height: auto;
+      animation: float 2s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
     .spinner {
-      width: 60px;
-      height: 60px;
-      border: 5px solid #ede9fe;
+      width: 48px; height: 48px;
+      border: 4px solid #ede9fe;
       border-top-color: var(--purple);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text {
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 700;
-      font-size: 17px;
+    .loading-title {
+      font-weight: 800;
+      font-size: 20px;
+      color: var(--ink);
+      text-align: center;
+    }
+    .loading-sub {
+      font-size: 14px;
       color: var(--muted);
       text-align: center;
-      line-height: 1.6;
     }
 
     /* ── QUIZ SCREEN ── */
-    #screen-quiz {
-      overflow: hidden;
-    }
+    #screen-quiz { overflow: hidden; }
     .quiz-topbar {
       flex-shrink: 0;
       display: flex;
@@ -153,289 +152,193 @@
       padding: 8px 16px 4px;
     }
     .quiz-x {
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
       border-radius: 50%;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #d1d5db;
-      flex-shrink: 0;
+      background: none; border: none; cursor: pointer;
+      color: #d1d5db; flex-shrink: 0;
     }
     .progress-track {
-      flex: 1;
-      height: 12px;
+      flex: 1; height: 12px;
       border-radius: 100px;
       background: #f3f4f6;
       overflow: hidden;
     }
     .progress-fill {
-      height: 100%;
-      border-radius: 100px;
+      height: 100%; border-radius: 100px;
       background: var(--purple);
       transition: transform 350ms cubic-bezier(0.4,0,0.2,1);
       transform-origin: left;
     }
     .quiz-counter {
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--muted);
-      flex-shrink: 0;
+      font-weight: 700; font-size: 14px;
+      color: var(--muted); flex-shrink: 0;
     }
     .quiz-topic {
       flex-shrink: 0;
       padding: 4px 20px 4px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-weight: 700; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.1em;
       color: var(--purple);
     }
     .quiz-question {
       flex-shrink: 0;
       padding: 16px 24px 12px;
-      max-height: 30%;
-      overflow-y: auto;
+      max-height: 30%; overflow-y: auto;
     }
     .quiz-question p {
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 800;
-      font-size: 22px;
-      color: var(--ink);
-      line-height: 1.35;
+      font-weight: 800; font-size: 22px;
+      color: var(--ink); line-height: 1.35;
     }
     .quiz-options {
-      flex: 1;
-      overflow-y: auto;
+      flex: 1; overflow-y: auto;
       padding: 8px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+      display: flex; flex-direction: column; gap: 12px;
     }
     .option-btn {
-      width: 100%;
-      border-radius: 20px;
+      width: 100%; border-radius: 20px;
       border: 2px solid var(--border);
       background: white;
       padding: 16px 20px;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 700;
-      font-size: 17px;
-      color: #3c3c3c;
-      cursor: pointer;
-      text-align: left;
+      font-weight: 700; font-size: 17px;
+      color: #3c3c3c; cursor: pointer; text-align: left;
       transition: all 0.12s;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       line-height: 1.4;
     }
     .option-btn:active:not(:disabled) { transform: scale(0.97); }
     .option-btn.selected { border-color: #a78bfa; background: #f5f3ff; color: var(--purple); }
-    .option-btn.correct { border-color: #86efac; background: #f0fdf4; color: #16a34a; }
-    .option-btn.wrong { border-color: #fca5a5; background: #fff5f5; color: #ef4444; }
-    .option-btn.dimmed { border-color: #f3f4f6; color: #d1d5db; box-shadow: none; }
+    .option-btn.correct  { border-color: #86efac; background: #f0fdf4; color: #16a34a; }
+    .option-btn.wrong    { border-color: #fca5a5; background: #fff5f5; color: var(--red); }
+    .option-btn.dimmed   { border-color: #f3f4f6; color: #d1d5db; box-shadow: none; }
     .option-btn:disabled { cursor: not-allowed; }
 
-    .quiz-bottom {
-      flex-shrink: 0;
-      padding: 8px 16px 24px;
-    }
+    .quiz-bottom { flex-shrink: 0; padding: 8px 16px 24px; }
     .check-btn {
-      width: 100%;
-      border: none;
-      border-radius: 20px;
+      width: 100%; border: none; border-radius: 20px;
       padding: 20px;
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 800;
-      font-size: 20px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.15s;
-      background: var(--purple);
-      color: white;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: 20px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; transition: all 0.15s;
+      background: var(--purple); color: white;
       box-shadow: 0 4px 0 var(--purple-dark);
     }
     .check-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--purple-dark); }
     .check-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    .feedback-bar {
-      border-radius: 20px;
-      overflow: hidden;
-      border: 2px solid;
-    }
+    .feedback-bar { border-radius: 20px; overflow: hidden; border: 2px solid; }
     .feedback-bar.correct { border-color: #86efac; background: #f0fdf4; }
-    .feedback-bar.wrong { border-color: #fca5a5; background: #fff5f5; }
-    .feedback-top {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-    }
+    .feedback-bar.wrong   { border-color: #fca5a5; background: #fff5f5; }
+    .feedback-top { display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
     .feedback-emoji { font-size: 24px; }
-    .feedback-text {
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 800;
-      font-size: 18px;
-      color: var(--ink);
-    }
+    .feedback-text { font-weight: 800; font-size: 18px; color: var(--ink); }
     .continue-btn {
-      width: 100%;
-      border: none;
-      padding: 16px;
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 800;
-      font-size: 20px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      cursor: pointer;
-      color: white;
-      transition: all 0.15s;
+      width: 100%; border: none; padding: 16px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: 20px;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      cursor: pointer; color: white; transition: all 0.15s;
     }
     .continue-btn.correct-btn { background: var(--purple); box-shadow: 0 4px 0 var(--purple-dark); }
-    .continue-btn.wrong-btn { background: #f59e0b; box-shadow: 0 4px 0 #d97706; }
+    .continue-btn.wrong-btn   { background: var(--amber);  box-shadow: 0 4px 0 var(--amber-dark); }
     .continue-btn:active { transform: translateY(2px); }
 
     /* ── RESULTS SCREEN ── */
     #screen-results {
       align-items: center;
       padding: 32px 24px;
-      gap: 20px;
-      overflow-y: auto;
+      gap: 20px; overflow-y: auto;
     }
     .results-mascot {
-      width: 120px;
-      height: auto;
+      width: 130px; height: auto;
       animation: float 2s ease-in-out infinite;
     }
-    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-    .results-emoji { font-size: 52px; text-align: center; }
     .results-title {
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 900;
-      font-size: 30px;
-      color: var(--ink);
-      text-align: center;
+      font-weight: 900; font-size: 30px;
+      color: var(--ink); text-align: center;
     }
     .results-sub {
-      font-size: 15px;
-      color: var(--muted);
-      text-align: center;
-      line-height: 1.6;
+      font-size: 15px; color: var(--muted);
+      text-align: center; line-height: 1.6;
     }
     .score-card {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+      display: flex; align-items: center; gap: 16px;
       background: var(--purple-light);
-      border-radius: 20px;
-      padding: 20px 24px;
-      width: 100%;
-      max-width: 400px;
+      border-radius: 20px; padding: 20px 24px;
+      width: 100%; max-width: 400px;
     }
     .score-num {
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 900;
-      font-size: 42px;
-      color: var(--purple);
-      line-height: 1;
+      font-weight: 900; font-size: 42px;
+      color: var(--purple); line-height: 1;
     }
     .score-label {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 600;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--purple);
-      opacity: 0.7;
+      font-weight: 700; font-size: 12px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--purple); opacity: 0.7;
     }
     .power-card {
-      background: #faf9ff;
-      border: 2px solid #ede9fe;
-      border-radius: 20px;
-      padding: 20px;
-      width: 100%;
-      max-width: 400px;
+      background: #faf9ff; border: 2px solid #ede9fe;
+      border-radius: 20px; padding: 20px;
+      width: 100%; max-width: 400px;
       text-align: center;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
+      display: flex; flex-direction: column; gap: 8px;
     }
-    .power-title {
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 900;
-      font-size: 18px;
-      color: var(--ink);
-    }
-    .power-sub {
-      font-size: 14px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-    .btn-green {
-      width: 100%;
-      max-width: 400px;
-      background: var(--green);
-      color: white;
-      border: none;
-      border-radius: 20px;
-      padding: 18px;
-      font-family: 'Baloo 2', sans-serif;
-      font-weight: 800;
-      font-size: 18px;
-      cursor: pointer;
-      box-shadow: 0 4px 0 var(--green-dark);
+    .power-title { font-weight: 900; font-size: 18px; color: var(--ink); }
+    .power-sub   { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .btn-wa {
+      width: 100%; max-width: 400px;
+      background: #25D366; color: white;
+      border: none; border-radius: 20px; padding: 18px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: 18px;
+      cursor: pointer; box-shadow: 0 4px 0 #1da851;
       transition: all 0.15s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
       text-decoration: none;
-      letter-spacing: 0.02em;
     }
-    .btn-green:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--green-dark); }
+    .btn-wa:active { transform: translateY(2px); box-shadow: 0 2px 0 #1da851; }
   </style>
 </head>
 <body>
 
   <!-- SCREEN 1: Pick subject -->
   <div class="screen active" id="screen-pick">
-    <img class="pick-logo" src="/icon.png" alt="Numio" />
-    <div class="pick-title">Pick a subject to<br/><span>try Numio! 📚</span></div>
+    <img class="pick-logo" src="/nav-logo.png" alt="Numio" />
+    <div class="pick-title">Pick a subject to<br/><span>try Numio!</span></div>
     <div class="pick-sub">Select a textbook page and see how Numio generates a quiz for your child instantly.</div>
     <div class="images-grid">
       <div class="image-card" onclick="selectImage(this, 'math')">
         <img src="/test-math.jpg" alt="Math" />
-        <div class="image-label">➕ Math</div>
+        <div class="image-label">Math</div>
         <div class="selected-check">✓</div>
       </div>
       <div class="image-card" onclick="selectImage(this, 'science')">
         <img src="/test-science.jpg" alt="Science" />
-        <div class="image-label">🔬 Science</div>
+        <div class="image-label">Science</div>
         <div class="selected-check">✓</div>
       </div>
       <div class="image-card" onclick="selectImage(this, 'english')">
         <img src="/test-english.jpg" alt="English" />
-        <div class="image-label">📖 English</div>
+        <div class="image-label">English</div>
         <div class="selected-check">✓</div>
       </div>
       <div class="image-card" onclick="selectImage(this, 'history')">
         <img src="/test-history.jpg" alt="History" />
-        <div class="image-label">🏛️ History</div>
+        <div class="image-label">History</div>
         <div class="selected-check">✓</div>
       </div>
     </div>
-    <button class="btn-purple" id="startBtn" disabled onclick="generateQuiz()">Generate my quiz! ✨</button>
+    <button class="btn-purple" id="startBtn" disabled onclick="generateQuiz()">Generate my quiz ✨</button>
   </div>
 
   <!-- SCREEN 2: Loading -->
   <div class="screen" id="screen-loading">
+    <img class="loading-mascot" src="/nav-profile.png" alt="" />
     <div class="spinner"></div>
-    <div class="loading-text">📸 Reading the textbook page...<br/>Generating your quiz!</div>
+    <div class="loading-title">Building your quiz...</div>
+    <div class="loading-sub">Reading the textbook page ✨</div>
   </div>
 
   <!-- SCREEN 3: Quiz -->
@@ -463,8 +366,7 @@
 
   <!-- SCREEN 4: Results -->
   <div class="screen" id="screen-results">
-    <img class="results-mascot" src="/mascot.png" alt="Numio" onerror="this.style.display='none'" />
-    <div class="results-emoji" id="resultsEmoji">🎉</div>
+    <img class="results-mascot" src="/nav-profile.png" alt="Numio" />
     <div class="results-title" id="resultsTitle">Great job!</div>
     <div class="results-sub" id="resultsSub">You completed the quiz!</div>
     <div class="score-card">
@@ -475,12 +377,12 @@
       </div>
     </div>
     <div class="power-card">
-      <div class="power-title">⚡ This is the power of Numio</div>
+      <div class="power-title">This is the power of Numio</div>
       <div class="power-sub">Just one photo of your child's textbook and a personalized quiz is generated instantly — on any subject, anytime.</div>
     </div>
-    <a class="btn-green" id="waBtn" href="#" target="_blank">
+    <a class="btn-wa" id="waBtn" href="#" target="_blank">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-      I want this for my child! 💚
+      I want this for my child!
     </a>
   </div>
 
@@ -534,8 +436,7 @@
         questions = getFallback(selectedSubject)
       }
 
-      currentQ = 0
-      score = 0
+      currentQ = 0; score = 0
       document.getElementById('screen-loading').classList.remove('active')
       document.getElementById('screen-quiz').classList.add('active')
       showQuestion()
@@ -544,8 +445,7 @@
     function showQuestion() {
       const q = questions[currentQ]
       const total = questions.length
-      selectedAnswer = null
-      revealed = false
+      selectedAnswer = null; revealed = false
 
       document.getElementById('quizTopic').textContent = topicNames[selectedSubject] || selectedSubject
       document.getElementById('quizCounter').textContent = `${currentQ + 1}/${total}`
@@ -562,16 +462,13 @@
         container.appendChild(btn)
       })
 
-      const bottom = document.getElementById('quizBottom')
-      bottom.innerHTML = '<button class="check-btn" id="checkBtn" disabled onclick="handleCheck()">CHECK</button>'
+      document.getElementById('quizBottom').innerHTML = '<button class="check-btn" id="checkBtn" disabled onclick="handleCheck()">CHECK</button>'
     }
 
     function selectOption(idx) {
       if (revealed) return
       selectedAnswer = idx
-      document.querySelectorAll('.option-btn').forEach((btn, i) => {
-        btn.classList.toggle('selected', i === idx)
-      })
+      document.querySelectorAll('.option-btn').forEach((btn, i) => btn.classList.toggle('selected', i === idx))
       document.getElementById('checkBtn').disabled = false
     }
 
@@ -591,8 +488,7 @@
 
       if (isCorrect) score++
 
-      const bottom = document.getElementById('quizBottom')
-      bottom.innerHTML = `
+      document.getElementById('quizBottom').innerHTML = `
         <div class="feedback-bar ${isCorrect ? 'correct' : 'wrong'}">
           <div class="feedback-top">
             <span class="feedback-emoji">${isCorrect ? '🎉' : '💪'}</span>
@@ -604,11 +500,8 @@
 
     function handleContinue() {
       currentQ++
-      if (currentQ < questions.length) {
-        showQuestion()
-      } else {
-        showResults()
-      }
+      if (currentQ < questions.length) showQuestion()
+      else showResults()
     }
 
     function showResults() {
@@ -617,24 +510,20 @@
 
       const total = questions.length
       const pct = Math.round((score / total) * 100)
-
       document.getElementById('scoreNum').textContent = `${score}/${total}`
 
       if (pct === 100) {
-        document.getElementById('resultsEmoji').textContent = '🏆'
         document.getElementById('resultsTitle').textContent = 'Perfect score!'
         document.getElementById('resultsSub').textContent = 'Your child is going to love this!'
       } else if (pct >= 66) {
-        document.getElementById('resultsEmoji').textContent = '🎉'
         document.getElementById('resultsTitle').textContent = 'Great job!'
         document.getElementById('resultsSub').textContent = 'Imagine your child doing this every day!'
       } else {
-        document.getElementById('resultsEmoji').textContent = '💪'
         document.getElementById('resultsTitle').textContent = 'Keep practicing!'
         document.getElementById('resultsSub').textContent = 'Numio makes it fun to keep going!'
       }
 
-      const msg = encodeURIComponent(`I just tried Numio and I love it! I want this for my child 💚`)
+      const msg = encodeURIComponent(`I just tried Numio and I love it! I want this for my child 💜`)
       document.getElementById('waBtn').href = `https://wa.me/14384099964?text=${msg}`
     }
 
