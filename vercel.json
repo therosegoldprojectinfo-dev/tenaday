@@ -1,8 +1,8 @@
 {
   "rewrites": [
-    { "source": "/privacy.html", "destination": "/privacy.html" },
-    { "source": "/terms.html",   "destination": "/terms.html"   },
-    { "source": "/landing",      "destination": "/landing.html" },
-    { "source": "/(.*)",         "destination": "/index.html"   }
+    { "source": "/privacy",  "destination": "/privacy.html" },
+    { "source": "/terms",    "destination": "/terms.html"   },
+    { "source": "/testing",  "destination": "/testing.html" },
+    { "source": "/(.*)",     "destination": "/index.html"   }
   ]
 }
