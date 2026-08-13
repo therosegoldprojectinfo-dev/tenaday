@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ensureAuth } from './lib/auth'
 import Login from './screens/Login'
-import TrialFlow from './screens/TrialFlow'
+import AccountCreation from './screens/AccountCreation'
 import { getStreak } from './lib/economy'
 import { getKids, createKid } from './lib/kids'
 import Nav from './components/Nav'
@@ -126,47 +126,36 @@ export default function App() {
     return (
       <LangContext.Provider value={lang}>
         <div dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-          <TrialFlow
-            lang={lang}
+          <AccountCreation
             onLanguageChange={setLang}
-            onSignup={async ({ username, password, lang: signupLang, trialExam, showLogin }) => {
-              // "Already have an account" → show Login screen
-              if (showLogin) {
-                setShowOnboarding(true)
-                return
-              }
-
-              // Derive credentials same way as Onboarding.jsx
+            onLogin={() => setShowOnboarding(true)}
+            onSignup={async ({ username, kidName, password, lang: signupLang }) => {
               const hashBuffer = async (input) => {
                 const encoded = new TextEncoder().encode(input)
                 const buf = await crypto.subtle.digest('SHA-256', encoded)
                 return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
               }
 
-              const fakeEmail  = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
-              const derivedPw  = await hashBuffer(`numio:${username.trim().toLowerCase()}:${password}:v3`)
-              const pwHash     = await hashBuffer(`numio-pin:${password}`)
+              const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
+              const derivedPw = await hashBuffer(`numio:${username.trim().toLowerCase()}:${password}:v3`)
+              const pwHash    = await hashBuffer(`numio-pin:${password}`)
 
               const { supabase } = await import('./lib/supabaseClient')
               let isNewAccount = true
               const { error: signUpErr } = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
 
               if (signUpErr) {
-                // Prior attempt created auth row but failed on profile/PIN — recover it
                 const { error: signInErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: derivedPw })
                 if (signInErr) throw new Error(lang === 'ar' ? 'اسم المستخدم مستخدم بالفعل' : 'That username is already taken')
-                isNewAccount = false // reconciling an existing account
+                isNewAccount = false
               }
 
               const { data: { user } } = await supabase.auth.getUser()
               if (!user) throw new Error('Signup failed')
 
-              // Only write profile if new account — upsert only updates safe columns
-              // Use INSERT, and on conflict update only the columns we have grant for
               const { error: insertErr } = await supabase.from('profiles').insert({
                 id: user.id, display_name: username.trim(), language: signupLang || lang,
               })
-              // 23505 = unique violation = profile already exists, update safe columns only
               if (insertErr && insertErr.code !== '23505') throw new Error(insertErr.message)
               if (insertErr?.code === '23505') {
                 await supabase.from('profiles').update({
@@ -174,56 +163,34 @@ export default function App() {
                 }).eq('id', user.id)
               }
 
-              // Set PIN if new account OR if reconciled account has no PIN yet
-              // (set_parent_pin allows free write when parent_pin IS NULL)
               if (isNewAccount) {
                 const { error: pinErr } = await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
                 if (pinErr) {
-                  // Fresh signup failed on PIN — safe to clean up the profile row
                   await supabase.from('profiles').delete().eq('id', user.id)
                   throw new Error(pinErr.message)
                 }
               } else {
-                // Only check if PIN is NULL — parent_pin column not client-readable after v2
-                // set_parent_pin allows free write when PIN is NULL (set_parent_pin.sql:41)
-                // so calling it unconditionally on reconciliation is safe
                 await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
               }
 
-              // Kid creation + trial migration — only for new accounts
-              // Reconciled accounts already have kids, chapters, and data
               let kid
               if (isNewAccount) {
                 try {
-                  kid = await createKid(username.trim())
-                  if (trialExam && trialExam.id === 'trial') {
-                    const { data: chapter } = await supabase.from('chapters')
-                      .insert({ name: lang === 'ar' ? 'أول اختبار Numio' : 'Your First Ever Numio Quiz', emoji: '🎉', user_id: user.id, kid_id: kid.id })
-                      .select().single()
-                    if (chapter) {
-                      await supabase.from('exams').insert({
-                        user_id: user.id, kid_id: kid.id,
-                        topic: trialExam.topic, questions: trialExam.questions,
-                        chapter_id: chapter.id,
-                      })
-                    }
-                    ;['numio_trial_exam','numio_trial_done','numio_trial_used'].forEach(k => localStorage.removeItem(k))
-                  }
+                  // Use the kid's actual name instead of username
+                  kid = await createKid(kidName.trim())
                 } catch (e) {
-                  console.error('kid/migration failed:', e)
+                  console.error('kid creation failed:', e)
                   try {
                     const kidList = await getKids()
-                    kid = kidList[0] || await createKid(username.trim())
+                    kid = kidList[0] || await createKid(kidName.trim())
                   } catch { throw new Error(lang === 'ar' ? 'حدث خطأ ما، حاول مجدداً' : 'Something went wrong, please try again') }
                 }
               } else {
-                // Reconciled account — load existing kids
                 try {
                   const kidList = await getKids()
                   kid = kidList[0]
                   setKids(kidList)
                 } catch (e) {
-                  console.error('Failed to load kids on reconciliation:', e)
                   throw new Error(lang === 'ar' ? 'حدث خطأ ما، حاول مجدداً' : 'Something went wrong, please try again')
                 }
               }
@@ -234,7 +201,6 @@ export default function App() {
               setOnboarded(true)
             }}
           />
-
         </div>
       </LangContext.Provider>
     )
