@@ -407,6 +407,8 @@
 
     async function generateQuiz() {
       if (!selectedSubject) return
+      // Fire Meta Lead event
+      if (window.fbq) fbq('track', 'Lead', { content_name: 'testing_quiz_started', content_category: selectedSubject })
       document.getElementById('screen-pick').classList.remove('active')
       document.getElementById('screen-loading').classList.add('active')
 
