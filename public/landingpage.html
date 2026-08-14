@@ -26,7 +26,7 @@
 
     /* HERO */
     .hero{background:#ffffff;padding:40px 20px 0;text-align:center;max-width:680px;margin:0 auto;position:relative;overflow:hidden}
-    .numio-float{position:absolute;pointer-events:none;animation:nf 3s ease-in-out infinite alternate}
+    .numio-float{position:absolute;pointer-events:none;animation:nf 3s ease-in-out infinite alternate;z-index:10}
     .nf1{top:12px;left:10px;animation-delay:0s}
     .nf2{top:20px;right:14px;animation-delay:0.4s}
     .nf3{top:140px;left:4px;animation-delay:0.7s}
@@ -146,27 +146,10 @@
   <img src="/event-hero.png" alt="Numio App" class="product-img"/>
 </div>
 
-<!-- PROBLEM -->
-<div class="ps-wrap">
-  <div class="ps-icon-row">
-    <div class="ps-icon-circle prob">⚠️</div>
-  </div>
-  <div class="ps-box problem">
-    <div class="ps-title prob">The Problem</div>
-    <div class="ps-body">
-      ⏰ Wasting time searching for worksheets that match their lessons. 🤷 Not knowing what your child should actually be practicing. 📄 Generic exercises that have nothing to do with what they learned today. 😫 Your child refuses to practice — and it turns into a fight every single night. 👩‍🏫 And somehow, you're the one expected to make all of it happen.
-    </div>
-  </div>
-
-  <div class="ps-icon-row" style="margin-top:16px">
-    <div class="ps-icon-circle sol">✅</div>
-  </div>
-  <div class="ps-box solution">
-    <div class="ps-title sol">The Solution</div>
-    <div class="ps-body">
-      📸 Take a picture of their lesson — that's it. 🧠 Numio reads the lesson and creates practice based on exactly what they're learning. 🚫 No searching. No preparation. No extra work from you. 🎮 Your child actually wants to practice — because they're earning rewards they chose themselves.
-    </div>
-  </div>
+<!-- PROBLEM / SOLUTION IMAGES -->
+<div style="max-width:680px;margin:0 auto;padding:36px 20px;display:flex;flex-direction:column;gap:20px">
+  <img src="/problem-card.png" alt="The Problem" style="width:100%;height:auto;display:block;border-radius:20px"/>
+  <img src="/solution-card.png" alt="The Solution" style="width:100%;height:auto;display:block;border-radius:20px"/>
 </div>
 
 <div class="divider"></div>
