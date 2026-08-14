@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Numio — Get Your Child Ready for the School Year</title>
-  <meta name="description" content="Help your child get better grades without adding more work to your day. Just take a picture of their lesson."/>
+  <title>Numio — Back-to-School Offer</title>
+  <meta name="description" content="Help your child get better grades without extra work. Just take a picture of their lesson."/>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;0,700;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet"/>
   <script>
   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
@@ -14,161 +14,113 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
-    body{font-family:'Plus Jakarta Sans',sans-serif;background:#f7f4f0;-webkit-font-smoothing:antialiased;padding-bottom:80px;overflow-x:hidden}
+    body{font-family:'Plus Jakarta Sans',sans-serif;background:#fff8f5;color:#1a0a2e;-webkit-font-smoothing:antialiased;padding-bottom:80px;overflow-x:hidden}
 
     /* ── TICKER ── */
-    .ticker{background:#1a0a2e;padding:11px 0;overflow:hidden;white-space:nowrap;border-bottom:2px solid #7c3aed}
-    .ticker-track{display:inline-flex;animation:ticker 22s linear infinite;gap:0}
-    .ticker-item{font-weight:800;font-size:12px;color:#e9d5ff;padding:0 24px;letter-spacing:0.1em;text-transform:uppercase}
-    .ticker-dot{color:#7c3aed;font-size:16px;line-height:1}
+    .ticker{background:#7c3aed;padding:10px 0;overflow:hidden;white-space:nowrap}
+    .ticker-track{display:inline-flex;animation:ticker 22s linear infinite}
+    .ticker-item{font-weight:800;font-size:12px;color:white;padding:0 20px;letter-spacing:0.1em;text-transform:uppercase}
+    .ticker-dot{color:rgba(255,255,255,0.4);font-size:14px}
     @keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
     /* ── NAV ── */
-    .nav{background:white;border-bottom:3px solid #1a0a2e;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+    .nav{background:white;border-bottom:2px solid #f0e8ff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(124,58,237,0.08)}
     .nav img{height:26px;width:auto}
-    .nav-btn{background:#1a0a2e;color:white;font-weight:900;font-size:13px;padding:10px 22px;border-radius:8px;border:none;cursor:pointer;letter-spacing:0.03em;text-transform:uppercase}
+    .nav-btn{background:#7c3aed;color:white;font-weight:900;font-size:13px;padding:10px 20px;border-radius:100px;border:none;cursor:pointer}
 
     /* ── HERO ── */
-    .hero{background:#1a0a2e;position:relative;overflow:hidden;padding:0}
-    /* star/grain texture overlay */
-    .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(124,58,237,0.4) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(168,85,247,0.25) 0%,transparent 50%);pointer-events:none}
-    .hero-inner{max-width:680px;margin:0 auto;padding:40px 24px 0;position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;text-align:center}
-    .hero-badge{background:linear-gradient(90deg,#7c3aed,#a855f7);color:white;font-weight:900;font-size:11px;padding:6px 18px;border-radius:4px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:20px;display:inline-block;box-shadow:0 4px 16px rgba(124,58,237,0.5)}
-    .hero h1{font-weight:900;font-size:clamp(34px,9vw,56px);line-height:1.05;color:white;margin-bottom:6px;letter-spacing:-0.02em}
-    .hero h1 .accent{color:#c084fc;display:block;font-style:italic}
-    .hero-sub{font-size:17px;color:rgba(255,255,255,0.6);line-height:1.7;max-width:440px;margin:16px auto 28px}
+    .hero{background:#fff8f5;padding:40px 20px 0;text-align:center;max-width:680px;margin:0 auto;position:relative}
 
-    /* hero product showcase */
-    .hero-showcase{width:100%;max-width:400px;margin:0 auto;position:relative}
-    .hero-showcase-bg{background:linear-gradient(180deg,rgba(124,58,237,0.3) 0%,rgba(124,58,237,0) 100%);border-radius:32px 32px 0 0;padding:40px 20px 0;display:flex;justify-content:center;align-items:flex-end;gap:16px}
-    .hero-mascot-main{width:180px;height:180px;object-fit:contain;filter:drop-shadow(0 0 40px rgba(192,132,252,0.6));animation:float 3s ease-in-out infinite}
-    .hero-fire{width:100px;height:auto;object-fit:contain;filter:drop-shadow(0 0 20px rgba(255,45,120,0.5));animation:float 3s ease-in-out infinite 0.5s}
-    .hero-coins{width:80px;height:auto;object-fit:contain;filter:drop-shadow(0 0 20px rgba(251,191,36,0.5));animation:float 3s ease-in-out infinite 1s}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+    /* sparkle decorations */
+    .sparkle{position:absolute;pointer-events:none;font-size:24px;animation:sparkle-pop 2s ease-in-out infinite alternate}
+    .sp1{top:20px;left:10px;animation-delay:0s;font-size:28px}
+    .sp2{top:30px;right:15px;animation-delay:0.3s;font-size:20px}
+    .sp3{top:120px;left:5px;animation-delay:0.6s;font-size:16px}
+    .sp4{top:100px;right:8px;animation-delay:0.9s;font-size:22px}
+    @keyframes sparkle-pop{0%{transform:scale(0.8) rotate(-10deg);opacity:0.6}100%{transform:scale(1.2) rotate(10deg);opacity:1}}
 
-    /* ── TRUST BAR ── */
-    .trust-bar{background:#f0ede8;border-bottom:2px solid #e5e1da;padding:14px 20px}
-    .trust-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
-    .trust-item{display:flex;align-items:center;gap:6px;font-weight:800;font-size:12px;color:#1a0a2e;white-space:nowrap;text-transform:uppercase;letter-spacing:0.06em}
-    .trust-check{width:18px;height:18px;background:#7c3aed;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:900;flex-shrink:0}
+    .offer-pill{background:linear-gradient(90deg,#7c3aed,#a855f7);color:white;font-weight:900;font-size:12px;padding:7px 20px;border-radius:100px;display:inline-block;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:20px;box-shadow:0 4px 14px rgba(124,58,237,0.35)}
 
-    /* ── OFFER BOX ── */
-    .offer-wrap{max-width:680px;margin:0 auto;padding:32px 20px}
-    .offer-box{background:white;border-radius:16px;overflow:hidden;border:3px solid #1a0a2e;box-shadow:6px 6px 0 #1a0a2e}
-    .offer-top{background:#1a0a2e;padding:28px 24px;text-align:center;position:relative;overflow:hidden}
-    .offer-top::before{content:'🎒 BACK-TO-SCHOOL';position:absolute;top:8px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:900;color:rgba(255,255,255,0.3);letter-spacing:0.2em;white-space:nowrap}
-    .offer-mascot{width:70px;height:70px;object-fit:contain;position:absolute;right:20px;top:50%;transform:translateY(-50%);filter:drop-shadow(0 4px 12px rgba(192,132,252,0.5))}
-    .offer-old{font-size:16px;color:rgba(255,255,255,0.4);text-decoration:line-through;font-weight:700;margin-top:16px}
-    .offer-price-row{display:flex;align-items:flex-start;justify-content:center;gap:4px;margin:4px 0}
-    .offer-dollar{font-size:28px;font-weight:900;color:white;margin-top:12px}
-    .offer-amount{font-size:80px;font-weight:900;color:white;line-height:0.9}
-    .offer-period-wrap{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;margin-top:8px}
-    .offer-period{font-size:14px;color:rgba(255,255,255,0.5);font-weight:700}
-    .offer-save-badge{display:inline-block;background:#7c3aed;color:white;font-weight:900;font-size:12px;padding:5px 16px;border-radius:4px;letter-spacing:0.08em;text-transform:uppercase;margin-top:8px}
-    .offer-body{padding:24px}
-    .offer-list{list-style:none;display:flex;flex-direction:column;gap:0;border:2px solid #f0ede8;border-radius:12px;overflow:hidden;margin-bottom:20px}
-    .offer-list li{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;font-size:14px;font-weight:700;color:#1a0a2e;border-bottom:1px solid #f0ede8}
-    .offer-list li:last-child{border-bottom:none}
-    .offer-list li .check{color:#7c3aed;font-size:16px;margin-right:10px}
-    .offer-list li .val{font-size:13px;color:#9ca3af;font-weight:600}
-    .btn-cta{display:block;width:100%;background:#7c3aed;color:white;font-weight:900;font-size:18px;padding:20px;border-radius:10px;border:3px solid #1a0a2e;cursor:pointer;text-align:center;box-shadow:4px 4px 0 #1a0a2e;letter-spacing:0.02em;text-transform:uppercase;margin-bottom:14px;transition:all 0.1s}
-    .btn-cta:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #1a0a2e}
-    .btn-cta.light{background:white;color:#7c3aed}
-    .guarantee-row{display:flex;align-items:center;justify-content:center;gap:8px;font-size:13px;color:#6b7280;font-weight:700;text-align:center}
+    .hero h1{font-weight:900;font-size:clamp(30px,8vw,46px);line-height:1.15;color:#1a0a2e;margin-bottom:8px;letter-spacing:-0.02em}
+    .hero h1 .underline{color:#7c3aed;text-decoration:underline;text-decoration-color:#f472b6;text-decoration-thickness:3px;text-underline-offset:4px;font-style:italic}
 
-    /* ── SECTIONS ── */
-    .s{padding:56px 0}
-    .s-dark{background:#1a0a2e;padding:56px 0}
-    .s-purple{background:#7c3aed;padding:56px 0}
-    .s-cream{background:#f7f4f0;padding:56px 0}
-    .s-white{background:white;padding:56px 0}
-    .sw{max-width:680px;margin:0 auto;padding:0 24px}
+    /* timer */
+    .timer-box{display:inline-flex;align-items:center;gap:8px;background:white;border:2px solid #f0e8ff;border-radius:16px;padding:12px 20px;margin:20px 0;box-shadow:0 4px 16px rgba(124,58,237,0.1)}
+    .timer-label{font-weight:800;font-size:13px;color:#7c3aed;text-transform:uppercase;letter-spacing:0.08em}
+    .timer-units{display:flex;gap:6px;align-items:center}
+    .timer-block{background:#7c3aed;color:white;font-weight:900;font-size:20px;padding:8px 12px;border-radius:8px;min-width:44px;text-align:center;line-height:1}
+    .timer-sep{font-weight:900;font-size:20px;color:#7c3aed}
 
-    .eyebrow{font-weight:900;font-size:11px;letter-spacing:0.12em;text-transform:uppercase;margin-bottom:14px}
-    .eyebrow-dark{color:#a78bfa}
-    .eyebrow-light{color:#7c3aed}
-    .eyebrow-purple{color:rgba(255,255,255,0.6)}
+    /* product image with blob */
+    .product-wrap{position:relative;width:100%;max-width:360px;margin:24px auto 0;display:flex;justify-content:center}
+    .product-blob{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:280px;height:220px;background:linear-gradient(180deg,#f0e8ff 0%,#e9d5ff 100%);border-radius:50% 50% 0 0;z-index:0}
+    /* paint splats */
+    .paint-left{position:absolute;left:-20px;top:40px;width:80px;height:80px;background:#fde68a;border-radius:50% 30% 60% 40%/40% 50% 60% 50%;opacity:0.7;z-index:0;transform:rotate(-20deg)}
+    .paint-right{position:absolute;right:-10px;top:20px;width:60px;height:60px;background:#fca5a5;border-radius:40% 60% 30% 70%/60% 40% 70% 30%;opacity:0.6;z-index:0;transform:rotate(15deg)}
+    .paint-bottom-left{position:absolute;left:10px;bottom:20px;width:50px;height:50px;background:#86efac;border-radius:60% 40% 70% 30%/50% 60% 40% 70%;opacity:0.6;z-index:0}
+    .paint-top-right{position:absolute;right:20px;top:-10px;width:40px;height:40px;background:#c084fc;border-radius:30% 70% 40% 60%/60% 30% 70% 40%;opacity:0.5;z-index:0}
+    .product-img{position:relative;z-index:1;width:260px;height:auto;object-fit:contain;filter:drop-shadow(0 16px 32px rgba(124,58,237,0.25))}
 
-    h2{font-weight:900;font-size:clamp(28px,7vw,40px);line-height:1.1;letter-spacing:-0.02em;margin-bottom:16px}
-    h2.light{color:white}
-    h2.dark{color:#1a0a2e}
-    h2 em{font-style:italic;color:#a855f7}
-    h2.light em{color:#c084fc}
+    /* ── SECTION BASE ── */
+    .section{max-width:680px;margin:0 auto;padding:40px 20px}
+    .section-sm{max-width:680px;margin:0 auto;padding:24px 20px}
 
-    .body-text{font-size:16px;line-height:1.8;margin-bottom:10px}
-    .body-text.light{color:rgba(255,255,255,0.6)}
-    .body-text.dark{color:#4b5563}
-    .body-text strong.light{color:white}
-    .body-text strong.dark{color:#1a0a2e}
+    /* ── PROBLEM / SOLUTION BOXES ── */
+    .ps-box{border-radius:20px;padding:24px;margin:16px 0;border:2px solid}
+    .ps-box.problem{background:#fff5f5;border-color:#fca5a5;box-shadow:4px 4px 0 #fca5a5}
+    .ps-box.solution{background:#f0fdf4;border-color:#86efac;box-shadow:4px 4px 0 #86efac}
+    .ps-icon{font-size:32px;margin-bottom:8px;display:block}
+    .ps-title{font-weight:900;font-size:20px;margin-bottom:14px}
+    .ps-title.problem{color:#dc2626}
+    .ps-title.solution{color:#16a34a}
+    .ps-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+    .ps-list li{display:flex;align-items:flex-start;gap:10px;font-size:16px;font-weight:700;line-height:1.5;color:#1a0a2e}
+    .ps-list li .emi{font-size:20px;flex-shrink:0}
 
-    /* ── NO LIST ── */
-    .no-list{list-style:none;display:flex;flex-direction:column;gap:8px;margin:20px 0}
-    .no-list li{display:flex;align-items:flex-start;gap:12px;font-size:16px;font-weight:700;line-height:1.5}
-    .no-list li.light{color:rgba(255,255,255,0.8)}
-    .no-list li.dark{color:#1a0a2e}
-    .no-list li .ico{font-size:20px;flex-shrink:0}
+    /* ── DIVIDER ── */
+    .vs-divider{display:flex;align-items:center;justify-content:center;gap:12px;padding:8px 0}
+    .vs-badge{background:#1a0a2e;color:white;font-weight:900;font-size:18px;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 
-    /* ── STEPS ── */
-    .steps{display:flex;flex-direction:column;gap:16px;margin-top:24px}
-    .step{background:white;border-radius:12px;padding:20px 20px 20px 16px;display:flex;gap:16px;align-items:flex-start;border:2px solid #1a0a2e;box-shadow:4px 4px 0 #1a0a2e}
-    .step-num{width:52px;height:52px;border-radius:10px;background:#1a0a2e;color:white;font-weight:900;font-size:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .step h3{font-weight:900;font-size:18px;color:#1a0a2e;margin-bottom:4px}
-    .step p{font-size:14px;color:#6b7280;line-height:1.6}
-    .step-emoji{font-size:28px;margin-bottom:6px}
+    /* ── CTA BUTTON ── */
+    .btn-cta{display:block;width:100%;background:#7c3aed;color:white;font-weight:900;font-size:18px;padding:20px;border-radius:14px;border:none;cursor:pointer;text-align:center;box-shadow:0 6px 0 #5b21b6;letter-spacing:0.01em;transition:all 0.1s;margin-bottom:12px}
+    .btn-cta:active{transform:translateY(4px);box-shadow:0 2px 0 #5b21b6}
+    .btn-cta.dark{background:#1a0a2e;box-shadow:0 6px 0 #000}
+    .btn-cta.dark:active{box-shadow:0 2px 0 #000}
+    .guarantee{display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;color:#6b7280;font-weight:700;text-align:center}
 
-    /* ── FLOW ── */
-    .flow{background:white;border:2px solid #1a0a2e;border-radius:16px;padding:24px;margin-top:24px;box-shadow:4px 4px 0 #1a0a2e}
-    .flow-item{display:flex;align-items:center;gap:14px;font-size:16px;font-weight:800;color:#1a0a2e;padding:10px 0;border-bottom:1px dashed #e5e7eb}
-    .flow-item:last-child{border-bottom:none}
-    .flow-item .fi{font-size:24px;flex-shrink:0}
-    .flow-arrow{font-size:14px;color:#7c3aed;padding:2px 0 2px 16px;font-weight:900}
-
-    /* ── RESULT BOX ── */
-    .result-box{background:#7c3aed;border-radius:16px;padding:24px;text-align:center;border:3px solid #1a0a2e;box-shadow:5px 5px 0 #1a0a2e;margin-top:24px}
-    .result-box p{font-size:17px;font-weight:800;color:white;line-height:1.6}
-    .result-box p span{color:#e9d5ff}
-
-    /* ── GAME GRID ── */
-    .game-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
-    .game-card{background:white;border-radius:12px;padding:20px;text-align:center;border:2px solid #1a0a2e;box-shadow:3px 3px 0 #1a0a2e}
-    .game-card .gi{font-size:40px;margin-bottom:10px}
-    .game-card h4{font-weight:900;font-size:16px;color:#1a0a2e;margin-bottom:4px}
-    .game-card p{font-size:13px;color:#6b7280;line-height:1.5}
-
-    /* ── REWARD BOX ── */
-    .reward-box{background:#fef9c3;border:2px solid #fbbf24;border-radius:12px;padding:18px 20px;margin-top:16px;box-shadow:3px 3px 0 #f59e0b}
-    .reward-box p{font-size:14px;font-weight:800;color:#92400e;line-height:1.6}
-
-    /* ── HABIT ── */
-    .habit{display:flex;align-items:center;flex-wrap:wrap;gap:4px;justify-content:center;margin:24px 0}
-    .habit-pill{background:#1a0a2e;color:white;font-weight:900;font-size:15px;padding:12px 20px;border-radius:8px;letter-spacing:0.02em}
-    .habit-arr{color:white;font-size:22px;font-weight:900;opacity:0.5}
-
-    /* ── PROMISE GRID ── */
-    .promise-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:24px}
-    .promise-item{text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
-    .promise-icon{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,0.15);border:2px solid rgba(255,255,255,0.3);display:flex;align-items:center;justify-content:center;font-size:24px}
-    .promise-label{font-size:12px;font-weight:800;color:white;text-align:center;line-height:1.3;letter-spacing:0.03em;text-transform:uppercase}
-
-    /* ── CLOSING HERO ── */
-    .closing{background:#1a0a2e;padding:56px 0;position:relative;overflow:hidden}
-    .closing::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(124,58,237,0.35) 0%,transparent 60%);pointer-events:none}
+    /* ── OFFER CARD ── */
+    .offer-card{background:white;border-radius:20px;overflow:hidden;border:2px solid #ede9fe;box-shadow:0 8px 32px rgba(124,58,237,0.12)}
+    .offer-card-top{background:linear-gradient(135deg,#7c3aed,#a855f7);padding:28px 24px;text-align:center;position:relative;overflow:hidden}
+    .offer-card-top::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.08)}
+    .offer-mascot-small{position:absolute;right:16px;top:50%;transform:translateY(-50%);width:60px;height:60px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.2))}
+    .offer-old-price{font-size:16px;color:rgba(255,255,255,0.45);text-decoration:line-through;font-weight:700;margin-bottom:4px}
+    .offer-price-row{display:flex;align-items:flex-start;justify-content:center;gap:4px;margin-bottom:4px}
+    .offer-curr{font-size:24px;font-weight:900;color:white;margin-top:10px}
+    .offer-amount{font-size:72px;font-weight:900;color:white;line-height:0.95}
+    .offer-right{display:flex;flex-direction:column;justify-content:center;margin-top:10px}
+    .offer-per{font-size:15px;color:rgba(255,255,255,0.6);font-weight:700}
+    .offer-save{display:inline-block;background:rgba(255,255,255,0.2);color:white;font-weight:800;font-size:12px;padding:4px 14px;border-radius:100px;text-transform:uppercase;letter-spacing:0.08em;margin-top:8px}
+    .offer-card-body{padding:24px}
+    .offer-checklist{list-style:none;display:flex;flex-direction:column;gap:0;border:1.5px solid #f0e8ff;border-radius:12px;overflow:hidden;margin-bottom:20px}
+    .offer-checklist li{display:flex;align-items:center;gap:10px;padding:13px 16px;font-size:15px;font-weight:700;color:#1a0a2e;border-bottom:1px solid #f0e8ff}
+    .offer-checklist li:last-child{border-bottom:none}
+    .offer-checklist .ck{color:#7c3aed;font-size:17px}
 
     /* ── STICKY ── */
-    .sticky{position:fixed;bottom:0;left:0;right:0;z-index:100;background:#1a0a2e;border-top:3px solid #7c3aed;padding:12px 20px;display:none;align-items:center;justify-content:space-between;gap:12px}
+    .sticky{position:fixed;bottom:0;left:0;right:0;z-index:100;background:white;border-top:2px solid #ede9fe;padding:12px 20px;display:none;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 20px rgba(124,58,237,0.1)}
     .sticky-left{display:flex;flex-direction:column}
-    .sticky-old{font-size:11px;color:rgba(255,255,255,0.35);text-decoration:line-through;font-weight:700}
-    .sticky-new{font-size:24px;font-weight:900;color:white}
-    .sticky-save{font-size:11px;color:#a78bfa;font-weight:800;text-transform:uppercase;letter-spacing:0.06em}
-    .sticky-btn{background:#7c3aed;color:white;font-weight:900;font-size:14px;padding:14px 20px;border-radius:8px;border:2px solid rgba(255,255,255,0.2);cursor:pointer;white-space:nowrap;text-transform:uppercase;letter-spacing:0.05em}
+    .sticky-old{font-size:11px;color:#9ca3af;text-decoration:line-through;font-weight:700}
+    .sticky-new{font-size:22px;font-weight:900;color:#7c3aed}
+    .sticky-save{font-size:11px;color:#a78bfa;font-weight:800;text-transform:uppercase;letter-spacing:0.05em}
+    .sticky-btn{background:#7c3aed;color:white;font-weight:900;font-size:14px;padding:14px 20px;border-radius:12px;border:none;cursor:pointer;box-shadow:0 4px 0 #5b21b6;white-space:nowrap}
 
     /* ── FOOTER ── */
-    .footer{background:#0f0718;padding:28px 20px;text-align:center}
-    .footer-inner{max-width:680px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:14px}
-    .footer img{height:20px;width:auto;opacity:0.5}
-    .footer-links{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
-    .footer-links a{font-size:12px;color:rgba(255,255,255,0.3);text-decoration:underline}
-    .footer p{font-size:11px;color:rgba(255,255,255,0.2)}
+    .footer{background:#f7f4f0;border-top:2px solid #ede9fe;padding:28px 20px;text-align:center}
+    .footer-inner{max-width:680px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:12px}
+    .footer img{height:22px;width:auto;opacity:0.6}
+    .footer-links{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+    .footer-links a{font-size:12px;color:#9ca3af;text-decoration:underline}
+    .footer p{font-size:11px;color:#d1d5db}
   </style>
 </head>
 <body>
@@ -180,12 +132,10 @@
     <span class="ticker-item">75% OFF — Limited Time</span><span class="ticker-dot"> ✦ </span>
     <span class="ticker-item">🛡️ Money-Back Guarantee</span><span class="ticker-dot"> ✦ </span>
     <span class="ticker-item">📸 Photo to Quiz in Seconds</span><span class="ticker-dot"> ✦ </span>
-    <span class="ticker-item">⭐ Works on Any Subject</span><span class="ticker-dot"> ✦ </span>
     <span class="ticker-item">🎒 Back-to-School Offer</span><span class="ticker-dot"> ✦ </span>
     <span class="ticker-item">75% OFF — Limited Time</span><span class="ticker-dot"> ✦ </span>
     <span class="ticker-item">🛡️ Money-Back Guarantee</span><span class="ticker-dot"> ✦ </span>
     <span class="ticker-item">📸 Photo to Quiz in Seconds</span><span class="ticker-dot"> ✦ </span>
-    <span class="ticker-item">⭐ Works on Any Subject</span><span class="ticker-dot"> ✦ </span>
   </div>
 </div>
 
@@ -197,267 +147,113 @@
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-inner">
-    <span class="hero-badge">🎒 Back-to-School — 75% Off Today</span>
-    <h1>
-      Get Your Child<br/>Ready for the
-      <span class="accent">School Year</span>
-    </h1>
-    <p class="hero-sub">Help your child get better grades — without adding more work to your day. Just take a picture of their lesson.</p>
+  <!-- sparkles -->
+  <span class="sparkle sp1">✨</span>
+  <span class="sparkle sp2">⭐</span>
+  <span class="sparkle sp3">✦</span>
+  <span class="sparkle sp4">✨</span>
 
-    <div class="hero-showcase">
-      <div class="hero-showcase-bg">
-        <img src="/streak-fire.png" alt="" class="hero-fire"/>
-        <img src="/nav-profile.png" alt="Numio" class="hero-mascot-main"/>
-        <img src="/coin-stack.png" alt="" class="hero-coins"/>
-      </div>
+  <div class="offer-pill">🎒 75% OFF Back-to-School Offer</div>
+
+  <h1>Imagine Your Child<br/><span class="underline">Practicing for School</span><br/>Without Any Extra<br/>Work From You.</h1>
+
+  <!-- COUNTDOWN TIMER -->
+  <div class="timer-box">
+    <span class="timer-label">⏰ Offer Ends In:</span>
+    <div class="timer-units">
+      <div class="timer-block" id="t-h">23</div>
+      <span class="timer-sep">:</span>
+      <div class="timer-block" id="t-m">59</div>
+      <span class="timer-sep">:</span>
+      <div class="timer-block" id="t-s">59</div>
     </div>
   </div>
-</div>
 
-<!-- TRUST BAR -->
-<div class="trust-bar">
-  <div class="trust-inner">
-    <div class="trust-item"><div class="trust-check">✓</div> Money-Back Guarantee</div>
-    <div class="trust-item"><div class="trust-check">✓</div> Works on Any Phone</div>
-    <div class="trust-item"><div class="trust-check">✓</div> Arabic & English</div>
-    <div class="trust-item"><div class="trust-check">✓</div> Ready in 10 Seconds</div>
+  <!-- PRODUCT IMAGE with blob + paint splats -->
+  <div class="product-wrap">
+    <div class="paint-left"></div>
+    <div class="paint-right"></div>
+    <div class="paint-bottom-left"></div>
+    <div class="paint-top-right"></div>
+    <div class="product-blob"></div>
+    <img src="/event-hero.png" alt="Numio App" class="product-img"/>
   </div>
 </div>
 
-<!-- OFFER BOX -->
-<div class="offer-wrap" id="offer">
-  <div class="offer-box">
-    <div class="offer-top">
-      <img src="/nav-profile.png" alt="" class="offer-mascot"/>
-      <div class="offer-old">$60/year</div>
+<!-- PROBLEM / SOLUTION -->
+<div class="section">
+
+  <!-- THE PROBLEM -->
+  <div class="ps-box problem">
+    <span class="ps-icon">⚠️</span>
+    <div class="ps-title problem">The Problem</div>
+    <ul class="ps-list">
+      <li><span class="emi">⏰</span> Wasting time searching for worksheets</li>
+      <li><span class="emi">🤷</span> Not knowing what they should practice</li>
+      <li><span class="emi">📄</span> Random exercises that don't match their lessons</li>
+      <li><span class="emi">😫</span> Your child doesn't want to practice</li>
+      <li><span class="emi">👩‍🏫</span> And now you're the one who has to make it happen.</li>
+    </ul>
+  </div>
+
+  <!-- VS divider -->
+  <div class="vs-divider">
+    <div style="flex:1;height:2px;background:#ede9fe;border-radius:2px"></div>
+    <div class="vs-badge">VS</div>
+    <div style="flex:1;height:2px;background:#ede9fe;border-radius:2px"></div>
+  </div>
+
+  <!-- THE SOLUTION -->
+  <div class="ps-box solution">
+    <span class="ps-icon">✅</span>
+    <div class="ps-title solution">The Solution</div>
+    <ul class="ps-list">
+      <li><span class="emi">📸</span> Take a picture of their lesson</li>
+      <li><span class="emi">🧠</span> Numio creates practice based on exactly what they're learning</li>
+      <li><span class="emi">🚫</span> No searching. No preparing. No involvement from you.</li>
+      <li><span class="emi">🎮</span> Your child actually wants to practice</li>
+      <li><span class="emi">⏱️</span> Just a few minutes a day</li>
+    </ul>
+  </div>
+
+  <!-- CTA after problem/solution -->
+  <div style="margin-top:28px">
+    <button class="btn-cta" onclick="fbq('track','InitiateCheckout');window.location.href='https://numiomath.app'">
+      Get Numio for $15/year →
+    </button>
+    <div class="guarantee">🛡️ Try it risk-free with our money-back guarantee.</div>
+  </div>
+</div>
+
+<!-- OFFER CARD -->
+<div class="section-sm" id="offer">
+  <div class="offer-card">
+    <div class="offer-card-top">
+      <img src="/nav-profile.png" alt="" class="offer-mascot-small"/>
+      <div class="offer-old-price">$60/year</div>
       <div class="offer-price-row">
-        <span class="offer-dollar">$</span>
+        <span class="offer-curr">$</span>
         <span class="offer-amount">15</span>
-        <div class="offer-period-wrap">
-          <span class="offer-period">/year</span>
-          <span class="offer-period">$1.25/mo</span>
+        <div class="offer-right">
+          <span class="offer-per">/year</span>
+          <span class="offer-per">$1.25/mo</span>
         </div>
       </div>
-      <span class="offer-save-badge">Save 75% — Back-to-School</span>
+      <span class="offer-save">Save 75% — Back-to-School</span>
     </div>
-    <div class="offer-body">
-      <ul class="offer-list">
-        <li><span><span class="check">✓</span> Unlimited photo-to-quiz generation</span><span class="val">∞</span></li>
-        <li><span><span class="check">✓</span> Works on any school subject</span><span class="val">All</span></li>
-        <li><span><span class="check">✓</span> Arabic & English support</span><span class="val">🌍</span></li>
-        <li><span><span class="check">✓</span> Coins & rewards system</span><span class="val">🪙</span></li>
-        <li><span><span class="check">✓</span> Full parent dashboard</span><span class="val">👨‍👩‍👧</span></li>
-        <li><span><span class="check">✓</span> Progress tracking</span><span class="val">📈</span></li>
+    <div class="offer-card-body">
+      <ul class="offer-checklist">
+        <li><span class="ck">✓</span> Unlimited photo-to-quiz generation</li>
+        <li><span class="ck">✓</span> Works on any school subject</li>
+        <li><span class="ck">✓</span> Arabic & English support</li>
+        <li><span class="ck">✓</span> Coins & rewards your child loves</li>
+        <li><span class="ck">✓</span> Full parent dashboard</li>
+        <li><span class="ck">✓</span> Progress tracking all year</li>
       </ul>
       <button class="btn-cta" onclick="fbq('track','InitiateCheckout');window.location.href='https://numiomath.app'">
         Get Numio for $15/year →
       </button>
-      <div class="guarantee-row">🛡️ Try it risk-free — money-back guarantee</div>
-    </div>
-  </div>
-</div>
-
-<!-- PROBLEM — DARK -->
-<div class="s-dark">
-  <div class="sw">
-    <div class="eyebrow eyebrow-dark">Sound familiar?</div>
-    <h2 class="light">A new school year<br/>is coming.</h2>
-    <p class="body-text light">And you already know what happens. New lessons. New homework. New things your child needs to understand.</p>
-    <p class="body-text light">You want them to <strong class="light">start strong and keep up.</strong></p>
-    <p class="body-text light">But you don't want to spend your evenings:</p>
-    <ul class="no-list" style="margin-top:16px">
-      <li class="light"><span class="ico">❌</span> Searching for worksheets</li>
-      <li class="light"><span class="ico">❌</span> Finding exercises online</li>
-      <li class="light"><span class="ico">❌</span> Printing pages</li>
-      <li class="light"><span class="ico">❌</span> Figuring out what they should practice</li>
-      <li class="light"><span class="ico">❌</span> Sitting beside them for hours</li>
-    </ul>
-    <div class="result-box" style="margin-top:28px">
-      <p><span>What if you could get your child to practice</span><br/><strong style="color:white;font-size:20px">without doing all that?</strong><br/><span style="font-size:18px">That's what Numio is for.</span></p>
-    </div>
-  </div>
-</div>
-
-<!-- HOW IT WORKS — CREAM -->
-<div class="s-cream">
-  <div class="sw">
-    <div class="eyebrow eyebrow-light">How it works</div>
-    <h2 class="dark">Three steps.<br/><em>That's it.</em></h2>
-    <div class="steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div>
-          <div class="step-emoji">📸</div>
-          <h3>Take a picture of their lesson</h3>
-          <p>Your child learns something new at school. You take a picture of the lesson. That's your only job.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div>
-          <div class="step-emoji">🧠</div>
-          <h3>Numio does the work</h3>
-          <p>It turns the lesson into personalized questions for your child to practice. Instantly — in seconds.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div>
-          <div class="step-emoji">✏️</div>
-          <h3>Your child practices</h3>
-          <p>A few questions. A few minutes. Based on exactly what they're learning at school.</p>
-        </div>
-      </div>
-    </div>
-    <div style="background:#1a0a2e;border-radius:14px;padding:20px 24px;margin-top:20px;text-align:center;border:2px solid #7c3aed">
-      <p style="font-size:16px;font-weight:800;color:white">No searching. No printing. No preparing.<br/><span style="color:#a78bfa;font-size:14px;font-weight:600">You give Numio the lesson. Numio gives your child the practice.</span></p>
-    </div>
-  </div>
-</div>
-
-<!-- WHAT MAKES IT DIFFERENT — WHITE -->
-<div class="s-white">
-  <div class="sw">
-    <div class="eyebrow eyebrow-light">What makes Numio different</div>
-    <h2 class="dark">Their school lessons<br/><em>become their practice.</em></h2>
-    <p class="body-text dark">Most educational apps give kids exercises that have nothing to do with what they're learning at school.</p>
-    <p class="body-text dark"><strong class="dark">Numio starts with their actual lessons.</strong></p>
-    <div class="flow">
-      <div class="flow-item"><span class="fi">📚</span> Their lesson</div>
-      <div class="flow-arrow">↓</div>
-      <div class="flow-item"><span class="fi">📸</span> You take a picture</div>
-      <div class="flow-arrow">↓</div>
-      <div class="flow-item"><span class="fi">🧠</span> Numio creates personalized practice</div>
-      <div class="flow-arrow">↓</div>
-      <div class="flow-item"><span class="fi">✏️</span> Your child practices</div>
-      <div class="flow-arrow">↓</div>
-      <div class="flow-item"><span class="fi">📈</span> They keep building their skills</div>
-    </div>
-    <div style="background:#f0fdf4;border:2px solid #86efac;border-radius:12px;padding:16px 20px;margin-top:16px;box-shadow:3px 3px 0 #16a34a">
-      <p style="font-size:15px;font-weight:900;color:#16a34a">✓ Practice what they're learning — not random questions.</p>
-    </div>
-  </div>
-</div>
-
-<!-- FOR BUSY PARENTS — DARK -->
-<div class="s-dark">
-  <div class="sw">
-    <div class="eyebrow eyebrow-dark">For busy parents</div>
-    <h2 class="light">You already have<br/><em>enough to do.</em> ❤️</h2>
-    <p class="body-text light">Getting your child ready for school shouldn't mean creating another job for yourself.</p>
-    <ul class="no-list" style="margin-top:16px">
-      <li class="light"><span class="ico">❌</span> Search Google for exercises</li>
-      <li class="light"><span class="ico">❌</span> Find worksheets at the right level</li>
-      <li class="light"><span class="ico">❌</span> Print anything</li>
-      <li class="light"><span class="ico">❌</span> Prepare a practice session</li>
-      <li class="light"><span class="ico">❌</span> Spend an hour teaching math</li>
-    </ul>
-    <div style="margin-top:28px;border:2px solid rgba(124,58,237,0.4);border-radius:16px;padding:28px;text-align:center;background:rgba(124,58,237,0.1)">
-      <p style="font-size:20px;font-weight:900;color:white;line-height:1.6">You take the picture.<br/>Numio does the preparation.<br/>Then your child practices.</p>
-      <p style="font-size:34px;font-weight:900;color:#c084fc;margin-top:12px;font-style:italic">Simple.</p>
-    </div>
-  </div>
-</div>
-
-<!-- HABIT — PURPLE -->
-<div class="s-purple">
-  <div class="sw" style="text-align:center">
-    <div class="eyebrow eyebrow-purple">The big picture</div>
-    <h2 class="light">Just a few minutes a day<br/>adds up all year.</h2>
-    <p style="font-size:16px;color:rgba(255,255,255,0.7);line-height:1.7;margin-bottom:24px">The goal isn't more homework. It's a little extra practice with what they're actually learning — building a habit that compounds.</p>
-    <div class="habit">
-      <span class="habit-pill">Learn</span><span class="habit-arr">→</span>
-      <span class="habit-pill">Practice</span><span class="habit-arr">→</span>
-      <span class="habit-pill">Improve</span><span class="habit-arr">→</span>
-      <span class="habit-pill">Repeat</span>
-    </div>
-    <p style="font-size:15px;color:rgba(255,255,255,0.6);font-weight:600">And you don't have to become your child's teacher to make it happen.</p>
-  </div>
-</div>
-
-<!-- GAMIFICATION — CREAM -->
-<div class="s-cream">
-  <div class="sw">
-    <div class="eyebrow eyebrow-light">Make practice fun</div>
-    <h2 class="dark">Practice that feels<br/><em>like a game.</em></h2>
-    <p class="body-text dark">Most kids aren't excited about another worksheet. That's why Numio makes practice feel more like a game.</p>
-    <div class="game-grid">
-      <div class="game-card"><div class="gi">⭐</div><h4>Complete practice</h4><p>Short quizzes from real school lessons</p></div>
-      <div class="game-card"><div class="gi">🪙</div><h4>Earn coins</h4><p>Every correct answer earns coins</p></div>
-      <div class="game-card"><div class="gi">🎁</div><h4>Unlock rewards</h4><p>You set the rewards as a parent</p></div>
-      <div class="game-card"><div class="gi">📈</div><h4>Track progress</h4><p>See improvement over the school year</p></div>
-    </div>
-    <div class="reward-box">
-      <p>You choose the rewards: screen time, Fortnite, TV, dessert — whatever motivates your child. The goal? Make it easier to build a practice habit.</p>
-    </div>
-  </div>
-</div>
-
-<!-- NUMIO PROMISE — DARK -->
-<div class="s-dark">
-  <div class="sw" style="text-align:center">
-    <div class="eyebrow eyebrow-dark">The Numio Promise</div>
-    <h2 class="light">Built for your child.<br/><em>Made for you.</em></h2>
-    <div class="promise-grid" style="margin-top:28px">
-      <div class="promise-item"><div class="promise-icon">📸</div><div class="promise-label">Any Subject</div></div>
-      <div class="promise-item"><div class="promise-icon">⚡</div><div class="promise-label">10 Second Quiz</div></div>
-      <div class="promise-item"><div class="promise-icon">🌍</div><div class="promise-label">Arabic & English</div></div>
-      <div class="promise-item"><div class="promise-icon">🎮</div><div class="promise-label">Game-Like Fun</div></div>
-      <div class="promise-item"><div class="promise-icon">👨‍👩‍👧</div><div class="promise-label">Parent Control</div></div>
-      <div class="promise-item"><div class="promise-icon">🛡️</div><div class="promise-label">Money-Back</div></div>
-    </div>
-  </div>
-</div>
-
-<!-- SECOND OFFER — CREAM -->
-<div class="s-cream">
-  <div class="sw">
-    <div class="eyebrow eyebrow-light">🎒 Back-to-School Offer</div>
-    <h2 class="dark">Give your child<br/><em>a head start.</em></h2>
-    <p class="body-text dark">You could spend hundreds on tutoring. You could spend hours finding worksheets. Or you could give Numio a try.</p>
-    <div style="margin-top:24px">
-      <div class="offer-box">
-        <div class="offer-top">
-          <img src="/nav-profile.png" alt="" class="offer-mascot"/>
-          <div class="offer-old">$60/year</div>
-          <div class="offer-price-row">
-            <span class="offer-dollar">$</span>
-            <span class="offer-amount">15</span>
-            <div class="offer-period-wrap">
-              <span class="offer-period">/year</span>
-              <span class="offer-period">$1.25/mo</span>
-            </div>
-          </div>
-          <span class="offer-save-badge">75% OFF — Limited Time</span>
-        </div>
-        <div class="offer-body">
-          <button class="btn-cta" onclick="fbq('track','InitiateCheckout');window.location.href='https://numiomath.app'">
-            Get Numio for $15/year →
-          </button>
-          <div class="guarantee-row">🛡️ Try Numio risk-free — money-back guarantee</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- CLOSING — DARK -->
-<div class="closing">
-  <div class="sw" style="text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px;position:relative;z-index:1">
-    <img src="/nav-profile.png" alt="" style="width:120px;height:auto;filter:drop-shadow(0 0 30px rgba(192,132,252,0.5));animation:float 3s ease-in-out infinite"/>
-    <h2 class="light">Start the school year<br/><em>strong.</em></h2>
-    <p style="font-size:16px;color:rgba(255,255,255,0.6);line-height:1.8;max-width:380px">You want your child to feel confident. You want them to keep up. You shouldn't have to spend every evening preparing exercises.</p>
-    <div style="width:100%;max-width:400px">
-      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px">
-        <span style="font-size:16px;color:rgba(255,255,255,0.35);text-decoration:line-through;font-weight:700">$60/year</span>
-        <span style="font-size:36px;font-weight:900;color:white">$15/year</span>
-        <span style="background:#7c3aed;color:white;font-weight:900;font-size:11px;padding:4px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:0.08em">75% OFF</span>
-      </div>
-      <button class="btn-cta" onclick="fbq('track','InitiateCheckout');window.location.href='https://numiomath.app'" style="font-size:18px">
-        Get Numio for $15/year →
-      </button>
-      <div class="guarantee-row" style="color:rgba(255,255,255,0.4);margin-top:12px">🛡️ Money-back guarantee · Start practicing in minutes.</div>
+      <div class="guarantee">🛡️ Try it risk-free — money-back guarantee</div>
     </div>
   </div>
 </div>
@@ -478,19 +274,37 @@
 <div class="sticky" id="sticky">
   <div class="sticky-left">
     <span class="sticky-old">$60/year</span>
-    <span class="sticky-new">$15/yr</span>
+    <span class="sticky-new">$15/year</span>
     <span class="sticky-save">Save 75% Today</span>
   </div>
-  <button class="sticky-btn" onclick="fbq('track','InitiateCheckout');window.location.href='https://numiomath.app'">Get Numio Now →</button>
+  <button class="sticky-btn" onclick="fbq('track','InitiateCheckout');window.location.href='https://numiomath.app'">
+    Get Numio →
+  </button>
 </div>
 
 <script>
+  // Countdown timer — 24 hours from page load
+  const end = Date.now() + 24*60*60*1000
+  function tick(){
+    const diff = Math.max(0, end - Date.now())
+    const h = Math.floor(diff/3600000)
+    const m = Math.floor((diff%3600000)/60000)
+    const s = Math.floor((diff%60000)/1000)
+    document.getElementById('t-h').textContent = String(h).padStart(2,'0')
+    document.getElementById('t-m').textContent = String(m).padStart(2,'0')
+    document.getElementById('t-s').textContent = String(s).padStart(2,'0')
+  }
+  tick(); setInterval(tick,1000)
+
+  // Sticky bar
   window.addEventListener('scroll',()=>{
-    document.getElementById('sticky').style.display=window.scrollY>600?'flex':'none'
+    document.getElementById('sticky').style.display = window.scrollY>400?'flex':'none'
   })
+
+  // Ticker loop
   const t=document.getElementById('ticker')
   t.innerHTML+=t.innerHTML
 </script>
-<style>@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}</style>
+
 </body>
 </html>
