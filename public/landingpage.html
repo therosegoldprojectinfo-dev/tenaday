@@ -14,9 +14,11 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
-    body{font-family:'Inter',sans-serif;background:#ffffff;color:#000000;-webkit-font-smoothing:antialiased;padding-bottom:80px;overflow-x:hidden}
 
-    /* ── TIMER ── */
+    /* 1. BLUSH BACKGROUND */
+    body{font-family:'Inter',sans-serif;background:#FDF6F8;color:#000000;-webkit-font-smoothing:antialiased;padding-bottom:80px;overflow-x:hidden}
+
+    /* TIMER */
     .timer-bar{background:#7c3aed;padding:12px 20px;text-align:center}
     .timer-inner{display:flex;flex-direction:column;align-items:center;gap:6px;max-width:680px;margin:0 auto}
     .timer-label{font-weight:800;font-size:13px;color:white;letter-spacing:0.06em;text-transform:uppercase}
@@ -24,8 +26,8 @@
     .t-block{background:rgba(0,0,0,0.25);color:white;font-weight:800;font-size:22px;padding:6px 12px;border-radius:6px;min-width:46px;text-align:center;line-height:1}
     .t-sep{font-weight:800;font-size:22px;color:rgba(255,255,255,0.5)}
 
-    /* ── HERO ── */
-    .hero{background:#ffffff;padding:40px 20px 0;text-align:center;max-width:680px;margin:0 auto;position:relative;overflow:hidden}
+    /* HERO */
+    .hero{background:#FDF6F8;padding:40px 20px 0;text-align:center;max-width:680px;margin:0 auto;position:relative;overflow:hidden}
     .nf{position:absolute;pointer-events:none;animation:nf-anim 3s ease-in-out infinite alternate;z-index:10}
     .nf1{top:12px;left:10px;animation-delay:0s}
     .nf2{top:20px;right:14px;animation-delay:0.4s}
@@ -35,81 +37,104 @@
     .nf6{top:240px;right:18px;animation-delay:0.8s}
     @keyframes nf-anim{0%{transform:translateY(0) rotate(-8deg) scale(0.9)}100%{transform:translateY(-10px) rotate(8deg) scale(1.1)}}
 
-    .hero h1{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(28px,8vw,44px);line-height:1.15;color:#000000;margin-bottom:28px;letter-spacing:-0.4px;position:relative;z-index:1}
+    /* 3. HEADLINE TIGHTENING */
+    .hero h1{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(28px,8vw,44px);line-height:1.15;color:#000000;margin-bottom:28px;letter-spacing:-0.02em;position:relative;z-index:1}
     .hero h1 .hl{color:#7c3aed;font-style:italic;text-decoration:underline;text-decoration-color:#f472b6;text-decoration-thickness:3px;text-underline-offset:5px}
     .product-img{width:100%;max-width:340px;height:auto;display:block;margin:0 auto;position:relative;z-index:1}
 
-    /* ── PROBLEM / SOLUTION — exact PQ7 recipe ── */
+    /* PROBLEM / SOLUTION */
     .ps-section{max-width:680px;margin:0 auto;padding:40px 20px;display:flex;flex-direction:column;gap:24px}
     .ps-card{background:#ffffff;border-radius:10px;padding:0 15px 20px;text-align:center;position:relative}
     .ps-card.problem{border:2px solid rgb(255,0,0)}
-    .ps-card.solution{border:2px solid rgb(10,167,29)}
+    /* 4. CONSISTENT GREEN */
+    .ps-card.solution{border:2px solid rgb(0,173,33)}
     .ps-icon{font-size:28px;display:block;margin:0 auto;transform:translateY(-50%);width:52px;height:52px;line-height:52px;text-align:center}
     .ps-title{font-family:'Inter',sans-serif;font-weight:700;font-size:28px;margin-bottom:14px;letter-spacing:-0.4px;margin-top:-8px}
     .ps-card.problem .ps-title{color:rgb(250,0,0)}
-    .ps-card.solution .ps-title{color:rgb(10,167,29)}
+    .ps-card.solution .ps-title{color:rgb(0,173,33)}
     .ps-body{font-family:'Inter',sans-serif;font-size:16px;font-weight:400;color:#000000;line-height:1.8;letter-spacing:-0.2px}
 
-    /* ── HOW IT WORKS ── */
+    /* ── TIMELINE MAP ── */
+    .timeline-section{max-width:640px;margin:0 auto;padding:48px 20px}
+    .timeline-heading{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(22px,6vw,30px);color:#7c3aed;text-align:center;letter-spacing:-0.02em;margin-bottom:40px;line-height:1.2}
+    .timeline{position:relative;display:flex;flex-direction:column;gap:0}
+    /* vertical pink line */
+    .timeline::before{content:'';position:absolute;left:19px;top:0;bottom:0;width:4px;background:#f63c8c;border-radius:2px;z-index:0}
+    .tl-stop{display:grid;grid-template-columns:40px 1fr;gap:16px;margin-bottom:32px;position:relative}
+    /* badge */
+    .tl-badge{width:40px;height:40px;border-radius:9999px;background:#f63c8c;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:3px solid #FDF6F8;position:relative;z-index:1;box-shadow:0 0 0 2px #f63c8c}
+    .tl-badge svg{width:18px;height:18px;stroke:white;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
+    .tl-content{padding-top:8px}
+    .tl-label{display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;font-weight:700;font-size:14px;color:#7c3aed;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px}
+    .tl-label svg{width:16px;height:16px;stroke:#7c3aed;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+    .tl-card{background:hsl(330 100% 98%);border:1.5px solid #ede9fe;border-radius:12px;padding:18px 20px}
+    .tl-card ul{list-style:disc;padding-left:18px;display:flex;flex-direction:column;gap:8px}
+    .tl-card ul li{font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#000;line-height:1.6}
+    /* scroll reveal */
+    .tl-stop{opacity:0;transform:translateY(32px);transition:opacity 0.5s ease,transform 0.5s ease}
+    .tl-stop.visible{opacity:1;transform:translateY(0)}
+
+    /* HOW IT WORKS */
     .how-wrap{max-width:680px;margin:0 auto;padding:0 20px 40px}
     .section-eyebrow{font-family:'Inter',sans-serif;font-weight:800;font-size:11px;color:#7c3aed;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px}
-    .section-title{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(24px,6vw,32px);color:#000;line-height:1.2;margin-bottom:24px;letter-spacing:-0.4px}
+    .section-title{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(24px,6vw,32px);color:#000;line-height:1.2;margin-bottom:24px;letter-spacing:-0.02em}
     .how-card{background:#ffffff;border:2px solid #e5e7eb;border-radius:10px;padding:22px;margin-bottom:14px}
     .how-card h3{font-family:'Inter',sans-serif;font-weight:700;font-size:17px;color:#000;margin-bottom:8px;letter-spacing:-0.3px}
     .how-card p{font-family:'Inter',sans-serif;font-size:15px;color:#4b5563;line-height:1.7;font-weight:400}
 
-    /* ── WHO ── */
+    /* WHO */
     .who-wrap{max-width:680px;margin:0 auto;padding:0 20px 40px}
     .who-box{background:#ffffff;border-radius:10px;padding:24px;border:2px solid #e5e7eb}
     .who-title{font-family:'Inter',sans-serif;font-weight:700;font-size:20px;color:#000;margin-bottom:16px;letter-spacing:-0.3px}
     .who-list{list-style:none;display:flex;flex-direction:column;gap:12px}
     .who-list li{display:flex;align-items:flex-start;gap:10px;font-size:16px;font-weight:400;color:#000;line-height:1.5}
-    .who-list li .wc{color:#7c3aed;font-size:18px;flex-shrink:0}
 
-    /* ── GUARANTEE ── */
+    /* GUARANTEE */
     .guar-wrap{max-width:680px;margin:0 auto;padding:0 20px 40px}
-    .guar-box{background:#ffffff;border:2px solid rgb(10,167,29);border-radius:10px;padding:24px;text-align:center}
-    .guar-title{font-family:'Inter',sans-serif;font-weight:700;font-size:22px;color:rgb(10,167,29);margin-bottom:12px;letter-spacing:-0.3px}
+    .guar-box{background:#ffffff;border:2px solid rgb(0,173,33);border-radius:10px;padding:24px;text-align:center}
+    .guar-title{font-family:'Inter',sans-serif;font-weight:700;font-size:22px;color:rgb(0,173,33);margin-bottom:12px;letter-spacing:-0.3px}
     .guar-body{font-family:'Inter',sans-serif;font-size:16px;color:#000;line-height:1.8;font-weight:400}
 
-    /* ── OFFER ── */
+    /* OFFER */
     .offer-wrap{max-width:680px;margin:0 auto;padding:0 20px 40px}
     .offer-box{background:#ffffff;border-radius:10px;padding:28px 20px;border:2px solid #e5e7eb}
     .offer-title{font-family:'Inter',sans-serif;font-weight:800;font-size:20px;color:#000;margin-bottom:20px;text-align:center;line-height:1.3;letter-spacing:-0.3px}
     .offer-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
     .offer-list li{display:flex;align-items:flex-start;gap:10px;font-size:16px;font-weight:400;color:#000;line-height:1.5}
-    .offer-list li .ck{color:rgb(10,167,29);font-size:18px;flex-shrink:0;font-weight:700}
+    .offer-list li .ck{color:rgb(0,173,33);font-size:18px;flex-shrink:0;font-weight:700}
     .price-tag{font-family:'Inter',sans-serif;font-size:14px;color:#6b7280;font-weight:400;margin-bottom:8px;text-align:center}
     .price-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px}
     .price-old{font-family:'Inter',sans-serif;font-size:18px;color:#9ca3af;text-decoration:line-through;font-weight:400}
     .price-new{font-family:'Inter',sans-serif;font-size:32px;font-weight:800;color:#7c3aed;letter-spacing:-0.4px}
     .price-save{font-family:'Inter',sans-serif;display:inline-block;background:#7c3aed;color:white;font-weight:700;font-size:12px;padding:4px 14px;border-radius:100px;text-transform:uppercase;letter-spacing:0.06em}
 
-    /* ── CTA BUTTON — exact PQ7 style ── */
-    .btn-cta{display:block;width:100%;background:rgb(0,173,33);color:white;font-family:'Inter',sans-serif;font-weight:800;font-size:20px;height:70px;line-height:70px;padding:0 20px;border-radius:0;border:none;cursor:pointer;text-align:center;box-shadow:0 3px 3px 2px rgba(0,0,0,0.2);letter-spacing:-0.3px;margin-bottom:16px;transition:opacity 0.1s}
+    /* 2. CTA BUTTON — 28px */
+    .btn-cta{display:block;width:100%;background:rgb(0,173,33);color:white;font-family:'Inter',sans-serif;font-weight:800;font-size:28px;height:70px;line-height:70px;padding:0 20px;border-radius:0;border:none;cursor:pointer;text-align:center;box-shadow:0 3px 3px 2px rgba(0,0,0,0.2);letter-spacing:-0.3px;margin-bottom:16px;transition:opacity 0.1s}
     .btn-cta:active{opacity:0.9}
-    .trust-badges{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap}
-    .trust-badge{display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#374151}
-    .trust-badge .tc{color:rgb(10,167,29);font-size:16px}
-    .no-risk{font-family:'Inter',sans-serif;text-align:center;font-size:13px;color:#6b7280;font-weight:400;line-height:1.6;margin-top:14px}
 
-    /* ── STICKY ── */
+    /* 5. TRUST BADGES */
+    .trust-badges{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:12px}
+    .trust-badge{display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#374151}
+    .trust-badge .tc{color:rgb(0,173,33);font-size:16px}
+    .no-risk{font-family:'Inter',sans-serif;text-align:center;font-size:13px;color:#6b7280;font-weight:400;line-height:1.6}
+
+    /* STICKY */
     .sticky{position:fixed;bottom:0;left:0;right:0;z-index:100;background:white;border-top:2px solid #e5e7eb;padding:12px 20px;display:none;align-items:center;justify-content:space-between;gap:12px;box-shadow:0 -4px 20px rgba(0,0,0,0.08)}
     .s-left{display:flex;flex-direction:column}
     .s-old{font-size:11px;color:#9ca3af;text-decoration:line-through;font-weight:400}
     .s-new{font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:#7c3aed;letter-spacing:-0.3px}
     .s-save{font-size:11px;color:#7c3aed;font-weight:700;text-transform:uppercase;letter-spacing:0.05em}
-    .s-btn{background:rgb(0,173,33);color:white;font-family:'Inter',sans-serif;font-weight:800;font-size:14px;padding:14px 18px;border-radius:0;border:none;cursor:pointer;box-shadow:0 3px 3px rgba(0,0,0,0.2);white-space:nowrap;letter-spacing:-0.2px}
+    .s-btn{background:rgb(0,173,33);color:white;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;padding:14px 18px;border-radius:0;border:none;cursor:pointer;box-shadow:0 3px 3px rgba(0,0,0,0.2);white-space:nowrap}
 
-    /* ── FOOTER ── */
-    .footer{background:#f9f9f9;border-top:1px solid #e5e7eb;padding:24px 20px;text-align:center}
+    /* FOOTER */
+    .footer{background:#FDF6F8;border-top:1px solid #e5e7eb;padding:24px 20px;text-align:center}
     .footer-inner{max-width:680px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:10px}
     .footer img{height:20px;width:auto;opacity:0.4}
     .footer-links{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
     .footer-links a{font-size:12px;color:#9ca3af;text-decoration:underline}
     .footer p{font-size:11px;color:#d1d5db}
 
-    .divider{height:1px;background:#f0f0f0;max-width:680px;margin:0 auto}
+    .divider{height:1px;background:#f0e8f0;max-width:680px;margin:0 auto}
   </style>
 </head>
 <body>
@@ -136,45 +161,91 @@
   <span class="nf nf4"><img src="/nav-profile.png" width="22" height="22" style="object-fit:contain"/></span>
   <span class="nf nf5"><img src="/nav-profile.png" width="13" height="13" style="object-fit:contain"/></span>
   <span class="nf nf6"><img src="/nav-profile.png" width="17" height="17" style="object-fit:contain"/></span>
-
   <h1>Imagine Your Child<br/><span class="hl">Practicing for School</span><br/>— Without Any Extra<br/>Work From You.</h1>
   <img src="/event-hero.png" alt="Numio App" class="product-img"/>
 </div>
 
 <!-- PROBLEM / SOLUTION -->
 <div class="ps-section">
-
   <div class="ps-card problem">
     <span class="ps-icon">⚠️</span>
     <div class="ps-title">The Problem</div>
     <div class="ps-body">Wasting time searching for worksheets that match their lessons. Not knowing what your child should actually be practicing. Generic exercises that have nothing to do with what they learned today. Your child refuses to practice — and it turns into a fight every single night. And somehow, you're the one expected to make all of it happen.</div>
   </div>
-
   <div class="ps-card solution">
     <span class="ps-icon">✅</span>
     <div class="ps-title">The Solution</div>
     <div class="ps-body">Take a picture of their lesson — that's it. Numio reads the lesson and creates practice based on exactly what they're learning. No searching. No preparation. No extra work from you. Your child actually wants to practice — because they're earning rewards they chose themselves.</div>
   </div>
-
 </div>
 
 <div class="divider"></div>
 
-<!-- HOW IT WORKS -->
-<div class="how-wrap">
-  <div class="section-eyebrow">How it works</div>
-  <div class="section-title">Here's How It Works</div>
-  <div class="how-card">
-    <h3>1. 📸 Practice Without the Prep</h3>
-    <p>Open Numio, take a picture of their textbook page, and you're done. No printing. No searching. No lesson planning. Numio handles everything else.</p>
-  </div>
-  <div class="how-card">
-    <h3>2. 🎯 Practice Exactly What They're Learning at School</h3>
-    <p>Most apps throw random questions at your child. Numio reads their actual lesson and builds practice around it — so every question is relevant, not random.</p>
-  </div>
-  <div class="how-card">
-    <h3>3. 🎮 Your Child Asks to Practice. Yes, Really.</h3>
-    <p>Kids earn coins for completing their practice. You set the rewards — screen time, a snack, a toy, anything. They do the work to get what they want. You stop being the bad guy.</p>
+<!-- TIMELINE MAP -->
+<div class="timeline-section">
+  <div class="timeline-heading">What a Day Looks Like With Numio</div>
+  <div class="timeline" id="timeline">
+
+    <!-- Stop 1: Morning -->
+    <div class="tl-stop">
+      <div class="tl-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/><circle cx="12" cy="12" r="5"/></svg>
+      </div>
+      <div class="tl-content">
+        <div class="tl-label">
+          <svg viewBox="0 0 24 24"><path d="M12 2v2M4.22 4.22l1.42 1.42M2 12h2M4.22 19.78l1.42-1.42M12 18a6 6 0 0 0 0-12"/><path d="M12 22v-2M19.78 19.78l-1.42-1.42M22 12h-2M19.78 4.22l-1.42 1.42"/></svg>
+          Morning
+        </div>
+        <div class="tl-card">
+          <ul>
+            <li>Your child does one 5-minute session before school.</li>
+            <li>Numbers feel familiar, not scary.</li>
+            <li>You take a picture of their lesson — that's the only step.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stop 2: Midday -->
+    <div class="tl-stop">
+      <div class="tl-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/><circle cx="12" cy="12" r="5"/></svg>
+      </div>
+      <div class="tl-content">
+        <div class="tl-label">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+          Midday
+        </div>
+        <div class="tl-card">
+          <ul>
+            <li>Practice adapts to their level — no frustration, no boredom.</li>
+            <li>Numio builds questions from what they actually learned.</li>
+            <li>Your child earns coins with every correct answer.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stop 3: Evening -->
+    <div class="tl-stop">
+      <div class="tl-badge">
+        <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </div>
+      <div class="tl-content">
+        <div class="tl-label">
+          <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          Evening
+        </div>
+        <div class="tl-card">
+          <ul>
+            <li>You get a quick progress recap.</li>
+            <li>You actually see them improving — week by week.</li>
+            <li>They redeem coins for rewards you already approved.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -187,10 +258,10 @@
   <div class="who-box">
     <div class="who-title">You're the right parent for Numio if:</div>
     <ul class="who-list">
-      <li><span class="wc">✔️</span> Your child is in grades 1–6</li>
-      <li><span class="wc">✔️</span> You want them to practice but don't have time to sit and teach after a full day</li>
-      <li><span class="wc">✔️</span> You've tried worksheets, YouTube videos, or tutors — but nothing sticks</li>
-      <li><span class="wc">✔️</span> You're tired of the nightly battle just to get them to open a book</li>
+      <li><span style="color:#7c3aed;font-size:18px;flex-shrink:0">✔️</span> Your child is in grades 1–6</li>
+      <li><span style="color:#7c3aed;font-size:18px;flex-shrink:0">✔️</span> You want them to practice but don't have time to sit and teach after a full day</li>
+      <li><span style="color:#7c3aed;font-size:18px;flex-shrink:0">✔️</span> You've tried worksheets, YouTube videos, or tutors — but nothing sticks</li>
+      <li><span style="color:#7c3aed;font-size:18px;flex-shrink:0">✔️</span> You're tired of the nightly battle just to get them to open a book</li>
     </ul>
     <div style="margin-top:16px;padding:14px;background:#f5f3ff;border-radius:8px;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;font-family:'Inter',sans-serif">
       If that's you — Numio was built for your family.
@@ -234,7 +305,7 @@
       Start My Child's First Quiz →
     </button>
     <div class="trust-badges">
-      <div class="trust-badge"><span class="tc">✅</span> Money-Back Guarantee</div>
+      <div class="trust-badge"><span class="tc">✅</span> 30-Day Money-Back Guarantee</div>
       <div class="trust-badge"><span class="tc">✅</span> Cancel Anytime</div>
     </div>
     <div class="no-risk">🛡️ Zero risk. If it doesn't work, you pay nothing.<br/>Full refund within 365 days. No questions asked.</div>
@@ -264,6 +335,7 @@
 </div>
 
 <script>
+  // Timer
   const end = Date.now() + 24*60*60*1000
   function tick(){
     const diff = Math.max(0, end - Date.now())
@@ -275,9 +347,23 @@
     document.getElementById('t-s').textContent = String(s).padStart(2,'0')
   }
   tick(); setInterval(tick,1000)
+
+  // Sticky
   window.addEventListener('scroll',()=>{
     document.getElementById('sticky').style.display = window.scrollY>300?'flex':'none'
   })
+
+  // Timeline scroll reveal
+  const stops = document.querySelectorAll('.tl-stop')
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach((entry,i)=>{
+      if(entry.isIntersecting){
+        setTimeout(()=>entry.target.classList.add('visible'), i*150)
+        observer.unobserve(entry.target)
+      }
+    })
+  },{threshold:0.15,rootMargin:'-40px'})
+  stops.forEach(s=>observer.observe(s))
 </script>
 </body>
 </html>
