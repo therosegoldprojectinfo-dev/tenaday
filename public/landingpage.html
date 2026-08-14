@@ -19,12 +19,14 @@
     body{font-family:'Inter',sans-serif;background:#ffffff;color:#000000;-webkit-font-smoothing:antialiased;padding-bottom:80px;overflow-x:hidden}
 
     /* TIMER */
-    .timer-bar{background:#7c3aed;padding:12px 20px;text-align:center}
-    .timer-inner{display:flex;flex-direction:column;align-items:center;gap:6px;max-width:680px;margin:0 auto}
-    .timer-label{font-weight:800;font-size:13px;color:white;letter-spacing:0.06em;text-transform:uppercase}
-    .timer-units{display:flex;gap:6px;align-items:center}
-    .t-block{background:rgba(0,0,0,0.25);color:white;font-weight:800;font-size:22px;padding:6px 12px;border-radius:6px;min-width:46px;text-align:center;line-height:1}
-    .t-sep{font-weight:800;font-size:22px;color:rgba(255,255,255,0.5)}
+    .timer-bar{background:#ffffff;padding:10px 20px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.1)}
+    .timer-inner{display:flex;align-items:center;justify-content:center;gap:12px;max-width:680px;margin:0 auto;flex-wrap:wrap}
+    .timer-numio{width:28px;height:28px;object-fit:contain;animation:nf-anim 2s ease-in-out infinite alternate}
+    .timer-numio.sm{width:20px;height:20px}
+    .timer-label{font-weight:800;font-size:13px;color:#7c3aed;letter-spacing:0.06em;text-transform:uppercase}
+    .timer-units{display:flex;gap:5px;align-items:center}
+    .t-block{background:#7c3aed;color:white;font-weight:800;font-size:20px;padding:6px 10px;border-radius:6px;min-width:42px;text-align:center;line-height:1}
+    .t-sep{font-weight:800;font-size:20px;color:#7c3aed}
 
     /* HERO */
     .hero{background:#ffffff;padding:40px 20px 0;text-align:center;max-width:680px;margin:0 auto;position:relative;overflow:hidden}
@@ -67,7 +69,7 @@
     .tl-content{padding-top:8px}
     .tl-label{display:flex;align-items:center;gap:8px;font-family:'Inter',sans-serif;font-weight:700;font-size:14px;color:#7c3aed;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px}
     .tl-label svg{width:16px;height:16px;stroke:#7c3aed;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-    .tl-card{background:hsl(330 100% 98%);border:1.5px solid #ede9fe;border-radius:12px;padding:18px 20px}
+    .tl-card{background:#ffffff;border:1.5px solid #ede9fe;border-radius:12px;padding:18px 20px}
     .tl-card ul{list-style:disc;padding-left:18px;display:flex;flex-direction:column;gap:8px}
     .tl-card ul li{font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#000;line-height:1.6}
     /* scroll reveal */
@@ -139,10 +141,12 @@
 </head>
 <body>
 
-<!-- TIMER -->
+<!-- TIMER — sticky white bar -->
 <div class="timer-bar">
   <div class="timer-inner">
-    <div class="timer-label">🎒 75% OFF Back-to-School Offer — Ends In:</div>
+    <img src="/nav-profile.png" class="timer-numio" alt=""/>
+    <img src="/nav-profile.png" class="timer-numio sm" alt="" style="animation-delay:0.3s"/>
+    <div class="timer-label">🎒 75% OFF — Ends In:</div>
     <div class="timer-units">
       <div class="t-block" id="t-h">23</div>
       <span class="t-sep">:</span>
@@ -150,17 +154,13 @@
       <span class="t-sep">:</span>
       <div class="t-block" id="t-s">59</div>
     </div>
+    <img src="/nav-profile.png" class="timer-numio sm" alt="" style="animation-delay:0.6s"/>
+    <img src="/nav-profile.png" class="timer-numio" alt="" style="animation-delay:0.9s"/>
   </div>
 </div>
 
 <!-- HERO -->
 <div class="hero">
-  <span class="nf nf1"><img src="/nav-profile.png" width="26" height="26" style="object-fit:contain"/></span>
-  <span class="nf nf2"><img src="/nav-profile.png" width="20" height="20" style="object-fit:contain"/></span>
-  <span class="nf nf3"><img src="/nav-profile.png" width="15" height="15" style="object-fit:contain"/></span>
-  <span class="nf nf4"><img src="/nav-profile.png" width="22" height="22" style="object-fit:contain"/></span>
-  <span class="nf nf5"><img src="/nav-profile.png" width="13" height="13" style="object-fit:contain"/></span>
-  <span class="nf nf6"><img src="/nav-profile.png" width="17" height="17" style="object-fit:contain"/></span>
   <h1>Imagine Your Child<br/><span class="hl">Practicing for School</span><br/>— Without Any Extra<br/>Work From You.</h1>
   <img src="/event-hero.png" alt="Numio App" class="product-img"/>
 </div>
