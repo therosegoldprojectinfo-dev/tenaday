@@ -20,9 +20,10 @@
 
     /* TIMER */
     .timer-bar{background:#ffffff;padding:10px 20px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.1)}
-    .timer-inner{display:flex;align-items:center;justify-content:center;gap:12px;max-width:680px;margin:0 auto;flex-wrap:wrap}
-    .timer-numio{width:28px;height:28px;object-fit:contain;animation:nf-anim 2s ease-in-out infinite alternate}
-    .timer-numio.sm{width:20px;height:20px}
+    .timer-inner{display:flex;align-items:center;justify-content:space-between;max-width:680px;margin:0 auto}
+    .timer-numio{width:32px;height:32px;object-fit:contain;animation:nf-anim 2s ease-in-out infinite alternate;flex-shrink:0}
+    .timer-numio.sm{width:24px;height:24px}
+    .timer-center{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
     .timer-label{font-weight:800;font-size:13px;color:#7c3aed;letter-spacing:0.06em;text-transform:uppercase}
     .timer-units{display:flex;gap:5px;align-items:center}
     .t-block{background:#7c3aed;color:white;font-weight:800;font-size:20px;padding:6px 10px;border-radius:6px;min-width:42px;text-align:center;line-height:1}
@@ -144,18 +145,27 @@
 <!-- TIMER — sticky white bar -->
 <div class="timer-bar">
   <div class="timer-inner">
-    <img src="/nav-profile.png" class="timer-numio" alt=""/>
-    <img src="/nav-profile.png" class="timer-numio sm" alt="" style="animation-delay:0.3s"/>
-    <div class="timer-label">🎒 75% OFF — Ends In:</div>
-    <div class="timer-units">
-      <div class="t-block" id="t-h">23</div>
-      <span class="t-sep">:</span>
-      <div class="t-block" id="t-m">59</div>
-      <span class="t-sep">:</span>
-      <div class="t-block" id="t-s">59</div>
+    <!-- Left numios -->
+    <div style="display:flex;align-items:center;gap:6px">
+      <img src="/nav-profile.png" class="timer-numio" alt="" style="animation-delay:0s"/>
+      <img src="/nav-profile.png" class="timer-numio sm" alt="" style="animation-delay:0.4s"/>
     </div>
-    <img src="/nav-profile.png" class="timer-numio sm" alt="" style="animation-delay:0.6s"/>
-    <img src="/nav-profile.png" class="timer-numio" alt="" style="animation-delay:0.9s"/>
+    <!-- Center content -->
+    <div class="timer-center">
+      <div class="timer-label">🎒 75% OFF — Ends In:</div>
+      <div class="timer-units">
+        <div class="t-block" id="t-h">23</div>
+        <span class="t-sep">:</span>
+        <div class="t-block" id="t-m">59</div>
+        <span class="t-sep">:</span>
+        <div class="t-block" id="t-s">59</div>
+      </div>
+    </div>
+    <!-- Right numios -->
+    <div style="display:flex;align-items:center;gap:6px">
+      <img src="/nav-profile.png" class="timer-numio sm" alt="" style="animation-delay:0.6s"/>
+      <img src="/nav-profile.png" class="timer-numio" alt="" style="animation-delay:0.9s"/>
+    </div>
   </div>
 </div>
 
