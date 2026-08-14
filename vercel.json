@@ -1,8 +1,9 @@
 {
   "rewrites": [
-    { "source": "/privacy",  "destination": "/privacy.html" },
-    { "source": "/terms",    "destination": "/terms.html"   },
-    { "source": "/testing",  "destination": "/testing.html" },
-    { "source": "/(.*)",     "destination": "/index.html"   }
+    { "source": "/privacy",     "destination": "/privacy.html"     },
+    { "source": "/terms",       "destination": "/terms.html"       },
+    { "source": "/testing",     "destination": "/testing.html"     },
+    { "source": "/landingpage", "destination": "/landingpage.html" },
+    { "source": "/(.*)",        "destination": "/index.html"       }
   ]
 }
