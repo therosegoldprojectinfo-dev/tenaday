@@ -40,7 +40,7 @@ serve(async (req) => {
         body: new URLSearchParams({
           email: user.email || '',
           name:  profile?.display_name || '',
-          metadata: { supabase_user_id: user.id },
+          'metadata[supabase_user_id]': user.id,
         }),
       })
       const customer = await customerRes.json()
