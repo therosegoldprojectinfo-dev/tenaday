@@ -16,8 +16,6 @@ import PinGate from './screens/PinGate'
 import QuizIntro from './screens/QuizIntro'
 import Profile from './screens/Profile'
 import Heroes from './screens/Heroes'
-import Paywall from './screens/Paywall'
-import { useSubscription } from './lib/useSubscription'
 import { LangContext } from './lib/LangContext'
 import { KidContext } from './lib/KidContext'
 
@@ -34,7 +32,6 @@ export default function App() {
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
   }, [lang])
   const [onboarded, setOnboarded]     = useState(null)
-  const { status: subStatus, daysLeft, isBlocked } = useSubscription(onboarded === true)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [tab, setTab]                 = useState('chapters')
   const [pinUnlocked, setPinUnlocked] = useState(false)
@@ -246,10 +243,7 @@ export default function App() {
             className={`flex-1 ${showNav ? 'md:ms-56' : ''}`}
             style={{ paddingBottom: showNav ? 'calc(64px + env(safe-area-inset-bottom))' : 0, overflow: 'hidden', minWidth: 0, width: '100%' }}
           >
-            {/* Paywall gate — expired trial */}
-            {isBlocked ? (
-              <Paywall daysLeft={0} />
-            ) : !activeKid && screen !== 'parent_zone' && screen !== 'profile' ? (
+            {!activeKid && screen !== 'parent_zone' && screen !== 'profile' ? (
               <div className="flex flex-col items-center justify-center gap-6 text-center" style={{ height: '100dvh' }}>
                 <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-duo animate-spin" />
                 <p className="font-body text-sm text-muted">Loading...</p>
