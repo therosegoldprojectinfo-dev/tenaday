@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { createKid } from '../lib/kids'
 
@@ -6,22 +6,8 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
   const [username, setUsername] = useState('')
   const [kidName,  setKidName]  = useState('')
   const [password, setPassword] = useState('')
-  const [email,    setEmail]    = useState('')
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
-
-  // Fetch email directly from Stripe via edge function — no race condition
-  useEffect(() => {
-    if (!sessionId) return
-    fetch('https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/get-session-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: sessionId }),
-    })
-      .then(r => r.json())
-      .then(data => { if (data.email) setEmail(data.email) })
-      .catch(e => console.warn('Could not fetch email:', e))
-  }, [sessionId])
 
   const inputStyle = {
     border: '2px solid #e5e7eb', background: '#fafafa',
@@ -34,7 +20,6 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
     if (!username.trim()) { setError('Enter a username'); return }
     if (!kidName.trim())  { setError("Enter your child's name"); return }
     if (password.length < 6) { setError('Password must be at least 6 characters'); return }
-    if (!email.trim()) { setError('Please enter your email address'); return }
 
     setLoading(true)
     setError('')
@@ -46,18 +31,15 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
       }
 
+      const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
       const derivedPw = await hashBuffer(`numio:${username.trim().toLowerCase()}:${password}:v3`)
       const pwHash    = await hashBuffer(`numio-pin:${password}`)
 
-      // 1. Create account using their REAL Stripe email
-      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-        email:    email,
-        password: derivedPw,
-      })
-      if (signUpErr) throw new Error(signUpErr.message)
+      // 1. Create Supabase account
+      const { error: signUpErr } = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
+      if (signUpErr) throw new Error('That username is already taken. Try a different one.')
 
-      // Get user from signUp response directly (avoids getUser 403)
-      const user = signUpData?.user
+      const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Signup failed — please try again')
 
       // 2. Create profile
@@ -69,7 +51,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       // 3. Set parent PIN
       await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
 
-      // 4. Link Stripe session → marks subscription active
+      // 4. Link Stripe session → marks subscription as active
       const { data: linkResult } = await supabase.rpc('link_pending_subscription', {
         p_session_id: sessionId,
         p_user_id:    user.id,
@@ -117,17 +99,6 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         </div>
 
         <div className="flex flex-col gap-4 flex-1">
-
-          {/* Email — auto-filled from Stripe, editable as fallback */}
-          <div className="flex flex-col gap-1.5">
-            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR EMAIL</label>
-            <input type="email" value={email} onChange={e => { setEmail(e.target.value); setError('') }}
-              placeholder="your@email.com"
-              style={inputStyle}
-              onFocus={e => e.target.style.borderColor = '#7c3aed'}
-              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
-          </div>
-
           <div className="flex flex-col gap-1.5">
             <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR USERNAME</label>
             <input type="text" value={username} onChange={e => { setUsername(e.target.value); setError('') }}
@@ -166,7 +137,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
           </p>
 
           <button onClick={handleSubmit}
-            disabled={loading || !username.trim() || !kidName.trim() || password.length < 6 || !email.trim()}
+            disabled={loading || !username.trim() || !kidName.trim() || password.length < 6}
             className="w-full disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:scale-95"
             style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}>
             {loading ? 'Setting up your account...' : 'Enter Numio →'}
