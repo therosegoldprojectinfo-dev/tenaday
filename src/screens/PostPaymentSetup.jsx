@@ -35,9 +35,6 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       const derivedPw = await hashBuffer(`numio:${username.trim().toLowerCase()}:${password}:v3`)
       const pwHash    = await hashBuffer(`numio-pin:${password}`)
 
-      // Sign out any existing anonymous session first
-      await supabase.auth.signOut()
-
       // 1. Create Supabase account
       const { error: signUpErr } = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
       if (signUpErr) throw new Error('That username is already taken. Try a different one.')
