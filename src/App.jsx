@@ -275,9 +275,9 @@ export default function App() {
             className={`flex-1 ${showNav ? 'md:ms-56' : ''}`}
             style={{ paddingBottom: showNav ? 'calc(64px + env(safe-area-inset-bottom))' : 0, overflow: 'hidden', minWidth: 0, width: '100%' }}
           >
-            {/* Paywall gate — show if not subscribed */}
-            {checked && isInactive && !sessionId ? (
-              <Paywall />
+            {/* No paywall — pay-first flow handled before login */}
+            {false ? (
+              <div/>
             ) : !activeKid && screen !== 'parent_zone' && screen !== 'profile' ? (
               <div className="flex flex-col items-center justify-center gap-6 text-center" style={{ height: '100dvh' }}>
                 <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-duo animate-spin" />
