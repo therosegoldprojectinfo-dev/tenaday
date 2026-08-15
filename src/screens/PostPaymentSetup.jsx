@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { createKid } from '../lib/kids'
 
 export default function PostPaymentSetup({ sessionId, onComplete }) {
   const [username, setUsername] = useState('')
@@ -30,16 +31,19 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
       }
 
-      const fakeEmail  = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
-      const derivedPw  = await hashBuffer(`numio:${username.trim().toLowerCase()}:${password}:v3`)
-      const pwHash     = await hashBuffer(`numio-pin:${password}`)
+      const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
+      const derivedPw = await hashBuffer(`numio:${username.trim().toLowerCase()}:${password}:v3`)
+      const pwHash    = await hashBuffer(`numio-pin:${password}`)
+
+      // Sign out any existing anonymous session first
+      await supabase.auth.signOut()
 
       // 1. Create Supabase account
       const { error: signUpErr } = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
-      if (signUpErr) throw new Error('That username is already taken')
+      if (signUpErr) throw new Error('That username is already taken. Try a different one.')
 
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Signup failed')
+      if (!user) throw new Error('Signup failed — please try again')
 
       // 2. Create profile
       const { error: insertErr } = await supabase.from('profiles').insert({
@@ -50,22 +54,24 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       // 3. Set parent PIN
       await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
 
-      // 4. Link the Stripe session to this user — marks subscription as active
+      // 4. Link Stripe session → marks subscription as active
       const { data: linkResult } = await supabase.rpc('link_pending_subscription', {
         p_session_id: sessionId,
         p_user_id:    user.id,
       })
-
       if (linkResult?.error) {
-        // Session not found or already claimed — still let them in, webhook may have been slow
         console.warn('link_pending_subscription:', linkResult.error)
       }
 
-      // 5. Done — tell App.jsx to proceed
-      onComplete({ userId: user.id, username: username.trim(), kidName: kidName.trim() })
+      // 5. Create kid
+      const kid = await createKid(kidName.trim())
+
+      // 6. Done!
+      onComplete({ kid })
 
     } catch (e) {
-      setError(e.message || 'Something went wrong')
+      console.error('PostPaymentSetup error:', e)
+      setError(e.message || 'Something went wrong. Please try again.')
       setLoading(false)
     }
   }
@@ -74,11 +80,9 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
     <div className="bg-white w-full flex flex-col" style={{ minHeight: '100dvh' }}>
       <div className="w-full max-w-md mx-auto flex flex-col px-6" style={{ minHeight: '100dvh' }}>
 
-        {/* Header */}
         <div className="flex-shrink-0 pt-10 pb-6">
           <img src="/nav-logo.png" alt="Numio" className="h-10 w-auto mb-6" />
 
-          {/* Success badge */}
           <div className="flex items-center gap-3 mb-6 p-4 rounded-2xl" style={{ background: '#f0fdf4', border: '2px solid #bbf7d0' }}>
             <span style={{ fontSize: 28 }}>🎉</span>
             <div>
@@ -91,16 +95,13 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
           <p className="font-body text-base text-muted">One last step — set up your login details.</p>
         </div>
 
-        {/* Mascot */}
         <div className="flex justify-center mb-6 flex-shrink-0">
           <div style={{ animation: 'float 3s ease-in-out infinite' }}>
             <img src="/nav-profile.png" alt="" className="w-24 h-auto" />
           </div>
         </div>
 
-        {/* Form */}
         <div className="flex flex-col gap-4 flex-1">
-
           <div className="flex flex-col gap-1.5">
             <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR USERNAME</label>
             <input type="text" value={username} onChange={e => { setUsername(e.target.value); setError('') }}
