@@ -16,7 +16,6 @@ import PinGate from './screens/PinGate'
 import QuizIntro from './screens/QuizIntro'
 import Profile from './screens/Profile'
 import Heroes from './screens/Heroes'
-import Paywall from './screens/Paywall'
 import { useSubscription } from './lib/useSubscription'
 import PostPaymentSetup from './screens/PostPaymentSetup'
 import { LangContext } from './lib/LangContext'
@@ -277,7 +276,7 @@ export default function App() {
             style={{ paddingBottom: showNav ? 'calc(64px + env(safe-area-inset-bottom))' : 0, overflow: 'hidden', minWidth: 0, width: '100%' }}
           >
             {/* Paywall gate — show if not subscribed */}
-            {checked && isInactive ? (
+            {checked && isInactive && !sessionId ? (
               <Paywall />
             ) : !activeKid && screen !== 'parent_zone' && screen !== 'profile' ? (
               <div className="flex flex-col items-center justify-center gap-6 text-center" style={{ height: '100dvh' }}>
