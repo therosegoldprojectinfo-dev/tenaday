@@ -18,6 +18,7 @@ import Profile from './screens/Profile'
 import Heroes from './screens/Heroes'
 import Paywall from './screens/Paywall'
 import { useSubscription } from './lib/useSubscription'
+import PostPaymentSetup from './screens/PostPaymentSetup'
 import { LangContext } from './lib/LangContext'
 import { KidContext } from './lib/KidContext'
 
@@ -27,6 +28,12 @@ export default function App() {
   const [authReady, setAuthReady]     = useState(false)
   const [streak, setStreak]           = useState(0)
   const [lang, setLang]               = useState('en')
+
+  // Detect post-payment redirect from Stripe
+  const [sessionId] = useState(() => {
+    const params = new URLSearchParams(window.location.search)
+    return params.get('session_id') || null
+  })
 
   // Sync html element lang + dir for screen readers and SEO
   useEffect(() => {
@@ -81,6 +88,29 @@ export default function App() {
     if (!activeKid) return
     getStreak(activeKid.id).then(s => setStreak(s.count)).catch(() => {})
   }, [activeKid?.id])
+
+  // Post-payment flow: user just paid but has no account yet
+  if (sessionId && !onboarded) {
+    return (
+      <LangContext.Provider value={lang}>
+        <PostPaymentSetup
+          sessionId={sessionId}
+          onComplete={async ({ kidName }) => {
+            // Clean session_id from URL without reload
+            window.history.replaceState({}, '', window.location.pathname)
+            // Create the kid then enter app
+            try {
+              const kid = await createKid(kidName.trim())
+              setKids([kid])
+              setActiveKid(kid)
+              getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+            } catch (e) { console.error('kid creation failed:', e) }
+            setOnboarded(true)
+          }}
+        />
+      </LangContext.Provider>
+    )
+  }
 
   if (!authReady || onboarded === null) {
     return (
