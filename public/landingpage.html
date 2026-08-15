@@ -410,7 +410,7 @@
       btn.textContent = 'Loading...'
       btn.disabled = true
       fbq('track', 'InitiateCheckout')
-      const res = await fetch('https://YOUR_PROJECT_REF.supabase.co/functions/v1/create-checkout', { // ← replace YOUR_PROJECT_REF with your Supabase project ref
+      const res = await fetch('https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout', { // ← replace YOUR_PROJECT_REF with your Supabase project ref
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       })
