@@ -149,11 +149,6 @@ export default function Login({ lang = 'en', onSuccess, onTryFree, onLanguageCha
             <div className="flex-1 h-px bg-gray-100" />
           </div>
 
-          <button onClick={onTryFree}
-            className="w-full font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95"
-            style={{ background: '#f5f3ff', color: '#7c3aed', boxShadow: '0 2px 12px rgba(124,58,237,0.1)' }}>
-            {s.try_free}
-          </button>
         </div>
         <div className="pb-8" />
       </div>
