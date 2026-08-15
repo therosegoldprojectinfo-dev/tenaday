@@ -10,17 +10,17 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
 
-  // Fetch the email from the pending_subscriptions table using session_id
+  // Fetch email directly from Stripe via edge function — no race condition
   useEffect(() => {
     if (!sessionId) return
-    supabase
-      .from('pending_subscriptions')
-      .select('email')
-      .eq('session_id', sessionId)
-      .single()
-      .then(({ data }) => {
-        if (data?.email) setEmail(data.email)
-      })
+    fetch('https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/get-session-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId }),
+    })
+      .then(r => r.json())
+      .then(data => { if (data.email) setEmail(data.email) })
+      .catch(e => console.warn('Could not fetch email:', e))
   }, [sessionId])
 
   const inputStyle = {
