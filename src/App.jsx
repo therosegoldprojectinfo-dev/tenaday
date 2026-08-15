@@ -88,9 +88,9 @@ export default function App() {
     getStreak(activeKid.id).then(s => setStreak(s.count)).catch(() => {})
   }, [activeKid?.id])
 
-  // Post-payment flow: user just paid but has no account yet
-  // Render BEFORE auth check so nothing overrides it
-  if (sessionId) {
+  // Post-payment flow: only show if we have a session_id AND user is not already onboarded
+  // This prevents refresh bypass — once onboarded is true, normal auth flow takes over
+  if (sessionId && onboarded !== true) {
     return (
       <LangContext.Provider value={lang}>
         <PostPaymentSetup
