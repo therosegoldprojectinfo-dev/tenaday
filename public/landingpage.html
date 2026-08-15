@@ -209,7 +209,7 @@
 <div style="max-width:680px;margin:0 auto;padding:0 20px 48px">
   <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(22px,6vw,30px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:28px">I Had the Same Problem as You…</p>
 
-  <img src="/founder-photo.jpg" alt="Ismail and his brother" style="width:100%;aspect-ratio:16/9;object-fit:cover;object-position:center 20%;border-radius:10px;margin-bottom:28px;display:block"/>
+  <img src="/founder-photo.jpg" alt="Ismail and his brother" style="width:100%;aspect-ratio:16/9;object-fit:cover;object-position:center 20%;border-radius:10px;margin-bottom:28px;display:block;border:4px solid #ef4444"/>
 
   <p style="font-family:'Inter',sans-serif;font-size:16px;font-weight:400;color:#000;line-height:1.8;margin-bottom:16px">My little brother wasn't motivated to practice every day. And if we only practiced what he was learning at school, there simply wasn't enough practice.</p>
   <p style="font-family:'Inter',sans-serif;font-size:16px;font-weight:400;color:#000;line-height:1.8;margin-bottom:16px">His grades started going down.</p>
@@ -241,7 +241,7 @@
       <div class="tl-content">
         <div class="tl-label">Step 1</div>
         <div class="tl-card">
-          <img src="/step1-photo.png" alt="Take a picture" style="width:100%;border-radius:12px;margin-bottom:12px"/>
+          
           <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:17px;color:#000;margin-bottom:6px">Take a picture of the lesson</div>
           <div style="font-family:'Inter',sans-serif;font-size:14px;color:#4b5563;line-height:1.7;font-weight:400">Open Numio, snap a photo of their textbook page. That's the only step you need to do.</div>
         </div>
@@ -256,7 +256,7 @@
       <div class="tl-content">
         <div class="tl-label">Step 2</div>
         <div class="tl-card">
-          <img src="/step2-quiz.png" alt="Practice the quiz" style="width:100%;border-radius:12px;margin-bottom:12px"/>
+          
           <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:17px;color:#000;margin-bottom:6px">Practice the quiz Numio built</div>
           <div style="font-family:'Inter',sans-serif;font-size:14px;color:#4b5563;line-height:1.7;font-weight:400">Numio reads the lesson and creates personalized questions — relevant to exactly what they're learning, not random exercises.</div>
         </div>
@@ -271,7 +271,7 @@
       <div class="tl-content">
         <div class="tl-label">Step 3</div>
         <div class="tl-card">
-          <img src="/step3-streak.png" alt="Practice every day" style="width:100%;border-radius:12px;margin-bottom:12px"/>
+          
           <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:17px;color:#000;margin-bottom:6px">Practice every day</div>
           <div style="font-family:'Inter',sans-serif;font-size:14px;color:#4b5563;line-height:1.7;font-weight:400">Your child earns coins and builds a streak. Small daily sessions add up to real progress over the school year.</div>
         </div>
@@ -407,7 +407,7 @@
       btn.textContent = 'Loading...'
       btn.disabled = true
       fbq('track', 'InitiateCheckout')
-      const res = await fetch('https://YOUR_PROJECT_REF.supabase.co/functions/v1/create-checkout' // ← replace with your actual Supabase project URL, {
+      const res = await fetch('https://YOUR_PROJECT_REF.supabase.co/functions/v1/create-checkout', { // ← replace YOUR_PROJECT_REF with your Supabase project ref
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       })
