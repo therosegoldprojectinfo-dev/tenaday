@@ -13,13 +13,13 @@
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"/></noscript>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth;overflow-x:hidden}
+    html{scroll-behavior:smooth}
 
     /* 1. BLUSH BACKGROUND */
     body{font-family:'Inter',sans-serif;background:#ffffff;color:#000000;-webkit-font-smoothing:antialiased;padding-bottom:80px;overflow-x:hidden}
 
     /* TIMER */
-    .timer-bar{background:#ffffff;padding:10px 20px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.1);overflow:hidden;width:100%}
+    .timer-bar{background:#ffffff;padding:10px 20px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.1);width:100%}
     .timer-inner{display:flex;align-items:center;justify-content:space-between;max-width:680px;margin:0 auto}
     .timer-numio{width:32px;height:32px;object-fit:contain;animation:nf-anim 2s ease-in-out infinite alternate;flex-shrink:0}
     .timer-numio.sm{width:24px;height:24px}
@@ -143,7 +143,7 @@
 <body>
 
 <!-- TIMER — sticky bar -->
-<div class="timer-bar" style="background:linear-gradient(90deg,#4a0072 0%,#7b1fa2 40%,#6a1b9a 60%,#4a0072 100%);padding:10px 16px">
+<div class="timer-bar" style="background:linear-gradient(90deg,#5b21b6 0%,#7c3aed 35%,#a855f7 65%,#7c3aed 85%,#5b21b6 100%);padding:10px 16px">
   <div class="timer-inner" style="max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:8px">
     <!-- Left gold zag -->
     <img src="/gold-zag.png" alt="" style="width:48px;height:48px;object-fit:contain;flex-shrink:0;transform:scaleX(-1)"/>
@@ -335,38 +335,7 @@
 <!-- OFFER -->
 <div class="offer-wrap" id="offer">
 
-  <!-- Above-box: badges + title + timer -->
-  <div style="text-align:center;margin-bottom:20px">
-    <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px">
-      <!-- Badge left -->
-      <img src="/bts-badge.png" alt="75% Off Back to School" style="width:64px;height:64px;object-fit:contain;flex-shrink:0"/>
-      <!-- Center text + timer -->
-      <div style="flex:1">
-        <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:clamp(18px,5vw,24px);color:#000;letter-spacing:-0.4px;line-height:1.2;margin-bottom:10px">Better grades for your child</div>
-        <!-- 24h timer -->
-        <div style="display:flex;align-items:center;justify-content:center;gap:6px">
-          <div style="background:#3b0764;border-radius:8px;padding:8px 10px;min-width:44px;text-align:center">
-            <div style="font-family:'Inter',sans-serif;font-size:20px;font-weight:900;color:#fff;line-height:1" id="ob-h">23</div>
-            <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em">HRS</div>
-          </div>
-          <span style="font-family:'Inter',sans-serif;font-size:20px;font-weight:900;color:#3b0764">:</span>
-          <div style="background:#3b0764;border-radius:8px;padding:8px 10px;min-width:44px;text-align:center">
-            <div style="font-family:'Inter',sans-serif;font-size:20px;font-weight:900;color:#fff;line-height:1" id="ob-m">59</div>
-            <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em">MIN</div>
-          </div>
-          <span style="font-family:'Inter',sans-serif;font-size:20px;font-weight:900;color:#3b0764">:</span>
-          <div style="background:#3b0764;border-radius:8px;padding:8px 10px;min-width:44px;text-align:center">
-            <div style="font-family:'Inter',sans-serif;font-size:20px;font-weight:900;color:#fff;line-height:1" id="ob-s">59</div>
-            <div style="font-family:'Inter',sans-serif;font-size:9px;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em">SEC</div>
-          </div>
-        </div>
-      </div>
-      <!-- Badge right -->
-      <img src="/bts-badge.png" alt="75% Off Back to School" style="width:64px;height:64px;object-fit:contain;flex-shrink:0"/>
-    </div>
-  </div>
-
-  <div class="offer-box" style="background:#7c3aed;border:none;border-radius:16px;overflow:hidden;padding:0">
+    <div class="offer-box" style="background:#7c3aed;border:none;border-radius:16px;overflow:hidden;padding:0">
 
     <!-- Yellow banner -->
     <div style="background:#fbbf24;text-align:center;padding:14px 20px">
