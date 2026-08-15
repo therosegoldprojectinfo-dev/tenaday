@@ -194,7 +194,7 @@
 
   <!-- CTA after solution -->
   <div style="margin-top:24px">
-    <button class="btn-cta" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">
+    <button class="btn-cta" onclick="goToCheckout()">
       Help your child get better grades →
     </button>
     <div class="trust-badges">
@@ -209,9 +209,7 @@
 <div style="max-width:680px;margin:0 auto;padding:0 20px 48px">
   <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(22px,6vw,30px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:28px">I Had the Same Problem as You…</p>
 
-  <div style="width:100%;aspect-ratio:16/9;background:#f3f4f6;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:28px">
-    <span style="font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#9ca3af">IMAGE</span>
-  </div>
+  <img src="/founder-photo.jpg" alt="Ismail and his brother" style="width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;margin-bottom:28px;display:block"/>
 
   <p style="font-family:'Inter',sans-serif;font-size:16px;font-weight:400;color:#000;line-height:1.8;margin-bottom:16px">My little brother wasn't motivated to practice every day. And if we only practiced what he was learning at school, there simply wasn't enough practice.</p>
   <p style="font-family:'Inter',sans-serif;font-size:16px;font-weight:400;color:#000;line-height:1.8;margin-bottom:16px">His grades started going down.</p>
@@ -284,7 +282,7 @@
 
   <!-- CTA after step 3 -->
   <div style="margin-top:32px;padding:0">
-    <button class="btn-cta" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">
+    <button class="btn-cta" onclick="goToCheckout()">
       Help your child get better grades →
     </button>
     <div class="trust-badges" style="margin-top:12px">
@@ -313,7 +311,7 @@
   </div>
   <!-- CTA after who -->
   <div style="margin-top:24px">
-    <button class="btn-cta" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">
+    <button class="btn-cta" onclick="goToCheckout()">
       Help your child get better grades →
     </button>
     <div class="trust-badges">
@@ -367,7 +365,7 @@
       </div>
 
       <!-- CTA -->
-      <button class="btn-cta" style="box-shadow:0 0 0 3px rgba(255,255,255,0.4),0 4px 12px rgba(0,0,0,0.25);" onclick="fbq('track','InitiateCheckout');window.location.href='https://numiomath.app'">
+      <button class="btn-cta" style="box-shadow:0 0 0 3px rgba(255,255,255,0.4),0 4px 12px rgba(0,0,0,0.25);" onclick="goToCheckout()" data-label="Start My Child's First Quiz →">
         Start My Child's First Quiz →
       </button>
 
@@ -398,10 +396,34 @@
     <span style="font-family:'Inter',sans-serif;font-size:14px;font-weight:900;color:#000;letter-spacing:-0.3px">🎒 Back-to-School Offer</span>
     <span class="s-save">Save 75% Today</span>
   </div>
-  <button class="s-btn" onclick="fbq('track','InitiateCheckout');window.location.href='https://numiomath.app'">Get Numio →</button>
+  <button class="s-btn" onclick="goToCheckout()">Get Numio →</button>
 </div>
 
 <script>
+  // Checkout redirect
+  async function goToCheckout() {
+    try {
+      const btn = event.currentTarget
+      btn.textContent = 'Loading...'
+      btn.disabled = true
+      fbq('track', 'InitiateCheckout')
+      const res = await fetch('https://YOUR_PROJECT_REF.supabase.co/functions/v1/create-checkout' // ← replace with your actual Supabase project URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      })
+      const data = await res.json()
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        throw new Error(data.error || 'Something went wrong')
+      }
+    } catch (e) {
+      alert('Something went wrong. Please try again.')
+      const btn = document.querySelectorAll('.btn-cta')
+      btn.forEach(b => { b.textContent = b.dataset.label; b.disabled = false })
+    }
+  }
+
   // Timer — 365-day guarantee, persistent across reloads via localStorage
   const TIMER_KEY = 'numio_offer_24h_v2';
   const DURATION = 24 * 60 * 60 * 1000;
