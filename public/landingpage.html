@@ -13,13 +13,13 @@
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"/></noscript>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
+    html{scroll-behavior:smooth;overflow-x:hidden}
 
     /* 1. BLUSH BACKGROUND */
     body{font-family:'Inter',sans-serif;background:#ffffff;color:#000000;-webkit-font-smoothing:antialiased;padding-bottom:80px;overflow-x:hidden}
 
     /* TIMER */
-    .timer-bar{background:#ffffff;padding:10px 20px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.1)}
+    .timer-bar{background:#ffffff;padding:10px 20px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.1);overflow:hidden;width:100%}
     .timer-inner{display:flex;align-items:center;justify-content:space-between;max-width:680px;margin:0 auto}
     .timer-numio{width:32px;height:32px;object-fit:contain;animation:nf-anim 2s ease-in-out infinite alternate;flex-shrink:0}
     .timer-numio.sm{width:24px;height:24px}
@@ -93,7 +93,7 @@
     .who-list li{display:flex;align-items:flex-start;gap:10px;font-size:16px;font-weight:400;color:#000;line-height:1.5}
 
     /* GUARANTEE */
-    .guar-wrap{max-width:680px;margin:0 auto;padding:0 20px 40px}
+    .guar-wrap{max-width:680px;margin:0 auto;padding:0 20px 56px}
     .guar-box{background:#ffffff;border:2px solid rgb(0,173,33);border-radius:10px;padding:24px;text-align:center}
     .guar-title{font-family:'Inter',sans-serif;font-weight:700;font-size:22px;color:rgb(0,173,33);margin-bottom:12px;letter-spacing:-0.3px}
     .guar-body{font-family:'Inter',sans-serif;font-size:16px;color:#000;line-height:1.8;font-weight:400}
