@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ensureAuth } from './lib/auth'
 import Login from './screens/Login'
-import AccountCreation from './screens/AccountCreation'
 import { getStreak } from './lib/economy'
 import { getKids, createKid } from './lib/kids'
 import Nav from './components/Nav'
@@ -120,8 +119,8 @@ export default function App() {
   }
 
   if (!onboarded) {
-    // Show Login screen if user tapped "Already have an account"
-    if (showOnboarding) {
+    // Only login — account creation only via landing page (pay first)
+    if (true) {
       return (
         <LangContext.Provider value={lang}>
           <Login
@@ -155,88 +154,7 @@ export default function App() {
       )
     }
 
-    return (
-      <LangContext.Provider value={lang}>
-        <div dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-          <AccountCreation
-            onLanguageChange={setLang}
-            onLogin={() => setShowOnboarding(true)}
-            onSignup={async ({ username, kidName, password, lang: signupLang }) => {
-              const hashBuffer = async (input) => {
-                const encoded = new TextEncoder().encode(input)
-                const buf = await crypto.subtle.digest('SHA-256', encoded)
-                return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
-              }
 
-              const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
-              const derivedPw = await hashBuffer(`numio:${username.trim().toLowerCase()}:${password}:v3`)
-              const pwHash    = await hashBuffer(`numio-pin:${password}`)
-
-              const { supabase } = await import('./lib/supabaseClient')
-              let isNewAccount = true
-              const { error: signUpErr } = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
-
-              if (signUpErr) {
-                const { error: signInErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: derivedPw })
-                if (signInErr) throw new Error(lang === 'ar' ? 'اسم المستخدم مستخدم بالفعل' : 'That username is already taken')
-                isNewAccount = false
-              }
-
-              const { data: { user } } = await supabase.auth.getUser()
-              if (!user) throw new Error('Signup failed')
-
-              const { error: insertErr } = await supabase.from('profiles').insert({
-                id: user.id, display_name: username.trim(), language: signupLang || lang,
-              })
-              if (insertErr && insertErr.code !== '23505') throw new Error(insertErr.message)
-              if (insertErr?.code === '23505') {
-                await supabase.from('profiles').update({
-                  display_name: username.trim(), language: signupLang || lang,
-                }).eq('id', user.id)
-              }
-
-              if (isNewAccount) {
-                const { error: pinErr } = await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
-                if (pinErr) {
-                  await supabase.from('profiles').delete().eq('id', user.id)
-                  throw new Error(pinErr.message)
-                }
-              } else {
-                await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
-              }
-
-              let kid
-              if (isNewAccount) {
-                try {
-                  // Use the kid's actual name instead of username
-                  kid = await createKid(kidName.trim())
-                } catch (e) {
-                  console.error('kid creation failed:', e)
-                  try {
-                    const kidList = await getKids()
-                    kid = kidList[0] || await createKid(kidName.trim())
-                  } catch { throw new Error(lang === 'ar' ? 'حدث خطأ ما، حاول مجدداً' : 'Something went wrong, please try again') }
-                }
-              } else {
-                try {
-                  const kidList = await getKids()
-                  kid = kidList[0]
-                  setKids(kidList)
-                } catch (e) {
-                  throw new Error(lang === 'ar' ? 'حدث خطأ ما، حاول مجدداً' : 'Something went wrong, please try again')
-                }
-              }
-
-              setActiveKid(kid)
-              if (kid) getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
-              if (signupLang) setLang(signupLang)
-              setOnboarded(true)
-            }}
-          />
-        </div>
-      </LangContext.Provider>
-    )
-  }
 
 
   const { screen, chapter, exam, revisionExams } = nav
