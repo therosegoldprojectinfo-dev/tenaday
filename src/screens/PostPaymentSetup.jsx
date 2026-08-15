@@ -99,6 +99,16 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         </div>
 
         <div className="flex flex-col gap-4 flex-1">
+          {/* Email — auto-filled from Stripe */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR EMAIL</label>
+            <input type="email" value={email} onChange={e => { setEmail(e.target.value); setError('') }}
+              placeholder="your@email.com"
+              style={inputStyle}
+              onFocus={e => e.target.style.borderColor = '#7c3aed'}
+              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
+          </div>
+
           <div className="flex flex-col gap-1.5">
             <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR USERNAME</label>
             <input type="text" value={username} onChange={e => { setUsername(e.target.value); setError('') }}
