@@ -117,11 +117,8 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
 
           <div className="flex flex-col gap-1.5">
             <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR EMAIL</label>
-            <input type="email" value={email} onChange={e => { setEmail(e.target.value); setError('') }}
-              placeholder="your@email.com"
-              style={inputStyle}
-              onFocus={e => e.target.style.borderColor = '#7c3aed'}
-              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
+            <input type="email" value={email} readOnly
+              style={{ ...inputStyle, background: '#f3f4f6', color: '#6b7280', cursor: 'not-allowed' }} />
           </div>
 
           <div className="flex flex-col gap-1.5">
