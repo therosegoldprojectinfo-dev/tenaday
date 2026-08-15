@@ -30,18 +30,32 @@ serve(async (req) => {
     const sb    = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
 
     switch (event.type) {
+
       case 'checkout.session.completed': {
         const session = event.data.object
         const userId  = session.metadata?.supabase_user_id
-        if (!userId) break
-        await sb.rpc('set_stripe_data', {
-          p_user_id:         userId,
-          p_customer_id:     session.customer,
-          p_subscription_id: session.subscription,
-          p_status:          'active',
-        })
+
+        if (userId) {
+          // Old flow (existing users paying again) — link directly
+          await sb.rpc('set_stripe_data', {
+            p_user_id:         userId,
+            p_customer_id:     session.customer,
+            p_subscription_id: session.subscription,
+            p_status:          'active',
+          })
+        } else {
+          // New flow — store as pending, linked by session_id
+          // User will claim it after creating their account
+          await sb.from('pending_subscriptions').upsert({
+            session_id:             session.id,
+            stripe_customer_id:     session.customer,
+            stripe_subscription_id: session.subscription,
+            email:                  session.customer_details?.email || '',
+          })
+        }
         break
       }
+
       case 'invoice.paid': {
         const invoice = event.data.object
         const subRes  = await fetch(`https://api.stripe.com/v1/subscriptions/${invoice.subscription}`, {
@@ -58,6 +72,7 @@ serve(async (req) => {
         })
         break
       }
+
       case 'customer.subscription.deleted':
       case 'customer.subscription.paused': {
         const sub    = event.data.object
@@ -66,11 +81,14 @@ serve(async (req) => {
         await sb.from('profiles').update({ subscription_status: 'inactive' }).eq('id', userId)
         break
       }
+
       case 'customer.subscription.updated': {
         const sub    = event.data.object
         const userId = sub.metadata?.supabase_user_id
         if (!userId) break
-        await sb.from('profiles').update({ subscription_status: sub.status === 'active' ? 'active' : 'inactive' }).eq('id', userId)
+        await sb.from('profiles').update({
+          subscription_status: sub.status === 'active' ? 'active' : 'inactive'
+        }).eq('id', userId)
         break
       }
     }
