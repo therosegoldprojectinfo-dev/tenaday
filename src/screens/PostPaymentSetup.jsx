@@ -34,7 +34,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
     if (!username.trim()) { setError('Enter a username'); return }
     if (!kidName.trim())  { setError("Enter your child's name"); return }
     if (password.length < 6) { setError('Password must be at least 6 characters'); return }
-    if (!email) { setError('Could not find your payment email. Please contact support.'); return }
+    if (!email.trim()) { setError('Please enter your email address'); return }
 
     setLoading(true)
     setError('')
@@ -118,11 +118,14 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
 
         <div className="flex flex-col gap-4 flex-1">
 
-          {/* Email — read only, auto-filled from Stripe */}
+          {/* Email — auto-filled from Stripe, editable as fallback */}
           <div className="flex flex-col gap-1.5">
             <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR EMAIL</label>
-            <input type="email" value={email} readOnly
-              style={{ ...inputStyle, background: '#f3f4f6', color: '#6b7280', cursor: 'not-allowed' }} />
+            <input type="email" value={email} onChange={e => { setEmail(e.target.value); setError('') }}
+              placeholder="your@email.com"
+              style={inputStyle}
+              onFocus={e => e.target.style.borderColor = '#7c3aed'}
+              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
           </div>
 
           <div className="flex flex-col gap-1.5">
@@ -163,7 +166,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
           </p>
 
           <button onClick={handleSubmit}
-            disabled={loading || !username.trim() || !kidName.trim() || password.length < 6 || !email}
+            disabled={loading || !username.trim() || !kidName.trim() || password.length < 6 || !email.trim()}
             className="w-full disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:scale-95"
             style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}>
             {loading ? 'Setting up your account...' : 'Enter Numio →'}
