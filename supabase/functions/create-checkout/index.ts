@@ -1,14 +1,11 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const STRIPE_SECRET_KEY    = Deno.env.get('STRIPE_SECRET_KEY')!
-const SUPABASE_URL         = Deno.env.get('SUPABASE_URL')!
-const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const PRICE_ID             = 'price_1U4V4f004XbuCgJZ51il9sJj'
-const APP_URL              = 'https://numiomath.app'
+const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!
+const PRICE_ID          = 'price_1U4V4f004XbuCgJZ51il9sJj'
+const APP_URL           = 'https://numiomath.app'
 
 const CORS = {
-  'Access-Control-Allow-Origin':  APP_URL,
+  'Access-Control-Allow-Origin':  '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
@@ -17,36 +14,7 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
 
   try {
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) return new Response('Unauthorized', { status: 401, headers: CORS })
-
-    const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-    const { data: { user }, error: authErr } = await sb.auth.getUser(authHeader.replace('Bearer ', ''))
-    if (authErr || !user) return new Response('Unauthorized', { status: 401, headers: CORS })
-
-    const { data: profile } = await sb.from('profiles').select('stripe_customer_id, display_name').eq('id', user.id).single()
-
-    // Create or reuse Stripe customer
-    let customerId = profile?.stripe_customer_id
-    if (!customerId) {
-      const customerRes = await fetch('https://api.stripe.com/v1/customers', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          email: user.email || '',
-          name:  profile?.display_name || '',
-          'metadata[supabase_user_id]': user.id,
-        }),
-      })
-      const customer = await customerRes.json()
-      customerId = customer.id
-      await sb.from('profiles').update({ stripe_customer_id: customerId }).eq('id', user.id)
-    }
-
-    // Create Stripe Checkout session
+    // Create Stripe Checkout session — no user needed
     const sessionRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
@@ -54,14 +22,13 @@ serve(async (req) => {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        customer:                                        customerId,
-        'line_items[0][price]':                          PRICE_ID,
-        'line_items[0][quantity]':                       '1',
-        mode:                                            'subscription',
-        success_url:                                     `${APP_URL}?subscribed=true`,
-        cancel_url:                                      `${APP_URL}?subscribed=false`,
-        'metadata[supabase_user_id]':                    user.id,
-        'subscription_data[metadata][supabase_user_id]': user.id,
+        'line_items[0][price]':    PRICE_ID,
+        'line_items[0][quantity]': '1',
+        mode:                      'subscription',
+        // Collect email at checkout so we have it for account creation
+        customer_creation:         'always',
+        success_url:               `${APP_URL}?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url:                `https://numiomath.app/landingpage.html`,
       }),
     })
 
