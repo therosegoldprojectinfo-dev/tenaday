@@ -153,9 +153,7 @@ export default function App() {
         </LangContext.Provider>
       )
     }
-
-
-
+  }
 
   const { screen, chapter, exam, revisionExams } = nav
 
