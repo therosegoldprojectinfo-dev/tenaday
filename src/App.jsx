@@ -90,7 +90,8 @@ export default function App() {
   }, [activeKid?.id])
 
   // Post-payment flow: user just paid but has no account yet
-  if (sessionId && !onboarded) {
+  // Render BEFORE auth check so nothing overrides it
+  if (sessionId) {
     return (
       <LangContext.Provider value={lang}>
         <PostPaymentSetup
@@ -106,6 +107,7 @@ export default function App() {
               getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
             } catch (e) { console.error('kid creation failed:', e) }
             setOnboarded(true)
+            setAuthReady(true)
           }}
         />
       </LangContext.Provider>
