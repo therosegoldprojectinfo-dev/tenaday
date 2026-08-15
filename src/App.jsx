@@ -96,18 +96,16 @@ export default function App() {
       <LangContext.Provider value={lang}>
         <PostPaymentSetup
           sessionId={sessionId}
-          onComplete={async ({ kidName }) => {
+          onComplete={async ({ kid }) => {
             // Clean session_id from URL without reload
             window.history.replaceState({}, '', window.location.pathname)
-            // Create the kid then enter app
-            try {
-              const kid = await createKid(kidName.trim())
+            if (kid) {
               setKids([kid])
               setActiveKid(kid)
               getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
-            } catch (e) { console.error('kid creation failed:', e) }
-            setOnboarded(true)
+            }
             setAuthReady(true)
+            setOnboarded(true)
           }}
         />
       </LangContext.Provider>
