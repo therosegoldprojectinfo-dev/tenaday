@@ -152,13 +152,13 @@
     </div>
     <!-- Center content -->
     <div class="timer-center">
-      <div class="timer-label">🛡️ 365-Day Money-Back Guarantee Ends In:</div>
+      <div class="timer-label">🛡️ 365-Day Money-Back Guarantee</div>
       <div class="timer-units">
-        <div class="t-block" id="t-h" style="min-width:44px">365</div>
-        <span class="t-sep" style="font-size:11px">days</span>
-        <div class="t-block" id="t-m">00h 00m</div>
+        <div class="t-block" id="t-h">23</div>
         <span class="t-sep">:</span>
-        <div class="t-block" id="t-s">00s</div>
+        <div class="t-block" id="t-m">59</div>
+        <span class="t-sep">:</span>
+        <div class="t-block" id="t-s">59</div>
       </div>
     </div>
     <!-- Right numios -->
@@ -389,8 +389,7 @@
 <!-- STICKY -->
 <div class="sticky" id="sticky">
   <div class="s-left">
-    <span class="s-old">$60/year</span>
-    <span class="s-new">$15/year</span>
+    <span style="font-family:'Inter',sans-serif;font-size:14px;font-weight:900;color:#000;letter-spacing:-0.3px">🎒 Back-to-School Offer</span>
     <span class="s-save">Save 75% Today</span>
   </div>
   <button class="s-btn" onclick="fbq('track','InitiateCheckout');window.location.href='https://numiomath.app'">Get Numio →</button>
@@ -398,8 +397,8 @@
 
 <script>
   // Timer — 365-day guarantee, persistent across reloads via localStorage
-  const TIMER_KEY = 'numio_offer_end';
-  const DURATION = 365 * 24 * 60 * 60 * 1000;
+  const TIMER_KEY = 'numio_offer_24h_v2';
+  const DURATION = 24 * 60 * 60 * 1000;
   let timerEnd;
   const stored = localStorage.getItem(TIMER_KEY);
   if (stored) {
@@ -410,13 +409,12 @@
   }
   function tick(){
     const diff = Math.max(0, timerEnd - Date.now());
-    const days = Math.floor(diff / 86400000);
-    const h = Math.floor((diff % 86400000) / 3600000);
+    const h = Math.floor(diff / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    document.getElementById('t-h').textContent = String(days).padStart(3,'0');
-    document.getElementById('t-m').textContent = String(h).padStart(2,'0') + 'h ' + String(m).padStart(2,'0') + 'm';
-    document.getElementById('t-s').textContent = String(s).padStart(2,'0') + 's';
+    document.getElementById('t-h').textContent = String(h).padStart(2,'0');
+    document.getElementById('t-m').textContent = String(m).padStart(2,'0');
+    document.getElementById('t-s').textContent = String(s).padStart(2,'0');
   }
   tick(); setInterval(tick,1000);
 
