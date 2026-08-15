@@ -46,12 +46,14 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
       }
 
-      const derivedPw = await hashBuffer(`numio:${username.trim().toLowerCase()}:${password}:v3`)
-      const pwHash    = await hashBuffer(`numio-pin:${password}`)
+      const cleanUsername = username.trim().toLowerCase().replace(/\s+/g, '_')
+      const fakeEmail  = `${cleanUsername}@numio.app`
+      const derivedPw  = await hashBuffer(`numio:${cleanUsername}:${password}:v3`)
+      const pwHash     = await hashBuffer(`numio-pin:${password}`)
 
-      // 1. Create account with Stripe email
+      // 1. Create account with username@numio.app — matches Login flow exactly
       const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-        email:    email.trim(),
+        email:    fakeEmail,
         password: derivedPw,
       })
       if (signUpErr) throw new Error(signUpErr.message)
@@ -61,7 +63,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
 
       // 2. Create profile
       const { error: insertErr } = await supabase.from('profiles').insert({
-        id: user.id, display_name: username.trim(), language: 'en',
+        id: user.id, display_name: username.trim(), language: 'en', stripe_email: email.trim(),
       })
       if (insertErr && insertErr.code !== '23505') throw new Error(insertErr.message)
 
