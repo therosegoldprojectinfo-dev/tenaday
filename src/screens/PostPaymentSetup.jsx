@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { createKid } from '../lib/kids'
 
@@ -6,8 +6,22 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
   const [username, setUsername] = useState('')
   const [kidName,  setKidName]  = useState('')
   const [password, setPassword] = useState('')
+  const [email,    setEmail]    = useState('')
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
+
+  // Fetch the email from the pending_subscriptions table using session_id
+  useEffect(() => {
+    if (!sessionId) return
+    supabase
+      .from('pending_subscriptions')
+      .select('email')
+      .eq('session_id', sessionId)
+      .single()
+      .then(({ data }) => {
+        if (data?.email) setEmail(data.email)
+      })
+  }, [sessionId])
 
   const inputStyle = {
     border: '2px solid #e5e7eb', background: '#fafafa',
@@ -20,6 +34,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
     if (!username.trim()) { setError('Enter a username'); return }
     if (!kidName.trim())  { setError("Enter your child's name"); return }
     if (password.length < 6) { setError('Password must be at least 6 characters'); return }
+    if (!email) { setError('Could not find your payment email. Please contact support.'); return }
 
     setLoading(true)
     setError('')
@@ -31,15 +46,18 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
       }
 
-      const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
       const derivedPw = await hashBuffer(`numio:${username.trim().toLowerCase()}:${password}:v3`)
       const pwHash    = await hashBuffer(`numio-pin:${password}`)
 
-      // 1. Create Supabase account
-      const { error: signUpErr } = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
-      if (signUpErr) throw new Error('That username is already taken. Try a different one.')
+      // 1. Create account using their REAL Stripe email
+      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+        email:    email,
+        password: derivedPw,
+      })
+      if (signUpErr) throw new Error(signUpErr.message)
 
-      const { data: { user } } = await supabase.auth.getUser()
+      // Get user from signUp response directly (avoids getUser 403)
+      const user = signUpData?.user
       if (!user) throw new Error('Signup failed — please try again')
 
       // 2. Create profile
@@ -51,7 +69,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       // 3. Set parent PIN
       await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
 
-      // 4. Link Stripe session → marks subscription as active
+      // 4. Link Stripe session → marks subscription active
       const { data: linkResult } = await supabase.rpc('link_pending_subscription', {
         p_session_id: sessionId,
         p_user_id:    user.id,
@@ -99,6 +117,14 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         </div>
 
         <div className="flex flex-col gap-4 flex-1">
+
+          {/* Email — read only, auto-filled from Stripe */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR EMAIL</label>
+            <input type="email" value={email} readOnly
+              style={{ ...inputStyle, background: '#f3f4f6', color: '#6b7280', cursor: 'not-allowed' }} />
+          </div>
+
           <div className="flex flex-col gap-1.5">
             <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR USERNAME</label>
             <input type="text" value={username} onChange={e => { setUsername(e.target.value); setError('') }}
@@ -137,7 +163,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
           </p>
 
           <button onClick={handleSubmit}
-            disabled={loading || !username.trim() || !kidName.trim() || password.length < 6}
+            disabled={loading || !username.trim() || !kidName.trim() || password.length < 6 || !email}
             className="w-full disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:scale-95"
             style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}>
             {loading ? 'Setting up your account...' : 'Enter Numio →'}
