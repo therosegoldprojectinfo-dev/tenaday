@@ -35,6 +35,8 @@ Your job is to:
 6. Make the language simple, fun, and encouraging
 
 CRITICAL RULES:
+- For MCQ: correct_answer MUST be the exact full text of one of the options — NEVER a letter like "A" or "B"
+- For true/false: correct_answer MUST be in the detected language (e.g. "صحيح" not "True" for Arabic)
 - ONLY ask questions about the actual knowledge/content (math concepts, facts, vocabulary, science, history, etc.)
 - NEVER ask about titles, page numbers, headers, footers, or document structure
 - Every question must help the child LEARN and UNDERSTAND the subject matter
@@ -49,8 +51,8 @@ You MUST respond with ONLY a valid JSON object — no markdown, no backticks, no
       "id": 1,
       "type": "mcq",
       "question": "Question text?",
-      "options": ["A", "B", "C", "D"],
-      "correct_answer": "B",
+      "options": ["Mercury", "Venus", "Earth", "Mars"],
+      "correct_answer": "Venus",
       "explanation": "Kid-friendly explanation."
     },
     {
@@ -142,7 +144,7 @@ serve(async (req) => {
     const { images, is_trial } = await req.json()
 
     // Trial mode: 5 questions, 1 image max
-    const isTrial = is_trial === true || isAnonymous
+    const isTrial = isAnonymous  // derive from server-side anonymous check only
     const questionCount = isTrial ? 5 : 15
 
     if (isTrial && images?.length > 1) {
@@ -179,6 +181,22 @@ serve(async (req) => {
         return new Response(
           JSON.stringify({ error: 'Image too large' }),
           { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+        )
+      }
+    }
+
+    // ── Subscription check (server-side — client gate is cosmetic) ──
+    if (!isAnonymous) {
+      const { data: profile, error: profileErr } = await sb
+        .from('profiles')
+        .select('subscription_status')
+        .eq('id', user.id)
+        .single()
+
+      if (profileErr || !profile || profile.subscription_status !== 'active') {
+        return new Response(
+          JSON.stringify({ error: 'SUBSCRIPTION_REQUIRED' }),
+          { status: 402, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
         )
       }
     }
