@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { createKid } from '../lib/kids'
+import { createKid, getKids } from '../lib/kids'
+
+const WHATSAPP = 'https://wa.me/14384104068'
 
 export default function PostPaymentSetup({ sessionId, onComplete }) {
   const [email,    setEmail]    = useState('')
@@ -28,12 +30,13 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
     width: '100%', borderRadius: 16, padding: '14px 16px',
     fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700,
     fontSize: 17, color: '#1a1a2e', outline: 'none', transition: 'border-color 0.15s',
+    boxSizing: 'border-box',
   }
 
   async function handleSubmit() {
-    if (!email.trim())    { setError('Please enter your email address'); return }
-    if (!username.trim()) { setError('Enter a username'); return }
-    if (!kidName.trim())  { setError("Enter your child's name"); return }
+    if (!email.trim())       { setError('Please enter your email address'); return }
+    if (!username.trim())    { setError('Enter a username'); return }
+    if (!kidName.trim())     { setError("Enter your child's name"); return }
     if (password.length < 6) { setError('Password must be at least 6 characters'); return }
 
     setLoading(true)
@@ -47,43 +50,96 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       }
 
       const cleanUsername = username.trim().toLowerCase().replace(/\s+/g, '_')
-      const fakeEmail  = `${cleanUsername}@numio.app`
-      const derivedPw  = await hashBuffer(`numio:${cleanUsername}:${password}:v3`)
-      const pwHash     = await hashBuffer(`numio-pin:${password}`)
+      const fakeEmail     = `${cleanUsername}@numio.app`
+      const derivedPw     = await hashBuffer(`numio:${cleanUsername}:${password}:v3`)
+      const pwHash        = await hashBuffer(`numio-pin:${password}`)
 
-      // 1. Create account with username@numio.app — matches Login flow exactly
+      // ── STEP 1: Sign up — if already registered, sign in instead (resumable) ──
+      let user = null
       const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
-        email:    fakeEmail,
-        password: derivedPw,
+        email: fakeEmail, password: derivedPw,
       })
-      if (signUpErr) throw new Error(signUpErr.message)
 
-      const user = signUpData?.user
-      if (!user) throw new Error('Signup failed — please try again')
-
-      // 2. Create profile
-      const { error: insertErr } = await supabase.from('profiles').insert({
-        id: user.id, display_name: username.trim(), language: 'en', stripe_email: email.trim(),
-      })
-      if (insertErr && insertErr.code !== '23505') throw new Error(insertErr.message)
-
-      // 3. Set parent PIN
-      await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
-
-      // 4. Link Stripe session → marks subscription active (blocking — must succeed)
-      const { data: linkResult, error: linkErr } = await supabase.rpc('link_pending_subscription', {
-        p_session_id: sessionId,
-        p_user_id:    user.id,
-      })
-      if (linkErr) throw new Error('Could not activate your subscription. Please try again or contact support.')
-      if (linkResult?.error && linkResult.error !== 'session_not_found') {
-        throw new Error('Could not activate your subscription. Please try again or contact support.')
+      if (signUpErr) {
+        if (signUpErr.message?.toLowerCase().includes('already registered') ||
+            signUpErr.message?.toLowerCase().includes('already been registered')) {
+          // Account exists — sign in and resume from wherever we stopped
+          const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+            email: fakeEmail, password: derivedPw,
+          })
+          if (signInErr) throw new Error('Incorrect password for this username. Please try a different username.')
+          user = signInData?.user
+        } else {
+          throw new Error(signUpErr.message)
+        }
+      } else {
+        user = signUpData?.user
       }
 
-      // 5. Create kid
-      const kid = await createKid(kidName.trim())
+      if (!user) throw new Error('Account creation failed. Please try again.')
 
-      // 6. Done!
+      // ── STEP 2: Create profile if missing (idempotent) ──
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id, subscription_status')
+        .eq('id', user.id)
+        .single()
+
+      if (!existingProfile) {
+        const { error: insertErr } = await supabase.from('profiles').insert({
+          id: user.id, display_name: username.trim(), language: 'en', stripe_email: email.trim(),
+        })
+        if (insertErr && insertErr.code !== '23505') throw new Error('Failed to create profile. Please retry.')
+      }
+
+      // ── STEP 3: Set parent PIN if not already set (idempotent) ──
+      await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash }).catch(() => {
+        // Already set — fine, continue
+      })
+
+      // ── STEP 4: Link Stripe session (blocking, with retry logic) ──
+      const alreadyActive = existingProfile?.subscription_status === 'active'
+      if (!alreadyActive) {
+        const { data: linkResult, error: linkErr } = await supabase.rpc('link_pending_subscription', {
+          p_session_id: sessionId,
+          p_user_id:    user.id,
+        })
+
+        if (linkErr) {
+          // Webhook may not have fired yet — wait 2s and retry once
+          await new Promise(r => setTimeout(r, 2000))
+          const { data: retryResult, error: retryErr } = await supabase.rpc('link_pending_subscription', {
+            p_session_id: sessionId,
+            p_user_id:    user.id,
+          })
+          if (retryErr || retryResult?.error === 'session_not_found') {
+            throw new Error('Could not activate your subscription. Please tap Retry or contact support.')
+          }
+        } else if (linkResult?.error === 'session_not_found') {
+          // Webhook hasn't fired yet — wait and retry
+          await new Promise(r => setTimeout(r, 3000))
+          const { data: retryResult } = await supabase.rpc('link_pending_subscription', {
+            p_session_id: sessionId,
+            p_user_id:    user.id,
+          })
+          if (retryResult?.error === 'session_not_found') {
+            throw new Error('Could not activate your subscription. Please tap Retry or contact support.')
+          }
+        }
+      }
+
+      // ── STEP 5: Create kid if none exists (idempotent) ──
+      let kid = null
+      const existingKids = await getKids().catch(() => [])
+      if (existingKids && existingKids.length > 0) {
+        kid = existingKids[0]
+      } else {
+        kid = await createKid(kidName.trim())
+      }
+
+      if (!kid) throw new Error('Failed to set up your child profile. Please retry.')
+
+      // ── Done! ──
       onComplete({ kid })
 
     } catch (e) {
@@ -94,81 +150,96 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
   }
 
   return (
-    <div className="bg-white w-full flex flex-col" style={{ minHeight: '100dvh' }}>
-      <div className="w-full max-w-md mx-auto flex flex-col px-6" style={{ minHeight: '100dvh' }}>
+    <div style={{ background: '#fff', minHeight: '100dvh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ width: '100%', maxWidth: 440, margin: '0 auto', padding: '0 24px', display: 'flex', flexDirection: 'column', minHeight: '100dvh' }}>
 
-        <div className="flex-shrink-0 pt-10 pb-6">
-          <img src="/nav-logo.png" alt="Numio" className="h-10 w-auto mb-6" />
-          <div className="flex items-center gap-3 mb-6 p-4 rounded-2xl" style={{ background: '#f0fdf4', border: '2px solid #bbf7d0' }}>
+        <div style={{ paddingTop: 40, paddingBottom: 24 }}>
+          <img src="/nav-logo.png" alt="Numio" style={{ height: 40, marginBottom: 24 }} />
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, padding: 16, borderRadius: 16, background: '#f0fdf4', border: '2px solid #bbf7d0' }}>
             <span style={{ fontSize: 28 }}>🎉</span>
             <div>
-              <p className="font-display font-extrabold text-base" style={{ color: '#15803d' }}>Payment successful!</p>
-              <p className="font-body text-sm" style={{ color: '#166534' }}>Now set up your account to get started.</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: 15, color: '#15803d', margin: 0 }}>Payment successful!</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 13, color: '#166534', margin: 0 }}>Now set up your account to get started.</p>
             </div>
           </div>
-          <h1 className="font-display font-extrabold text-3xl text-ink mb-2">Create your account</h1>
-          <p className="font-body text-base text-muted">One last step — set up your login details.</p>
+
+          <h1 style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: 28, color: '#1a1a2e', marginBottom: 6 }}>Create your account</h1>
+          <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 15, color: '#6b7280', margin: 0 }}>One last step — set up your login details.</p>
         </div>
 
-        <div className="flex justify-center mb-6 flex-shrink-0">
-          <div style={{ animation: 'float 3s ease-in-out infinite' }}>
-            <img src="/nav-profile.png" alt="" className="w-24 h-auto" />
-          </div>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+          <img src="/nav-profile.png" alt="" style={{ width: 90, height: 'auto', animation: 'float 3s ease-in-out infinite' }} />
         </div>
 
-        <div className="flex flex-col gap-4 flex-1">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
 
-          {error && <p className="font-body text-sm font-bold text-center" style={{ color: '#ef4444' }}>{error}</p>}
+          {error && (
+            <div style={{ background: '#fef2f2', border: '2px solid #fecaca', borderRadius: 12, padding: '12px 16px' }}>
+              <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 14, fontWeight: 700, color: '#dc2626', margin: '0 0 6px 0' }}>{error}</p>
+              {error.includes('contact support') && (
+                <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
+                  style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 13, fontWeight: 700, color: '#7c3aed', textDecoration: 'underline' }}>
+                  💬 Contact us on WhatsApp →
+                </a>
+              )}
+            </div>
+          )}
 
-          <div className="flex flex-col gap-1.5">
-            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR EMAIL</label>
-            <input type="email" value={email} readOnly
-              style={{ ...inputStyle, background: '#f3f4f6', color: '#6b7280', cursor: 'not-allowed' }} />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em' }}>YOUR EMAIL</label>
+            <input type="email" value={email} onChange={e => { setEmail(e.target.value); setError('') }}
+              placeholder="your@email.com" style={inputStyle}
+              onFocus={e => e.target.style.borderColor = '#7c3aed'}
+              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR USERNAME</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em' }}>YOUR USERNAME</label>
             <input type="text" value={username} onChange={e => { setUsername(e.target.value); setError('') }}
-              placeholder="e.g. sarah_mom" autoCapitalize="none" autoCorrect="off"
-              style={inputStyle}
+              placeholder="e.g. sarah_mom" autoCapitalize="none" autoCorrect="off" style={inputStyle}
               onFocus={e => e.target.style.borderColor = '#7c3aed'}
               onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">YOUR CHILD'S NAME</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em' }}>YOUR CHILD'S NAME</label>
             <input type="text" value={kidName} onChange={e => { setKidName(e.target.value); setError('') }}
-              placeholder="e.g. Adam"
-              style={inputStyle}
+              placeholder="e.g. Adam" style={inputStyle}
               onFocus={e => e.target.style.borderColor = '#7c3aed'}
               onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">PASSWORD</label>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, fontSize: 11, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.08em' }}>PASSWORD</label>
             <input type="password" value={password} onChange={e => { setPassword(e.target.value); setError('') }}
               placeholder="At least 6 characters"
-              onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-              style={inputStyle}
+              onKeyDown={e => e.key === 'Enter' && handleSubmit()} style={inputStyle}
               onFocus={e => e.target.style.borderColor = '#7c3aed'}
               onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
           </div>
 
-          <p className="font-body text-xs text-muted text-center">
+          <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 12, color: '#9ca3af', textAlign: 'center', margin: 0 }}>
             By continuing you agree to our{' '}
-            <a href="/privacy.html" target="_blank" className="underline" style={{ color: '#7c3aed' }}>Privacy Policy</a>
+            <a href="/privacy.html" target="_blank" style={{ color: '#7c3aed' }}>Privacy Policy</a>
             {' '}and{' '}
-            <a href="/terms.html" target="_blank" className="underline" style={{ color: '#7c3aed' }}>Terms of Use</a>
+            <a href="/terms.html" target="_blank" style={{ color: '#7c3aed' }}>Terms of Use</a>
           </p>
 
           <button onClick={handleSubmit} disabled={loading}
-            className="w-full disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:scale-95"
-            style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}>
+            style={{
+              background: loading ? '#a78bfa' : '#7c3aed', color: '#fff', border: 'none',
+              borderRadius: 18, padding: '18px 0', width: '100%',
+              fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800, fontSize: 19,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              boxShadow: loading ? 'none' : '0 4px 0 #5b21b6',
+              transition: 'all 0.15s',
+            }}>
             {loading ? 'Setting up your account...' : 'Enter Numio →'}
           </button>
-        </div>
 
-        <div className="pb-8" />
+          <div style={{ paddingBottom: 32 }} />
+        </div>
       </div>
       <style>{`@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`}</style>
     </div>
