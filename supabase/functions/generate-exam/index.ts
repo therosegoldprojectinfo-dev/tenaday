@@ -142,7 +142,7 @@ serve(async (req) => {
 
       if (profileErr || !profile || profile.subscription_status !== 'active') {
         return new Response(
-          JSON.stringify({ error: 'SUBSCRIPTION_REQUIRED' }),
+          JSON.stringify({ error: 'SUBSCRIPTION_ACTIVATING' }),
           { status: 402, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
         )
       }
