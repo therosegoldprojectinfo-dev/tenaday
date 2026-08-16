@@ -83,12 +83,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       // 5. Create kid
       const kid = await createKid(kidName.trim())
 
-      // 6. Fire Meta Purchase pixel
-      if (typeof fbq !== 'undefined') {
-        fbq('track', 'Purchase', { value: 15.00, currency: 'USD' })
-      }
-
-      // 7. Done!
+      // 6. Done!
       onComplete({ kid })
 
     } catch (e) {
