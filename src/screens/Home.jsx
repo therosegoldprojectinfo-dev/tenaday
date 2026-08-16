@@ -30,6 +30,11 @@ function getErrorMessage(err, lang) {
   if (err?.message === 'DAILY_LIMIT' || err?.message?.includes('temporarily unavailable')) {
     return lang === 'ar' ? 'وصلنا للحد اليومي. عد غداً 🌙' : 'Daily limit reached. Come back tomorrow 🌙'
   }
+  if (err?.message === 'SUBSCRIPTION_ACTIVATING' || err?.message === 'SUBSCRIPTION_REQUIRED') {
+    return lang === 'ar'
+      ? '⏳ جاري تفعيل اشتراكك، انتظر لحظة ثم حاول مجدداً.'
+      : '⏳ Your subscription is activating. Wait a moment and try again.'
+  }
   if (err?.message) return err.message
   return lang === 'ar' ? 'حدث خطأ ما. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'
 }
