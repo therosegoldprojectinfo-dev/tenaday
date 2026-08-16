@@ -83,7 +83,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
           })
           if (signInErr) {
             // Sign in failed = username is taken by someone else
-            throw new Error('This username is already taken. Please choose a different one.')
+            throw new Error('This username is already taken — try adding a number or your initial, like Osman2 or OsmanA.')
           }
           user = signInData?.user
         } else {
@@ -93,14 +93,14 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         user = signUpData?.user
       }
 
-      if (!user) throw new Error('Account creation failed. Please try again.')
+      if (!user) throw new Error('Something went wrong creating your account. Please tap retry.')
 
       // ── STEP 2: Create profile if missing (idempotent) ──
       // Insert — 23505 conflict means profile already exists, that's fine
       const { error: insertErr } = await supabase.from('profiles').insert({
         id: user.id, display_name: username.trim(), language: 'en', stripe_email: email.trim(),
       })
-      if (insertErr && insertErr.code !== '23505') throw new Error('Failed to create profile. Please retry.')
+      if (insertErr && insertErr.code !== '23505') throw new Error('Account setup interrupted. Tap retry — your payment is safe.')
 
       // Check if already subscribed via RPC (respects RLS properly)
       const { data: subData } = await supabase.rpc('get_subscription_status')
@@ -145,7 +145,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         kid = await createKid(kidName.trim())
       }
 
-      if (!kid) throw new Error('Failed to set up your child profile. Please retry.')
+      if (!kid) throw new Error('Almost there! Tap retry to finish setting up your child\'s profile.')
 
       // ── Done! ──
       onComplete({ kid })
