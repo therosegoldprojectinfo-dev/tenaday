@@ -30,7 +30,12 @@ export default function App() {
   // Detect post-payment redirect from Stripe
   const [sessionId] = useState(() => {
     const params = new URLSearchParams(window.location.search)
-    return params.get('session_id') || null
+    const sid = params.get('session_id') || null
+    // Fire Meta Purchase pixel immediately — payment already happened at this point
+    if (sid && typeof fbq !== 'undefined') {
+      fbq('track', 'Purchase', { value: 15.00, currency: 'USD' })
+    }
+    return sid
   })
 
   // Sync html element lang + dir for screen readers and SEO
