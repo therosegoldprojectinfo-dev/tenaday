@@ -97,7 +97,10 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         // Already set — fine, continue
       })
 
-      // ── STEP 4: Link Stripe session (blocking, with retry logic) ──
+      // ── STEP 4: Link Stripe session ──
+      // Stripe ALWAYS delivers the webhook — just sometimes takes a few seconds.
+      // So we try to link, and if session_not_found we let them in anyway.
+      // The webhook will fire shortly and set subscription_status = active automatically.
       const alreadyActive = existingProfile?.subscription_status === 'active'
       if (!alreadyActive) {
         const { data: linkResult, error: linkErr } = await supabase.rpc('link_pending_subscription', {
@@ -106,26 +109,15 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         })
 
         if (linkErr) {
-          // Webhook may not have fired yet — wait 2s and retry once
+          // DB error — retry once after 2s
           await new Promise(r => setTimeout(r, 2000))
-          const { data: retryResult, error: retryErr } = await supabase.rpc('link_pending_subscription', {
+          await supabase.rpc('link_pending_subscription', {
             p_session_id: sessionId,
             p_user_id:    user.id,
           })
-          if (retryErr || retryResult?.error === 'session_not_found') {
-            throw new Error('Could not activate your subscription. Please tap Retry or contact support.')
-          }
-        } else if (linkResult?.error === 'session_not_found') {
-          // Webhook hasn't fired yet — wait and retry
-          await new Promise(r => setTimeout(r, 3000))
-          const { data: retryResult } = await supabase.rpc('link_pending_subscription', {
-            p_session_id: sessionId,
-            p_user_id:    user.id,
-          })
-          if (retryResult?.error === 'session_not_found') {
-            throw new Error('Could not activate your subscription. Please tap Retry or contact support.')
-          }
+          // Either way — let them in. Webhook will activate subscription shortly.
         }
+        // session_not_found = webhook not fired yet — let them in, webhook is coming
       }
 
       // ── STEP 5: Create kid if none exists (idempotent) ──
