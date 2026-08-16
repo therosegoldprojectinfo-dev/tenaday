@@ -74,17 +74,6 @@ You MUST respond with ONLY a valid JSON object — no markdown, no backticks, no
 
 Generate exactly {QUESTION_COUNT} questions total.`
 
-// Helper: log a trial failure so ceilings apply even on bad model output
-async function logTrialFailure(sb: any, anonymousId: string, imageCount: number, usage: any) {
-  const costUsd = ((usage.input_tokens || 0) * 3 / 1_000_000) + ((usage.output_tokens || 0) * 15 / 1_000_000)
-  await sb.from('trial_logs').insert({
-    anonymous_id: anonymousId,
-    image_count: imageCount,
-    input_tokens: usage.input_tokens || 0,
-    output_tokens: usage.output_tokens || 0,
-    cost_usd: costUsd,
-  })
-}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS_HEADERS })
@@ -98,8 +87,7 @@ serve(async (req) => {
     const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
     const { data: { user }, error: authError } = await sb.auth.getUser(jwt)
 
-    // P0 fix: block completely unauthenticated requests
-    // Allow anonymous users for trial (1 call, 5 questions max — enforced below)
+    // Block unauthenticated requests — must be a paid user
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
@@ -107,52 +95,11 @@ serve(async (req) => {
       )
     }
 
-    const isAnonymous = user.is_anonymous === true
-
-    // ── Trial limit (anonymous users) ────────────────────────────
-    if (isAnonymous) {
-      // 1. Per-session limit: check if this anonymous_id already has a trial
-      const { data: existingTrials, error: trialErr } = await sb
-        .from('trial_logs')
-        .select('id')
-        .eq('anonymous_id', user.id)
-        .limit(1)
-      if (!trialErr && existingTrials && existingTrials.length > 0) {
-        return new Response(
-          JSON.stringify({ error: 'Trial already used. Create a free account to continue.' }),
-          { status: 403, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-        )
-      }
-
-      // 2. Global daily cap: max 100 trials per day across all anonymous users
-      // Prevents mass abuse when running paid ads
-      const today = new Date().toISOString().split('T')[0]
-      const { count: dailyTrials } = await sb
-        .from('trial_logs')
-        .select('id', { count: 'exact', head: true })
-        .gte('created_at', `${today}T00:00:00Z`)
-      if (dailyTrials && dailyTrials >= 100) {
-        return new Response(
-          JSON.stringify({ error: 'Service temporarily unavailable. Please try again tomorrow.' }),
-          { status: 503, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
-
     // ── Parse body + validate BEFORE rate limit ───────────────────
     // So malformed requests don't burn the user's daily quota
-    const { images, is_trial } = await req.json()
+    const { images } = await req.json()
 
-    // Trial mode: 5 questions, 1 image max
-    const isTrial = isAnonymous  // derive from server-side anonymous check only
-    const questionCount = isTrial ? 5 : 15
-
-    if (isTrial && images?.length > 1) {
-      return new Response(
-        JSON.stringify({ error: 'Trial mode allows 1 image only' }),
-        { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
-    }
+    const questionCount = 15
 
     if (!images || !images.length) {
       return new Response(
@@ -186,7 +133,7 @@ serve(async (req) => {
     }
 
     // ── Subscription check (server-side — client gate is cosmetic) ──
-    if (!isAnonymous) {
+    {
       const { data: profile, error: profileErr } = await sb
         .from('profiles')
         .select('subscription_status')
@@ -202,7 +149,7 @@ serve(async (req) => {
     }
 
     // ── Rate limit (AFTER validation so bad requests don't burn quota) ──
-    if (!isAnonymous) {
+    {
       // FIX #2: Check global ceiling BEFORE increment so ceiling hit doesn't burn quota
       // Also fail CLOSED on DB error (null count = treat as at ceiling)
       const today = new Date().toISOString().split('T')[0]
@@ -282,7 +229,6 @@ serve(async (req) => {
       if (!exam || !Array.isArray(exam.questions) || exam.questions.length === 0) {
         console.error('Claude returned invalid schema:', JSON.stringify(exam).slice(0, 200))
         // Log failure so trial ceilings still apply even on bad model output
-        if (isAnonymous) { try { await logTrialFailure(sb, user.id, images.length, usage) } catch (_) {} }
         return new Response(
           JSON.stringify({ error: 'Quiz generation failed' }),
           { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
@@ -292,7 +238,6 @@ serve(async (req) => {
       for (const q of exam.questions) {
         if (!q.type || !q.question || !q.correct_answer) {
           console.error('Claude returned malformed question:', JSON.stringify(q).slice(0, 200))
-          if (isAnonymous) { try { await logTrialFailure(sb, user.id, images.length, usage) } catch (_) {} }
           return new Response(
             JSON.stringify({ error: 'Quiz generation failed' }),
             { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
@@ -301,7 +246,6 @@ serve(async (req) => {
         // MCQ must have at least 2 options
         if (q.type === 'mcq' && (!Array.isArray(q.options) || q.options.length < 2)) {
           console.error('Claude returned MCQ without options:', JSON.stringify(q).slice(0, 200))
-          if (isAnonymous) { try { await logTrialFailure(sb, user.id, images.length, usage) } catch (_) {} }
           return new Response(
             JSON.stringify({ error: 'Quiz generation failed' }),
             { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
@@ -310,7 +254,6 @@ serve(async (req) => {
       }
     } catch {
       console.error('Failed to parse Claude JSON:', rawText)
-      if (isAnonymous) { try { await logTrialFailure(sb, user.id, images.length, usage) } catch (_) {} }
       return new Response(
         JSON.stringify({ error: 'Quiz generation failed' }),
         { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
@@ -324,24 +267,15 @@ serve(async (req) => {
         ((usage.input_tokens || 0) * 3 / 1_000_000) +
         ((usage.output_tokens || 0) * 15 / 1_000_000)
 
-      // Log usage — real users to usage_logs, anonymous trials to trial_logs
-      if (isAnonymous) {
-        await sb.from('trial_logs').insert({
-          anonymous_id:  user.id,
-          image_count:   images.length,
-          input_tokens:  usage.input_tokens || 0,
-          output_tokens: usage.output_tokens || 0,
-          cost_usd:      costUsd,
-        })
-      } else {
-        await sb.from('usage_logs').insert({
+      // Log usage
+      await sb.from('usage_logs').insert({
           user_id:       user.id,
           image_count:   images.length,
           input_tokens:  usage.input_tokens || 0,
           output_tokens: usage.output_tokens || 0,
           cost_usd:      costUsd,
         })
-      }
+
     } catch (trackErr) {
       console.error('Usage tracking failed (non-fatal):', trackErr)
     }
