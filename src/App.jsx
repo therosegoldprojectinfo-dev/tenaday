@@ -120,8 +120,7 @@ export default function App() {
 
   if (!onboarded) {
     // Show Login screen if user tapped "Already have an account"
-    if (showOnboarding) {
-      return (
+    return (
         <LangContext.Provider value={lang}>
           <Login
             lang={lang}
@@ -152,7 +151,7 @@ export default function App() {
           />
         </LangContext.Provider>
       )
-    }
+  }
 
 
 
