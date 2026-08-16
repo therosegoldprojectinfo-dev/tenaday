@@ -400,27 +400,9 @@
 
 <script>
   // Checkout redirect
-  async function goToCheckout() {
-    try {
-      const btn = event.currentTarget
-      btn.textContent = 'Loading...'
-      btn.disabled = true
-      fbq('track', 'InitiateCheckout')
-      const res = await fetch('https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout', { // ← replace YOUR_PROJECT_REF with your Supabase project ref
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      })
-      const data = await res.json()
-      if (data.url) {
-        window.location.href = data.url
-      } else {
-        throw new Error(data.error || 'Something went wrong')
-      }
-    } catch (e) {
-      alert('Something went wrong. Please try again.')
-      const btn = document.querySelectorAll('.btn-cta')
-      btn.forEach(b => { b.textContent = b.dataset.label; b.disabled = false })
-    }
+  function goToCheckout() {
+    fbq('track', 'InitiateCheckout')
+    window.location.href = 'https://buy.stripe.com/fZueV589fewW3fsbI57EQ0q'
   }
 
   // Timer — 365-day guarantee, persistent across reloads via localStorage
