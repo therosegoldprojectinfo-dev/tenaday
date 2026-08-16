@@ -56,18 +56,35 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
 
       // ── STEP 1: Sign up — if already registered, sign in instead (resumable) ──
       let user = null
-      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+
+      // Quick pre-check: does this username exist? Avoids confusing 500 errors
+      // We do this by attempting signIn first — if it works, resume; if not, sign up
+      const { data: preCheck } = await supabase.auth.signInWithPassword({
         email: fakeEmail, password: derivedPw,
       })
+      let signUpData, signUpErr
+      if (preCheck?.user) {
+        // Already registered with correct password — resume setup
+        user = preCheck.user
+      } else {
+        // Try fresh signup
+        const result = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
+        signUpData = result.data
+        signUpErr = result.error
+      }
 
       if (signUpErr) {
         if (signUpErr.message?.toLowerCase().includes('already registered') ||
-            signUpErr.message?.toLowerCase().includes('already been registered')) {
-          // Account exists — sign in and resume from wherever we stopped
+            signUpErr.message?.toLowerCase().includes('already been registered') ||
+            signUpErr.status === 422 || signUpErr.message?.includes('{}')) {
+          // Try signing in — if it works, this user already set up their account
           const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
             email: fakeEmail, password: derivedPw,
           })
-          if (signInErr) throw new Error('Incorrect password for this username. Please try a different username.')
+          if (signInErr) {
+            // Sign in failed = username is taken by someone else
+            throw new Error('This username is already taken. Please choose a different one.')
+          }
           user = signInData?.user
         } else {
           throw new Error(signUpErr.message)
