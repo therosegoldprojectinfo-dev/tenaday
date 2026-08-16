@@ -70,17 +70,25 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       // 3. Set parent PIN
       await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
 
-      // 4. Link Stripe session → marks subscription active
-      const { data: linkResult } = await supabase.rpc('link_pending_subscription', {
+      // 4. Link Stripe session → marks subscription active (blocking — must succeed)
+      const { data: linkResult, error: linkErr } = await supabase.rpc('link_pending_subscription', {
         p_session_id: sessionId,
         p_user_id:    user.id,
       })
-      if (linkResult?.error) console.warn('link_pending_subscription:', linkResult.error)
+      if (linkErr) throw new Error('Could not activate your subscription. Please try again or contact support.')
+      if (linkResult?.error && linkResult.error !== 'session_not_found') {
+        throw new Error('Could not activate your subscription. Please try again or contact support.')
+      }
 
       // 5. Create kid
       const kid = await createKid(kidName.trim())
 
-      // 6. Done!
+      // 6. Fire Meta Purchase pixel
+      if (typeof fbq !== 'undefined') {
+        fbq('track', 'Purchase', { value: 15.00, currency: 'USD' })
+      }
+
+      // 7. Done!
       onComplete({ kid })
 
     } catch (e) {
