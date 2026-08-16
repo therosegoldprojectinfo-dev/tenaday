@@ -17,6 +17,7 @@ import Profile from './screens/Profile'
 import Heroes from './screens/Heroes'
 import { useSubscription } from './lib/useSubscription'
 import PostPaymentSetup from './screens/PostPaymentSetup'
+import Paywall from './screens/Paywall'
 import { LangContext } from './lib/LangContext'
 import { KidContext } from './lib/KidContext'
 
