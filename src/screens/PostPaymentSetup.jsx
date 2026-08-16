@@ -54,24 +54,11 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       const derivedPw     = await hashBuffer(`numio:${cleanUsername}:${password}:v3`)
       const pwHash        = await hashBuffer(`numio-pin:${password}`)
 
-      // ── STEP 1: Sign up — if already registered, sign in instead (resumable) ──
+      // ── STEP 1: Sign up directly — handle existing user gracefully ──
       let user = null
-
-      // Quick pre-check: does this username exist? Avoids confusing 500 errors
-      // We do this by attempting signIn first — if it works, resume; if not, sign up
-      const { data: preCheck } = await supabase.auth.signInWithPassword({
+      const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
         email: fakeEmail, password: derivedPw,
       })
-      let signUpData, signUpErr
-      if (preCheck?.user) {
-        // Already registered with correct password — resume setup
-        user = preCheck.user
-      } else {
-        // Try fresh signup
-        const result = await supabase.auth.signUp({ email: fakeEmail, password: derivedPw })
-        signUpData = result.data
-        signUpErr = result.error
-      }
 
       if (signUpErr) {
         if (signUpErr.message?.toLowerCase().includes('already registered') ||
