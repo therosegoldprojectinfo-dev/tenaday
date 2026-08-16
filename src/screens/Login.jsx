@@ -145,10 +145,15 @@ export default function Login({ lang = 'en', onSuccess, onTryFree, onLanguageCha
 
           <div className="flex items-center gap-3 my-1">
             <div className="flex-1 h-px bg-gray-100" />
-            <span className="font-body text-xs text-muted">{s.no_account}</span>
+            <span className="font-body text-xs text-muted">{lang === 'ar' ? 'ليس لديك حساب؟' : "Don't have an account?"}</span>
             <div className="flex-1 h-px bg-gray-100" />
           </div>
 
+          <a href="/landingpage.html"
+            className="w-full font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95 flex items-center justify-center"
+            style={{ background: '#f5f3ff', color: '#7c3aed', boxShadow: '0 2px 12px rgba(124,58,237,0.1)' }}>
+            {lang === 'ar' ? 'احصل على Numio ←' : 'Get Numio →'}
+          </a>
         </div>
         <div className="pb-8" />
       </div>
