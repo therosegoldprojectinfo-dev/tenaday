@@ -79,29 +79,28 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       if (!user) throw new Error('Account creation failed. Please try again.')
 
       // ── STEP 2: Create profile if missing (idempotent) ──
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id, subscription_status')
-        .eq('id', user.id)
-        .single()
+      // Insert — 23505 conflict means profile already exists, that's fine
+      const { error: insertErr } = await supabase.from('profiles').insert({
+        id: user.id, display_name: username.trim(), language: 'en', stripe_email: email.trim(),
+      })
+      if (insertErr && insertErr.code !== '23505') throw new Error('Failed to create profile. Please retry.')
 
-      if (!existingProfile) {
-        const { error: insertErr } = await supabase.from('profiles').insert({
-          id: user.id, display_name: username.trim(), language: 'en', stripe_email: email.trim(),
-        })
-        if (insertErr && insertErr.code !== '23505') throw new Error('Failed to create profile. Please retry.')
-      }
+      // Check if already subscribed via RPC (respects RLS properly)
+      const { data: subData } = await supabase.rpc('get_subscription_status')
+      const alreadyActive = subData?.status === 'active'
 
       // ── STEP 3: Set parent PIN if not already set (idempotent) ──
-      await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash }).catch(() => {
+      try {
+        await supabase.rpc('set_parent_pin', { p_pin_hash: pwHash })
+      } catch (_) {
         // Already set — fine, continue
-      })
+      }
 
       // ── STEP 4: Link Stripe session ──
       // Stripe ALWAYS delivers the webhook — just sometimes takes a few seconds.
       // So we try to link, and if session_not_found we let them in anyway.
       // The webhook will fire shortly and set subscription_status = active automatically.
-      const alreadyActive = existingProfile?.subscription_status === 'active'
+      // alreadyActive already determined above
       if (!alreadyActive) {
         const { data: linkResult, error: linkErr } = await supabase.rpc('link_pending_subscription', {
           p_session_id: sessionId,
