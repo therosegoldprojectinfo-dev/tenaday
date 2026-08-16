@@ -11,12 +11,27 @@ async function verifyStripeSignature(payload: string, signature: string, secret:
     const parts = signature.split(',').reduce((acc, part) => {
       const [k, v] = part.split('='); acc[k] = v; return acc
     }, {} as Record<string, string>)
+
+    // Reject if timestamp is older than 5 minutes
+    const ts = parseInt(parts['t'], 10)
+    if (Math.abs(Date.now() / 1000 - ts) > 300) return false
+
     const signedPayload = `${parts['t']}.${payload}`
     const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
     const sig  = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signedPayload))
     const computed = Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('')
     return computed === parts['v1']
   } catch { return false }
+}
+
+// Resolve user_id from stripe_customer_id — works even when metadata is missing
+async function getUserIdByCustomer(sb: any, customerId: string): Promise<string | null> {
+  const { data } = await sb
+    .from('profiles')
+    .select('id')
+    .eq('stripe_customer_id', customerId)
+    .single()
+  return data?.id || null
 }
 
 serve(async (req) => {
@@ -36,7 +51,7 @@ serve(async (req) => {
         const userId  = session.metadata?.supabase_user_id
 
         if (userId) {
-          // Old flow (existing users paying again) — link directly
+          // Old flow — direct link
           await sb.rpc('set_stripe_data', {
             p_user_id:         userId,
             p_customer_id:     session.customer,
@@ -44,57 +59,81 @@ serve(async (req) => {
             p_status:          'active',
           })
         } else {
-          // New flow — store as pending, linked by session_id
-          // User will claim it after creating their account
-          await sb.from('pending_subscriptions').upsert({
+          // New pay-first flow — store as pending for PostPaymentSetup to claim
+          const { error } = await sb.from('pending_subscriptions').upsert({
             session_id:             session.id,
             stripe_customer_id:     session.customer,
             stripe_subscription_id: session.subscription,
             email:                  session.customer_details?.email || '',
           })
+          if (error) {
+            console.error('Failed to store pending subscription:', error)
+            return new Response('DB error', { status: 500 }) // Make Stripe retry
+          }
         }
         break
       }
 
       case 'invoice.paid': {
-        const invoice = event.data.object
-        const subRes  = await fetch(`https://api.stripe.com/v1/subscriptions/${invoice.subscription}`, {
-          headers: { 'Authorization': `Bearer ${STRIPE_SECRET_KEY}` }
-        })
-        const sub    = await subRes.json()
-        const userId = sub.metadata?.supabase_user_id
+        const invoice  = event.data.object
+        const customerId = invoice.customer
+        // Resolve by customer_id — works without metadata
+        const userId = await getUserIdByCustomer(sb, customerId)
         if (!userId) break
-        await sb.rpc('set_stripe_data', {
+        const { error } = await sb.rpc('set_stripe_data', {
           p_user_id:         userId,
-          p_customer_id:     invoice.customer,
+          p_customer_id:     customerId,
           p_subscription_id: invoice.subscription,
           p_status:          'active',
         })
+        if (error) {
+          console.error('invoice.paid set_stripe_data failed:', error)
+          return new Response('DB error', { status: 500 })
+        }
         break
       }
 
       case 'customer.subscription.deleted':
       case 'customer.subscription.paused': {
-        const sub    = event.data.object
-        const userId = sub.metadata?.supabase_user_id
+        const sub      = event.data.object
+        const userId   = await getUserIdByCustomer(sb, sub.customer)
         if (!userId) break
-        await sb.from('profiles').update({ subscription_status: 'inactive' }).eq('id', userId)
+        const { error } = await sb.from('profiles')
+          .update({ subscription_status: 'inactive' })
+          .eq('id', userId)
+        if (error) {
+          console.error('subscription revoke failed:', error)
+          return new Response('DB error', { status: 500 })
+        }
         break
       }
 
       case 'customer.subscription.updated': {
         const sub    = event.data.object
-        const userId = sub.metadata?.supabase_user_id
+        const userId = await getUserIdByCustomer(sb, sub.customer)
         if (!userId) break
-        await sb.from('profiles').update({
-          subscription_status: sub.status === 'active' ? 'active' : 'inactive'
-        }).eq('id', userId)
+        const { error } = await sb.from('profiles')
+          .update({ subscription_status: sub.status === 'active' ? 'active' : 'inactive' })
+          .eq('id', userId)
+        if (error) {
+          console.error('subscription update failed:', error)
+          return new Response('DB error', { status: 500 })
+        }
+        break
+      }
+
+      case 'invoice.payment_failed': {
+        // Grace period — don't immediately revoke, let Stripe retry
+        // If it keeps failing, customer.subscription.updated will fire with status != active
+        const invoice = event.data.object
+        console.log('Payment failed for customer:', invoice.customer)
         break
       }
     }
 
     return new Response(JSON.stringify({ received: true }), { headers: { 'Content-Type': 'application/json' } })
   } catch (err) {
+    console.error('Webhook error:', err.message)
     return new Response(JSON.stringify({ error: err.message }), { status: 500 })
   }
 })
