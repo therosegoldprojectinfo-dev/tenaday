@@ -42,6 +42,22 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
     setLoading(true)
     setError('')
 
+    // Hard 30s timeout — if anything hangs, user sees error + retry instead of infinite spinner
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Setup is taking too long. Please tap retry.')), 30000)
+    )
+
+    try {
+      await Promise.race([setupAccount(), timeout])
+    } catch (e) {
+      console.error('PostPaymentSetup error:', e)
+      setError(e.message || 'Something went wrong. Please try again.')
+      setLoading(false)
+    }
+    return
+  }
+
+  async function setupAccount() {
     try {
       const hashBuffer = async (input) => {
         const encoded = new TextEncoder().encode(input)
@@ -137,10 +153,13 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       // ── Done! ──
       onComplete({ kid })
 
+      // Fallback: if onComplete doesn't navigate within 2s, force reload
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 2000)
+
     } catch (e) {
-      console.error('PostPaymentSetup error:', e)
-      setError(e.message || 'Something went wrong. Please try again.')
-      setLoading(false)
+      throw e
     }
   }
 
