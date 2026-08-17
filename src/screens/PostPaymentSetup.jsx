@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { createKid, getKids } from '../lib/kids'
 
-const WHATSAPP = 'https://wa.me/14384104068'
+const WHATSAPP = 'https://wa.me/14384102068'
 
 export default function PostPaymentSetup({ sessionId, onComplete }) {
   const [email,    setEmail]    = useState('')
