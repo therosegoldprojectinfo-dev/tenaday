@@ -33,12 +33,19 @@ export default function App() {
     const params = new URLSearchParams(window.location.search)
     return params.get('session_id') || null
   })
-  // Grace period: if session_id was in URL, skip Paywall for 30s while webhook lands
+  // Grace period: skip Paywall for 30s after payment while webhook lands
+  // Reads session_id (first load) OR subscribed=true (after reload)
   const [justPaid, setJustPaid] = useState(() => {
-    return !!new URLSearchParams(window.location.search).get('session_id')
+    const params = new URLSearchParams(window.location.search)
+    return !!(params.get('session_id') || params.get('subscribed'))
   })
   useEffect(() => {
     if (justPaid) {
+      // Clean the subscribed param from URL silently
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('subscribed')) {
+        window.history.replaceState({}, '', window.location.pathname)
+      }
       const t = setTimeout(() => setJustPaid(false), 30000)
       return () => clearTimeout(t)
     }
