@@ -126,7 +126,7 @@ export default function Login({ lang = 'en', onSuccess, onTryFree, onLanguageCha
             {loading ? s.loading : s.cta}
           </button>
 
-          <a href={`https://wa.me/14384104068?text=${encodeURIComponent('Hi, I forgot my Numio password. My username is: ')}`}
+          <a href={`https://wa.me/14384102068?text=${encodeURIComponent('Hi, I forgot my Numio password. My username is: ')}`}
             target="_blank" rel="noopener noreferrer"
             className="font-body font-bold text-sm text-center py-1"
             style={{ color: '#7c3aed' }}>
