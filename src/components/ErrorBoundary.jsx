@@ -1,6 +1,6 @@
 import { Component } from 'react'
 
-const WHATSAPP = 'https://wa.me/14384104068'
+const WHATSAPP = 'https://wa.me/14384102068'
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
