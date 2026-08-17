@@ -167,7 +167,7 @@ export default function Profile({ onLogout, onLanguageChange }) {
         </div>
 
         {/* WhatsApp support */}
-        <a href="https://wa.me/14384104068" target="_blank" rel="noopener noreferrer"
+        <a href="https://wa.me/14384102068" target="_blank" rel="noopener noreferrer"
           className="text-center block"
           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, color: '#9ca3af', textDecoration: 'none' }}>
           {lang === 'ar'
