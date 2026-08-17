@@ -1,4 +1,4 @@
-const WHATSAPP = 'https://wa.me/14384104068'
+const WHATSAPP = 'https://wa.me/14384102068'
 const LANDING  = '/landingpage.html'
 
 export default function Paywall() {
