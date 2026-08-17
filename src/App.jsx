@@ -33,6 +33,16 @@ export default function App() {
     const params = new URLSearchParams(window.location.search)
     return params.get('session_id') || null
   })
+  // Grace period: if session_id was in URL, skip Paywall for 30s while webhook lands
+  const [justPaid, setJustPaid] = useState(() => {
+    return !!new URLSearchParams(window.location.search).get('session_id')
+  })
+  useEffect(() => {
+    if (justPaid) {
+      const t = setTimeout(() => setJustPaid(false), 30000)
+      return () => clearTimeout(t)
+    }
+  }, [])
 
   // Sync html element lang + dir for screen readers and SEO
   useEffect(() => {
@@ -98,6 +108,7 @@ export default function App() {
           onComplete={async ({ kid }) => {
             // Clean session_id from URL without reload
             window.history.replaceState({}, '', window.location.pathname)
+            setJustPaid(true) // Grace period — don't show Paywall while webhook lands
             if (kid) {
               setKids([kid])
               setActiveKid(kid)
@@ -193,7 +204,7 @@ export default function App() {
             style={{ paddingBottom: showNav ? 'calc(64px + env(safe-area-inset-bottom))' : 0, overflow: 'hidden', minWidth: 0, width: '100%' }}
           >
             {/* Paywall gate — show if not subscribed */}
-            {checked && isInactive && !sessionId ? (
+            {checked && isInactive && !sessionId && !justPaid ? (
               <Paywall />
             ) : !activeKid && screen !== 'parent_zone' && screen !== 'profile' ? (
               <div className="flex flex-col items-center justify-center gap-6 text-center" style={{ height: '100dvh' }}>
