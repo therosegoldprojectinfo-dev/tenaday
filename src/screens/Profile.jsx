@@ -165,6 +165,16 @@ export default function Profile({ onLogout, onLanguageChange }) {
           style={{ background: '#fff5f5', boxShadow: '0 2px 16px rgba(239,68,68,0.08)', color: '#ef4444' }}>
           {lang === 'ar' ? '🚪 تسجيل الخروج' : '🚪 Log out'}
         </div>
+
+        {/* WhatsApp support */}
+        <a href="https://wa.me/14384104068" target="_blank" rel="noopener noreferrer"
+          className="text-center block"
+          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, color: '#9ca3af', textDecoration: 'none' }}>
+          {lang === 'ar'
+            ? <>واجهت مشكلة؟ <span style={{ color: '#7c3aed', fontWeight: 700 }}>تواصل معنا على واتساب</span></>
+            : <>Encounter any issues? <span style={{ color: '#7c3aed', fontWeight: 700 }}>Contact us on WhatsApp</span></>
+          }
+        </a>
       </div>
 
       {showAddKid && <AddKidModal lang={lang} onConfirm={handleAddKid} onClose={() => setShowAddKid(false)} />}
