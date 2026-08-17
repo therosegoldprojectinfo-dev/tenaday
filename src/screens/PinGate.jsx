@@ -97,7 +97,7 @@ export default function PinGate({ onSuccess, onBack }) {
             <p className="font-body font-bold text-sm text-red-500">{error}</p>
             {(error.includes('locked') || error.includes('قفل')) && (
               <a
-                href="https://wa.me/14384104068?text=Hi%2C%20I%20am%20locked%20out%20of%20my%20Numio%20Parent%20Zone."
+                href="https://wa.me/14384102068?text=Hi%2C%20I%20am%20locked%20out%20of%20my%20Numio%20Parent%20Zone."
                 target="_blank" rel="noopener noreferrer"
                 className="font-body font-bold text-sm underline mt-1 block"
                 style={{ color: '#7c3aed' }}
