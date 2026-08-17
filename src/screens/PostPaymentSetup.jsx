@@ -155,7 +155,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
 
       // Fallback: if onComplete doesn't navigate within 2s, force reload
       setTimeout(() => {
-        window.location.href = '/'
+        window.location.href = '/?subscribed=true'
       }, 2000)
 
     } catch (e) {
