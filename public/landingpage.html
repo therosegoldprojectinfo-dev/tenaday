@@ -19,7 +19,7 @@
     body{font-family:'Inter',sans-serif;background:#ffffff;color:#000000;-webkit-font-smoothing:antialiased;padding-bottom:80px;overflow-x:hidden}
 
     /* TIMER */
-    .timer-bar{background:#ffffff;padding:10px 20px;text-align:center;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.1);width:100%}
+    .timer-bar{background:#ffffff;padding:10px 20px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.1);width:100%}
     .timer-inner{display:flex;align-items:center;justify-content:space-between;max-width:680px;margin:0 auto}
     .timer-numio{width:32px;height:32px;object-fit:contain;animation:nf-anim 2s ease-in-out infinite alternate;flex-shrink:0}
     .timer-numio.sm{width:24px;height:24px}
@@ -142,33 +142,6 @@
 </head>
 <body>
 
-<!-- TIMER — sticky bar -->
-<div class="timer-bar" style="background:linear-gradient(90deg,#5b21b6 0%,#7c3aed 35%,#a855f7 65%,#7c3aed 85%,#5b21b6 100%);padding:10px 16px;overflow:hidden;position:relative">
-  <!-- Decorative zags — absolutely positioned so they never cause scroll -->
-  <img src="/gold-zag.png" alt="" style="position:absolute;left:-8px;top:50%;transform:translateY(-50%) rotate(-20deg);width:52px;height:52px;object-fit:contain;opacity:0.5;filter:blur(1.5px)"/>
-  <img src="/gold-zag.png" alt="" style="position:absolute;left:28px;top:50%;transform:translateY(-60%) rotate(15deg);width:42px;height:42px;object-fit:contain;opacity:0.85"/>
-  <img src="/gold-zag.png" alt="" style="position:absolute;right:-8px;top:50%;transform:translateY(-50%) rotate(20deg);width:52px;height:52px;object-fit:contain;opacity:0.5;filter:blur(1.5px)"/>
-  <img src="/gold-zag.png" alt="" style="position:absolute;right:28px;top:50%;transform:translateY(-60%) rotate(-15deg);width:42px;height:42px;object-fit:contain;opacity:0.85"/>
-
-  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 80px">
-    <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:0.06em;text-align:center;line-height:1.3">365-Day Money-Back Guarantee<br/><span style="font-weight:600;font-size:11px;opacity:0.85">Ends In:</span></div>
-    <!-- Timer cards -->
-    <div style="display:flex;align-items:center;gap:5px">
-      <div style="background:#d4e157;border-radius:8px;padding:5px 10px;text-align:center;min-width:42px">
-        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:900;color:#1a1a1a;line-height:1" id="t-h">23</div>
-        <div style="font-family:'Inter',sans-serif;font-size:8px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.06em">HRS</div>
-      </div>
-      <div style="background:#d4e157;border-radius:8px;padding:5px 10px;text-align:center;min-width:42px">
-        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:900;color:#1a1a1a;line-height:1" id="t-m">59</div>
-        <div style="font-family:'Inter',sans-serif;font-size:8px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.06em">MIN</div>
-      </div>
-      <div style="background:#d4e157;border-radius:8px;padding:5px 10px;text-align:center;min-width:42px">
-        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:900;color:#1a1a1a;line-height:1" id="t-s">59</div>
-        <div style="font-family:'Inter',sans-serif;font-size:8px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.06em">SEC</div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- HERO -->
 <div class="hero">
@@ -330,6 +303,39 @@
   </div>
 </div>
 
+<!-- TIMER — sticky bar -->
+<div class="timer-bar" style="background:linear-gradient(90deg,#5b21b6 0%,#7c3aed 35%,#a855f7 65%,#7c3aed 85%,#5b21b6 100%);padding:10px 16px;overflow:hidden;position:relative">
+  <!-- Decorative zags — absolutely positioned so they never cause scroll -->
+  <img src="/gold-zag.png" alt="" style="position:absolute;left:-8px;top:50%;transform:translateY(-50%) rotate(-20deg);width:52px;height:52px;object-fit:contain;opacity:0.5;filter:blur(1.5px)"/>
+  <img src="/gold-zag.png" alt="" style="position:absolute;left:28px;top:50%;transform:translateY(-60%) rotate(15deg);width:42px;height:42px;object-fit:contain;opacity:0.85"/>
+  <img src="/gold-zag.png" alt="" style="position:absolute;right:-8px;top:50%;transform:translateY(-50%) rotate(20deg);width:52px;height:52px;object-fit:contain;opacity:0.5;filter:blur(1.5px)"/>
+  <img src="/gold-zag.png" alt="" style="position:absolute;right:28px;top:50%;transform:translateY(-60%) rotate(-15deg);width:42px;height:42px;object-fit:contain;opacity:0.85"/>
+
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 80px">
+    <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:0.06em;text-align:center;line-height:1.3">🎒 Get 9 Months FREE<br/><span style="font-weight:600;font-size:11px;opacity:0.85">Offer Ends In:</span></div>
+    <!-- Timer cards -->
+    <div style="display:flex;align-items:center;gap:5px">
+      <div style="background:#d4e157;border-radius:8px;padding:5px 10px;text-align:center;min-width:42px">
+        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:900;color:#1a1a1a;line-height:1" id="t-d">03</div>
+        <div style="font-family:'Inter',sans-serif;font-size:8px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.06em">DAYS</div>
+      </div>
+      <div style="background:#d4e157;border-radius:8px;padding:5px 10px;text-align:center;min-width:42px">
+        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:900;color:#1a1a1a;line-height:1" id="t-h">23</div>
+        <div style="font-family:'Inter',sans-serif;font-size:8px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.06em">HRS</div>
+      </div>
+      <div style="background:#d4e157;border-radius:8px;padding:5px 10px;text-align:center;min-width:42px">
+        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:900;color:#1a1a1a;line-height:1" id="t-m">59</div>
+        <div style="font-family:'Inter',sans-serif;font-size:8px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.06em">MIN</div>
+      </div>
+      <div style="background:#d4e157;border-radius:8px;padding:5px 10px;text-align:center;min-width:42px">
+        <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:900;color:#1a1a1a;line-height:1" id="t-s">59</div>
+        <div style="font-family:'Inter',sans-serif;font-size:8px;font-weight:700;color:#1a1a1a;text-transform:uppercase;letter-spacing:0.06em">SEC</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="height:20px"></div>
 <!-- OFFER -->
 <div class="offer-wrap" id="offer">
 
@@ -405,24 +411,19 @@
   }
 
   // Timer — 365-day guarantee, persistent across reloads via localStorage
-  const TIMER_KEY = 'numio_offer_24h_v2';
-  const DURATION = 24 * 60 * 60 * 1000;
-  let timerEnd;
-  const stored = localStorage.getItem(TIMER_KEY);
-  if (stored) {
-    timerEnd = parseInt(stored, 10);
-  } else {
-    timerEnd = Date.now() + DURATION;
-    localStorage.setItem(TIMER_KEY, timerEnd);
-  }
+  // Fixed end date — same for everyone, doesn't reset
+  const timerEnd = new Date('2026-08-20T00:00:00Z').getTime();
   function tick(){
     const diff = Math.max(0, timerEnd - Date.now());
-    const h = Math.floor(diff / 3600000);
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
+    const dd = String(d).padStart(2,'0');
     const hh = String(h).padStart(2,'0');
     const mm = String(m).padStart(2,'0');
     const ss = String(s).padStart(2,'0');
+    if(document.getElementById('t-d')) document.getElementById('t-d').textContent = dd;
     document.getElementById('t-h').textContent = hh;
     document.getElementById('t-m').textContent = mm;
     document.getElementById('t-s').textContent = ss;
