@@ -191,7 +191,7 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
           {error && (
             <div style={{ background: '#fef2f2', border: '2px solid #fecaca', borderRadius: 12, padding: '12px 16px' }}>
               <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 14, fontWeight: 700, color: '#dc2626', margin: '0 0 6px 0' }}>{error}</p>
-              {error.includes('contact support') || error.includes('activate your subscription') || error.includes('Already registered') && (
+              {error.length > 0 && (
                 <a href={WHATSAPP} target="_blank" rel="noopener noreferrer"
                   style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 13, fontWeight: 700, color: '#7c3aed', textDecoration: 'underline' }}>
                   💬 Contact us on WhatsApp →
