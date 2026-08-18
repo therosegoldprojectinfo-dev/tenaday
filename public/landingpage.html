@@ -9,7 +9,22 @@
   <script>
   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
   fbq('init','1028944262871292');fbq('track','PageView');
-  </script>
+  
+  // Offer slideshow
+  (function(){
+    const slides = document.querySelectorAll('.offer-slide')
+    const dots = document.querySelectorAll('.slide-dot')
+    let current = 0
+    function showSlide(n) {
+      slides[current].style.opacity = '0'
+      dots[current].style.opacity = '0.4'
+      current = (n + slides.length) % slides.length
+      slides[current].style.opacity = '1'
+      dots[current].style.opacity = '1'
+    }
+    setInterval(() => showSlide(current + 1), 3000)
+  })()
+</script>
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"/></noscript>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -345,9 +360,23 @@
     </div>
 
     <div style="padding:24px 20px">
-      <!-- Image placeholder -->
-      <div style="width:100%;aspect-ratio:16/9;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:24px">
-        <span style="font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:rgba(255,255,255,0.6)">IMAGE</span>
+      <!-- Slideshow -->
+      <div id="offer-slideshow" style="width:100%;aspect-ratio:1/1;border-radius:10px;margin-bottom:24px;overflow:hidden;position:relative">
+        <img src="/slide1.png" class="offer-slide" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;opacity:1;transition:opacity 0.5s ease"/>
+        <img src="/slide2.png" class="offer-slide" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;opacity:0;transition:opacity 0.5s ease"/>
+        <img src="/slide3.png" class="offer-slide" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;opacity:0;transition:opacity 0.5s ease"/>
+        <img src="/slide4.png" class="offer-slide" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;opacity:0;transition:opacity 0.5s ease"/>
+        <img src="/slide5.png" class="offer-slide" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;opacity:0;transition:opacity 0.5s ease"/>
+        <img src="/slide6.png" class="offer-slide" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;opacity:0;transition:opacity 0.5s ease"/>
+        <!-- Dots -->
+        <div style="position:absolute;bottom:8px;left:0;right:0;display:flex;justify-content:center;gap:6px;z-index:2">
+          <div class="slide-dot active-dot" style="width:6px;height:6px;border-radius:50%;background:#fff;opacity:1;transition:opacity 0.3s"></div>
+          <div class="slide-dot" style="width:6px;height:6px;border-radius:50%;background:#fff;opacity:0.4;transition:opacity 0.3s"></div>
+          <div class="slide-dot" style="width:6px;height:6px;border-radius:50%;background:#fff;opacity:0.4;transition:opacity 0.3s"></div>
+          <div class="slide-dot" style="width:6px;height:6px;border-radius:50%;background:#fff;opacity:0.4;transition:opacity 0.3s"></div>
+          <div class="slide-dot" style="width:6px;height:6px;border-radius:50%;background:#fff;opacity:0.4;transition:opacity 0.3s"></div>
+          <div class="slide-dot" style="width:6px;height:6px;border-radius:50%;background:#fff;opacity:0.4;transition:opacity 0.3s"></div>
+        </div>
       </div>
 
       <!-- Feature list -->
@@ -474,6 +503,21 @@
     })
   },{threshold:0.15,rootMargin:'-40px'})
   stops.forEach(s=>observer.observe(s))
+
+  // Offer slideshow
+  (function(){
+    const slides = document.querySelectorAll('.offer-slide')
+    const dots = document.querySelectorAll('.slide-dot')
+    let current = 0
+    function showSlide(n) {
+      slides[current].style.opacity = '0'
+      dots[current].style.opacity = '0.4'
+      current = (n + slides.length) % slides.length
+      slides[current].style.opacity = '1'
+      dots[current].style.opacity = '1'
+    }
+    setInterval(() => showSlide(current + 1), 3000)
+  })()
 </script>
 </body>
 </html>
