@@ -9,39 +9,12 @@
   <script>
   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
   fbq('init','1028944262871292');fbq('track','PageView');
-  
-  // Offer slideshow — arrows + swipe
-  (function(){
-    const el = document.getElementById('offer-slideshow')
-    if (!el) return
-    const slides = Array.from(el.querySelectorAll('.offer-slide'))
-    const dots = Array.from(document.querySelectorAll('#offer-dots div'))
-    if (!slides.length) return
-    let current = 0
-    function showSlide(n) {
-      slides[current].style.opacity = '0'
-      dots[current].style.background = '#ddd6fe'
-      current = (n + slides.length) % slides.length
-      slides[current].style.opacity = '1'
-      dots[current].style.background = '#7c3aed'
-    }
-    document.getElementById('slide-prev').addEventListener('click', function(e){ e.stopPropagation(); showSlide(current - 1) })
-    document.getElementById('slide-next').addEventListener('click', function(e){ e.stopPropagation(); showSlide(current + 1) })
-    // Swipe support
-    let startX = 0
-    el.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX }, {passive:true})
-    el.addEventListener('touchend', function(e){
-      const diff = startX - e.changedTouches[0].clientX
-      if (Math.abs(diff) > 30) showSlide(diff > 0 ? current + 1 : current - 1)
-    }, {passive:true})
-  })()
-</script>
+  </script>
   <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"/></noscript>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html{scroll-behavior:smooth}
 
-    /* 1. BLUSH BACKGROUND */
     body{font-family:'Inter',sans-serif;background:#ffffff;color:#000000;-webkit-font-smoothing:antialiased;padding-bottom:80px;overflow-x:hidden}
 
     /* TIMER */
@@ -66,7 +39,6 @@
     .nf6{top:240px;right:18px;animation-delay:0.8s}
     @keyframes nf-anim{0%{transform:translateY(0) rotate(-8deg) scale(0.9)}100%{transform:translateY(-10px) rotate(8deg) scale(1.1)}}
 
-    /* 3. HEADLINE TIGHTENING */
     .hero h1{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(32px,9vw,50px);line-height:1.15;color:#000000;margin-bottom:28px;letter-spacing:-0.02em;position:relative;z-index:1;text-align:center}
     .hero h1 .hl{color:#7c3aed;font-style:italic;text-decoration:underline;text-decoration-color:#f472b6;text-decoration-thickness:3px;text-underline-offset:5px}
     .product-img{width:100%;max-width:340px;height:auto;display:block;margin:0 auto;position:relative;z-index:1}
@@ -75,7 +47,6 @@
     .ps-section{max-width:680px;margin:0 auto;padding:40px 20px;display:flex;flex-direction:column;gap:24px}
     .ps-card{background:#ffffff;border-radius:10px;padding:0 15px 20px;text-align:center;position:relative}
     .ps-card.problem{border:2px solid rgb(255,0,0)}
-    /* 4. CONSISTENT GREEN */
     .ps-card.solution{border:2px solid rgb(0,173,33)}
     .ps-icon{font-size:28px;display:block;margin:0 auto;transform:translateY(-50%);width:52px;height:52px;line-height:52px;text-align:center}
     .ps-title{font-family:'Inter',sans-serif;font-weight:700;font-size:28px;margin-bottom:14px;letter-spacing:-0.4px;margin-top:-8px}
@@ -84,13 +55,11 @@
     .ps-body{font-family:'Inter',sans-serif;font-size:16px;font-weight:400;color:#000000;line-height:1.8;letter-spacing:-0.2px}
 
     /* ── TIMELINE MAP ── */
-    .timeline-section{max-width:640px;margin:0 auto;padding:48px 20px}
-    .timeline-heading{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(28px,7vw,38px);color:#7c3aed;text-align:center;letter-spacing:-0.02em;margin-bottom:40px;line-height:1.2}
+    .timeline-section{max-width:640px;margin:0 auto;padding:24px 20px 48px}
+    .timeline-heading{font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(28px,7vw,38px);color:#7c3aed;text-align:center;letter-spacing:-0.02em;margin-bottom:24px;line-height:1.2}
     .timeline{position:relative;display:flex;flex-direction:column;gap:0}
-    /* vertical pink line */
     .timeline::before{content:'';position:absolute;left:19px;top:0;bottom:0;width:4px;background:#f63c8c;border-radius:2px;z-index:0}
     .tl-stop{display:grid;grid-template-columns:40px 1fr;gap:16px;margin-bottom:32px;position:relative}
-    /* badge */
     .tl-badge{width:40px;height:40px;border-radius:9999px;background:#f63c8c;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:3px solid #FDF6F8;position:relative;z-index:1;box-shadow:0 0 0 2px #f63c8c}
     .tl-badge svg{width:18px;height:18px;stroke:white;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round}
     .tl-content{padding-top:8px}
@@ -99,7 +68,6 @@
     .tl-card{background:#ffffff;border:1.5px solid #ede9fe;border-radius:12px;padding:18px 20px}
     .tl-card ul{list-style:disc;padding-left:18px;display:flex;flex-direction:column;gap:8px}
     .tl-card ul li{font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:#000;line-height:1.6}
-    /* scroll reveal */
     .tl-stop{opacity:0;transform:translateY(32px);transition:opacity 0.5s ease,transform 0.5s ease}
     .tl-stop.visible{opacity:1;transform:translateY(0)}
 
@@ -137,11 +105,9 @@
     .price-new{font-family:'Inter',sans-serif;font-size:32px;font-weight:800;color:#7c3aed;letter-spacing:-0.4px}
     .price-save{font-family:'Inter',sans-serif;display:inline-block;background:#7c3aed;color:white;font-weight:700;font-size:12px;padding:4px 14px;border-radius:100px;text-transform:uppercase;letter-spacing:0.06em}
 
-    /* 2. CTA BUTTON — 28px */
     .btn-cta{display:block;width:100%;background:rgb(0,173,33);color:white;font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(16px,4.5vw,28px);height:70px;line-height:70px;padding:0 20px;border-radius:0;border:none;cursor:pointer;text-align:center;box-shadow:0 3px 3px 2px rgba(0,0,0,0.2);letter-spacing:-0.3px;margin-bottom:16px;transition:opacity 0.1s;white-space:nowrap}
     .btn-cta:active{opacity:0.9}
 
-    /* 5. TRUST BADGES */
     .trust-badges{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:12px}
     .trust-badge{display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#374151}
     .trust-badge .tc{color:rgb(0,173,33);font-size:16px}
@@ -238,7 +204,6 @@
       <div class="tl-content">
         <div class="tl-label">Step 1</div>
         <div class="tl-card">
-          
           <img src="/numio-demo.gif" alt="Take a picture" style="width:100%;border-radius:12px;margin-bottom:12px;display:block"/>
           <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:17px;color:#000">Take a picture of their lesson to generate a quiz</div>
         </div>
@@ -253,7 +218,6 @@
       <div class="tl-content">
         <div class="tl-label">Step 2</div>
         <div class="tl-card">
-          
           <img src="/numio-demo2.gif" alt="Practice the quiz" style="width:100%;border-radius:12px;margin-bottom:12px;display:block"/>
           <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:17px;color:#000">Practice exactly what they're learning at school — no random questions</div>
         </div>
@@ -268,7 +232,6 @@
       <div class="tl-content">
         <div class="tl-label">Step 3</div>
         <div class="tl-card">
-          
           <img src="/numio-demo3.gif" alt="Practice every day" style="width:100%;border-radius:12px;margin-bottom:12px;display:block"/>
           <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:17px;color:#000">Exchange coins for rewards they actually want</div>
         </div>
@@ -328,7 +291,6 @@
 
 <!-- TIMER — sticky bar -->
 <div class="timer-bar" style="background:linear-gradient(90deg,#5b21b6 0%,#7c3aed 35%,#a855f7 65%,#7c3aed 85%,#5b21b6 100%);padding:10px 16px;overflow:hidden;position:relative">
-  <!-- Decorative zags — absolutely positioned so they never cause scroll -->
   <img src="/gold-zag.png" alt="" style="position:absolute;left:-8px;top:50%;transform:translateY(-50%) rotate(-20deg);width:52px;height:52px;object-fit:contain;opacity:0.5;filter:blur(1.5px)"/>
   <img src="/gold-zag.png" alt="" style="position:absolute;left:28px;top:50%;transform:translateY(-60%) rotate(15deg);width:42px;height:42px;object-fit:contain;opacity:0.85"/>
   <img src="/gold-zag.png" alt="" style="position:absolute;right:-8px;top:50%;transform:translateY(-50%) rotate(20deg);width:52px;height:52px;object-fit:contain;opacity:0.5;filter:blur(1.5px)"/>
@@ -336,7 +298,6 @@
 
   <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:0 80px">
     <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:13px;color:#fff;text-transform:uppercase;letter-spacing:0.06em;text-align:center;line-height:1.3">🎒 Get 9 Months FREE<br/><span style="font-weight:600;font-size:11px;opacity:0.85">Offer Ends In:</span></div>
-    <!-- Timer cards -->
     <div style="display:flex;align-items:center;gap:5px">
       <div style="background:#d4e157;border-radius:8px;padding:5px 10px;text-align:center;min-width:42px">
         <div style="font-family:'Inter',sans-serif;font-size:18px;font-weight:900;color:#1a1a1a;line-height:1" id="t-d">03</div>
@@ -445,14 +406,13 @@
 </div>
 
 <script>
-  // Checkout redirect
+  // Checkout redirect — updated Stripe URL
   function goToCheckout() {
     fbq('track', 'InitiateCheckout')
-    window.location.href = 'https://buy.stripe.com/fZueV589fewW3fsbI57EQ0q'
+    window.location.href = 'https://buy.stripe.com/6oUaEPgFL0G6cQ27rP7EQ0r'
   }
 
-  // Timer — 365-day guarantee, persistent across reloads via localStorage
-  // Fixed end date — same for everyone, doesn't reset
+  // Timer
   const timerEnd = new Date('2026-08-20T00:00:00Z').getTime();
   function tick(){
     const diff = Math.max(0, timerEnd - Date.now());
@@ -460,90 +420,71 @@
     const h = Math.floor((diff % 86400000) / 3600000);
     const m = Math.floor((diff % 3600000) / 60000);
     const s = Math.floor((diff % 60000) / 1000);
-    const dd = String(d).padStart(2,'0');
-    const hh = String(h).padStart(2,'0');
-    const mm = String(m).padStart(2,'0');
-    const ss = String(s).padStart(2,'0');
-    if(document.getElementById('t-d')) document.getElementById('t-d').textContent = dd;
-    document.getElementById('t-h').textContent = hh;
-    document.getElementById('t-m').textContent = mm;
-    document.getElementById('t-s').textContent = ss;
-    if(document.getElementById('ob-h')){
-      document.getElementById('ob-h').textContent = hh;
-      document.getElementById('ob-m').textContent = mm;
-      document.getElementById('ob-s').textContent = ss;
-    }
+    document.getElementById('t-d').textContent = String(d).padStart(2,'0');
+    document.getElementById('t-h').textContent = String(h).padStart(2,'0');
+    document.getElementById('t-m').textContent = String(m).padStart(2,'0');
+    document.getElementById('t-s').textContent = String(s).padStart(2,'0');
   }
-  tick(); setInterval(tick,1000);
+  tick(); setInterval(tick, 1000);
 
   // Sticky
-  window.addEventListener('scroll',()=>{
-    document.getElementById('sticky').style.display = window.scrollY>300?'flex':'none'
-  })
+  window.addEventListener('scroll', function(){
+    document.getElementById('sticky').style.display = window.scrollY > 300 ? 'flex' : 'none';
+  });
 
-  // Confetti when offer section comes into view
-  const confettiScript = document.createElement('script')
-  confettiScript.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js'
-  document.head.appendChild(confettiScript)
-
-  confettiScript.onload = () => {
-    const offerEl = document.getElementById('offer')
-    let fired = false
-    const confettiObserver = new IntersectionObserver((entries) => {
+  // Confetti
+  var confettiScript = document.createElement('script');
+  confettiScript.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js';
+  document.head.appendChild(confettiScript);
+  confettiScript.onload = function() {
+    var offerEl = document.getElementById('offer');
+    var fired = false;
+    var confettiObserver = new IntersectionObserver(function(entries) {
       if (entries[0].isIntersecting && !fired) {
-        fired = true
-        confetti({
-          particleCount: 120,
-          spread: 80,
-          origin: { x: 0.3, y: 1 },
-          colors: ['#7c3aed', '#a855f7', '#f472b6', '#fbbf24', '#34d399'],
-        })
-        confetti({
-          particleCount: 120,
-          spread: 80,
-          origin: { x: 0.7, y: 1 },
-          colors: ['#7c3aed', '#a855f7', '#f472b6', '#fbbf24', '#34d399'],
-        })
+        fired = true;
+        confetti({ particleCount: 120, spread: 80, origin: { x: 0.3, y: 1 }, colors: ['#7c3aed','#a855f7','#f472b6','#fbbf24','#34d399'] });
+        confetti({ particleCount: 120, spread: 80, origin: { x: 0.7, y: 1 }, colors: ['#7c3aed','#a855f7','#f472b6','#fbbf24','#34d399'] });
       }
-    }, { threshold: 0.3 })
-    confettiObserver.observe(offerEl)
-  }
-  const stops = document.querySelectorAll('.tl-stop')
-  const observer = new IntersectionObserver((entries)=>{
-    entries.forEach((entry,i)=>{
-      if(entry.isIntersecting){
-        setTimeout(()=>entry.target.classList.add('visible'), i*150)
-        observer.unobserve(entry.target)
+    }, { threshold: 0.3 });
+    confettiObserver.observe(offerEl);
+  };
+
+  // Timeline scroll reveal — runs after DOM ready (we're at bottom of body)
+  var stops = document.querySelectorAll('.tl-stop');
+  var tlObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        tlObserver.unobserve(entry.target);
       }
-    })
-  },{threshold:0.15,rootMargin:'-40px'})
-  if(stops.length) stops.forEach(s=>observer.observe(s))
+    });
+  }, { threshold: 0.15, rootMargin: '-40px' });
+  stops.forEach(function(s) { tlObserver.observe(s); });
 
   // Offer slideshow — arrows + swipe
   (function(){
-    const el = document.getElementById('offer-slideshow')
-    if (!el) return
-    const slides = Array.from(el.querySelectorAll('.offer-slide'))
-    const dots = Array.from(document.querySelectorAll('#offer-dots div'))
-    if (!slides.length) return
-    let current = 0
+    var el = document.getElementById('offer-slideshow');
+    if (!el) return;
+    var slides = Array.from(el.querySelectorAll('.offer-slide'));
+    var dots = Array.from(document.querySelectorAll('#offer-dots div'));
+    if (!slides.length) return;
+    var current = 0;
     function showSlide(n) {
-      slides[current].style.opacity = '0'
-      dots[current].style.background = '#ddd6fe'
-      current = (n + slides.length) % slides.length
-      slides[current].style.opacity = '1'
-      dots[current].style.background = '#7c3aed'
+      slides[current].style.opacity = '0';
+      dots[current].style.background = '#ddd6fe';
+      current = (n + slides.length) % slides.length;
+      slides[current].style.opacity = '1';
+      dots[current].style.background = '#7c3aed';
     }
-    document.getElementById('slide-prev').addEventListener('click', function(e){ e.stopPropagation(); showSlide(current - 1) })
-    document.getElementById('slide-next').addEventListener('click', function(e){ e.stopPropagation(); showSlide(current + 1) })
-    // Swipe support
-    let startX = 0
-    el.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX }, {passive:true})
+    document.getElementById('slide-prev').addEventListener('click', function(e){ e.stopPropagation(); showSlide(current - 1); });
+    document.getElementById('slide-next').addEventListener('click', function(e){ e.stopPropagation(); showSlide(current + 1); });
+    var startX = 0;
+    el.addEventListener('touchstart', function(e){ startX = e.touches[0].clientX; }, {passive:true});
     el.addEventListener('touchend', function(e){
-      const diff = startX - e.changedTouches[0].clientX
-      if (Math.abs(diff) > 30) showSlide(diff > 0 ? current + 1 : current - 1)
-    }, {passive:true})
-  })()
+      var diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 30) showSlide(diff > 0 ? current + 1 : current - 1);
+    }, {passive:true});
+  })();
 </script>
 </body>
 </html>
