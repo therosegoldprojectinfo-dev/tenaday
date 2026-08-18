@@ -517,7 +517,7 @@
       }
     })
   },{threshold:0.15,rootMargin:'-40px'})
-  stops.forEach(s=>observer.observe(s))
+  if(stops.length) stops.forEach(s=>observer.observe(s))
 
   // Offer slideshow — arrows + swipe
   (function(){
