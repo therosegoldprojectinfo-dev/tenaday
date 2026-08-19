@@ -382,9 +382,9 @@
 <body>
 
   <!-- STICKY TIMER BANNER -->
-  <div id="top-banner" style="background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;position:sticky;top:0;z-index:200;gap:8px;flex-wrap:wrap;">
-    <div style="font-size:13px;font-weight:800;white-space:nowrap;">🎒 Get Numio for 75% off today · Offer ends in:</div>
-    <div style="display:flex;gap:5px;align-items:center;">
+  <div id="top-banner" style="background:linear-gradient(90deg,#5b21b6,#7c3aed,#a855f7,#7c3aed,#5b21b6);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 16px;position:sticky;top:0;z-index:200;text-align:center;gap:6px;">
+    <div style="font-size:13px;font-weight:800;">🎒 Get 75% off today · Offer ends in:</div>
+    <div style="display:flex;gap:5px;align-items:center;justify-content:center;">
       <div style="background:#d4e157;border-radius:6px;padding:3px 8px;text-align:center;min-width:36px;"><div id="b-d" style="font-size:16px;font-weight:900;color:#1a1a1a;line-height:1;">03</div><div style="font-size:7px;font-weight:700;color:#1a1a1a;text-transform:uppercase;">DAYS</div></div>
       <span style="font-weight:900;">:</span>
       <div style="background:#d4e157;border-radius:6px;padding:3px 8px;text-align:center;min-width:36px;"><div id="b-h" style="font-size:16px;font-weight:900;color:#1a1a1a;line-height:1;">23</div><div style="font-size:7px;font-weight:700;color:#1a1a1a;text-transform:uppercase;">HRS</div></div>
@@ -401,15 +401,6 @@
     <h1>Get unlimited personalized practice<br>for your child this <span>entire school year</span></h1>
   </div>
 
-  <!-- 3. VIDEO PLACEHOLDER -->
-  <div style="max-width:600px;margin:32px auto 0;padding:0 20px;background:#fff;">
-    <div style="width:100%;aspect-ratio:16/9;background:#f0ebff;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px dashed #7c3aed;">
-      <div style="font-size:52px;margin-bottom:12px;">▶️</div>
-      <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:18px;color:#7c3aed;">Video coming soon</div>
-      <div style="font-family:'Inter',sans-serif;font-size:13px;color:#888;margin-top:6px;">See Numio in action</div>
-    </div>
-  </div>
-
 
   <div id="offer" style="padding:0 20px;max-width:680px;margin:24px auto 0;">
     <div class="offer-box">
@@ -418,6 +409,12 @@
         <div class="ob-sub">Try Numio with 365-day money-back guarantee for 75% off</div>
       </div>
       <div class="offer-inner">
+        <!-- VIDEO -->
+        <div style="width:100%;aspect-ratio:16/9;background:#f0ebff;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:16px;">
+          <div style="font-size:48px;margin-bottom:10px;">▶️</div>
+          <div style="font-weight:800;font-size:16px;color:#7c3aed;">Video coming soon</div>
+          <div style="font-size:12px;color:#888;margin-top:4px;">See Numio in action</div>
+        </div>
         <div class="slideshow" id="offer-slideshow">
           <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide1.png" class="active"/>
           <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide2.png"/>
@@ -676,7 +673,6 @@
     }
     document.getElementById('slide-prev').addEventListener('click',function(e){e.stopPropagation();showSlide(current-1);});
     document.getElementById('slide-next').addEventListener('click',function(e){e.stopPropagation();showSlide(current+1);});
-    setInterval(function(){ showSlide(current+1); }, 3000);
   })();
 
   </script>
