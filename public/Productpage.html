@@ -368,10 +368,20 @@
     }
     .cta-btn:hover { background: #6d28d9; transform: scale(1.02); }
   </style>
+  <style>
+    .btn-cta{display:block;width:100%;background:rgb(0,173,33);color:#fff;font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(16px,4.5vw,24px);height:70px;line-height:70px;padding:0 20px;border:none;cursor:pointer;text-align:center;box-shadow:0 3px 3px 2px rgba(0,0,0,0.2);letter-spacing:-0.3px;margin-bottom:16px;transition:opacity 0.1s;white-space:nowrap}
+    .btn-cta:active{opacity:0.9}
+    .trust-row{display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#374151;margin-bottom:20px}
+    .trust-row .tc{color:rgb(0,173,33);font-size:16px}
+    .step-card{display:flex;align-items:flex-start;gap:16px;margin-bottom:24px}
+    .step-num{background:#7c3aed;color:#fff;font-family:'Inter',sans-serif;font-weight:900;font-size:18px;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .step-body .step-title{font-weight:800;font-size:17px;color:#000;margin-bottom:4px;letter-spacing:-0.3px}
+    .step-body p{font-size:15px;color:#4b5563;line-height:1.7}
+  </style>
 </head>
 <body>
 
-  <!-- BANNER -->
+  <!-- 1. BANNER -->
   <div class="top-banner">
     <div>
       <div class="offer">BACK TO SCHOOL OFFER</div>
@@ -386,13 +396,13 @@
     </div>
   </div>
 
-  <!-- HERO -->
-  <div class="hero" style="position:relative;background:#fff;">
+  <!-- 2. HERO HEADLINE -->
+  <div class="hero" style="background:#fff;">
     <div class="eyebrow">For busy parents</div>
     <h1>Your child will actually<br><span>practise better</span></h1>
   </div>
 
-  <!-- VIDEO PLACEHOLDER -->
+  <!-- 3. VIDEO PLACEHOLDER -->
   <div style="max-width:600px;margin:32px auto 0;padding:0 20px;background:#fff;">
     <div style="width:100%;aspect-ratio:16/9;background:#f0ebff;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px dashed #7c3aed;">
       <div style="font-size:52px;margin-bottom:12px;">▶️</div>
@@ -401,7 +411,7 @@
     </div>
   </div>
 
-  <!-- TIMER + OFFER -->
+  <!-- 4. TIMER + OFFER -->
   <div class="timer-wrap" style="margin-top:32px;">
     <div class="timer-label">🎒 Get 9 Months FREE · Offer Ends In:</div>
     <div class="timer-units">
@@ -449,10 +459,64 @@
     </div>
   </div>
 
-  <!-- WHITE BG WRAPPER for everything below offer -->
+  <!-- WHITE WRAPPER for all content below offer -->
   <div style="background:#fff;position:relative;">
 
-    <!-- HOW IT WORKS -->
+    <!-- 5. IS THIS YOU? (Problem — builds empathy right after they see the price) -->
+    <div style="background:#fff5f5;padding:40px 0;margin:48px 0 0;">
+      <div style="max-width:640px;margin:0 auto;padding:0 20px;">
+        <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(26px,7vw,36px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:24px;text-align:center">Does this sound like you?</p>
+        <div style="border:2px solid rgb(255,0,0);border-radius:10px;padding:20px;">
+          <div style="display:flex;flex-direction:column;gap:14px;font-size:16px;font-weight:400;color:#000;line-height:1.6;">
+            <div>⏰ Too busy to help your child practice every day</div>
+            <div>🤷 No idea what they should actually be practicing</div>
+            <div>📄 The exercises you find have nothing to do with what they learned that day</div>
+            <div>😫 Your child doesn't want to practice</div>
+            <div>💥 You end up fighting about it every time</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. HOW IT WORKS (3 steps with GIFs) -->
+    <div style="background:#f5f3ff;padding:40px 0;margin-top:0;">
+      <div style="max-width:640px;margin:0 auto;padding:0 20px;">
+        <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(28px,7vw,38px);color:#7c3aed;line-height:1.2;letter-spacing:-0.02em;margin-bottom:8px;text-align:center">Here's how it works →</p>
+        <p style="text-align:center;font-size:15px;color:#6b7280;margin-bottom:32px">3 steps. Takes less than 2 minutes.</p>
+
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">📸 Take a picture of their lesson</div>
+            <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/numio-demo.gif" alt="Step 1" style="width:100%;border-radius:10px;margin:10px 0"/>
+            <p>Just photograph their textbook page or worksheet. Numio reads it and creates a personalized quiz in seconds.</p>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">✏️ Your child practices exactly what they learned</div>
+            <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/numio-demo2.gif" alt="Step 2" style="width:100%;border-radius:10px;margin:10px 0"/>
+            <p>No random questions. Practice is built from their actual lesson — so every question is relevant.</p>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">🏆 They earn coins &amp; rewards</div>
+            <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/numio-demo3.gif" alt="Step 3" style="width:100%;border-radius:10px;margin:10px 0"/>
+            <p>Kids earn coins for every quiz they complete. They exchange coins for rewards you set — screen time, treats, anything that motivates them.</p>
+          </div>
+        </div>
+
+        <button class="btn-cta" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Help your child get better grades →</button>
+        <div class="trust-row"><span class="tc">✅</span> 365-Day Money-Back Guarantee</div>
+      </div>
+    </div>
+
+    <!-- 7. HOW IT HELPS (checkmarks) -->
     <div class="how-section">
       <h2 class="how-title"><strong>But how does this weird app<br>help my child practise?</strong></h2>
       <div class="how-list">
@@ -471,20 +535,38 @@
       </div>
     </div>
 
-    <!-- WHY WOULD THEY WANT TO -->
+    <!-- 8. WHY WOULD THEY WANT TO -->
     <div style="max-width:600px;margin:56px auto 0;padding:0 24px;text-align:center;">
       <h2 style="font-family:'Inter',sans-serif;font-size:clamp(26px,7vw,38px);font-weight:900;line-height:1.15;color:#111;margin-bottom:28px;">But Why Would My Child <span style="color:#7c3aed;">WANT</span> to Practice With This Weird App?</h2>
       <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/child.png" alt="How Numio motivation works" style="width:100%;display:block;"/>
-      <p style="font-size:18px;font-weight:700;color:#111;margin-top:24px;line-height:1.5;text-align:center;">So instead of constantly asking them to practice, you give them a reason to come back.</p>
+      <p style="font-size:18px;font-weight:700;color:#111;margin-top:24px;line-height:1.5;">So instead of constantly asking them to practice, you give them a reason to come back.</p>
     </div>
 
-    <!-- COMPARE -->
+    <!-- 9. IS THIS RIGHT FOR YOU -->
+    <div style="background:#f5f3ff;padding:40px 0;margin-top:56px;">
+      <div style="max-width:640px;margin:0 auto;padding:0 20px;">
+        <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(28px,7vw,38px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:20px;text-align:center">"But is this even right for you?"</p>
+        <p style="font-weight:700;font-size:18px;color:#000;margin-bottom:16px">You're the right parent for Numio if:</p>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:20px;padding:0">
+          <li style="display:flex;align-items:flex-start;gap:10px;font-size:16px;color:#000;line-height:1.5"><span style="color:#7c3aed;font-size:18px;flex-shrink:0">✔️</span> Your child is aged 5–11 years old</li>
+          <li style="display:flex;align-items:flex-start;gap:10px;font-size:16px;color:#000;line-height:1.5"><span style="color:#7c3aed;font-size:18px;flex-shrink:0">✔️</span> You want your child to practise more</li>
+          <li style="display:flex;align-items:flex-start;gap:10px;font-size:16px;color:#000;line-height:1.5"><span style="color:#7c3aed;font-size:18px;flex-shrink:0">✔️</span> … but you're busy and don't want to pay $500 for a tutor</li>
+        </ul>
+        <div style="background:#fff;border-radius:8px;padding:14px;font-size:15px;font-weight:700;color:#7c3aed;text-align:center;margin-bottom:28px;">
+          If that's you — Numio was built for your family.
+        </div>
+        <button class="btn-cta" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Help your child get better grades →</button>
+        <div class="trust-row"><span class="tc">✅</span> 365-Day Money-Back Guarantee</div>
+      </div>
+    </div>
+
+    <!-- 10. COMPARE -->
     <div style="max-width:600px;margin:56px auto 0;padding:0 24px;text-align:center;">
       <h2 style="font-family:'Inter',sans-serif;font-size:clamp(32px,9vw,52px);font-weight:900;line-height:1.1;color:#111;margin-bottom:32px;">You tried it all.<br>Let's compare.</h2>
       <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Simple%20and%20targeted%20questions.png" alt="Numio vs the rest" style="width:100%;max-width:480px;display:block;margin:0 auto;"/>
     </div>
 
-    <!-- GUARANTEE -->
+    <!-- 11. GUARANTEE -->
     <div style="max-width:600px;margin:48px auto 0;padding:0 24px;">
       <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(26px,7vw,36px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:24px;text-align:center">And what if, for some weird reason, Numio doesn't help my child?</p>
       <div style="border:2px solid rgb(0,173,33);border-radius:12px;padding:24px;text-align:center;">
@@ -494,7 +576,7 @@
       </div>
     </div>
 
-    <!-- FAQ -->
+    <!-- 12. FAQ -->
     <div style="max-width:600px;margin:56px auto 0;padding:0 24px 60px;">
       <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(26px,7vw,36px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:8px;text-align:center">Frequently Asked Questions</p>
       <p style="text-align:center;font-size:15px;color:#888;margin-bottom:32px">Your questions, answered.</p>
