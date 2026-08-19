@@ -371,21 +371,30 @@
 </head>
 <body>
 
+  <!-- BANNER -->
   <div class="top-banner">
     <div>
       <div class="offer">BACK TO SCHOOL OFFER</div>
       <div style="color:rgba(255,255,255,0.85);font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">Save up to 75% today</div>
     </div>
+    <div class="countdown">
+      <span class="digit" id="b-d">03</span>
+      <span class="sep">:</span>
+      <span class="digit" id="b-h">23</span>
+      <span class="sep">:</span>
+      <span class="digit" id="b-m">59</span>
+    </div>
+  </div>
 
-  <!-- 1. Eyebrow + Headline -->
+  <!-- HERO -->
   <div class="hero" style="position:relative;background:#fff;">
     <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/guarantee-badge.png" alt="365 Day Money Back" style="position:absolute;top:-10px;right:-8px;width:115px;height:115px;object-fit:contain;z-index:2;transform:rotate(8deg);"/>
     <div class="eyebrow">For busy parents</div>
+    <h1>Your child will actually<br><span>practise better</span></h1>
+  </div>
 
-
-  
   <!-- VIDEO PLACEHOLDER -->
-  <div style="max-width:600px;margin:32px auto 0;padding:0 20px;">
+  <div style="max-width:600px;margin:32px auto 0;padding:0 20px;background:#fff;">
     <div style="width:100%;aspect-ratio:16/9;background:#f0ebff;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px dashed #7c3aed;">
       <div style="font-size:52px;margin-bottom:12px;">▶️</div>
       <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:18px;color:#7c3aed;">Video coming soon</div>
@@ -393,10 +402,8 @@
     </div>
   </div>
 
-
-
   <!-- TIMER + OFFER -->
-  <div class="timer-wrap">
+  <div class="timer-wrap" style="margin-top:32px;">
     <div class="timer-label">🎒 Get 9 Months FREE · Offer Ends In:</div>
     <div class="timer-units">
       <div class="t-block"><div class="t-num" id="t-d">03</div><div class="t-label-u">DAYS</div></div>
@@ -406,102 +413,129 @@
     </div>
   </div>
 
-
-
-  <!-- 2. Before/After image (Copie de... = the before/after) -->
-  <div class="before-after-wrap">
-    <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Copie%20de%20Practise%20what%20they%20learn%20at%20school.png" alt="Before and after Numio"/>
-  </div>
-
-
-
-  <!-- 5. How it works -->
-  <div class="how-section">
-    <h2 class="how-title"><strong>But how does this weird app<br>help my child practise?</strong></h2>
-    <div class="how-list">
-      <div class="how-item">
-        <img class="check" src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" alt="check"/>
-        <span>Numio generates quizzes from <strong>exactly</strong> what they learn at school</span>
+  <div id="offer" style="padding:0 20px;max-width:680px;margin:24px auto 0;">
+    <div class="offer-box">
+      <div class="offer-banner-inner">
+        <div class="ob-title">🎒 Back to School Offer</div>
+        <div class="ob-sub">Try Numio with 365-day money-back guarantee for 75% off</div>
       </div>
-      <div class="how-item">
-        <img class="check" src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" alt="check"/>
-        <span>Quizzes are simple and assure your child <strong>truly understands</strong></span>
+      <div class="offer-inner">
+        <div class="slideshow" id="offer-slideshow">
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide1.png" class="active"/>
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide2.png"/>
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide3.png"/>
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide4.png"/>
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide5.png"/>
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide6.png"/>
+          <div class="slide-arrow" id="slide-prev" style="left:8px">‹</div>
+          <div class="slide-arrow" id="slide-next" style="right:8px">›</div>
+        </div>
+        <div class="slide-dots" id="offer-dots">
+          <span class="active"></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <ul class="offer-features">
+          <li><span>✅</span> Unlimited lesson pictures</li>
+          <li><span>✅</span> Personalized practice</li>
+          <li><span>✅</span> Rewards &amp; coins</li>
+          <li><span>✅</span> Progress tracking</li>
+          <li><span>✅</span> Full year support</li>
+        </ul>
+        <div class="offer-price">
+          <span class="old">$60/year</span>
+          <span class="new">$15/year</span>
+        </div>
+        <button class="offer-cta" onclick="goToCheckout()">Start My Child's First Quiz →</button>
+        <div class="offer-guarantee">🛡️ 365-Day Money-Back Guarantee</div>
       </div>
-      <div class="how-item">
-        <img class="check" src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" alt="check"/>
-        <span>Numio rewards them with <strong>coins and badges</strong> to keep them motivated</span>
+    </div>
+  </div>
+
+  <!-- WHITE BG WRAPPER for everything below offer -->
+  <div style="background:#fff;position:relative;">
+
+    <!-- BEFORE/AFTER -->
+    <div class="before-after-wrap" style="padding-top:48px;">
+      <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Copie%20de%20Practise%20what%20they%20learn%20at%20school.png" alt="Before and after Numio"/>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="how-section">
+      <h2 class="how-title"><strong>But how does this weird app<br>help my child practise?</strong></h2>
+      <div class="how-list">
+        <div class="how-item">
+          <img class="check" src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" alt="check"/>
+          <span>Numio generates quizzes from <strong>exactly</strong> what they learn at school</span>
+        </div>
+        <div class="how-item">
+          <img class="check" src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" alt="check"/>
+          <span>Quizzes are simple and assure your child <strong>truly understands</strong></span>
+        </div>
+        <div class="how-item">
+          <img class="check" src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" alt="check"/>
+          <span>Numio rewards them with <strong>coins and badges</strong> to keep them motivated</span>
+        </div>
       </div>
     </div>
-  </div>
 
-
-
-
-
-  <!-- WHY WOULD THEY WANT TO -->
-  <div style="max-width:600px;margin:56px auto 0;padding:0 24px;text-align:center;background:#fff;position:relative;z-index:1;">
-    <h2 style="font-family:'Inter',sans-serif;font-size:clamp(26px,7vw,38px);font-weight:900;line-height:1.15;color:#111;margin-bottom:28px;">But Why Would My Child <span style="color:#7c3aed;">WANT</span> to Practice With This Weird App?</h2>
-    <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/child.png" alt="How Numio motivation works" style="width:100%;display:block;"/>
-    <p style="font-size:18px;font-weight:700;color:#111;margin-top:24px;line-height:1.5;text-align:center;">So instead of constantly asking them to practice, you give them a reason to come back.</p>
-  </div>
-
-
-
-  <!-- COMPARE SECTION -->
-  <div style="max-width:600px;margin:56px auto 0;padding:0 24px;text-align:center;background:#fff;position:relative;z-index:1;">
-    <h2 style="font-family:'Inter',sans-serif;font-size:clamp(32px,9vw,52px);font-weight:900;line-height:1.1;color:#111;margin-bottom:32px;">You tried it all.<br>Let's compare.</h2>
-    <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Simple%20and%20targeted%20questions.png" alt="Numio vs the rest" style="width:100%;max-width:480px;display:block;margin:0 auto;"/>
-  </div>
-
-
-
-
-  <!-- GUARANTEE -->
-  <div style="max-width:600px;margin:48px auto 0;padding:0 24px;">
-    <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(26px,7vw,36px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:24px;text-align:center">And what if, for some weird reason, Numio doesn't help my child?</p>
-    <div style="border:2px solid rgb(0,173,33);border-radius:12px;padding:24px;text-align:center;">
-      <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/money-back-badge.png" alt="365 Day Money Back Guarantee" style="width:140px;height:auto;margin-bottom:16px;display:block;margin:0 auto 16px;"/>
-      <p style="font-weight:800;font-size:20px;color:rgb(0,173,33);margin-bottom:10px">You get every cent back.</p>
-      <p style="font-size:16px;color:#000;line-height:1.8">Try Numio completely risk-free for 365 days. If your child isn't practicing more, we'll refund every cent. No questions asked.</p>
+    <!-- WHY WOULD THEY WANT TO -->
+    <div style="max-width:600px;margin:56px auto 0;padding:0 24px;text-align:center;">
+      <h2 style="font-family:'Inter',sans-serif;font-size:clamp(26px,7vw,38px);font-weight:900;line-height:1.15;color:#111;margin-bottom:28px;">But Why Would My Child <span style="color:#7c3aed;">WANT</span> to Practice With This Weird App?</h2>
+      <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/child.png" alt="How Numio motivation works" style="width:100%;display:block;"/>
+      <p style="font-size:18px;font-weight:700;color:#111;margin-top:24px;line-height:1.5;text-align:center;">So instead of constantly asking them to practice, you give them a reason to come back.</p>
     </div>
-  </div>
 
-
-
-
-  <!-- FAQ -->
-  <div style="max-width:600px;margin:56px auto 0;padding:0 24px 60px;">
-    <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(26px,7vw,36px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:8px;text-align:center">Frequently Asked Questions</p>
-    <p style="text-align:center;font-size:15px;color:#888;margin-bottom:32px">Your questions, answered.</p>
-
-    <div class="faq-item" onclick="this.classList.toggle('open')">
-      <div class="faq-q">What is Numio? <span class="faq-arrow">▾</span></div>
-      <div class="faq-a">Numio helps your child practice what they're actually learning at school. Just take a picture of their lesson, and Numio creates personalized practice for them.</div>
+    <!-- COMPARE -->
+    <div style="max-width:600px;margin:56px auto 0;padding:0 24px;text-align:center;">
+      <h2 style="font-family:'Inter',sans-serif;font-size:clamp(32px,9vw,52px);font-weight:900;line-height:1.1;color:#111;margin-bottom:32px;">You tried it all.<br>Let's compare.</h2>
+      <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Simple%20and%20targeted%20questions.png" alt="Numio vs the rest" style="width:100%;max-width:480px;display:block;margin:0 auto;"/>
     </div>
-    <div class="faq-item" onclick="this.classList.toggle('open')">
-      <div class="faq-q">How does Numio know what my child needs to practice? <span class="faq-arrow">▾</span></div>
-      <div class="faq-a">You simply take a picture of their school lesson, worksheet, or notes. Numio uses it to create practice based on what they're currently learning.</div>
-    </div>
-    <div class="faq-item" onclick="this.classList.toggle('open')">
-      <div class="faq-q">Will my child actually want to use it? <span class="faq-arrow">▾</span></div>
-      <div class="faq-a">Numio is designed to make practice more motivating. Your child earns coins and rewards as they practice, giving them a reason to keep coming back.</div>
-    </div>
-    <div class="faq-item" onclick="this.classList.toggle('open')">
-      <div class="faq-q">Do I need to sit with my child while they practice? <span class="faq-arrow">▾</span></div>
-      <div class="faq-a">No. Numio is designed so your child can practice independently, meaning less work for you.</div>
-    </div>
-    <div class="faq-item" onclick="this.classList.toggle('open')">
-      <div class="faq-q">What if Numio doesn't work for my child? <span class="faq-arrow">▾</span></div>
-      <div class="faq-a">You're covered by our 365-day money-back guarantee. Try Numio with your child, and if you don't feel it's helping them practice, you can get your full $15 back.</div>
-    </div>
-  </div>
 
+    <!-- GUARANTEE -->
+    <div style="max-width:600px;margin:48px auto 0;padding:0 24px;">
+      <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(26px,7vw,36px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:24px;text-align:center">And what if, for some weird reason, Numio doesn't help my child?</p>
+      <div style="border:2px solid rgb(0,173,33);border-radius:12px;padding:24px;text-align:center;">
+        <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/guarantee-badge.png" alt="365 Day Money Back Guarantee" style="width:140px;height:auto;display:block;margin:0 auto 16px;"/>
+        <p style="font-weight:800;font-size:20px;color:rgb(0,173,33);margin-bottom:10px">You get every cent back.</p>
+        <p style="font-size:16px;color:#000;line-height:1.8">Try Numio completely risk-free for 365 days. If your child isn't practicing more, we'll refund every cent. No questions asked.</p>
+      </div>
+    </div>
 
+    <!-- FAQ -->
+    <div style="max-width:600px;margin:56px auto 0;padding:0 24px 60px;">
+      <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(26px,7vw,36px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:8px;text-align:center">Frequently Asked Questions</p>
+      <p style="text-align:center;font-size:15px;color:#888;margin-bottom:32px">Your questions, answered.</p>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What is Numio? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">Numio helps your child practice what they're actually learning at school. Just take a picture of their lesson, and Numio creates personalized practice for them.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">How does Numio know what my child needs to practice? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">You simply take a picture of their school lesson, worksheet, or notes. Numio uses it to create practice based on what they're currently learning.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">Will my child actually want to use it? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">Numio is designed to make practice more motivating. Your child earns coins and rewards as they practice, giving them a reason to keep coming back.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">Do I need to sit with my child while they practice? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">No. Numio is designed so your child can practice independently, meaning less work for you.</div>
+      </div>
+      <div class="faq-item" onclick="this.classList.toggle('open')">
+        <div class="faq-q">What if Numio doesn't work for my child? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">You're covered by our 365-day money-back guarantee. Try Numio with your child, and if you don't feel it's helping them practice, you can get your full $15 back.</div>
+      </div>
+    </div>
 
-  </div>
+  </div><!-- end white wrapper -->
+
+  <!-- STICKY BAR -->
   <div class="sticky-bar">
     <div>
       <div class="price">$15<span>/year</span></div>
+      <div class="per">Less than $1.25/month</div>
+    </div>
+    <button class="cta-btn" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Get Numio Now →</button>
+  </div>
 
   <script>
     // Shared countdown end (3 days from now)
