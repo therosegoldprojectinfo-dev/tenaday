@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Numio – Product Page</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #111;
+      overflow-x: hidden;
+      padding-bottom: 90px;
+    }
+
+    /* TOP BANNER */
+    .top-banner {
+      background: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .top-banner .offer { color: #4ade80; text-transform: uppercase; }
+    .countdown { display: flex; gap: 6px; align-items: center; }
+    .countdown .digit {
+      background: #fff;
+      color: #111;
+      font-size: 18px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 4px;
+      min-width: 38px;
+      text-align: center;
+    }
+    .countdown .sep { color: #fff; font-size: 18px; font-weight: 800; }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 48px 20px 0;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .hero .eyebrow {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: clamp(30px, 8vw, 50px);
+      font-weight: 900;
+      line-height: 1.1;
+      color: #111;
+      margin-bottom: 0;
+    }
+    .hero h1 span { color: #7c3aed; }
+
+    /* BEFORE/AFTER */
+    .before-after-wrap {
+      max-width: 700px;
+      margin: 28px auto 0;
+      padding: 0 16px;
+    }
+    .before-after-wrap img {
+      width: 100%;
+      border-radius: 16px;
+      display: block;
+    }
+
+    /* SUBHEAD + CAPTION */
+    .subhead-block {
+      text-align: center;
+      max-width: 520px;
+      margin: 20px auto 0;
+      padding: 0 24px;
+    }
+    .subhead-block .subhead {
+      font-size: clamp(18px, 4vw, 24px);
+      font-weight: 800;
+      color: #333;
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+    .subhead-block .caption {
+      font-size: 15px;
+      font-weight: 500;
+      color: #555;
+      line-height: 1.6;
+    }
+    .subhead-block .caption strong { color: #111; font-weight: 700; }
+
+    /* BENEFITS */
+    .benefits-wrap {
+      max-width: 700px;
+      margin: 48px auto 0;
+      padding: 0 16px 48px;
+    }
+    .benefits-wrap img {
+      width: 100%;
+      display: block;
+    }
+
+    /* STICKY BAR */
+    .sticky-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #fff;
+      border-top: 2px solid #eee;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 999;
+      box-shadow: 0 -4px 24px rgba(0,0,0,0.09);
+    }
+    .price { font-size: 22px; font-weight: 900; color: #111; }
+    .price span { font-size: 14px; font-weight: 500; color: #888; }
+    .per { font-size: 11px; color: #aaa; font-weight: 500; margin-top: 2px; }
+    .cta-btn {
+      background: #7c3aed;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 14px 28px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .cta-btn:hover { background: #6d28d9; transform: scale(1.02); }
+  </style>
+</head>
+<body>
+
+  <div class="top-banner">
+    <div class="offer">⚡ Back to School — Save 75%</div>
+    <div class="countdown">
+      <span class="digit" id="m">14</span>
+      <span class="sep">:</span>
+      <span class="digit" id="s">59</span>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="eyebrow">For busy parents</div>
+    <h1>Your child will actually<br><span>practise better</span></h1>
+  </div>
+
+  <div class="before-after-wrap">
+    <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Practise%20what%20they%20learn%20at%20school.png" alt="Before and after Numio"/>
+  </div>
+
+  <div class="subhead-block">
+    <p class="subhead">...without you working more</p>
+    <p class="caption">Simple system that assures they practise <strong>exactly</strong> what they learn at school — and keeps them motivated to come back.</p>
+  </div>
+
+  <div class="benefits-wrap">
+    <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Copie%20de%20Practise%20what%20they%20learn%20at%20school.png" alt="What that means for you"/>
+  </div>
+
+  <div class="sticky-bar">
+    <div>
+      <div class="price">$15<span>/year</span></div>
+      <div class="per">Less than $1.25/month</div>
+    </div>
+    <button class="cta-btn">Get Numio Now →</button>
+  </div>
+
+  <script>
+    let total = 14 * 60 + 59;
+    const m = document.getElementById('m');
+    const s = document.getElementById('s');
+    function tick() {
+      if (total <= 0) return;
+      total--;
+      m.textContent = String(Math.floor(total / 60)).padStart(2, '0');
+      s.textContent = String(total % 60).padStart(2, '0');
+    }
+    setInterval(tick, 1000);
+  </script>
+
+</body>
+</html>
