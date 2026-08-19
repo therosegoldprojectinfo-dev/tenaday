@@ -328,6 +328,15 @@
     }
     .slide-dots span.active { background: #fff; }
 
+
+    /* FAQ */
+    .faq-item { border-bottom: 1px solid #e5e7eb; padding: 18px 0; cursor: pointer; }
+    .faq-q { font-weight: 700; font-size: 16px; color: #000; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .faq-a { font-size: 15px; color: #555; line-height: 1.7; margin-top: 12px; display: none; }
+    .faq-item.open .faq-a { display: block; }
+    .faq-item.open .faq-arrow { transform: rotate(180deg); }
+    .faq-arrow { transition: transform 0.2s; font-size: 18px; color: #7c3aed; flex-shrink: 0; }
+
     /* STICKY BAR */
     .sticky-bar {
       position: fixed;
@@ -480,6 +489,34 @@
       <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/money-back-badge.png" alt="365 Day Money Back Guarantee" style="width:140px;height:auto;margin-bottom:16px;display:block;margin:0 auto 16px;"/>
       <p style="font-weight:800;font-size:20px;color:rgb(0,173,33);margin-bottom:10px">You get every cent back.</p>
       <p style="font-size:16px;color:#000;line-height:1.8">Try Numio completely risk-free for 365 days. If your child isn't practicing more, we'll refund every cent. No questions asked.</p>
+    </div>
+  </div>
+
+
+  <!-- FAQ -->
+  <div style="max-width:600px;margin:56px auto 0;padding:0 24px 60px;">
+    <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(26px,7vw,36px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:8px;text-align:center">Frequently Asked Questions</p>
+    <p style="text-align:center;font-size:15px;color:#888;margin-bottom:32px">Your questions, answered.</p>
+
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">What is Numio? <span class="faq-arrow">▾</span></div>
+      <div class="faq-a">Numio helps your child practice what they're actually learning at school. Just take a picture of their lesson, and Numio creates personalized practice for them.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">How does Numio know what my child needs to practice? <span class="faq-arrow">▾</span></div>
+      <div class="faq-a">You simply take a picture of their school lesson, worksheet, or notes. Numio uses it to create practice based on what they're currently learning.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Will my child actually want to use it? <span class="faq-arrow">▾</span></div>
+      <div class="faq-a">Numio is designed to make practice more motivating. Your child earns coins and rewards as they practice, giving them a reason to keep coming back.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">Do I need to sit with my child while they practice? <span class="faq-arrow">▾</span></div>
+      <div class="faq-a">No. Numio is designed so your child can practice independently, meaning less work for you.</div>
+    </div>
+    <div class="faq-item" onclick="this.classList.toggle('open')">
+      <div class="faq-q">What if Numio doesn't work for my child? <span class="faq-arrow">▾</span></div>
+      <div class="faq-a">You're covered by our 365-day money-back guarantee. Try Numio with your child, and if you don't feel it's helping them practice, you can get your full $15 back.</div>
     </div>
   </div>
 
