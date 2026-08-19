@@ -19,7 +19,7 @@
 
     /* TOP BANNER */
     .top-banner {
-      background: #111;
+      background: #7c3aed;
       color: #fff;
       display: flex;
       align-items: center;
@@ -29,7 +29,7 @@
       font-weight: 600;
       letter-spacing: 0.04em;
     }
-    .top-banner .offer { color: #4ade80; text-transform: uppercase; }
+    .top-banner .offer { color: #fff; text-transform: uppercase; }
     .countdown { display: flex; gap: 6px; align-items: center; }
     .countdown .digit {
       background: #fff;
@@ -372,11 +372,18 @@
 <body>
 
   <div class="top-banner">
-    <div class="offer">⚡ Back to School — Save 75%</div>
+    <div>
+      <div class="offer">BACK TO SCHOOL OFFER</div>
+      <div style="color:rgba(255,255,255,0.85);font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">Save up to 75% today</div>
+    </div>
     <div class="countdown">
-      <span class="digit" id="m">14</span>
+      <span class="digit" id="b-d">03</span>
       <span class="sep">:</span>
-      <span class="digit" id="s">59</span>
+      <span class="digit" id="b-h">23</span>
+      <span class="sep">:</span>
+      <span class="digit" id="b-m">59</span>
+      <span class="sep">:</span>
+      <span class="digit" id="b-s">59</span>
     </div>
   </div>
 
@@ -539,32 +546,32 @@
   </div>
 
   <script>
-    let total = 14 * 60 + 59;
-    const m = document.getElementById('m');
-    const s = document.getElementById('s');
-    function tick() {
-      if (total <= 0) return;
-      total--;
-      m.textContent = String(Math.floor(total / 60)).padStart(2, '0');
-      s.textContent = String(total % 60).padStart(2, '0');
+    // Shared countdown end (3 days from now)
+    const _timerEnd = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).getTime();
+    function updateTimers(){
+      const diff = Math.max(0, _timerEnd - Date.now());
+      const d = String(Math.floor(diff/86400000)).padStart(2,'0');
+      const h = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+      const m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+      const s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+      // Banner
+      document.getElementById('b-d').textContent = d;
+      document.getElementById('b-h').textContent = h;
+      document.getElementById('b-m').textContent = m;
+      document.getElementById('b-s').textContent = s;
+      // Offer section
+      if(document.getElementById('t-d')) document.getElementById('t-d').textContent = d;
+      if(document.getElementById('t-h')) document.getElementById('t-h').textContent = h;
+      if(document.getElementById('t-m')) document.getElementById('t-m').textContent = m;
+      if(document.getElementById('t-s')) document.getElementById('t-s').textContent = s;
     }
-    setInterval(tick, 1000);
+    updateTimers(); setInterval(updateTimers, 1000);
 
   
   function goToCheckout() {
     window.location.href = 'https://buy.stripe.com/6oUaEPgFL0G6cQ27rP7EQ0r';
   }
 
-  // Full countdown timer
-  const timerEnd = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).getTime();
-  function tickFull(){
-    const diff = Math.max(0, timerEnd - Date.now());
-    document.getElementById('t-d').textContent = String(Math.floor(diff/86400000)).padStart(2,'0');
-    document.getElementById('t-h').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
-    document.getElementById('t-m').textContent = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
-    document.getElementById('t-s').textContent = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
-  }
-  tickFull(); setInterval(tickFull, 1000);
 
   // Slideshow
   (function(){
