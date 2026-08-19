@@ -381,25 +381,24 @@
 </head>
 <body>
 
-  <!-- 1. BANNER -->
-  <div class="top-banner">
-    <div>
-      <div class="offer">BACK TO SCHOOL OFFER</div>
-      <div style="color:rgba(255,255,255,0.85);font-size:12px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;">Save up to 75% today</div>
-    </div>
-    <div class="countdown">
-      <span class="digit" id="b-d">03</span>
-      <span class="sep">:</span>
-      <span class="digit" id="b-h">23</span>
-      <span class="sep">:</span>
-      <span class="digit" id="b-m">59</span>
+  <!-- STICKY TIMER BANNER -->
+  <div id="top-banner" style="background:#7c3aed;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;position:sticky;top:0;z-index:200;gap:8px;flex-wrap:wrap;">
+    <div style="font-size:13px;font-weight:800;white-space:nowrap;">🎒 Get Numio for 75% off today · Offer ends in:</div>
+    <div style="display:flex;gap:5px;align-items:center;">
+      <div style="background:#d4e157;border-radius:6px;padding:3px 8px;text-align:center;min-width:36px;"><div id="b-d" style="font-size:16px;font-weight:900;color:#1a1a1a;line-height:1;">03</div><div style="font-size:7px;font-weight:700;color:#1a1a1a;text-transform:uppercase;">DAYS</div></div>
+      <span style="font-weight:900;">:</span>
+      <div style="background:#d4e157;border-radius:6px;padding:3px 8px;text-align:center;min-width:36px;"><div id="b-h" style="font-size:16px;font-weight:900;color:#1a1a1a;line-height:1;">23</div><div style="font-size:7px;font-weight:700;color:#1a1a1a;text-transform:uppercase;">HRS</div></div>
+      <span style="font-weight:900;">:</span>
+      <div style="background:#d4e157;border-radius:6px;padding:3px 8px;text-align:center;min-width:36px;"><div id="b-m" style="font-size:16px;font-weight:900;color:#1a1a1a;line-height:1;">59</div><div style="font-size:7px;font-weight:700;color:#1a1a1a;text-transform:uppercase;">MIN</div></div>
+      <span style="font-weight:900;">:</span>
+      <div style="background:#d4e157;border-radius:6px;padding:3px 8px;text-align:center;min-width:36px;"><div id="b-s" style="font-size:16px;font-weight:900;color:#1a1a1a;line-height:1;">59</div><div style="font-size:7px;font-weight:700;color:#1a1a1a;text-transform:uppercase;">SEC</div></div>
     </div>
   </div>
 
   <!-- 2. HERO HEADLINE -->
   <div class="hero" style="background:#fff;">
-    <div class="eyebrow">For busy parents</div>
-    <h1>Your child will actually<br><span>practise better</span></h1>
+    <div class="eyebrow">⚠️ Busy parents</div>
+    <h1>Get unlimited personalized practice<br>for your child this <span>entire school year</span></h1>
   </div>
 
   <!-- 3. VIDEO PLACEHOLDER -->
@@ -411,16 +410,6 @@
     </div>
   </div>
 
-  <!-- 4. TIMER + OFFER -->
-  <div class="timer-wrap" style="margin-top:32px;">
-    <div class="timer-label">🎒 Get 9 Months FREE · Offer Ends In:</div>
-    <div class="timer-units">
-      <div class="t-block"><div class="t-num" id="t-d">03</div><div class="t-label-u">DAYS</div></div>
-      <div class="t-block"><div class="t-num" id="t-h">23</div><div class="t-label-u">HRS</div></div>
-      <div class="t-block"><div class="t-num" id="t-m">59</div><div class="t-label-u">MIN</div></div>
-      <div class="t-block"><div class="t-num" id="t-s">59</div><div class="t-label-u">SEC</div></div>
-    </div>
-  </div>
 
   <div id="offer" style="padding:0 20px;max-width:680px;margin:24px auto 0;">
     <div class="offer-box">
