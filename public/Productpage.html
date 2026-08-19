@@ -163,6 +163,171 @@
     }
     .how-item strong { font-weight: 900; }
 
+
+    /* TIMER BAR */
+    .timer-wrap {
+      background: linear-gradient(90deg,#5b21b6,#7c3aed,#a855f7,#7c3aed,#5b21b6);
+      padding: 14px 16px;
+      text-align: center;
+      margin-top: 48px;
+    }
+    .timer-label {
+      font-weight: 900;
+      font-size: 13px;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .timer-units {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .t-block {
+      background: #d4e157;
+      border-radius: 8px;
+      padding: 5px 10px;
+      text-align: center;
+      min-width: 44px;
+    }
+    .t-num { font-size: 22px; font-weight: 900; color: #1a1a1a; line-height: 1; }
+    .t-label-u { font-size: 8px; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 0.06em; }
+
+    /* OFFER BOX */
+    .offer-box {
+      background: #7c3aed;
+      margin: 0 20px;
+      border-radius: 16px;
+      overflow: hidden;
+      max-width: 640px;
+      margin: 24px auto 0;
+    }
+    .offer-banner-inner {
+      background: #fbbf24;
+      text-align: center;
+      padding: 14px 20px;
+    }
+    .offer-banner-inner .ob-title {
+      font-weight: 900;
+      font-size: 22px;
+      color: #000;
+      letter-spacing: -0.4px;
+      line-height: 1.2;
+    }
+    .offer-banner-inner .ob-sub {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(0,0,0,0.7);
+      margin-top: 4px;
+    }
+    .offer-inner {
+      padding: 24px 20px;
+    }
+    .offer-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding: 0;
+    }
+    .offer-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .offer-price {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .offer-price .old {
+      font-size: 20px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.5);
+      text-decoration: line-through;
+      margin-right: 12px;
+    }
+    .offer-price .new {
+      font-size: 32px;
+      font-weight: 900;
+      color: #fff;
+    }
+    .offer-cta {
+      display: block;
+      width: 100%;
+      background: rgb(0,173,33);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: clamp(16px, 4.5vw, 22px);
+      height: 70px;
+      line-height: 70px;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.4), 0 4px 12px rgba(0,0,0,0.25);
+      letter-spacing: -0.3px;
+      margin-bottom: 14px;
+    }
+    .offer-cta:active { opacity: 0.9; }
+    .offer-guarantee {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* SLIDESHOW */
+    .slideshow {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1/1;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+    .slideshow img {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .slideshow img.active { opacity: 1; }
+    .slide-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      background: rgba(255,255,255,0.85);
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 16px; color: #7c3aed; font-weight: 900;
+      user-select: none;
+    }
+    .slide-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .slide-dots span {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #ddd6fe;
+      transition: background 0.3s;
+      display: inline-block;
+    }
+    .slide-dots span.active { background: #fff; }
+
     /* STICKY BAR */
     .sticky-bar {
       position: fixed;
@@ -247,12 +412,65 @@
     </div>
   </div>
 
+
+  <!-- TIMER + OFFER -->
+  <div class="timer-wrap">
+    <div class="timer-label">🎒 Get 9 Months FREE · Offer Ends In:</div>
+    <div class="timer-units">
+      <div class="t-block"><div class="t-num" id="t-d">03</div><div class="t-label-u">DAYS</div></div>
+      <div class="t-block"><div class="t-num" id="t-h">23</div><div class="t-label-u">HRS</div></div>
+      <div class="t-block"><div class="t-num" id="t-m">59</div><div class="t-label-u">MIN</div></div>
+      <div class="t-block"><div class="t-num" id="t-s">59</div><div class="t-label-u">SEC</div></div>
+    </div>
+  </div>
+
+  <div id="offer" style="padding: 0 20px; max-width: 680px; margin: 24px auto 0;">
+    <div class="offer-box">
+      <div class="offer-banner-inner">
+        <div class="ob-title">🎒 Back to School Offer</div>
+        <div class="ob-sub">Try Numio with 365-day money-back guarantee for 75% off</div>
+      </div>
+      <div class="offer-inner">
+        <!-- Slideshow -->
+        <div class="slideshow" id="offer-slideshow">
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide1.png" class="active"/>
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide2.png"/>
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide3.png"/>
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide4.png"/>
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide5.png"/>
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide6.png"/>
+          <div class="slide-arrow" id="slide-prev" style="left:8px">‹</div>
+          <div class="slide-arrow" id="slide-next" style="right:8px">›</div>
+        </div>
+        <div class="slide-dots" id="offer-dots">
+          <span class="active"></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+
+        <ul class="offer-features">
+          <li><span>✅</span> Unlimited lesson pictures</li>
+          <li><span>✅</span> Personalized practice</li>
+          <li><span>✅</span> Rewards &amp; coins</li>
+          <li><span>✅</span> Progress tracking</li>
+          <li><span>✅</span> Full year support</li>
+        </ul>
+
+        <div class="offer-price">
+          <span class="old">$60/year</span>
+          <span class="new">$15/year</span>
+        </div>
+
+        <button class="offer-cta" onclick="goToCheckout()">Start My Child's First Quiz →</button>
+        <div class="offer-guarantee">🛡️ 365-Day Money-Back Guarantee</div>
+      </div>
+    </div>
+  </div>
+
   <div class="sticky-bar">
     <div>
       <div class="price">$15<span>/year</span></div>
       <div class="per">Less than $1.25/month</div>
     </div>
-    <button class="cta-btn">Get Numio Now →</button>
+    <button class="cta-btn" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Get Numio Now →</button>
   </div>
 
   <script>
@@ -266,6 +484,42 @@
       s.textContent = String(total % 60).padStart(2, '0');
     }
     setInterval(tick, 1000);
+
+  
+  function goToCheckout() {
+    window.location.href = 'https://buy.stripe.com/6oUaEPgFL0G6cQ27rP7EQ0r';
+  }
+
+  // Full countdown timer
+  const timerEnd = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).getTime();
+  function tickFull(){
+    const diff = Math.max(0, timerEnd - Date.now());
+    document.getElementById('t-d').textContent = String(Math.floor(diff/86400000)).padStart(2,'0');
+    document.getElementById('t-h').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('t-m').textContent = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+    document.getElementById('t-s').textContent = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+  }
+  tickFull(); setInterval(tickFull, 1000);
+
+  // Slideshow
+  (function(){
+    var el = document.getElementById('offer-slideshow');
+    if(!el) return;
+    var slides = Array.from(el.querySelectorAll('img:not([class*="arrow"])'));
+    var dots = Array.from(document.querySelectorAll('#offer-dots span'));
+    var current = 0;
+    function showSlide(n){
+      slides[current].classList.remove('active');
+      dots[current].classList.remove('active');
+      current = (n + slides.length) % slides.length;
+      slides[current].classList.add('active');
+      dots[current].classList.add('active');
+    }
+    document.getElementById('slide-prev').addEventListener('click',function(e){e.stopPropagation();showSlide(current-1);});
+    document.getElementById('slide-next').addEventListener('click',function(e){e.stopPropagation();showSlide(current+1);});
+    setInterval(function(){ showSlide(current+1); }, 3000);
+  })();
+
   </script>
 
 </body>
