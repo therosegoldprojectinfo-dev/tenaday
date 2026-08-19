@@ -121,15 +121,16 @@
     }
     .how-title {
       font-size: clamp(24px, 6vw, 38px);
-      font-weight: 900;
+      font-weight: 400;
       line-height: 1.15;
       color: #111;
       margin-bottom: 32px;
     }
+    .how-title strong { font-weight: 900; }
     .how-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 16px;
       text-align: center;
     }
     .how-item {
@@ -137,26 +138,28 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: clamp(20px, 5vw, 28px);
-      font-weight: 800;
+      font-size: clamp(16px, 4vw, 20px);
+      font-weight: 400;
       color: #111;
-      line-height: 1.3;
-      min-height: 90px;
+      line-height: 1.4;
+      min-height: 80px;
       padding: 0 20px;
     }
     .how-item .check {
       position: absolute;
-      width: 100px;
-      height: 100px;
+      width: 80px;
+      height: 80px;
       object-fit: contain;
-      opacity: 0.8;
-      left: 10px;
+      opacity: 0.85;
+      left: 50%;
       top: 50%;
-      transform: translateY(-50%);
+      transform: translate(-50%, -50%);
+      z-index: 0;
     }
     .how-item span {
       position: relative;
       z-index: 1;
+      max-width: 340px;
     }
     .how-item strong { font-weight: 900; }
 
@@ -227,7 +230,7 @@
 
   <!-- 5. How it works -->
   <div class="how-section">
-    <h2 class="how-title">But how does this weird app<br>help my child practise?</h2>
+    <h2 class="how-title"><strong>But how does this weird app<br>help my child practise?</strong></h2>
     <div class="how-list">
       <div class="how-item">
         <img class="check" src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" alt="check"/>
