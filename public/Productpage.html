@@ -335,7 +335,54 @@
       </div>
     </div>
   </div>
+
+    <!-- TRUST ICONS -->
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:16px;">
+      <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#111;">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#7c3aed" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Limited time offer — 75% off ends soon
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#111;">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#16a34a" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        365-day money-back guarantee — zero risk
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#111;">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#f59e0b" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Save $45 today — only $15 for the whole year
+      </div>
+    </div>
+
+    <!-- MINI FAQ -->
+    <div style="margin-top:20px;border-top:1.5px solid #e5e7eb;padding-top:4px;">
+      <div class="mfaq-item open" onclick="this.classList.toggle('open')">
+        <div class="mfaq-q">How does Numio actually help my son? <span class="mfaq-arrow">▾</span></div>
+        <div class="mfaq-a">You take a picture of what he's learning at school — Numio reads it and instantly builds a quiz around that exact topic. No random questions, no guessing. He practices <strong>exactly</strong> what his teacher taught him that day, which means the practice actually sticks.</div>
+      </div>
+      <div class="mfaq-item" onclick="this.classList.toggle('open')">
+        <div class="mfaq-q">Why would my son actually want to use it? <span class="mfaq-arrow">▾</span></div>
+        <div class="mfaq-a">Because he earns coins every time he completes a quiz — and you decide what those coins unlock. Screen time, a treat, a reward he cares about. Kids come back on their own because <strong>they want the reward</strong>, not because you're telling them to study.</div>
+      </div>
+      <div class="mfaq-item" onclick="this.classList.toggle('open')">
+        <div class="mfaq-q">What if I don't like it? <span class="mfaq-arrow">▾</span></div>
+        <div class="mfaq-a">You get every cent back. You have 365 days to try Numio with your child. If you don't feel it's helping, just message us and we'll refund you in full. No questions asked.</div>
+      </div>
+      <div class="mfaq-item" onclick="this.classList.toggle('open')">
+        <div class="mfaq-q">How does it work exactly? <span class="mfaq-arrow">▾</span></div>
+        <div class="mfaq-a">3 steps: <strong>1)</strong> You photograph their lesson or worksheet. <strong>2)</strong> Numio generates a personalized quiz in seconds. <strong>3)</strong> Your child answers the questions and earns coins redeemable for rewards you set. That's it — takes less than 2 minutes to set up.</div>
+      </div>
+    </div>
+
+  </div>
   </div><!-- end desktop-hero -->
+
+  <style>
+    .mfaq-item { border-bottom: 1px solid #e5e7eb; padding: 14px 0; cursor: pointer; }
+    .mfaq-q { font-weight: 700; font-size: 14px; color: #000; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .mfaq-a { font-size: 14px; color: #555; line-height: 1.7; margin-top: 10px; display: none; }
+    .mfaq-item.open .mfaq-a { display: block; }
+    .mfaq-item.open .mfaq-arrow { transform: rotate(180deg); }
+    .mfaq-arrow { transition: transform 0.2s; font-size: 16px; color: #7c3aed; flex-shrink: 0; }
+  </style>
 
   <!-- WHITE WRAPPER for all content below -->
   <div style="background:#fff;position:relative;">
