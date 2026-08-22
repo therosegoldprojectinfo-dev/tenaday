@@ -277,17 +277,9 @@
 <body>
 
   <!-- STICKY TIMER BANNER -->
-  <div id="top-banner" style="background:linear-gradient(90deg,#5b21b6,#7c3aed,#a855f7,#7c3aed,#5b21b6);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 16px;position:sticky;top:0;z-index:200;text-align:center;gap:6px;">
-    <div style="font-size:13px;font-weight:800;">🎒 Get 75% off today · Offer ends in:</div>
-    <div style="display:flex;gap:5px;align-items:center;justify-content:center;">
-      <div style="background:#d4e157;border-radius:6px;padding:3px 8px;text-align:center;min-width:36px;"><div id="b-d" style="font-size:16px;font-weight:900;color:#1a1a1a;line-height:1;">03</div><div style="font-size:7px;font-weight:700;color:#1a1a1a;text-transform:uppercase;">DAYS</div></div>
-      <span style="font-weight:900;">:</span>
-      <div style="background:#d4e157;border-radius:6px;padding:3px 8px;text-align:center;min-width:36px;"><div id="b-h" style="font-size:16px;font-weight:900;color:#1a1a1a;line-height:1;">23</div><div style="font-size:7px;font-weight:700;color:#1a1a1a;text-transform:uppercase;">HRS</div></div>
-      <span style="font-weight:900;">:</span>
-      <div style="background:#d4e157;border-radius:6px;padding:3px 8px;text-align:center;min-width:36px;"><div id="b-m" style="font-size:16px;font-weight:900;color:#1a1a1a;line-height:1;">59</div><div style="font-size:7px;font-weight:700;color:#1a1a1a;text-transform:uppercase;">MIN</div></div>
-      <span style="font-weight:900;">:</span>
-      <div style="background:#d4e157;border-radius:6px;padding:3px 8px;text-align:center;min-width:36px;"><div id="b-s" style="font-size:16px;font-weight:900;color:#1a1a1a;line-height:1;">59</div><div style="font-size:7px;font-weight:700;color:#1a1a1a;text-transform:uppercase;">SEC</div></div>
-    </div>
+  <div id="top-banner" style="background:linear-gradient(90deg,#5b21b6,#7c3aed,#a855f7,#7c3aed,#5b21b6);color:#fff;display:flex;align-items:center;justify-content:center;padding:7px 16px;position:sticky;top:0;z-index:200;gap:8px;white-space:nowrap;">
+    <span style="font-size:13px;font-weight:800;">💰 Save $45 today · Ends in</span>
+    <span style="font-size:13px;font-weight:900;"><span id="b-h">23</span>h <span id="b-m">59</span>min <span id="b-s">59</span>s</span>
   </div>
 
   <div class="desktop-hero">
@@ -520,7 +512,6 @@
       const h = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
       const m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
       const s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
-      if(document.getElementById('b-d')) document.getElementById('b-d').textContent = d;
       if(document.getElementById('b-h')) document.getElementById('b-h').textContent = h;
       if(document.getElementById('b-m')) document.getElementById('b-m').textContent = m;
       if(document.getElementById('b-s')) document.getElementById('b-s').textContent = s;
