@@ -234,13 +234,13 @@
     /* STEPS */
     .steps { display: flex; flex-direction: column; gap: 40px; }
     @media (min-width: 768px) { .steps { flex-direction: row; gap: 32px; } .step { flex: 1; } }
-    .step { display: flex; flex-direction: column; gap: 16px; }
+    .step { display: flex; flex-direction: column; gap: 16px; align-items: center; text-align: center; }
     .step-num-badge {
       width: 40px; height: 40px; background: var(--brand); color: var(--white);
       border-radius: 12px; display: flex; align-items: center; justify-content: center;
       font-weight: 800; font-size: 18px; flex-shrink: 0;
     }
-    .step-img { border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); max-width: 220px; }
+    .step-img { border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow-sm); max-width: 220px; margin: 0 auto; }
     .step h3 { font-size: 17px; margin: 0; }
     .step p { font-size: 15px; color: var(--muted); margin: 0; }
 
@@ -506,18 +506,18 @@
     <div class="wrap" style="max-width:640px;text-align:center;">
       <div class="section-label" style="justify-content:center;">Why it works</div>
       <h2 class="section-heading">But how does this weird app help my child practise?</h2>
-      <div class="helps-list" style="margin-top:32px;">
-        <div class="helps-item">
-          <div class="helps-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          Numio generates quizzes from <strong style="color:var(--dark);">exactly</strong> what they learn at school
+      <div style="display:flex;flex-direction:column;gap:24px;margin-top:32px;">
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,4vw,20px);font-weight:500;color:var(--dark);line-height:1.4;min-height:80px;padding:0 20px;">
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" style="position:absolute;width:80px;height:80px;object-fit:contain;opacity:0.85;left:50%;top:50%;transform:translate(-50%,-50%);z-index:0;" alt=""/>
+          <span style="position:relative;z-index:1;max-width:320px;">Numio generates quizzes from <strong>exactly</strong> what they learn at school</span>
         </div>
-        <div class="helps-item">
-          <div class="helps-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          Quizzes are simple and assure your child <strong style="color:var(--dark);">truly understands</strong>
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,4vw,20px);font-weight:500;color:var(--dark);line-height:1.4;min-height:80px;padding:0 20px;">
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" style="position:absolute;width:80px;height:80px;object-fit:contain;opacity:0.85;left:50%;top:50%;transform:translate(-50%,-50%);z-index:0;" alt=""/>
+          <span style="position:relative;z-index:1;max-width:320px;">Quizzes are simple and assure your child <strong>truly understands</strong></span>
         </div>
-        <div class="helps-item">
-          <div class="helps-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-          Numio rewards them with <strong style="color:var(--dark);">coins and badges</strong> to keep them motivated
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,4vw,20px);font-weight:500;color:var(--dark);line-height:1.4;min-height:80px;padding:0 20px;">
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" style="position:absolute;width:80px;height:80px;object-fit:contain;opacity:0.85;left:50%;top:50%;transform:translate(-50%,-50%);z-index:0;" alt=""/>
+          <span style="position:relative;z-index:1;max-width:320px;">Numio rewards them with <strong>coins and badges</strong> to keep them motivated</span>
         </div>
       </div>
     </div>
