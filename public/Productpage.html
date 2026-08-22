@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'Inter', sans-serif;
       background: #ffffff;
@@ -16,319 +15,6 @@
       padding-bottom: 90px;
       max-width: 100vw;
     }
-
-    /* TOP BANNER */
-    .top-banner {
-      background: #7c3aed;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.04em;
-    }
-    .top-banner .offer { color: #fff; text-transform: uppercase; }
-    .countdown { display: flex; gap: 6px; align-items: center; }
-    .countdown .digit {
-      background: #fff;
-      color: #111;
-      font-size: 18px;
-      font-weight: 800;
-      padding: 4px 10px;
-      border-radius: 4px;
-      min-width: 38px;
-      text-align: center;
-    }
-    .countdown .sep { color: #fff; font-size: 18px; font-weight: 800; }
-
-    /* HERO */
-    .hero {
-      text-align: center;
-      padding: 48px 20px 0;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .hero .eyebrow {
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #888;
-      margin-bottom: 16px;
-    }
-    .hero h1 {
-      font-size: clamp(36px, 10vw, 62px);
-      font-weight: 900;
-      line-height: 1.05;
-      color: #111;
-      margin-bottom: 0;
-    }
-    .hero h1 span { color: #7c3aed; }
-
-    /* BEFORE/AFTER */
-    .before-after-wrap {
-      max-width: 700px;
-      margin: 28px auto 0;
-      padding: 0 16px;
-    }
-    .before-after-wrap img {
-      width: 100%;
-      border-radius: 16px;
-      display: block;
-    }
-
-    /* SUBHEAD + CAPTION */
-    .subhead-block {
-      text-align: center;
-      max-width: 520px;
-      margin: 20px auto 0;
-      padding: 0 24px;
-    }
-    .subhead-block .subhead {
-      font-size: clamp(18px, 4vw, 24px);
-      font-weight: 800;
-      color: #111;
-      font-style: italic;
-      margin-bottom: 10px;
-    }
-    .subhead-block .caption {
-      font-size: 15px;
-      font-weight: 500;
-      color: #111;
-      line-height: 1.6;
-    }
-    .subhead-block .caption strong { color: #111; font-weight: 700; }
-
-    /* BENEFITS */
-    .benefits-wrap {
-      max-width: 700px;
-      margin: 48px auto 0;
-      padding: 0 16px 48px;
-    }
-    .benefits-wrap img {
-      width: 100%;
-      display: block;
-    }
-
-
-    /* HOW IT WORKS */
-    .how-section {
-      max-width: 600px;
-      margin: 48px auto 0;
-      padding: 0 24px;
-      text-align: center;
-    }
-    .how-title {
-      font-size: clamp(24px, 6vw, 38px);
-      font-weight: 400;
-      line-height: 1.15;
-      color: #111;
-      margin-bottom: 32px;
-    }
-    .how-title strong { font-weight: 900; }
-    .how-list {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      text-align: center;
-    }
-    .how-item {
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: clamp(16px, 4vw, 20px);
-      font-weight: 400;
-      color: #111;
-      line-height: 1.4;
-      min-height: 80px;
-      padding: 0 20px;
-    }
-    .how-item .check {
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-      opacity: 0.85;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      z-index: 0;
-    }
-    .how-item span {
-      position: relative;
-      z-index: 1;
-      max-width: 320px;
-    }
-    .how-item strong { font-weight: 900; }
-
-
-    /* TIMER BAR */
-    .timer-wrap {
-      background: linear-gradient(90deg,#5b21b6,#7c3aed,#a855f7,#7c3aed,#5b21b6);
-      padding: 14px 16px;
-      text-align: center;
-      margin-top: 32px;
-    }
-    .timer-label {
-      font-weight: 900;
-      font-size: 13px;
-      color: #fff;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 8px;
-    }
-    .timer-units {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .t-block {
-      background: #d4e157;
-      border-radius: 8px;
-      padding: 5px 10px;
-      text-align: center;
-      min-width: 44px;
-    }
-    .t-num { font-size: 22px; font-weight: 900; color: #1a1a1a; line-height: 1; }
-    .t-label-u { font-size: 8px; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 0.06em; }
-
-    /* OFFER BOX */
-    .offer-box {
-      background: #7c3aed;
-      margin: 0 20px;
-      border-radius: 16px;
-      overflow: hidden;
-      max-width: 640px;
-      margin: 24px auto 0;
-    }
-    .offer-banner-inner {
-      background: #fbbf24;
-      text-align: center;
-      padding: 14px 20px;
-    }
-    .offer-banner-inner .ob-title {
-      font-weight: 900;
-      font-size: 22px;
-      color: #000;
-      letter-spacing: -0.4px;
-      line-height: 1.2;
-    }
-    .offer-banner-inner .ob-sub {
-      font-size: 13px;
-      font-weight: 600;
-      color: rgba(0,0,0,0.7);
-      margin-top: 4px;
-    }
-    .offer-inner {
-      padding: 24px 20px;
-    }
-    .offer-features {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 24px;
-      padding: 0;
-    }
-    .offer-features li {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 16px;
-      font-weight: 600;
-      color: #fff;
-    }
-    .offer-price {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .offer-price .old {
-      font-size: 20px;
-      font-weight: 700;
-      color: rgba(255,255,255,0.5);
-      text-decoration: line-through;
-      margin-right: 12px;
-    }
-    .offer-price .new {
-      font-size: 32px;
-      font-weight: 900;
-      color: #fff;
-    }
-    .offer-cta {
-      display: block;
-      width: 100%;
-      background: rgb(0,173,33);
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-weight: 800;
-      font-size: clamp(16px, 4.5vw, 22px);
-      height: 70px;
-      line-height: 70px;
-      border: none;
-      cursor: pointer;
-      text-align: center;
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.4), 0 4px 12px rgba(0,0,0,0.25);
-      letter-spacing: -0.3px;
-      margin-bottom: 14px;
-    }
-    .offer-cta:active { opacity: 0.9; }
-    .offer-guarantee {
-      text-align: center;
-      font-size: 14px;
-      font-weight: 600;
-      color: #fff;
-    }
-
-    /* SLIDESHOW */
-    .slideshow {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1/1;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-bottom: 12px;
-    }
-    .slideshow img {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
-    .slideshow img.active { opacity: 1; }
-    .slide-arrow {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      z-index: 3;
-      background: rgba(255,255,255,0.85);
-      border-radius: 50%;
-      width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      font-size: 16px; color: #7c3aed; font-weight: 900;
-      user-select: none;
-    }
-    .slide-dots {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    .slide-dots span {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #ddd6fe;
-      transition: background 0.3s;
-      display: inline-block;
-    }
-    .slide-dots span.active { background: #fff; }
-
 
     /* FAQ */
     .faq-item { border-bottom: 1px solid #e5e7eb; padding: 18px 0; cursor: pointer; }
@@ -367,8 +53,7 @@
       transition: background 0.2s, transform 0.1s;
     }
     .cta-btn:hover { background: #6d28d9; transform: scale(1.02); }
-  </style>
-  <style>
+
     .btn-cta{display:block;width:100%;background:rgb(0,173,33);color:#fff;font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(16px,4.5vw,24px);height:70px;line-height:70px;padding:0 20px;border:none;cursor:pointer;text-align:center;box-shadow:0 3px 3px 2px rgba(0,0,0,0.2);letter-spacing:-0.3px;margin-bottom:16px;transition:opacity 0.1s;white-space:nowrap}
     .btn-cta:active{opacity:0.9}
     .trust-row{display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;color:#374151;margin-bottom:20px}
@@ -377,6 +62,163 @@
     .step-num{background:#7c3aed;color:#fff;font-family:'Inter',sans-serif;font-weight:900;font-size:18px;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
     .step-body .step-title{font-weight:800;font-size:17px;color:#000;margin-bottom:4px;letter-spacing:-0.3px}
     .step-body p{font-size:15px;color:#4b5563;line-height:1.7}
+
+    /* TOP HERO SLIDESHOW */
+    .hero-slideshow {
+      position: relative;
+      width: 100%;
+      background: #f8f4ff;
+      overflow: hidden;
+    }
+    .hero-slideshow .slides-track {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1/1;
+    }
+    .hero-slideshow .slide {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .hero-slideshow .slide.active { opacity: 1; }
+    .hero-slideshow .slide img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .hero-slide-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+      background: rgba(255,255,255,0.9);
+      border-radius: 50%;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      font-size: 18px; color: #7c3aed; font-weight: 900;
+      user-select: none;
+      border: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .thumb-strip {
+      display: flex;
+      gap: 6px;
+      padding: 10px 12px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      background: #fff;
+    }
+    .thumb-strip::-webkit-scrollbar { display: none; }
+    .thumb-strip .thumb {
+      flex-shrink: 0;
+      width: 52px; height: 52px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      background: #f0ebff;
+    }
+    .thumb-strip .thumb.active { border-color: #7c3aed; }
+    .thumb-strip .thumb img {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    /* PRODUCT INFO BLOCK */
+    .product-info {
+      padding: 16px 20px 0;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .product-tag {
+      display: inline-block;
+      background: #7c3aed;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .stars-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .stars-row .star { color: #f59e0b; font-size: 20px; }
+    .product-headline {
+      font-size: clamp(22px, 6vw, 32px);
+      font-weight: 900;
+      line-height: 1.15;
+      color: #111;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+    }
+    .product-headline span { color: #7c3aed; }
+    .price-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+    .price-old {
+      font-size: 18px;
+      font-weight: 600;
+      color: #aaa;
+      text-decoration: line-through;
+    }
+    .price-new {
+      font-size: 28px;
+      font-weight: 900;
+      color: #111;
+    }
+    .save-badge {
+      background: #111;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 5px 10px;
+      border-radius: 20px;
+    }
+    .product-desc {
+      font-size: 15px;
+      color: #4b5563;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .product-cta {
+      display: block;
+      width: 100%;
+      background: rgb(0,173,33);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: clamp(16px, 4.5vw, 22px);
+      height: 70px;
+      line-height: 70px;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 3px 3px 2px rgba(0,0,0,0.2);
+      letter-spacing: -0.3px;
+      margin-bottom: 12px;
+    }
+    .product-guarantee {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 0;
+    }
   </style>
 </head>
 <body>
@@ -395,61 +237,49 @@
     </div>
   </div>
 
-  <!-- 2. HERO HEADLINE -->
-  <div class="hero" style="background:#fff;">
-    <div class="eyebrow">⚠️ Busy parents</div>
-    <h1>Get unlimited personalized practice<br>for your child this <span>entire school year</span></h1>
-  </div>
-
-
-
-
-  <div id="offer" style="padding:0 20px;max-width:680px;margin:24px auto 0;">
-    <div class="offer-box">
-      <div class="offer-banner-inner">
-        <div class="ob-title">🎒 Back to School Offer</div>
-        <div class="ob-sub">Try Numio with 365-day money-back guarantee for 75% off</div>
-      </div>
-      <div class="offer-inner">
-        <div class="slideshow" id="offer-slideshow">
-          <div class="active" style="position:absolute;top:0;left:0;width:100%;height:100%;background:#f0ebff;display:flex;flex-direction:column;align-items:center;justify-content:center;">
-            <div style="font-size:48px;margin-bottom:10px;">▶️</div>
-            <div style="font-weight:800;font-size:16px;color:#7c3aed;">Video coming soon</div>
-            <div style="font-size:12px;color:#888;margin-top:4px;">See Numio in action</div>
-          </div>
-          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide1.png"/>
-          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide2.png"/>
-          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide3.png"/>
-          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide4.png"/>
-          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide5.png"/>
-          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/slide6.png"/>
-          <div class="slide-arrow" id="slide-prev" style="left:8px">‹</div>
-          <div class="slide-arrow" id="slide-next" style="right:8px">›</div>
-        </div>
-        <div class="slide-dots" id="offer-dots">
-          <span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span>
-        </div>
-        <ul class="offer-features">
-          <li><span>✅</span> Unlimited lesson pictures</li>
-          <li><span>✅</span> Personalized practice</li>
-          <li><span>✅</span> Rewards &amp; coins</li>
-          <li><span>✅</span> Progress tracking</li>
-          <li><span>✅</span> Full year support</li>
-        </ul>
-        <div class="offer-price">
-          <span class="old">$60/year</span>
-          <span class="new">$15/year</span>
-        </div>
-        <button class="offer-cta" onclick="goToCheckout()">Start My Child's First Quiz →</button>
-        <div class="offer-guarantee">🛡️ 365-Day Money-Back Guarantee</div>
-      </div>
+  <!-- HERO: IMAGE SLIDESHOW -->
+  <div class="hero-slideshow" id="hero-ss">
+    <div class="slides-track">
+      <div class="slide active"><img src="Get_better_at_what_you_learn_at_school.png" alt="Numio app"/></div>
+      <div class="slide"><img src="Get_better_at_what_you_learn_at_school__1_.png" alt="Benefits"/></div>
+      <div class="slide"><img src="Get_better_at_what_you_learn_at_school__2_.png" alt="How it works"/></div>
+      <div class="slide"><img src="Get_better_at_what_you_learn_at_school__3_.png" alt="Before After"/></div>
+      <div class="slide"><img src="Get_better_at_what_you_learn_at_school__4_.png" alt="Comparison"/></div>
+      <div class="slide"><img src="Get_better_at_what_you_learn_at_school__5_.png" alt="Guarantee"/></div>
+      <button class="hero-slide-arrow" id="hs-prev" style="left:8px">‹</button>
+      <button class="hero-slide-arrow" id="hs-next" style="right:8px">›</button>
+    </div>
+    <div class="thumb-strip" id="hs-thumbs">
+      <div class="thumb active"><img src="Get_better_at_what_you_learn_at_school.png"/></div>
+      <div class="thumb"><img src="Get_better_at_what_you_learn_at_school__1_.png"/></div>
+      <div class="thumb"><img src="Get_better_at_what_you_learn_at_school__2_.png"/></div>
+      <div class="thumb"><img src="Get_better_at_what_you_learn_at_school__3_.png"/></div>
+      <div class="thumb"><img src="Get_better_at_what_you_learn_at_school__4_.png"/></div>
+      <div class="thumb"><img src="Get_better_at_what_you_learn_at_school__5_.png"/></div>
     </div>
   </div>
 
-  <!-- WHITE WRAPPER for all content below offer -->
+  <!-- PRODUCT INFO -->
+  <div class="product-info" id="offer">
+    <div class="product-tag">🎒 Back to School Offer</div>
+    <div class="stars-row">
+      <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+    </div>
+    <h1 class="product-headline">Get unlimited personalized practice<br>for your child this <span>entire school year</span></h1>
+    <div class="price-row">
+      <span class="price-old">$60/year</span>
+      <span class="price-new">$15/year</span>
+      <span class="save-badge">You Save $45 (75%)</span>
+    </div>
+    <p class="product-desc">Just take a picture of their lesson — Numio creates a personalized quiz in seconds. Your child practices exactly what they learned, earns coins, and redeems rewards you set.</p>
+    <button class="product-cta" onclick="goToCheckout()">Start My Child's First Quiz →</button>
+    <div class="product-guarantee">🛡️ 365-Day Money-Back Guarantee · Less than $1.25/month</div>
+  </div>
+
+  <!-- WHITE WRAPPER for all content below -->
   <div style="background:#fff;position:relative;">
 
-    <!-- 5. IS THIS YOU? (Problem — builds empathy right after they see the price) -->
+    <!-- IS THIS YOU? -->
     <div style="background:#fff5f5;padding:40px 0;margin:48px 0 0;">
       <div style="max-width:640px;margin:0 auto;padding:0 20px;">
         <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(26px,7vw,36px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:24px;text-align:center">Does this sound like you?</p>
@@ -464,7 +294,6 @@
         </div>
       </div>
     </div>
-
 
     <!-- FOUNDER STORY -->
     <div style="max-width:640px;margin:0 auto;padding:48px 20px 0;">
@@ -486,7 +315,7 @@
       <div class="trust-row"><span class="tc">✅</span> 365-Day Money-Back Guarantee</div>
     </div>
 
-    <!-- 6. HOW IT WORKS (3 steps with GIFs) -->
+    <!-- HOW IT WORKS -->
     <div style="background:#f5f3ff;padding:40px 0;margin-top:0;">
       <div style="max-width:640px;margin:0 auto;padding:0 20px;">
         <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(28px,7vw,38px);color:#7c3aed;line-height:1.2;letter-spacing:-0.02em;margin-bottom:8px;text-align:center">Here's how it works →</p>
@@ -524,36 +353,35 @@
       </div>
     </div>
 
-    <!-- 7. HOW IT HELPS (checkmarks) -->
-    <div class="how-section">
-      <h2 class="how-title"><strong>But how does this weird app<br>help my child practise?</strong></h2>
-      <div class="how-list">
-        <div class="how-item">
-          <img class="check" src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" alt="check"/>
-          <span>Numio generates quizzes from <strong>exactly</strong> what they learn at school</span>
+    <!-- HOW IT HELPS -->
+    <div style="max-width:600px;margin:48px auto 0;padding:0 24px;text-align:center;">
+      <h2 style="font-size:clamp(24px,6vw,38px);font-weight:400;line-height:1.15;color:#111;margin-bottom:32px;"><strong>But how does this weird app<br>help my child practise?</strong></h2>
+      <div style="display:flex;flex-direction:column;gap:24px;text-align:center;">
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,4vw,20px);font-weight:400;color:#111;line-height:1.4;min-height:80px;padding:0 20px;">
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" style="position:absolute;width:80px;height:80px;object-fit:contain;opacity:0.85;left:50%;top:50%;transform:translate(-50%,-50%);z-index:0;" alt="check"/>
+          <span style="position:relative;z-index:1;max-width:320px;">Numio generates quizzes from <strong>exactly</strong> what they learn at school</span>
         </div>
-        <div class="how-item">
-          <img class="check" src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" alt="check"/>
-          <span>Quizzes are simple and assure your child <strong>truly understands</strong></span>
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,4vw,20px);font-weight:400;color:#111;line-height:1.4;min-height:80px;padding:0 20px;">
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" style="position:absolute;width:80px;height:80px;object-fit:contain;opacity:0.85;left:50%;top:50%;transform:translate(-50%,-50%);z-index:0;" alt="check"/>
+          <span style="position:relative;z-index:1;max-width:320px;">Quizzes are simple and assure your child <strong>truly understands</strong></span>
         </div>
-        <div class="how-item">
-          <img class="check" src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" alt="check"/>
-          <span>Numio rewards them with <strong>coins and badges</strong> to keep them motivated</span>
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(16px,4vw,20px);font-weight:400;color:#111;line-height:1.4;min-height:80px;padding:0 20px;">
+          <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/check.png" style="position:absolute;width:80px;height:80px;object-fit:contain;opacity:0.85;left:50%;top:50%;transform:translate(-50%,-50%);z-index:0;" alt="check"/>
+          <span style="position:relative;z-index:1;max-width:320px;">Numio rewards them with <strong>coins and badges</strong> to keep them motivated</span>
         </div>
       </div>
     </div>
 
-    <!-- 8. WHY WOULD THEY WANT TO -->
+    <!-- WHY WOULD THEY WANT TO -->
     <div style="max-width:600px;margin:56px auto 0;padding:0 24px;text-align:center;">
       <h2 style="font-family:'Inter',sans-serif;font-size:clamp(26px,7vw,38px);font-weight:900;line-height:1.15;color:#111;margin-bottom:28px;">But Why Would My Child <span style="color:#7c3aed;">WANT</span> to Practice With This Weird App?</h2>
       <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/child.png" alt="How Numio motivation works" style="width:100%;display:block;"/>
       <p style="font-size:18px;font-weight:700;color:#111;margin-top:24px;line-height:1.5;">So instead of constantly asking them to practice, you give them a reason to come back.</p>
-
-      <button class="btn-cta" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Help your child get better grades →</button>
+      <button class="btn-cta" style="margin-top:24px;" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Help your child get better grades →</button>
       <div class="trust-row"><span class="tc">✅</span> 365-Day Money-Back Guarantee</div>
     </div>
 
-    <!-- 9. IS THIS RIGHT FOR YOU -->
+    <!-- IS THIS RIGHT FOR YOU -->
     <div style="background:#f5f3ff;padding:40px 0;margin-top:56px;">
       <div style="max-width:640px;margin:0 auto;padding:0 20px;">
         <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(28px,7vw,38px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:20px;text-align:center">"But is this even right for you?"</p>
@@ -571,8 +399,7 @@
       </div>
     </div>
 
-
-    <!-- 10. COMPARE -->
+    <!-- COMPARE -->
     <div style="max-width:600px;margin:56px auto 0;padding:0 24px;text-align:center;">
       <h2 style="font-family:'Inter',sans-serif;font-size:clamp(32px,9vw,52px);font-weight:900;line-height:1.1;color:#111;margin-bottom:32px;">You tried it all.<br>Let's compare.</h2>
       <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Simple%20and%20targeted%20questions.png" alt="Numio vs the rest" style="width:100%;max-width:480px;display:block;margin:0 auto 24px;"/>
@@ -580,7 +407,7 @@
       <div class="trust-row"><span class="tc">✅</span> 365-Day Money-Back Guarantee</div>
     </div>
 
-    <!-- 11. GUARANTEE -->
+    <!-- GUARANTEE -->
     <div style="max-width:600px;margin:48px auto 0;padding:0 24px;">
       <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(26px,7vw,36px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:24px;text-align:center">And what if, for some weird reason, Numio doesn't help my child?</p>
       <div style="border:2px solid rgb(0,173,33);border-radius:12px;padding:24px;text-align:center;">
@@ -588,12 +415,11 @@
         <p style="font-weight:800;font-size:20px;color:rgb(0,173,33);margin-bottom:10px">You get every cent back.</p>
         <p style="font-size:16px;color:#000;line-height:1.8">Try Numio completely risk-free for 365 days. If your child isn't practicing more, we'll refund every cent. No questions asked.</p>
       </div>
-
-        <button class="btn-cta" style="margin-top:24px;" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Help your child get better grades →</button>
-        <div class="trust-row"><span class="tc">✅</span> 365-Day Money-Back Guarantee</div>
+      <button class="btn-cta" style="margin-top:24px;" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Help your child get better grades →</button>
+      <div class="trust-row"><span class="tc">✅</span> 365-Day Money-Back Guarantee</div>
     </div>
 
-    <!-- 12. FAQ -->
+    <!-- FAQ -->
     <div style="max-width:600px;margin:56px auto 0;padding:0 24px 60px;">
       <p style="font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(26px,7vw,36px);color:#000;line-height:1.2;letter-spacing:-0.02em;margin-bottom:8px;text-align:center">Frequently Asked Questions</p>
       <p style="text-align:center;font-size:15px;color:#888;margin-bottom:32px">Your questions, answered.</p>
@@ -631,7 +457,7 @@
   </div>
 
   <script>
-    // Shared countdown end (3 days from now)
+    // Countdown timer
     const _timerEnd = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).getTime();
     function updateTimers(){
       const diff = Math.max(0, _timerEnd - Date.now());
@@ -639,43 +465,34 @@
       const h = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
       const m = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
       const s = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
-      // Banner
       if(document.getElementById('b-d')) document.getElementById('b-d').textContent = d;
       if(document.getElementById('b-h')) document.getElementById('b-h').textContent = h;
       if(document.getElementById('b-m')) document.getElementById('b-m').textContent = m;
-      // seconds hidden in banner
-      // Offer section
-      if(document.getElementById('t-d')) document.getElementById('t-d').textContent = d;
-      if(document.getElementById('t-h')) document.getElementById('t-h').textContent = h;
-      if(document.getElementById('t-m')) document.getElementById('t-m').textContent = m;
-      if(document.getElementById('t-s')) document.getElementById('t-s').textContent = s;
+      if(document.getElementById('b-s')) document.getElementById('b-s').textContent = s;
     }
     updateTimers(); setInterval(updateTimers, 1000);
 
-  
-  function goToCheckout() {
-    window.location.href = 'https://buy.stripe.com/6oUaEPgFL0G6cQ27rP7EQ0r';
-  }
-
-
-  // Slideshow
-  (function(){
-    var el = document.getElementById('offer-slideshow');
-    if(!el) return;
-    var slides = Array.from(el.querySelectorAll('img:not([class*="arrow"]), div.active, div[style*="background:#f0ebff"]')).filter(function(e){ return !e.classList.contains('slide-arrow'); });
-    var dots = Array.from(document.querySelectorAll('#offer-dots span'));
-    var current = 0;
-    function showSlide(n){
-      slides[current].classList.remove('active');
-      dots[current].classList.remove('active');
-      current = (n + slides.length) % slides.length;
-      slides[current].classList.add('active');
-      dots[current].classList.add('active');
+    function goToCheckout() {
+      window.location.href = 'https://buy.stripe.com/6oUaEPgFL0G6cQ27rP7EQ0r';
     }
-    document.getElementById('slide-prev').addEventListener('click',function(e){e.stopPropagation();showSlide(current-1);});
-    document.getElementById('slide-next').addEventListener('click',function(e){e.stopPropagation();showSlide(current+1);});
-  })();
 
+    // Hero slideshow
+    (function(){
+      var ss = document.getElementById('hero-ss');
+      var slides = ss.querySelectorAll('.slide');
+      var thumbs = ss.querySelectorAll('.thumb');
+      var current = 0;
+      function show(n){
+        slides[current].classList.remove('active');
+        thumbs[current].classList.remove('active');
+        current = (n + slides.length) % slides.length;
+        slides[current].classList.add('active');
+        thumbs[current].classList.add('active');
+      }
+      document.getElementById('hs-prev').addEventListener('click', function(e){ e.stopPropagation(); show(current-1); });
+      document.getElementById('hs-next').addEventListener('click', function(e){ e.stopPropagation(); show(current+1); });
+      thumbs.forEach(function(t, i){ t.addEventListener('click', function(){ show(i); }); });
+    })();
   </script>
 
 </body>
