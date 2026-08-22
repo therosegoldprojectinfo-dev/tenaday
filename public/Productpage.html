@@ -36,6 +36,15 @@
       justify-content: space-between;
       z-index: 999;
       box-shadow: 0 -4px 24px rgba(0,0,0,0.09);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(100%);
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .sticky-bar.visible {
+      opacity: 1;
+      pointer-events: all;
+      transform: translateY(0);
     }
     .price { font-size: 22px; font-weight: 900; color: #111; }
     .price span { font-size: 14px; font-weight: 500; color: #888; }
@@ -53,6 +62,50 @@
       transition: background 0.2s, transform 0.1s;
     }
     .cta-btn:hover { background: #6d28d9; transform: scale(1.02); }
+
+    /* DESKTOP */
+    @media (min-width: 768px) {
+      body { padding-bottom: 0; }
+
+      /* hero: side by side on desktop */
+      .desktop-hero {
+        display: flex;
+        align-items: flex-start;
+        gap: 40px;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 40px 40px 0;
+      }
+      .desktop-hero .hero-slideshow {
+        flex: 1;
+        max-width: 520px;
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .desktop-hero .product-info {
+        flex: 1;
+        padding: 0;
+        position: sticky;
+        top: 80px;
+      }
+
+      /* content max width on desktop */
+      .desktop-content {
+        max-width: 860px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .sticky-bar {
+        max-width: 860px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100%);
+        border-radius: 16px 16px 0 0;
+      }
+      .sticky-bar.visible {
+        transform: translateX(-50%) translateY(0);
+      }
+    }
 
     .btn-cta{display:block;width:100%;background:rgb(0,173,33);color:#fff;font-family:'Inter',sans-serif;font-weight:800;font-size:clamp(16px,4.5vw,24px);height:70px;line-height:70px;padding:0 20px;border:none;cursor:pointer;text-align:center;box-shadow:0 3px 3px 2px rgba(0,0,0,0.2);letter-spacing:-0.3px;margin-bottom:16px;transition:opacity 0.1s;white-space:nowrap}
     .btn-cta:active{opacity:0.9}
@@ -237,6 +290,7 @@
     </div>
   </div>
 
+  <div class="desktop-hero">
   <!-- HERO: IMAGE SLIDESHOW -->
   <div class="hero-slideshow" id="hero-ss">
     <div class="slides-track">
@@ -275,6 +329,7 @@
     <button class="product-cta" onclick="goToCheckout()">Start My Child's First Quiz →</button>
     <div class="product-guarantee">🛡️ 365-Day Money-Back Guarantee · Less than $1.25/month</div>
   </div>
+  </div><!-- end desktop-hero -->
 
   <!-- WHITE WRAPPER for all content below -->
   <div style="background:#fff;position:relative;">
@@ -475,6 +530,17 @@
     function goToCheckout() {
       window.location.href = 'https://buy.stripe.com/6oUaEPgFL0G6cQ27rP7EQ0r';
     }
+
+    // Show sticky bar after 25% scroll
+    var stickyBar = document.querySelector('.sticky-bar');
+    window.addEventListener('scroll', function(){
+      var scrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+      if(scrolled > 0.25) {
+        stickyBar.classList.add('visible');
+      } else {
+        stickyBar.classList.remove('visible');
+      }
+    });
 
     // Hero slideshow
     (function(){
