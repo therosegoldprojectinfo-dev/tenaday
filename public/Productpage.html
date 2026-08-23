@@ -119,22 +119,23 @@
     .per-serving { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 20px; }
 
     /* OFFER CARD */
-    .offer-card { background: #FFB3D9; border-radius: var(--r-xl); padding: 20px 18px 18px; margin-bottom: 14px; }
+    .offer-card { background: #FFB3D9; border-radius: var(--r-xl); padding: 28px 22px 24px; margin-bottom: 14px; }
     .offer-label { font-family: 'Open Sans', sans-serif; font-size: 11px; font-weight: 900; color: rgba(255,255,255,0.75); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
     .offer-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
     .offer-price-row { display: flex; align-items: baseline; gap: 6px; }
     .offer-price-main { font-family: 'Open Sans', sans-serif; font-size: 38px; font-weight: 900; color: white; letter-spacing: -0.03em; line-height: 1; }
     .offer-price-unit { font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.8); }
     .offer-price-old { font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.5); text-decoration: line-through; }
-    .offer-save-badge { background: var(--purple); color: white; font-family: 'Open Sans', sans-serif; font-size: 12px; font-weight: 900; padding: 4px 12px; border-radius: var(--r-pill); white-space: nowrap; }
+    .offer-save-badge { background: #5B2DC8; color: white; font-family: 'Open Sans', sans-serif; font-size: 12px; font-weight: 900; padding: 6px 14px; border-radius: var(--r-pill); white-space: nowrap; box-shadow: 0 4px 0 #3E1A9E; border: none !important; display: inline-block; }
     .offer-sub { font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.7); margin-bottom: 16px; }
-    .offer-features { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+    .offer-features { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
     .offer-feature { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; color: #5B2DC8; }
     .feat-check { width: 20px; height: 20px; background: rgba(91,45,200,0.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 11px; color: #5B2DC8; font-weight: 900; }
-    .offer-trust { display: flex; flex-wrap: wrap; gap: 6px 14px; padding: 14px 0; border-top: 1.5px solid rgba(91,45,200,0.2); border-bottom: 1.5px solid rgba(91,45,200,0.2); margin-bottom: 16px; }
+    .offer-trust { display: flex; flex-wrap: wrap; gap: 8px 16px; padding: 18px 0; border-top: 1.5px solid rgba(91,45,200,0.2); border-bottom: 1.5px solid rgba(91,45,200,0.2); margin-bottom: 16px; }
     .offer-trust-item { font-size: 12px; font-weight: 700; color: rgba(91,45,200,0.7); display: flex; align-items: center; gap: 4px; }
     .offer-trust-item::before { content: '✓'; font-weight: 900; }
-    .offer-btn { display: block; width: 100%; background: var(--purple); color: white; font-family: 'Open Sans', sans-serif; font-size: 16px; font-weight: 900; height: 56px; border-radius: var(--r-pill); border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; transition: background 0.15s, transform 0.1s; }
+    .offer-btn { display: block; width: 100%; background: #5B2DC8; color: white; font-family: 'Open Sans', sans-serif; font-size: 16px; font-weight: 900; height: 56px; border-radius: var(--r-pill); border: none !important; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; box-shadow: 0 4px 0 #3E1A9E; transition: transform 0.1s, box-shadow 0.1s; }
+    .offer-btn:active { box-shadow: none; transform: translate(0, 4px); }
     .offer-btn:hover { background: var(--purple-dk); transform: translateY(-1px); }
 
     /* SHOP PAY */
@@ -303,7 +304,7 @@
       <!-- OFFER CARD -->
       <div class="offer-card">
         
-        <div style="font-family:'Open Sans',sans-serif;font-size:20px;font-weight:900;color:#5B2DC8;margin-bottom:10px;letter-spacing:-0.01em;">365 Days Full Access</div>
+        <div style="font-family:'Open Sans',sans-serif;font-size:20px;font-weight:900;color:#5B2DC8;margin-bottom:16px;letter-spacing:-0.01em;">365 Days Full Access</div>
         <div class="offer-top">
           <div>
             <div class="offer-price-row">
