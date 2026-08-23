@@ -582,17 +582,43 @@
   </section>
 
   <!-- QUALIFY -->
-  <section style="background:var(--purple);padding:64px 0;">
-    <div style="max-width:560px;margin:0 auto;padding:0 24px;text-align:center;">
-      <h2 style="font-family:'Open Sans',sans-serif;font-size:clamp(28px,7vw,40px);font-weight:900;color:white;line-height:1.15;margin-bottom:28px;text-transform:uppercase;">Is this right for you?</h2>
-      <p style="font-size:15px;color:rgba(255,255,255,0.75);margin-bottom:24px;">You're the right parent for Numio if:</p>
-      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px;">
-        <div style="background:white;border-radius:16px;padding:16px 20px;font-size:15px;color:#1A0A3C;font-weight:700;text-align:left;display:flex;align-items:center;gap:12px;"><span style="color:#16A34A;font-weight:900;font-size:17px;">✓</span>Your child is aged 5–11</div>
-        <div style="background:white;border-radius:16px;padding:16px 20px;font-size:15px;color:#1A0A3C;font-weight:700;text-align:left;display:flex;align-items:center;gap:12px;"><span style="color:#16A34A;font-weight:900;font-size:17px;">✓</span>You want them to practice more</div>
-        <div style="background:white;border-radius:16px;padding:16px 20px;font-size:15px;color:#1A0A3C;font-weight:700;text-align:left;display:flex;align-items:center;gap:12px;"><span style="color:#16A34A;font-weight:900;font-size:17px;">✓</span>But you're too busy to sit with them every night</div>
-        <div style="background:white;border-radius:16px;padding:16px 20px;font-size:15px;color:#1A0A3C;font-weight:700;text-align:left;display:flex;align-items:center;gap:12px;"><span style="color:#16A34A;font-weight:900;font-size:17px;">✓</span>And you're not willing to pay $500/month for a tutor</div>
+  <section style="background:#FFB3D9;padding:64px 0;">
+    <div style="max-width:480px;margin:0 auto;padding:0 24px;text-align:center;">
+      <h2 style="font-family:'Open Sans',sans-serif;font-size:clamp(24px,6vw,34px);font-weight:800;color:#3D0066;line-height:1.15;margin-bottom:12px;text-transform:uppercase;">Is this right for you?</h2>
+      <p style="font-size:15px;color:rgba(61,0,102,0.7);margin-bottom:32px;">You're the right parent for Numio if:</p>
+
+      <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:0;">
+
+        <!-- Vertical connector line -->
+        <div style="position:absolute;left:50%;top:44px;bottom:44px;width:2px;background:rgba(180,80,160,0.25);transform:translateX(-50%);z-index:0;"></div>
+
+        <!-- Card 1 -->
+        <div style="background:white;border-radius:16px;padding:18px 20px 18px 64px;width:100%;text-align:left;position:relative;margin-bottom:14px;z-index:1;border:1.5px solid #e8c0d8;box-shadow:0 4px 0 #d48ab4;">
+          <img src="icon_thumbsup.png" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:36px;height:36px;object-fit:contain;"/>
+          <div style="font-size:15px;font-weight:700;color:#1A0A3C;">Your child is aged 5–11</div>
+        </div>
+
+        <!-- Card 2 -->
+        <div style="background:white;border-radius:16px;padding:18px 20px 18px 64px;width:100%;text-align:left;position:relative;margin-bottom:14px;z-index:1;border:1.5px solid #e8c0d8;box-shadow:0 4px 0 #d48ab4;">
+          <img src="icon_thumbsup.png" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:36px;height:36px;object-fit:contain;"/>
+          <div style="font-size:15px;font-weight:700;color:#1A0A3C;">You want them to practice more</div>
+        </div>
+
+        <!-- Card 3 -->
+        <div style="background:white;border-radius:16px;padding:18px 20px 18px 64px;width:100%;text-align:left;position:relative;margin-bottom:14px;z-index:1;border:1.5px solid #e8c0d8;box-shadow:0 4px 0 #d48ab4;">
+          <img src="icon_thumbsup.png" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:36px;height:36px;object-fit:contain;"/>
+          <div style="font-size:15px;font-weight:700;color:#1A0A3C;">But you're too busy to sit with them every night</div>
+        </div>
+
+        <!-- Card 4 -->
+        <div style="background:white;border-radius:16px;padding:18px 20px 18px 64px;width:100%;text-align:left;position:relative;z-index:1;border:1.5px solid #e8c0d8;box-shadow:0 4px 0 #d48ab4;">
+          <img src="icon_thumbsup.png" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:36px;height:36px;object-fit:contain;"/>
+          <div style="font-size:15px;font-weight:700;color:#1A0A3C;">And you're not willing to pay $500/month for a tutor</div>
+        </div>
+
       </div>
-      <div style="background:rgba(255,255,255,0.15);border-radius:16px;padding:16px 20px;font-size:15px;font-weight:700;color:white;margin-bottom:28px;">If that's you — Numio was built for your family.</div>
+
+      <div style="background:rgba(61,0,102,0.12);border-radius:16px;padding:16px 20px;font-size:15px;font-weight:700;color:#3D0066;margin-top:24px;margin-bottom:28px;">If that's you — Numio was built for your family.</div>
       <button class="scroll-btn" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Help your child get better grades →</button>
     </div>
   </section>
