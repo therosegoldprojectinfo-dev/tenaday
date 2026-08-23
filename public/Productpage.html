@@ -85,11 +85,11 @@
     .ann-timer { font-weight: 900; color: var(--pink-lt); }
 
     /* HERO LAYOUT */
-    .hero-wrap { display: flex; flex-direction: column; gap: 24px; padding: 24px 16px 40px; max-width: 1160px; margin: 0 auto; }
+    .hero-wrap { display: flex; flex-direction: column; gap: 24px; padding: 24px 16px 40px; max-width: 1080px; margin: 0 auto; justify-content: center; }
     @media (min-width: 900px) {
       .hero-wrap { flex-direction: row; align-items: flex-start; gap: 48px; padding: 40px 40px 64px; }
-      .hero-left { flex: 0 0 460px; }
-      .hero-right { flex: 1; min-width: 0; position: sticky; top: 54px; }
+      .hero-left { flex: 0 0 500px; }
+      .hero-right { flex: 0 0 460px; max-width: 460px; position: sticky; top: 54px; }
     }
 
     /* SLIDESHOW */
@@ -225,6 +225,58 @@
     .sticky-price span { font-size: 13px; font-weight: 600; color: var(--muted); }
     .sticky-per { font-size: 11px; color: var(--muted); font-weight: 600; margin-top: 1px; }
     .sticky-btn { background: var(--purple); color: white; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 900; padding: 0 24px; height: 48px; border-radius: var(--r-pill); border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
+  
+    /* ── DESKTOP RESPONSIVE FIXES ── */
+    @media (min-width: 900px) {
+      /* Center the whole page content */
+      body { background: #f5f5f7; }
+      .hero-wrap {
+        background: #fff;
+        border-radius: 0;
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 56px 60px 72px;
+      }
+
+      /* Offer card max width on desktop */
+      .offer-card { border-radius: 24px; }
+
+      /* FAQ section on desktop */
+      .mfaq-q { font-size: 15px; }
+
+      /* Lower sections white bg */
+      .section { background: #fff; }
+      .section-bg { background: #f9f9f9; }
+      .section-alt { background: #f9f9f9; }
+
+      /* Wrap all lower sections */
+      .wrap { max-width: 900px !important; }
+
+      /* Steps on desktop */
+      .steps { gap: 40px; }
+      .step { padding: 24px; background: #fafafa; border-radius: 20px; border: 1.5px solid #f0e8ff; }
+
+      /* Qualify items */
+      .qualify-item { font-size: 17px; }
+
+      /* Sticky bar desktop */
+      .sticky-bar {
+        max-width: 800px;
+        left: 50%;
+        transform: translateX(-50%) translateY(100%);
+        border-radius: 20px 20px 0 0;
+        padding: 14px 32px;
+      }
+      .sticky-bar.visible {
+        transform: translateX(-50%) translateY(0);
+      }
+      body { padding-bottom: 0; }
+    }
+
+    @media (min-width: 1200px) {
+      .hero-wrap { max-width: 1100px; padding: 64px 80px 80px; }
+    }
+
   </style>
   <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -332,7 +384,7 @@
         
       </div>
 
-      <div style="padding:0 16px;margin-top:8px;">
+      <div style="margin-top:8px;">
         <div class="mfaq-item open">
           <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">How does Numio actually help my child?<span class="mfaq-icon">⌄</span></button>
           <div class="mfaq-a">You take a picture of what they're learning at school — Numio reads it and instantly builds a quiz around that exact topic. They practice <strong>exactly</strong> what their teacher taught them that day.</div>
@@ -355,7 +407,7 @@
 
   <!-- PROBLEM -->
   <section class="section section-alt">
-    <div class="wrap" style="max-width:680px;">
+    <div class="wrap" style="max-width:680px;margin:0 auto;">
       <div class="section-label">Sound familiar?</div>
       <h2 class="section-heading">Does this sound like you?</h2>
       <p class="section-sub">You're not alone. Most parents face the exact same struggle.</p>
