@@ -287,7 +287,12 @@
     <div class="hero-left">
       <div class="slideshow-wrap" id="hero-ss">
         <div class="slides-track">
-          <div class="slide active"><img src="slide1.png" alt="Numio app on phone"/></div>
+          <div class="slide active">
+            <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:contain;">
+              <source src="numio-demo.mp4" type="video/mp4"/>
+            </video>
+          </div>
+          <div class="slide"><img src="slide1.png" alt="Numio app on phone"/></div>
           <div class="slide"><img src="slide2.png" alt=""/></div>
           <div class="slide"><img src="slide3.png" alt=""/></div>
           <div class="slide"><img src="slide4.png" alt=""/></div>
@@ -297,7 +302,10 @@
           <button class="slide-arrow" id="hs-next" style="right:10px" aria-label="Next">›</button>
         </div>
         <div class="thumb-row" id="hs-thumbs">
-          <div class="thumb active"><img src="slide1.png" alt=""/></div>
+          <div class="thumb active" style="display:flex;align-items:center;justify-content:center;background:#f0ebff;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#5B2DC8"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+          <div class="thumb"><img src="slide1.png" alt=""/></div>
           <div class="thumb"><img src="slide2.png" alt=""/></div>
           <div class="thumb"><img src="slide3.png" alt=""/></div>
           <div class="thumb"><img src="slide4.png" alt=""/></div>
