@@ -137,6 +137,18 @@
     .offer-btn { display: block; width: 100%; background: #5B2DC8; color: white; font-family: 'Open Sans', sans-serif; font-size: 16px; font-weight: 900; height: 56px; border-radius: var(--r-pill); border: none !important; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; box-shadow: 0 4px 0 #3E1A9E; transition: transform 0.1s, box-shadow 0.1s; }
     .offer-btn:active { box-shadow: none; transform: translate(0, 4px); }
     .offer-btn:hover { background: var(--purple-dk); transform: translateY(-1px); }
+    .scroll-btn {
+      display: block; width: 100%;
+      background: #5B2DC8; color: white;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 15px; font-weight: 800;
+      height: 54px; border-radius: 12px;
+      border: none !important; cursor: pointer;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      box-shadow: 0 4px 0 #3E1A9E;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .scroll-btn:active { box-shadow: none; transform: translate(0, 4px); }
 
     /* SHOP PAY */
     .shop-pay-btn { width: 100%; background: #5A31F4; color: white; height: 50px; border-radius: var(--r-pill); font-size: 15px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; border: none; cursor: pointer; margin-bottom: 6px; font-family: 'Open Sans', sans-serif; }
@@ -556,7 +568,7 @@
       </div>
 
       <div style="margin-top:32px;">
-        <button class="offer-btn" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Help your child get better grades →</button>
+        <button class="scroll-btn" onclick="document.getElementById(\'offer\').scrollIntoView({behavior:\'smooth\'})">Help your child get better grades →</button>
       </div>
     </div>
   </section>
@@ -573,7 +585,7 @@
         <div style="background:white;border-radius:16px;padding:16px 20px;font-size:15px;color:#1A0A3C;font-weight:700;text-align:left;display:flex;align-items:center;gap:12px;"><span style="color:#16A34A;font-weight:900;font-size:17px;">✓</span>And you're not willing to pay $500/month for a tutor</div>
       </div>
       <div style="background:rgba(255,255,255,0.15);border-radius:16px;padding:16px 20px;font-size:15px;font-weight:700;color:white;margin-bottom:28px;">If that's you — Numio was built for your family.</div>
-      <button style="display:block;width:100%;background:var(--pink);color:white;font-family:'Open Sans',sans-serif;font-size:16px;font-weight:900;height:56px;border-radius:999px;border:none;cursor:pointer;text-transform:uppercase;letter-spacing:0.04em;" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Help your child get better grades →</button>
+      <button class="scroll-btn" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Help your child get better grades →</button>
     </div>
   </section>
 
@@ -584,7 +596,7 @@
       <h2 style="font-family:'Open Sans',sans-serif;font-size:clamp(22px,6vw,34px);font-weight:900;color:#1A0A3C;line-height:1.2;margin-bottom:12px;">"And what if, for some weird reason, Numio doesn't help my child?"</h2>
       <p style="font-family:'Open Sans',sans-serif;font-size:20px;font-weight:900;color:#16A34A;margin-bottom:12px;">You get every cent back.</p>
       <p style="font-size:15px;color:#4B4065;line-height:1.7;margin-bottom:32px;">Try Numio completely risk-free for 365 days. If your child isn't practicing more — full refund. No forms. No questions. No hassle.</p>
-      <button class="offer-btn" onclick="document.getElementById('offer').scrollIntoView({behavior:'smooth'})">Help your child get better grades →</button>
+      <button class="scroll-btn" onclick="document.getElementById(\'offer\').scrollIntoView({behavior:\'smooth\'})">Help your child get better grades →</button>
     </div>
   </section>
 
