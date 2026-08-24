@@ -685,7 +685,7 @@
  </div>
 
  <script>
- const _end = Date.now() + 24 * 60 * 60 * 1000;
+ const _end = new Date("2026-08-25T00:00:00").getTime();
  function tick() {
  const d = Math.max(0, _end - Date.now());
  document.getElementById('b-h').textContent = String(Math.floor(d/3600000)).padStart(2,'0');
