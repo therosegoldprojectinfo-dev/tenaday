@@ -223,94 +223,7 @@
       .mfaq-q { font-size: 15px; }
     }
 
-    /* ── CHECKOUT MODAL ── */
-    #checkout-overlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 9999;
-      background: rgba(26, 10, 60, 0.72);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      align-items: center; justify-content: center;
-      padding: 16px;
-    }
-    #checkout-overlay.open { display: flex; animation: overlayIn 0.2s ease; }
-    @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
 
-    #checkout-modal {
-      background: white;
-      border-radius: 24px;
-      width: 100%; max-width: 520px;
-      max-height: 92vh;
-      overflow: hidden;
-      display: flex; flex-direction: column;
-      box-shadow: 0 24px 80px rgba(91, 45, 200, 0.35);
-      animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    @keyframes slideUp {
-      from { transform: translateY(40px) scale(0.97); opacity: 0; }
-      to   { transform: translateY(0) scale(1); opacity: 1; }
-    }
-    #checkout-modal-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 20px 14px;
-      border-bottom: 1.5px solid #E8D9F5;
-      flex-shrink: 0;
-    }
-    #checkout-modal-header .modal-title {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 14px; font-weight: 800;
-      color: #5B2DC8; text-transform: uppercase; letter-spacing: 0.05em;
-    }
-    #checkout-modal-header .modal-price {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 20px; font-weight: 900; color: #1A0A3C;
-    }
-    .modal-close {
-      width: 32px; height: 32px; border-radius: 50%;
-      background: #F3EDFF; border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      color: #5B2DC8; font-size: 18px; font-weight: 700;
-      flex-shrink: 0; transition: background 0.15s;
-    }
-    .modal-close:hover { background: #E8D9F5; }
-    #checkout-iframe-wrap {
-      flex: 1; overflow: auto; min-height: 400px;
-      position: relative;
-    }
-    #checkout-iframe {
-      width: 100%; height: 100%;
-      min-height: 480px;
-      border: none; display: block;
-    }
-    #checkout-loading {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 14px;
-      background: white;
-    }
-    #checkout-loading .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid #E8D9F5;
-      border-top-color: #5B2DC8;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #checkout-loading p {
-      font-size: 13px; font-weight: 700; color: #8B7BAE;
-      font-family: 'Open Sans', sans-serif;
-    }
-    #checkout-modal-footer {
-      padding: 10px 20px 14px;
-      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-      border-top: 1.5px solid #E8D9F5;
-      flex-shrink: 0;
-    }
-    #checkout-modal-footer span {
-      font-size: 11px; font-weight: 700; color: #8B7BAE;
-      display: flex; align-items: center; gap: 4px;
-    }
-    #checkout-modal-footer span::before { content: '✓'; color: #16A34A; }
   </style>
   <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
@@ -644,35 +557,7 @@
     <button class="sticky-btn" onclick="goToCheckout()">Get Numio →</button>
   </div>
 
-  <!-- ── CHECKOUT MODAL ── -->
-  <div id="checkout-overlay" role="dialog" aria-modal="true" aria-label="Checkout">
-    <div id="checkout-modal">
-      <div id="checkout-modal-header">
-        <div>
-          <div class="modal-title">Numio · Full Year Access</div>
-          <div class="modal-price">$15 <span style="font-size:13px;font-weight:600;color:#8B7BAE;">/year</span></div>
-        </div>
-        <button class="modal-close" onclick="closeCheckout()" aria-label="Close">✕</button>
-      </div>
-      <div id="checkout-iframe-wrap">
-        <div id="checkout-loading">
-          <div class="spinner"></div>
-          <p>Loading secure checkout…</p>
-        </div>
-        <iframe
-          id="checkout-iframe"
-          title="Numio Checkout"
-          allow="payment"
-          style="opacity:0;transition:opacity 0.3s;">
-        </iframe>
-      </div>
-      <div id="checkout-modal-footer">
-        <span>Secure payment</span>
-        <span>SSL encrypted</span>
-        <span>365-day guarantee</span>
-      </div>
-    </div>
-  </div>
+
 
   <script>
     // ── TIMER ──
@@ -706,45 +591,20 @@
       thumbs.forEach((t, i) => t.addEventListener('click', () => show(i)));
     })();
 
-    // ── CHECKOUT MODAL ──
-    const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/6oUaEPgFL0G6cQ27rP7EQ0r';
-
+    // ── CHECKOUT ──
     function goToCheckout() {
       fbq('track', 'InitiateCheckout');
-      const overlay = document.getElementById('checkout-overlay');
-      const iframe  = document.getElementById('checkout-iframe');
-      const loading = document.getElementById('checkout-loading');
-
-      overlay.classList.add('open');
-      document.body.style.overflow = 'hidden';
-
-      iframe.style.opacity = '0';
-      loading.style.display = 'flex';
-      iframe.src = STRIPE_PAYMENT_LINK + '?embed=true';
-
-      iframe.onload = () => {
-        loading.style.display = 'none';
-        iframe.style.opacity  = '1';
-      };
+      const url = 'https://buy.stripe.com/6oUaEPgFL0G6cQ27rP7EQ0r';
+      const popup = window.open(
+        url,
+        'stripe-checkout',
+        'width=500,height=700,left=' + (screen.width/2 - 250) + ',top=' + (screen.height/2 - 350)
+      );
+      // Fallback for mobile / popup blockers
+      if (!popup || popup.closed) {
+        window.location.href = url;
+      }
     }
-
-    function closeCheckout() {
-      const overlay = document.getElementById('checkout-overlay');
-      const iframe  = document.getElementById('checkout-iframe');
-      overlay.classList.remove('open');
-      document.body.style.overflow = '';
-      setTimeout(() => { iframe.src = ''; }, 300);
-    }
-
-    // Close on backdrop click
-    document.getElementById('checkout-overlay').addEventListener('click', function(e) {
-      if (e.target === this) closeCheckout();
-    });
-
-    // Close on Escape
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeCheckout();
-    });
   </script>
 </body>
 </html>
