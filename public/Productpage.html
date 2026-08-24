@@ -683,8 +683,9 @@
     })();
 
     // ── EMBEDDED CHECKOUT ──
-    const SUPABASE_URL = 'https://lyedpfhzrvyaskmzhyhl.supabase.co';
-    const STRIPE_PK    = 'pk_live_51PpBJg004XbuCgJZSAj4kXcxFiIlmxVMUNeObL5TiOH1QEzagJOPeaKghgTecG3UpH7ZsJ0VkOYhfPSiQw99I15h00FhK5h8Eu';
+    const SUPABASE_URL  = 'https://lyedpfhzrvyaskmzhyhl.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0';
+    const STRIPE_PK     = 'pk_live_51PpBJg004XbuCgJZSAj4kXcxFiIlmxVMUNeObL5TiOH1QEzagJOPeaKghgTecG3UpH7ZsJ0VkOYhfPSiQw99I15h00FhK5h8Eu';
     let stripeInstance = null;
     let checkoutInstance = null;
 
@@ -709,7 +710,11 @@
           `${SUPABASE_URL}/functions/v1/create-checkout-session`,
           {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${SUPABASE_ANON}`,
+              'apikey': SUPABASE_ANON,
+            },
             body: JSON.stringify({ origin: window.location.origin }),
           }
         );
@@ -742,12 +747,12 @@
       document.getElementById('checkout-error').style.display   = 'none';
     }
 
-    // Close on backdrop click
-    document.getElementById('checkout-overlay').addEventListener('click', function(e) {
-      if (e.target === this) closeCheckout();
+    // Close on backdrop click + Escape — after DOM ready
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('checkout-overlay').addEventListener('click', function(e) {
+        if (e.target === this) closeCheckout();
+      });
     });
-
-    // Close on Escape
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') closeCheckout();
     });
