@@ -177,7 +177,7 @@
     .how-wrap {
       padding: 36px 20px 16px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 8px;
     }
     .how-col {
@@ -186,6 +186,17 @@
       flex-direction: column;
     }
     .how-col video {
+      width: 100%;
+      border-radius: 16px;
+      display: block;
+    }
+    .how-col-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      margin-top: 40%;
+    }
+    .how-col-right video {
       width: 100%;
       border-radius: 16px;
       display: block;
@@ -199,13 +210,13 @@
     .arrow-col {
       flex: 0 0 44px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
-      padding-bottom: 32px;
+      padding-top: 28%;
     }
     .arrow-col svg {
       width: 44px;
-      height: 44px;
+      height: 54px;
     }
 
     /* ── SECOND CTA ── */
@@ -261,13 +272,13 @@
       </div>
 
       <div class="arrow-col">
-        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg" overflow="visible">
-          <path d="M8 8 Q36 8 36 36" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <path d="M29 34 L36 36 L34 29" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <svg viewBox="0 0 44 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M22 4 Q40 4 40 48" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path d="M33 42 L40 48 L35 52" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
       </div>
 
-      <div class="how-col">
+      <div class="how-col-right">
         <video autoplay muted loop playsinline>
           <source src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Copie%20de%20Ad%20angle%201-2%20(1).mp4" type="video/mp4"/>
         </video>
