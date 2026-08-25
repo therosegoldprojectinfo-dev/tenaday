@@ -353,7 +353,7 @@
         <div class="slides-track">
           <div class="slide active">
             <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:contain;">
-              <source src="numio-demo.mp4" type="video/mp4"/>
+              <source src="Finalvideofornumio.mp4" type="video/mp4"/>
             </video>
           </div>
           <div class="slide"><img src="pasha.png" alt="Does this sound like you?"/></div>
@@ -374,40 +374,56 @@
     </div>
 
     <div class="hero-right" id="offer" style="padding-top:0;">
-      <h1 class="product-title" style="font-size:clamp(18px,6vw,34px);margin-bottom:10px;font-family:'Open Sans',sans-serif;">Numio | Turn any lesson into practice — instantly</h1>
-      <p class="product-desc" style="margin-bottom:16px;font-size:17px;line-height:1.6;">Perfect for busy parents who want their child practicing every day without any extra work.</p>
-      <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/broniska.png" alt="What Numio does for your child" style="width:100%;border-radius:16px;margin-bottom:-50px;margin-top:-90px;clip-path:inset(26% 0% 26% 0%);"/>
 
-      <div class="offer-card">
-        <div style="font-family:'Open Sans',sans-serif;font-size:20px;font-weight:900;color:#5B2DC8;margin-bottom:16px;letter-spacing:-0.01em;">365 Days Full Access</div>
-        <div class="offer-top">
-          <div>
-            <div class="offer-price-row">
-              <span class="offer-price-main" style="color:#5B2DC8;">$15</span>
-              <span class="offer-price-unit" style="color:#5B2DC8;">/year</span>
-              <span class="offer-price-old" style="color:rgba(91,45,200,0.4);">$60</span>
-            </div>
-          </div>
-          <div class="offer-save-badge">Save $45 🎉</div>
-        </div>
-        <div class="offer-features">
-          <div class="offer-feature"><div class="feat-check">✓</div>Unlimited personalized quizzes all year</div>
-          <div class="offer-feature"><div class="feat-check">✓</div>Coins &amp; rewards to keep kids motivated</div>
-          <div class="offer-feature"><div class="feat-check">✓</div>Practice built from their actual lesson — not random questions</div>
-          <div class="offer-feature"><div class="feat-check">✓</div>No ads, no videos, no distractions</div>
-        </div>
-        <div class="offer-trust">
-          <span class="offer-trust-item">Money Back Guarantee</span>
-          <span class="offer-trust-item">Instant Access</span>
-        </div>
-        <button class="offer-btn" onclick="goToCheckout()">Get Numio Now · $15/year →</button>
+      <!-- TITLE -->
+      <h1 style="font-family:'Open Sans',sans-serif;font-size:clamp(22px,6vw,34px);font-weight:900;color:var(--purple);line-height:1.1;margin-bottom:12px;text-transform:uppercase;letter-spacing:-0.01em;">Numio | Turn any lesson into practice — instantly</h1>
+      <p style="font-size:17px;color:var(--body);line-height:1.6;margin-bottom:16px;">Perfect for busy parents who want their child practicing every day without any extra work.</p>
+
+      <!-- BENEFIT PILLS -->
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--dark);">🎯 They get better at exactly what they're learning in school</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--dark);">📸 Your child practices without you doing anything</div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--dark);">🎮 Your child actually wants to come back</div>
       </div>
 
-      <div style="background:var(--purple-lt);border-radius:var(--r-xl);padding:24px 20px;margin-bottom:14px;text-align:center;">
-        <div style="font-family:'Open Sans',sans-serif;font-size:22px;font-weight:900;color:var(--purple);line-height:1.2;margin-bottom:10px;">Not sure yet?<br>You have 365 days to decide.</div>
-        <p style="font-size:14px;color:var(--body);line-height:1.6;margin:0;">If you don't feel Numio is really helping your child practice — you'll get every cent back.</p>
+      <!-- IMAGE -->
+      <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/broniska.png" alt="What Numio does for your child" style="width:100%;border-radius:16px;margin-bottom:16px;margin-top:-60px;clip-path:inset(26% 0% 26% 0%);"/>
+
+      <!-- OFFER CARD -->
+      <div class="offer-card" style="background:#FFB3D9;">
+
+        <!-- Title -->
+        <div style="font-family:'Open Sans',sans-serif;font-size:22px;font-weight:900;color:#5B2DC8;margin-bottom:4px;letter-spacing:-0.01em;">365 Days Unlimited Practice</div>
+
+        <!-- Price row -->
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;flex-wrap:wrap;">
+          <span style="font-size:38px;font-weight:900;color:#5B2DC8;letter-spacing:-0.03em;line-height:1;">$15</span>
+          <span style="font-size:15px;font-weight:700;color:#5B2DC8;">/year</span>
+          <span style="font-size:15px;font-weight:700;color:rgba(91,45,200,0.4);text-decoration:line-through;">$60/year</span>
+          <span style="background:#5B2DC8;color:white;font-size:12px;font-weight:900;padding:5px 12px;border-radius:999px;box-shadow:0 3px 0 #3E1A9E;">Save $45 🎉</span>
+        </div>
+
+        <!-- Features -->
+        <div style="display:flex;flex-direction:column;gap:10px;margin:18px 0;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:800;color:#5B2DC8;text-transform:uppercase;letter-spacing:0.03em;"><div style="width:22px;height:22px;background:rgba(91,45,200,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">📸</div>Unlimited Pictures</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:800;color:#5B2DC8;text-transform:uppercase;letter-spacing:0.03em;"><div style="width:22px;height:22px;background:rgba(91,45,200,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">🧠</div>Unlimited Quizzes</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:800;color:#5B2DC8;text-transform:uppercase;letter-spacing:0.03em;"><div style="width:22px;height:22px;background:rgba(91,45,200,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">📚</div>Unlimited Subjects</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:800;color:#5B2DC8;text-transform:uppercase;letter-spacing:0.03em;"><div style="width:22px;height:22px;background:rgba(91,45,200,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">🚫</div>No Ads or Distractions</div>
+        </div>
+
+        <!-- Timer banner -->
+        <div style="background:#5B2DC8;border-radius:12px;padding:12px 16px;margin-bottom:16px;text-align:center;">
+          <span style="font-family:'Open Sans',sans-serif;font-size:14px;font-weight:900;color:white;letter-spacing:0.02em;">⚡ HURRY! Price goes back to $60 in <span id="offer-timer" style="color:#FFB3D9;"></span></span>
+        </div>
+
+        <!-- CTA Button -->
+        <button class="offer-btn" onclick="goToCheckout()" style="font-size:17px;height:62px;letter-spacing:0.01em;">Start Your Child's First Quiz Tonight →</button>
+
+        <!-- Guarantee -->
+        <div style="margin-top:14px;text-align:center;font-size:13px;font-weight:600;color:rgba(91,45,200,0.8);line-height:1.6;">🛡️ We're so confident you'll love Numio we give you <strong>365 days</strong> to decide. Not happy? <strong>100% back.</strong> No questions.</div>
       </div>
 
+      <!-- MINI FAQ -->
       <div style="margin-top:8px;">
         <div class="mfaq-item open">
           <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">Will this actually work for MY child?<span class="mfaq-icon">⌄</span></button>
@@ -636,9 +652,14 @@
     const _end = new Date("2026-08-25T00:00:00").getTime();
     function tick() {
       const d = Math.max(0, _end - Date.now());
-      document.getElementById('b-h').textContent = String(Math.floor(d/3600000)).padStart(2,'0');
-      document.getElementById('b-m').textContent = String(Math.floor((d%3600000)/60000)).padStart(2,'0');
-      document.getElementById('b-s').textContent = String(Math.floor((d%60000)/1000)).padStart(2,'0');
+      const hh = String(Math.floor(d/3600000)).padStart(2,'0');
+      const mm = String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+      const ss = String(Math.floor((d%60000)/1000)).padStart(2,'0');
+      document.getElementById('b-h').textContent = hh;
+      document.getElementById('b-m').textContent = mm;
+      document.getElementById('b-s').textContent = ss;
+      const ot = document.getElementById('offer-timer');
+      if (ot) ot.textContent = hh + 'h ' + mm + 'm ' + ss + 's';
     }
     tick(); setInterval(tick, 1000);
 
