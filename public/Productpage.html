@@ -54,11 +54,6 @@
     @media (min-width: 768px) { .wrap { padding: 0 40px; } }
     .section { padding: 64px 0; }
     @media (min-width: 768px) { .section { padding: 96px 0; } }
-    .section-bg { background: #FAFAFA; }
-    .section-alt { background: #FAFAFA; }
-    .section-label { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--purple); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px; }
-    .section-heading { margin-bottom: 8px; }
-    .section-sub { font-size: 16px; color: var(--muted); margin-bottom: 40px; }
 
     .btn-primary {
       display: inline-flex; align-items: center; justify-content: center;
@@ -70,17 +65,6 @@
       transition: background 0.2s, transform 0.15s;
     }
     .btn-primary:hover { background: var(--purple-dk); transform: translateY(-2px); }
-    .btn-primary.full { width: 100%; font-size: 17px; height: 60px; }
-
-    .ann-bar {
-      background: var(--purple); color: white;
-      display: flex; align-items: center; justify-content: center;
-      gap: 8px; padding: 0 16px; height: 42px;
-      font-family: 'Open Sans', sans-serif; font-size: 13px; font-weight: 800;
-      position: sticky; top: 0; z-index: 300;
-    }
-    .ann-pill { background: #FFB3D9; color: white; font-size: 11px; font-weight: 900; padding: 3px 10px; border-radius: var(--r-pill); text-transform: uppercase; letter-spacing: 0.05em; }
-    .ann-timer { font-weight: 900; color: var(--pink-lt); }
 
     .hero-wrap { display: flex; flex-direction: column; gap: 24px; padding: 24px 16px 40px; max-width: 1080px; margin: 0 auto; justify-content: center; }
     @media (min-width: 900px) {
@@ -106,10 +90,6 @@
     .thumb.active { border-color: var(--pink); }
     .thumb img { width: 100%; height: 100%; object-fit: contain; }
 
-    .rating-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
-    .stars { color: var(--pink); font-size: 16px; letter-spacing: 1px; }
-    .rating-count { font-size: 13px; font-weight: 700; color: var(--muted); text-decoration: underline; cursor: pointer; }
-
     .mfaq-item { border-bottom: 1px solid var(--border); }
     .mfaq-q { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 0; font-size: 16px; font-weight: 700; color: var(--dark); background: none; border: none; cursor: pointer; text-align: left; }
     .mfaq-icon { flex-shrink: 0; transition: transform 0.2s; color: var(--pink); font-size: 18px; }
@@ -124,7 +104,7 @@
     .sticky-per { font-size: 11px; color: var(--muted); font-weight: 600; margin-top: 1px; }
     .sticky-btn { background: var(--purple); color: white; font-family: 'Open Sans', sans-serif; font-size: 14px; font-weight: 900; padding: 0 24px; height: 48px; border-radius: var(--r-pill); border: none; cursor: pointer; text-transform: uppercase; letter-spacing: 0.04em; }
 
-    /* 3D CTA BUTTON */
+    /* 3D GHOST CTA BUTTON */
     .cta-3d {
       position: relative;
       display: block;
@@ -143,32 +123,22 @@
       letter-spacing: 0.06em;
       transition: transform 0.1s, border-bottom-width 0.1s;
     }
-    .cta-3d:active {
-      border-bottom-width: 2px;
-      transform: translateY(4px);
-    }
+    .cta-3d:active { border-bottom-width: 2px; transform: translateY(4px); }
     .cta-3d:hover { background: #F3EDFF; }
 
-    /* ── EMBEDDED CHECKOUT MODAL ── */
+    /* CHECKOUT MODAL */
     #checkout-overlay {
-      display: none;
-      position: fixed; inset: 0; z-index: 9999;
+      display: none; position: fixed; inset: 0; z-index: 9999;
       background: rgba(26, 10, 60, 0.72);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-      align-items: center; justify-content: center;
-      padding: 16px;
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 16px;
     }
     #checkout-overlay.open { display: flex; animation: overlayIn 0.2s ease; }
     @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
-
     #checkout-modal {
-      background: white;
-      border-radius: 24px;
-      width: 100%; max-width: 520px;
-      max-height: 92vh;
-      overflow: hidden;
-      display: flex; flex-direction: column;
+      background: white; border-radius: 24px;
+      width: 100%; max-width: 520px; max-height: 92vh;
+      overflow: hidden; display: flex; flex-direction: column;
       box-shadow: 0 24px 80px rgba(91, 45, 200, 0.35);
       animation: slideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -178,19 +148,10 @@
     }
     #checkout-modal-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 16px 20px 14px;
-      border-bottom: 1.5px solid #E8D9F5;
-      flex-shrink: 0;
+      padding: 16px 20px 14px; border-bottom: 1.5px solid #E8D9F5; flex-shrink: 0;
     }
-    .modal-title {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 14px; font-weight: 800;
-      color: #5B2DC8; text-transform: uppercase; letter-spacing: 0.05em;
-    }
-    .modal-price {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 20px; font-weight: 900; color: #1A0A3C;
-    }
+    .modal-title { font-family: 'Open Sans', sans-serif; font-size: 14px; font-weight: 800; color: #5B2DC8; text-transform: uppercase; letter-spacing: 0.05em; }
+    .modal-price { font-family: 'Open Sans', sans-serif; font-size: 20px; font-weight: 900; color: #1A0A3C; }
     .modal-close {
       width: 32px; height: 32px; border-radius: 50%;
       background: #F3EDFF; border: none; cursor: pointer;
@@ -199,40 +160,14 @@
       flex-shrink: 0; transition: background 0.15s;
     }
     .modal-close:hover { background: #E8D9F5; }
-    #checkout-body {
-      flex: 1; overflow-y: auto; padding: 20px;
-      min-height: 420px; position: relative;
-    }
-    #checkout-loading {
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 14px; min-height: 380px;
-    }
-    #checkout-loading .spinner {
-      width: 40px; height: 40px;
-      border: 3px solid #E8D9F5;
-      border-top-color: #5B2DC8;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
+    #checkout-body { flex: 1; overflow-y: auto; padding: 20px; min-height: 420px; position: relative; }
+    #checkout-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; min-height: 380px; }
+    #checkout-loading .spinner { width: 40px; height: 40px; border: 3px solid #E8D9F5; border-top-color: #5B2DC8; border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    #checkout-loading p {
-      font-size: 13px; font-weight: 700; color: #8B7BAE;
-      font-family: 'Open Sans', sans-serif;
-    }
-    #checkout-error {
-      display: none; text-align: center; padding: 40px 20px;
-      font-size: 14px; color: #e53e3e; font-family: 'Open Sans', sans-serif;
-    }
-    #checkout-modal-footer {
-      padding: 10px 20px 14px;
-      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
-      border-top: 1.5px solid #E8D9F5; flex-shrink: 0;
-    }
-    #checkout-modal-footer span {
-      font-size: 11px; font-weight: 700; color: #8B7BAE;
-      display: flex; align-items: center; gap: 4px;
-    }
+    #checkout-loading p { font-size: 13px; font-weight: 700; color: #8B7BAE; font-family: 'Open Sans', sans-serif; }
+    #checkout-error { display: none; text-align: center; padding: 40px 20px; font-size: 14px; color: #e53e3e; font-family: 'Open Sans', sans-serif; }
+    #checkout-modal-footer { padding: 10px 20px 14px; display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; border-top: 1.5px solid #E8D9F5; flex-shrink: 0; }
+    #checkout-modal-footer span { font-size: 11px; font-weight: 700; color: #8B7BAE; display: flex; align-items: center; gap: 4px; }
     #checkout-modal-footer span::before { content: '✓'; color: #16A34A; }
   </style>
   <script type="text/javascript">
@@ -255,8 +190,7 @@
   fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"
-  /></noscript>
+  src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"/></noscript>
 </head>
 <body>
 
@@ -289,21 +223,21 @@
     <div class="hero-right" id="offer" style="padding-top:0;">
 
       <!-- TITLE -->
-      <h1 style="font-family:'Open Sans',sans-serif;font-size:clamp(22px,6vw,32px);font-weight:900;color:var(--dark);line-height:1.15;margin-bottom:10px;letter-spacing:-0.01em;">Numio | Turn any lesson into practice — instantly</h1>
+      <h1 style="font-family:'Open Sans',sans-serif;font-size:clamp(22px,6vw,32px);font-weight:900;color:#1A0A3C;line-height:1.15;margin-bottom:10px;letter-spacing:-0.01em;">Numio | Turn any lesson into practice — instantly</h1>
 
       <!-- DESC -->
-      <p style="font-size:16px;font-weight:400;color:var(--body);line-height:1.7;margin-bottom:16px;">Perfect for busy parents who want their child practicing every day without any extra work.</p>
+      <p style="font-size:16px;font-weight:400;color:#4B4065;line-height:1.7;margin-bottom:16px;">Perfect for busy parents who want their child practicing every day without any extra work.</p>
 
       <!-- BRONISKA IMAGE -->
       <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/broniska.png" alt="What Numio does for your child" style="width:100%;border-radius:16px;margin-bottom:0;margin-top:-60px;clip-path:inset(26% 0% 26% 0%);"/>
 
-      <!-- OFFER CARD — pink 3D border, white bg, caps features, 3D ghost button -->
-      <div style="background:white;border-radius:20px;padding:28px 24px 28px;margin-bottom:12px;border:4px solid #FF6EC7;box-shadow:0 8px 0 #FF6EC7;">
+      <!-- OFFER CARD — thick pink 3D border, white bg -->
+      <div style="background:white;border-radius:20px;padding:28px 24px 28px;margin-bottom:8px;border:4px solid #FF6EC7;box-shadow:0 8px 0 #FF6EC7;">
 
         <!-- Title -->
         <div style="font-family:'Open Sans',sans-serif;font-size:22px;font-weight:900;color:#1A0A3C;margin-bottom:16px;line-height:1.15;text-transform:uppercase;letter-spacing:0.01em;">365 Days Unlimited Practice</div>
 
-        <!-- Price row -->
+        <!-- Price -->
         <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px;">
           <span style="font-size:48px;font-weight:900;color:#1A0A3C;letter-spacing:-0.03em;line-height:1;">$15</span>
           <span style="font-size:16px;font-weight:600;color:#8B7BAE;">/year</span>
@@ -316,7 +250,7 @@
         <!-- Divider -->
         <div style="height:2px;background:#FFD6F0;margin-bottom:22px;border-radius:2px;"></div>
 
-        <!-- Features — ALL CAPS, bold, large -->
+        <!-- Features — ALL CAPS -->
         <div style="display:flex;flex-direction:column;gap:16px;margin-bottom:28px;">
           <div style="display:flex;align-items:center;gap:12px;">
             <div style="width:28px;height:28px;background:#FFD6F0;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -344,13 +278,14 @@
           </div>
         </div>
 
-        <!-- 3D ghost CTA button — white bg, purple border -->
+        <!-- 3D ghost button -->
         <button onclick="goToCheckout()" class="cta-3d">START YOUR CHILD'S FIRST QUIZ NOW →</button>
       </div>
 
-      <!-- GUARANTEE CARD -->
-      <div style="background:#F0FDF4;border:2px solid #BBF7D0;border-radius:20px;padding:18px 20px;margin-bottom:12px;text-align:center;">
-        <p style="font-size:15px;font-weight:700;color:#166534;line-height:1.6;margin:0;">🛡️ We're so confident you'll love Numio we give you <strong>365 days</strong> to decide. Not happy? <strong>100% back.</strong> No questions.</p>
+      <!-- GUARANTEE CARD — pink bg, big title -->
+      <div style="background:#FFD6F0;border-radius:20px;padding:28px 24px;margin-bottom:8px;">
+        <div style="font-family:'Open Sans',sans-serif;font-size:22px;font-weight:900;color:#1A0A3C;text-transform:uppercase;letter-spacing:0.01em;margin-bottom:14px;text-align:center;">WHAT IF I'M NOT HAPPY?</div>
+        <p style="font-size:15px;font-weight:600;color:#4B4065;line-height:1.75;margin:0;text-align:center;">We're so confident you'll love Numio we give you <strong style="color:#1A0A3C;">365 days</strong> to decide. Not happy? <strong style="color:#1A0A3C;">100% back.</strong> No questions asked. No forms. No waiting.</p>
       </div>
 
       <!-- HURRY BANNER -->
@@ -438,18 +373,15 @@
       errBox.style.display  = 'none';
       container.innerHTML   = '';
       try {
-        const res = await fetch(
-          `${SUPABASE_URL}/functions/v1/create-checkout-session`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${SUPABASE_ANON}`,
-              'apikey': SUPABASE_ANON,
-            },
-            body: JSON.stringify({ origin: window.location.origin }),
-          }
-        );
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout-session`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON}`,
+            'apikey': SUPABASE_ANON,
+          },
+          body: JSON.stringify({ origin: window.location.origin }),
+        });
         const { clientSecret, error } = await res.json();
         if (error) throw new Error(error);
         if (!stripeInstance) stripeInstance = Stripe(STRIPE_PK);
