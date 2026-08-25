@@ -98,11 +98,39 @@
       margin-bottom: 16px;
     }
 
+    /* HERO TITLE */
+    .hero-title-wrap {
+      text-align: center;
+      padding: 48px 24px 32px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .hero-eyebrow {
+      font-family: 'Open Sans', sans-serif;
+      font-size: clamp(13px, 3vw, 15px);
+      font-weight: 800;
+      color: #FF6EC7;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      margin-bottom: 14px;
+    }
+    .hero-title {
+      font-family: 'Open Sans', sans-serif;
+      font-size: clamp(32px, 8vw, 58px);
+      font-weight: 900;
+      color: #1A0A3C;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+    .hero-title span {
+      color: #5B2DC8;
+    }
+
     /* FAQ */
     .faq-wrap {
       max-width: 640px;
       margin: 0 auto;
-      padding: 40px 20px;
+      padding: 8px 20px 40px;
     }
     .mfaq-item { border-bottom: 1px solid var(--border); }
     .mfaq-q { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 0; font-size: 16px; font-weight: 700; color: var(--dark); cursor: pointer; text-align: left; }
@@ -129,6 +157,12 @@
         <div class="tbox"><span class="tnum" id="t-s">00</span><span class="tlabel">Sec</span></div>
       </div>
     </div>
+  </div>
+
+  <!-- HERO TITLE -->
+  <div class="hero-title-wrap">
+    <div class="hero-eyebrow">Busy Parents</div>
+    <h1 class="hero-title">Generate practice for your child<br><span>with just a picture</span></h1>
   </div>
 
   <!-- FAQ -->
