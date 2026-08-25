@@ -73,9 +73,7 @@
       line-height: 1.1;
       text-transform: uppercase;
     }
-    .flash-banner .flash-label span {
-      color: #FFB3D9;
-    }
+    .flash-banner .flash-label span { color: #FFB3D9; }
     .flash-banner .flash-ends {
       font-family: 'Open Sans', sans-serif;
       font-size: clamp(13px, 3vw, 16px);
@@ -85,44 +83,18 @@
       letter-spacing: 0.12em;
       margin-bottom: 4px;
     }
-    .timer-boxes {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+    .timer-boxes { display: flex; gap: 10px; align-items: center; }
     .tbox {
       background: #FFD60A;
       border-radius: 10px;
-      width: 72px;
-      height: 72px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      width: 72px; height: 72px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
       gap: 2px;
     }
-    .tbox .tnum {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 28px;
-      font-weight: 900;
-      color: #1A0A3C;
-      line-height: 1;
-    }
-    .tbox .tlabel {
-      font-family: 'Open Sans', sans-serif;
-      font-size: 10px;
-      font-weight: 800;
-      color: #1A0A3C;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-    .tsep {
-      font-size: 28px;
-      font-weight: 900;
-      color: rgba(255,255,255,0.5);
-      line-height: 1;
-      margin-bottom: 16px;
-    }
+    .tbox .tnum { font-size: 28px; font-weight: 900; color: #1A0A3C; line-height: 1; }
+    .tbox .tlabel { font-size: 10px; font-weight: 800; color: #1A0A3C; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tsep { font-size: 28px; font-weight: 900; color: rgba(255,255,255,0.5); line-height: 1; margin-bottom: 16px; }
 
     /* HERO TITLE */
     .hero-title-wrap {
@@ -132,7 +104,6 @@
       margin: 0 auto;
     }
     .hero-eyebrow {
-      font-family: 'Open Sans', sans-serif;
       font-size: clamp(13px, 3vw, 15px);
       font-weight: 800;
       color: #FF6EC7;
@@ -141,15 +112,46 @@
       margin-bottom: 14px;
     }
     .hero-title {
-      font-family: 'Open Sans', sans-serif;
       font-size: clamp(48px, 12vw, 87px);
       font-weight: 900;
       color: #1A0A3C;
       line-height: 1.1;
       letter-spacing: -0.02em;
     }
-    .hero-title span {
-      color: #5B2DC8;
+    .hero-title span { color: #5B2DC8; }
+
+    /* VIDEO SECTION */
+    .video-section {
+      text-align: center;
+      padding: 0 20px 48px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+    .video-section-title {
+      font-size: clamp(22px, 5vw, 32px);
+      font-weight: 900;
+      color: #1A0A3C;
+      margin-bottom: 28px;
+      letter-spacing: -0.01em;
+    }
+    .video-frame-wrap {
+      display: inline-block;
+      position: relative;
+      border-radius: 24px;
+      /* fat 3D border like the button style */
+      border: 5px solid #5B2DC8;
+      border-bottom: 10px solid #3E1A9E;
+      box-shadow: 0 8px 0 #3E1A9E, 0 16px 40px rgba(91,45,200,0.25);
+      overflow: hidden;
+      max-width: 380px;
+      width: 100%;
+      background: #000;
+    }
+    .video-frame-wrap video {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 18px;
     }
 
     /* FAQ */
@@ -189,6 +191,16 @@
   <div class="hero-title-wrap">
     <div class="hero-eyebrow">Busy Parents</div>
     <h1 class="hero-title">Generate practice for your child<br><span>with just a picture</span></h1>
+  </div>
+
+  <!-- VIDEO SECTION -->
+  <div class="video-section">
+    <div class="video-section-title">Take a pic of their lesson 📸</div>
+    <div class="video-frame-wrap">
+      <video autoplay muted loop playsinline>
+        <source src="Copie_de_Ad_angle_1-2__1_.mp4" type="video/mp4"/>
+      </video>
+    </div>
   </div>
 
   <!-- FAQ -->
