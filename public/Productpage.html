@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Numio – FAQ</title>
+  <title>Numio – $1/month</title>
 
   <!-- Facebook Pixel -->
   <script>
@@ -30,19 +30,19 @@
   })(window,document,"clarity","script","y6hivp7gvm");
   </script>
 
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800;900&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
   <style>
     :root {
-      --pink:      #FF6EC7;
-      --pink-lt:   #FFD6F0;
-      --purple:    #5B2DC8;
-      --purple-dk: #3E1A9E;
-      --dark:      #1A0A3C;
-      --body:      #4B4065;
-      --muted:     #8B7BAE;
+      --green:     #4ADE80;
+      --green-dk:  #22C55E;
+      --dark:      #0A0A0A;
+      --muted:     #555;
       --border:    #E8D9F5;
+      --pink:      #FF6EC7;
+      --purple:    #5B2DC8;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
       font-family: 'Open Sans', sans-serif;
       background: #fff;
@@ -50,118 +50,204 @@
       font-size: 16px;
       line-height: 1.6;
     }
-    button { font-family: inherit; cursor: pointer; border: none; background: none; }
+    .inner {
+      max-width: 480px;
+      margin: 0 auto;
+    }
 
-    /* BANNER */
-    .flash-banner {
-      width: 100%;
-      background: #5B2DC8;
-      padding: 32px 20px;
+    /* ── TOP BANNER ── */
+    .top-banner {
+      background: linear-gradient(135deg, #86EFAC 0%, #f0fff0 50%, #86EFAC 100%);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .top-banner-text .label {
+      font-size: 10px;
+      font-weight: 900;
+      color: #0A0A0A;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      line-height: 1.2;
+    }
+    .top-banner-text .sub {
+      font-size: 11px;
+      font-weight: 500;
+      color: #333;
+      font-style: italic;
+    }
+    .timer-boxes {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    .tbox {
+      background: #0A0A0A;
+      border-radius: 6px;
+      width: 38px;
+      height: 38px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 20px;
-      text-align: center;
     }
-    .flash-banner .flash-label {
-      font-family: 'Open Sans', sans-serif;
-      font-size: clamp(28px, 7vw, 52px);
+    .tbox .tnum {
+      font-size: 16px;
       font-weight: 900;
       color: #fff;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      text-transform: uppercase;
+      line-height: 1;
     }
-    .flash-banner .flash-label span { color: #FFB3D9; }
-    .flash-banner .flash-ends {
-      font-family: 'Open Sans', sans-serif;
-      font-size: clamp(13px, 3vw, 16px);
-      font-weight: 700;
-      color: rgba(255,255,255,0.75);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 4px;
-    }
-    .timer-boxes { display: flex; gap: 10px; align-items: center; }
-    .tbox {
-      background: #FFD60A;
-      border-radius: 10px;
-      width: 72px; height: 72px;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 2px;
-    }
-    .tbox .tnum { font-size: 28px; font-weight: 900; color: #1A0A3C; line-height: 1; }
-    .tbox .tlabel { font-size: 10px; font-weight: 800; color: #1A0A3C; letter-spacing: 0.08em; text-transform: uppercase; }
-    .tsep { font-size: 28px; font-weight: 900; color: rgba(255,255,255,0.5); line-height: 1; margin-bottom: 16px; }
 
-    /* HERO TITLE */
-    .hero-title-wrap {
+    /* ── HERO ── */
+    .hero {
+      padding: 28px 20px 20px;
       text-align: center;
-      padding: 48px 24px 32px;
-      max-width: 860px;
-      margin: 0 auto;
     }
     .hero-eyebrow {
-      font-size: clamp(13px, 3vw, 15px);
-      font-weight: 800;
-      color: #FF6EC7;
+      font-size: 12px;
+      font-weight: 900;
+      color: #0A0A0A;
       text-transform: uppercase;
-      letter-spacing: 0.18em;
-      margin-bottom: 14px;
+      letter-spacing: 0.14em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .hero-eyebrow::before {
+      content: "⚠";
+      font-size: 14px;
     }
     .hero-title {
-      font-size: clamp(48px, 12vw, 87px);
+      font-size: clamp(34px, 9vw, 46px);
       font-weight: 900;
-      color: #1A0A3C;
+      color: #0A0A0A;
       line-height: 1.1;
       letter-spacing: -0.02em;
+      margin-bottom: 24px;
     }
-    .hero-title span { color: #5B2DC8; }
 
-    /* VIDEO SECTION */
-    .video-section {
-      text-align: center;
-      padding: 0 20px 48px;
-      max-width: 860px;
-      margin: 0 auto;
-    }
-    .video-section-title {
-      font-size: clamp(22px, 5vw, 32px);
-      font-weight: 900;
-      color: #1A0A3C;
-      margin-bottom: 28px;
-      letter-spacing: -0.01em;
-    }
-    .video-frame-wrap {
-      display: inline-block;
-      position: relative;
-      border-radius: 24px;
-      /* fat 3D border like the button style */
-      border: 5px solid #5B2DC8;
-      border-bottom: 10px solid #3E1A9E;
-      box-shadow: 0 8px 0 #3E1A9E, 0 16px 40px rgba(91,45,200,0.25);
-      overflow: hidden;
-      max-width: 380px;
-      width: 100%;
-      background: #000;
-    }
-    .video-frame-wrap video {
+    /* ── CTA BUTTON ── */
+    .cta-wrap { padding: 0 20px; text-align: center; }
+    .cta-btn {
       display: block;
       width: 100%;
-      height: auto;
-      border-radius: 18px;
+      appearance: button;
+      background-color: #4ADE80;
+      border: solid transparent;
+      border-radius: 16px;
+      border-width: 0 0 6px;
+      border-bottom-color: #16A34A;
+      box-sizing: border-box;
+      color: #fff;
+      cursor: pointer;
+      font-family: 'Open Sans', sans-serif;
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: .5px;
+      line-height: 20px;
+      outline: none;
+      padding: 16px 19px;
+      text-align: center;
+      text-transform: none;
+      touch-action: manipulation;
+      transition: filter .2s, padding-bottom .1s, border-bottom-width .1s;
+      position: relative;
+      text-decoration: none;
+    }
+    .cta-btn:after {
+      background-clip: padding-box;
+      background-color: #22C55E;
+      border: solid transparent;
+      border-radius: 16px;
+      border-width: 0 0 6px;
+      bottom: -6px;
+      content: "";
+      left: 0;
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: -1;
+    }
+    .cta-btn:hover { filter: brightness(1.08); }
+    .cta-btn:active { padding-bottom: 10px; border-bottom-width: 0; }
+    .cta-sub {
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      margin-top: 8px;
+      text-align: center;
     }
 
-    /* FAQ */
+    /* ── HOW IT WORKS ── */
+    .how-wrap {
+      padding: 36px 20px 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 0;
+      position: relative;
+    }
+    .how-left {
+      flex: 0 0 55%;
+    }
+    .how-left .phone-img {
+      width: 100%;
+      border-radius: 16px;
+      display: block;
+    }
+    .how-left .step-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0A0A0A;
+      margin-top: 10px;
+    }
+    .arrow-wrap {
+      flex: 0 0 15%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 60px;
+    }
+    .arrow-wrap svg {
+      width: 48px;
+      height: 48px;
+      transform: rotate(20deg);
+    }
+    .how-right {
+      flex: 0 0 30%;
+      padding-top: 80px;
+    }
+    .how-right .practice-img {
+      width: 100%;
+      border-radius: 16px;
+      display: block;
+      background: #e5e7eb;
+      aspect-ratio: 9/16;
+    }
+    .how-right .step-label {
+      font-size: 13px;
+      font-weight: 800;
+      color: #0A0A0A;
+      margin-top: 10px;
+      text-align: right;
+    }
+
+    /* ── SECOND CTA ── */
+    .cta2-wrap {
+      padding: 24px 20px 8px;
+      text-align: center;
+    }
+
+    /* ── FAQ ── */
     .faq-wrap {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 8px 20px 40px;
+      padding: 24px 20px 48px;
     }
     .mfaq-item { border-bottom: 1px solid var(--border); }
-    .mfaq-q { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 0; font-size: 16px; font-weight: 700; color: var(--dark); cursor: pointer; text-align: left; }
+    .mfaq-q { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 0; font-size: 16px; font-weight: 700; color: var(--dark); background: none; border: none; cursor: pointer; text-align: left; font-family: inherit; }
     .mfaq-icon { flex-shrink: 0; transition: transform 0.2s; color: var(--pink); font-size: 18px; }
     .mfaq-item.open .mfaq-icon { transform: rotate(180deg); }
     .mfaq-a { font-size: 15px; color: var(--muted); line-height: 1.75; padding-bottom: 20px; display: none; }
@@ -170,36 +256,58 @@
 </head>
 <body>
 
-  <!-- BANNER -->
-  <div class="flash-banner">
-    <div class="flash-label">$1<span>/month</span></div>
-    <div>
-      <div class="flash-ends">Back to School Offer Ends In</div>
-      <div class="timer-boxes">
-        <div class="tbox"><span class="tnum" id="t-d">00</span><span class="tlabel">Days</span></div>
-        <div class="tsep">:</div>
-        <div class="tbox"><span class="tnum" id="t-h">00</span><span class="tlabel">Hours</span></div>
-        <div class="tsep">:</div>
-        <div class="tbox"><span class="tnum" id="t-m">00</span><span class="tlabel">Min</span></div>
-        <div class="tsep">:</div>
-        <div class="tbox"><span class="tnum" id="t-s">00</span><span class="tlabel">Sec</span></div>
-      </div>
+  <!-- TOP BANNER -->
+  <div class="top-banner">
+    <div class="top-banner-text">
+      <div class="label">Back to School Offer</div>
+      <div class="sub">Goes back to $60/year in:</div>
+    </div>
+    <div class="timer-boxes">
+      <div class="tbox"><span class="tnum" id="t-d">00</span></div>
+      <div class="tbox"><span class="tnum" id="t-h">00</span></div>
+      <div class="tbox"><span class="tnum" id="t-m">00</span></div>
+      <div class="tbox"><span class="tnum" id="t-s">00</span></div>
     </div>
   </div>
 
-  <!-- HERO TITLE -->
-  <div class="hero-title-wrap">
+  <div class="inner">
+  <!-- HERO -->
+  <div class="hero">
     <div class="hero-eyebrow">Busy Parents</div>
-    <h1 class="hero-title">Generate practice for your child<br><span>with just a picture</span></h1>
+    <h1 class="hero-title">Help your child study their lessons with just a picture</h1>
   </div>
 
-  <!-- VIDEO SECTION -->
-  <div class="video-section">
-    <div class="video-section-title">Take a pic of their lesson 📸</div>
-    <div class="video-frame-wrap">
-      <video autoplay muted loop playsinline>
+  <!-- CTA 1 -->
+  <div class="cta-wrap">
+    <button class="cta-btn" onclick="window.location.href='https://numiomath.app'">Try Numio Today — $1/month</button>
+    <div class="cta-sub">100% Money-back if you're not happy after 30 days</div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-wrap">
+    <div class="how-left">
+      <video class="phone-img" autoplay muted loop playsinline>
         <source src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Copie%20de%20Ad%20angle%201-2%20(1).mp4" type="video/mp4"/>
       </video>
+      <div class="step-label">#1- Take a pic of the lesson</div>
+    </div>
+    <div class="arrow-wrap">
+      <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 15 Q35 10 45 45" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M38 44 L45 45 L42 38" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <div class="how-right">
+      <div class="practice-img"></div>
+      <div class="step-label">#2- Practise</div>
+    </div>
+  </div>
+
+  <!-- CTA 2 -->
+  <div class="cta2-wrap">
+    <div class="cta-wrap" style="padding:0;">
+      <button class="cta-btn" onclick="window.location.href='https://numiomath.app'">Try Numio Today — $1/month</button>
+      <div class="cta-sub">100% Money-back if you're not happy after 30 days</div>
     </div>
   </div>
 
@@ -223,6 +331,7 @@
     </div>
   </div>
 
+  </div>
   <script>
     const _end = new Date("2026-08-27T01:00:00").getTime();
     function tick() {
