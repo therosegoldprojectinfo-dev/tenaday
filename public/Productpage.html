@@ -386,28 +386,32 @@
       <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/broniska.png" alt="What Numio does for your child" style="width:100%;border-radius:16px;margin-bottom:16px;margin-top:-60px;clip-path:inset(26% 0% 26% 0%);"/>
 
       <!-- OFFER CARD -->
-      <div class="offer-card" style="background:#FFB3D9;margin-bottom:12px;">
+      <div style="background:white;border-radius:24px;padding:24px 20px;margin-bottom:12px;border:2px solid #E8D9F5;box-shadow:0 4px 0 #d4b8f0;">
 
-        <!-- Card title + price -->
-        <div style="font-family:'Open Sans',sans-serif;font-size:22px;font-weight:900;color:#5B2DC8;margin-bottom:12px;">365 Days Unlimited Practice</div>
-        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
-          <span style="font-size:15px;font-weight:700;color:rgba(91,45,200,0.45);text-decoration:line-through;">$60/year</span>
-          <span style="font-size:15px;font-weight:700;color:#5B2DC8;">→</span>
-          <span style="font-size:38px;font-weight:900;color:#5B2DC8;letter-spacing:-0.03em;line-height:1;">$15</span>
-          <span style="font-size:15px;font-weight:700;color:#5B2DC8;">/year</span>
-          <span style="background:#5B2DC8;color:white;font-size:12px;font-weight:900;padding:5px 12px;border-radius:999px;box-shadow:0 3px 0 #3E1A9E;white-space:nowrap;">Save $45 🎉</span>
+        <!-- Card title -->
+        <div style="font-family:'Open Sans',sans-serif;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">365 Days Full Access</div>
+
+        <!-- Price -->
+        <div style="display:flex;align-items:baseline;gap:6px;margin-bottom:4px;flex-wrap:wrap;">
+          <span style="font-size:42px;font-weight:900;color:var(--dark);letter-spacing:-0.03em;line-height:1;">$15</span>
+          <span style="font-size:16px;font-weight:400;color:var(--muted);">/year</span>
+          <span style="font-size:14px;font-weight:400;color:var(--muted);text-decoration:line-through;margin-left:4px;">$60</span>
         </div>
+        <div style="font-size:13px;font-weight:400;color:var(--muted);margin-bottom:20px;">Less than $1.25/month · <span style="color:#16A34A;font-weight:600;">You save $45</span></div>
+
+        <!-- Divider -->
+        <div style="height:1px;background:var(--border);margin-bottom:18px;"></div>
 
         <!-- Features -->
-        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:20px;">
-          <div style="font-size:15px;font-weight:900;color:#5B2DC8;text-transform:uppercase;letter-spacing:0.05em;">📸 Unlimited Pictures</div>
-          <div style="font-size:15px;font-weight:900;color:#5B2DC8;text-transform:uppercase;letter-spacing:0.05em;">🧠 Unlimited Quizzes</div>
-          <div style="font-size:15px;font-weight:900;color:#5B2DC8;text-transform:uppercase;letter-spacing:0.05em;">📚 Unlimited Subjects</div>
-          <div style="font-size:15px;font-weight:900;color:#5B2DC8;text-transform:uppercase;letter-spacing:0.05em;">🚫 No Ads or Distractions</div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:22px;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:400;color:var(--dark);"><span style="color:#16A34A;font-weight:700;font-size:16px;">✓</span>📸 Unlimited pictures from any lesson</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:400;color:var(--dark);"><span style="color:#16A34A;font-weight:700;font-size:16px;">✓</span>🧠 Unlimited personalized quizzes</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:400;color:var(--dark);"><span style="color:#16A34A;font-weight:700;font-size:16px;">✓</span>📚 Any subject, any grade</div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:400;color:var(--dark);"><span style="color:#16A34A;font-weight:700;font-size:16px;">✓</span>🚫 No ads, no distractions</div>
         </div>
 
         <!-- CTA -->
-        <button class="offer-btn" onclick="goToCheckout()">Start Your Child's First Quiz Tonight →</button>
+        <button onclick="goToCheckout()" style="display:block;width:100%;background:#5B2DC8;color:white;font-family:'Open Sans',sans-serif;font-size:16px;font-weight:800;height:58px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 4px 0 #3E1A9E;transition:transform 0.1s,box-shadow 0.1s;letter-spacing:0.01em;" onmousedown="this.style.boxShadow='none';this.style.transform='translateY(4px)'" onmouseup="this.style.boxShadow='0 4px 0 #3E1A9E';this.style.transform='translateY(0)'">Start Your Child's First Quiz Tonight →</button>
       </div>
 
       <!-- GUARANTEE CARD -->
