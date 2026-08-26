@@ -313,6 +313,26 @@
 
   </div><!-- /inner -->
 
+  <!-- POPUP -->
+  <div id="popup-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#fff; max-width:420px; width:100%; padding:32px 24px; position:relative; text-align:center;">
+      <button onclick="closePopup()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#555;">✕</button>
+      <div style="font-size:clamp(24px, 6vw, 30px); font-weight:700; color:#0A0A0A; line-height:1.2; margin-bottom:16px;">What are you waiting for? 👀</div>
+      <div style="font-size:16px; font-weight:400; color:#0A0A0A; line-height:1.7; margin-bottom:24px;">
+        Your child could already be practicing.<br><br>
+        Try Numio for 30 days for just $1.
+      </div>
+      <button class="cta-btn" style="margin-bottom:12px;" onclick="window.location.href='https://numiomath.app'">Try Numio for 30 days — just $1</button>
+      <div style="font-size:13px; font-weight:500; color:#555;">
+        Either your child practices more, or you get your $1 back.<br>
+        <span style="background:#FFE656; color:#0A0A0A; padding:1px 6px; font-weight:600; white-space:nowrap; display:inline-block; margin-top:6px;">30-Day Money-Back Guarantee.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONFETTI CANVAS -->
+  <canvas id="confetti-canvas" style="position:fixed; inset:0; pointer-events:none; z-index:10000; display:none;"></canvas>
+
   <script>
     const _end = new Date("2026-08-27T01:00:00").getTime();
     function tick() {
@@ -332,6 +352,71 @@
     }
     tick();
     setInterval(tick, 1000);
+
+    // CONFETTI
+    const canvas = document.getElementById('confetti-canvas');
+    const ctx = canvas.getContext('2d');
+    let pieces = [];
+    let confettiAnim;
+
+    function launchConfetti() {
+      canvas.style.display = 'block';
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      pieces = [];
+      const colors = ['#34EB41','#FFE656','#C4B4FF','#FF6EC7','#5B2DC8','#ef4444','#fff'];
+      for (let i = 0; i < 150; i++) {
+        pieces.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * -canvas.height,
+          w: Math.random() * 10 + 6,
+          h: Math.random() * 6 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          speed: Math.random() * 4 + 2,
+          angle: Math.random() * 360,
+          spin: Math.random() * 6 - 3,
+          drift: Math.random() * 2 - 1,
+        });
+      }
+      animateConfetti();
+      setTimeout(() => { cancelAnimationFrame(confettiAnim); canvas.style.display = 'none'; }, 3500);
+    }
+
+    function animateConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      pieces.forEach(p => {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle * Math.PI / 180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+        p.y += p.speed;
+        p.x += p.drift;
+        p.angle += p.spin;
+      });
+      confettiAnim = requestAnimationFrame(animateConfetti);
+    }
+
+    // POPUP
+    let popupShown = false;
+    function showPopup() {
+      if (popupShown) return;
+      popupShown = true;
+      document.getElementById('popup-overlay').style.display = 'flex';
+      launchConfetti();
+    }
+    function closePopup() {
+      document.getElementById('popup-overlay').style.display = 'none';
+    }
+    setTimeout(showPopup, 5000);
+    window.addEventListener('scroll', function() {
+      const scrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+      if (scrolled >= 0.5) showPopup();
+    }, { passive: true });
+    document.getElementById('popup-overlay').addEventListener('click', function(e) {
+      if (e.target === this) closePopup();
+    });
   </script>
 
 </body>
