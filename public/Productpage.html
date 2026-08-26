@@ -154,6 +154,12 @@
       </div>
     </div>
 
+    <!-- CTA BETWEEN GIFS AND OLD WAY -->
+    <div class="cta-wrap" style="padding: 8px 20px 0;">
+      <button class="cta-btn" onclick="window.location.href='https://numiomath.app'">Try Numio Today — $1/month</button>
+      <div class="cta-sub">100% Money-back if you're not happy after 30 days</div>
+    </div>
+
     <!-- THE OLD WAY -->
     <div style="padding: 40px 20px 24px; text-align: center;">
       <div class="label-badge">
@@ -266,7 +272,7 @@
 
     <!-- PRICE CARD -->
     <div style="padding: 24px 20px 40px;">
-      <div style="overflow: hidden;">
+      <div class="price-card-trigger" style="overflow: hidden;">
         <div style="background: #FFE656; padding: 14px 20px; text-align: center;">
           <div style="font-size: 22px; font-weight: 400; color: #0A0A0A;">Back to school offer</div>
         </div>
@@ -393,22 +399,37 @@
       confettiAnim = requestAnimationFrame(animateConfetti);
     }
 
-    // POPUP
+    function closePopup() {
+      document.getElementById('popup-overlay').style.display = 'none';
+    }
+
+    // POPUP — shows after user reaches price card and stays 3 seconds
     let popupShown = false;
+    let priceCardTimer = null;
+
     function showPopup() {
       if (popupShown) return;
       popupShown = true;
       document.getElementById('popup-overlay').style.display = 'flex';
       launchConfetti();
     }
-    function closePopup() {
-      document.getElementById('popup-overlay').style.display = 'none';
+
+    const priceCard = document.querySelector('.price-card-trigger');
+    if (priceCard) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            if (!priceCardTimer) {
+              priceCardTimer = setTimeout(showPopup, 3000);
+            }
+          } else {
+            clearTimeout(priceCardTimer);
+            priceCardTimer = null;
+          }
+        });
+      }, { threshold: 0.3 });
+      observer.observe(priceCard);
     }
-    setTimeout(showPopup, 5000);
-    window.addEventListener('scroll', function() {
-      const scrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-      if (scrolled >= 0.5) showPopup();
-    }, { passive: true });
     document.getElementById('popup-overlay').addEventListener('click', function(e) {
       if (e.target === this) closePopup();
     });
