@@ -30,6 +30,7 @@
   })(window,document,"clarity","script","y6hivp7gvm");
   </script>
 
+  <script src="https://js.stripe.com/v3/"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -131,7 +132,7 @@
 
     <!-- CTA 1 -->
     <div class="cta-wrap">
-      <button class="cta-btn" onclick="window.location.href='https://numiomath.app'">Try Numio Today — $1/month</button>
+      <button class="cta-btn" onclick="scrollToPriceCard()">Try Numio Today — $1/month</button>
       <div class="cta-sub">100% Money-back if you're not happy after 30 days</div>
     </div>
 
@@ -156,7 +157,7 @@
 
     <!-- CTA BETWEEN GIFS AND OLD WAY -->
     <div class="cta-wrap" style="padding: 8px 20px 0;">
-      <button class="cta-btn" onclick="window.location.href='https://numiomath.app'">Try Numio Today — $1/month</button>
+      <button class="cta-btn" onclick="scrollToPriceCard()">Try Numio Today — $1/month</button>
       <div class="cta-sub">100% Money-back if you're not happy after 30 days</div>
     </div>
 
@@ -224,7 +225,7 @@
       </div>
       <div style="text-align: center; font-size: clamp(26px, 7vw, 36px); font-weight: 900; margin-bottom: 28px;">That's it!</div>
       <div class="cta-wrap" style="padding: 0;">
-        <button class="cta-btn" onclick="window.location.href='https://numiomath.app'">Try Numio Today — $1/month</button>
+        <button class="cta-btn" onclick="scrollToPriceCard()">Try Numio Today — $1/month</button>
         <div class="cta-sub">100% Money-back if you're not happy after 30 days</div>
       </div>
     </div>
@@ -287,7 +288,7 @@
           <div style="text-align: center; font-size: 26px; font-weight: 900; color: #0A0A0A; margin-bottom: 20px;">
             <span style="text-decoration: line-through; color: #555; font-weight: 400;">$60</span>&nbsp;→&nbsp;$1 today
           </div>
-          <button class="cta-btn" onclick="window.location.href='https://numiomath.app'" style="font-size:17px;">Start your child's first quiz →</button>
+          <button class="cta-btn" onclick="goToCheckout()" style="font-size:17px;">Start your child's first quiz →</button>
           <div style="text-align: center; margin-top: 14px; font-size: 15px; font-weight: 500; line-height: 1.6;">
             Not happy with Numio? Get your $1 back.<br>
             <span style="background: #FFE656; color: #0A0A0A; font-weight: 600; padding: 2px 8px; display: inline-block; margin-top: 4px; white-space: nowrap;">30-Day Money-Back Guarantee.</span>
@@ -327,7 +328,7 @@
       <div style="font-size:clamp(28px, 7vw, 36px); font-weight:900; color:#0A0A0A; line-height:1.2; margin-bottom:48px; text-align:center;">
         Either your child practices more or you get your $1 back!
       </div>
-      <button onclick="window.location.href='https://numiomath.app'" style="display:block; width:100%; background:#005506; color:#fff; font-family:'Inter',sans-serif; font-size:20px; font-weight:700; border:none; border-radius:0; padding:20px; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,0.25);">Try Numio for $1 →</button>
+      <button onclick="closePopup(); scrollToPriceCard();" style="display:block; width:100%; background:#005506; color:#fff; font-family:'Inter',sans-serif; font-size:20px; font-weight:700; border:none; border-radius:0; padding:20px; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,0.25);">Try Numio for $1 →</button>
     </div>
   </div>
 
@@ -433,6 +434,95 @@
     document.getElementById('popup-overlay').addEventListener('click', function(e) {
       if (e.target === this) closePopup();
     });
+  </script>
+
+  <!-- CHECKOUT MODAL -->
+  <div id="checkout-overlay" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(26,10,60,0.72); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px;">
+    <div id="checkout-modal" style="background:white; border-radius:16px; width:100%; max-width:520px; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 24px 80px rgba(91,45,200,0.35);">
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px 14px; border-bottom:1.5px solid #E8D9F5; flex-shrink:0;">
+        <div>
+          <div style="font-size:12px; font-weight:800; color:#5B2DC8; text-transform:uppercase; letter-spacing:0.05em;">Numio · 30-Day Access</div>
+          <div style="font-size:20px; font-weight:900; color:#0A0A0A;">$1 <span style="font-size:13px; font-weight:400; color:#888;">/month</span></div>
+        </div>
+        <button onclick="closeCheckout()" style="width:32px; height:32px; border-radius:50%; background:#F3EDFF; border:none; cursor:pointer; font-size:18px; color:#5B2DC8; font-weight:700;">✕</button>
+      </div>
+      <div id="checkout-body" style="flex:1; overflow-y:auto; padding:20px; min-height:420px;">
+        <div id="checkout-loading" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; min-height:380px;">
+          <div style="width:40px; height:40px; border:3px solid #E8D9F5; border-top-color:#5B2DC8; border-radius:50%; animation:spin 0.7s linear infinite;"></div>
+          <p style="font-size:13px; font-weight:700; color:#8B7BAE;">Loading secure checkout…</p>
+        </div>
+        <div id="checkout-error" style="display:none; text-align:center; padding:40px 20px; font-size:14px; color:#e53e3e;">Something went wrong. <a href="https://buy.stripe.com/6oUaEPgFL0G6cQ27rP7EQ0r" style="color:#5B2DC8;">Pay directly</a></div>
+        <div id="stripe-checkout-container"></div>
+      </div>
+      <div style="padding:10px 20px 14px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; border-top:1.5px solid #E8D9F5; flex-shrink:0;">
+        <span style="font-size:11px; font-weight:700; color:#8B7BAE;">✓ Secure payment</span>
+        <span style="font-size:11px; font-weight:700; color:#8B7BAE;">✓ SSL encrypted</span>
+        <span style="font-size:11px; font-weight:700; color:#8B7BAE;">✓ 30-day guarantee</span>
+      </div>
+    </div>
+  </div>
+
+  <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
+
+  <script>
+    // STRIPE CHECKOUT
+    const SUPABASE_URL  = 'https://lyedpfhzrvyaskmzhyhl.supabase.co';
+    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0';
+    const STRIPE_PK     = 'pk_live_51PpBJg004XbuCgJZSAj4kXcxFiIlmxVMUNeObL5TiOH1QEzagJOPeaKghgTecG3UpH7ZsJ0VkOYhfPSiQw99I15h00FhK5h8Eu';
+    let stripeInstance = null;
+    let checkoutInstance = null;
+
+    function scrollToPriceCard() {
+      document.querySelector('.price-card-trigger').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    async function goToCheckout() {
+      fbq('track', 'InitiateCheckout');
+      const overlay   = document.getElementById('checkout-overlay');
+      const loading   = document.getElementById('checkout-loading');
+      const errBox    = document.getElementById('checkout-error');
+      const container = document.getElementById('stripe-checkout-container');
+      overlay.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      loading.style.display = 'flex';
+      errBox.style.display  = 'none';
+      container.innerHTML   = '';
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout-session`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_ANON}`,
+            'apikey': SUPABASE_ANON,
+          },
+          body: JSON.stringify({ origin: window.location.origin }),
+        });
+        const { clientSecret, error } = await res.json();
+        if (error) throw new Error(error);
+        if (!stripeInstance) stripeInstance = Stripe(STRIPE_PK);
+        checkoutInstance = await stripeInstance.initEmbeddedCheckout({ clientSecret });
+        loading.style.display = 'none';
+        checkoutInstance.mount('#stripe-checkout-container');
+      } catch (err) {
+        console.error('Checkout error:', err);
+        loading.style.display = 'none';
+        errBox.style.display  = 'block';
+      }
+    }
+
+    function closeCheckout() {
+      document.getElementById('checkout-overlay').style.display = 'none';
+      document.body.style.overflow = '';
+      if (checkoutInstance) { checkoutInstance.destroy(); checkoutInstance = null; }
+      document.getElementById('stripe-checkout-container').innerHTML = '';
+      document.getElementById('checkout-loading').style.display = 'flex';
+      document.getElementById('checkout-error').style.display   = 'none';
+    }
+
+    document.getElementById('checkout-overlay').addEventListener('click', function(e) {
+      if (e.target === this) closeCheckout();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCheckout(); });
   </script>
 
 </body>
