@@ -172,7 +172,7 @@
     <!-- HOW IT WORKS -->
     <div class="how-wrap">
       <div style="flex: 1; display: flex; flex-direction: column;">
-        <video autoplay muted loop playsinline style="width:100%; border-radius:0; display:block;">
+        <video id="vid1" autoplay muted loop playsinline preload="auto" style="width:100%; border-radius:0; display:block;">
           <source src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Copie%20de%20Ad%20angle%201-2%20(1).mp4" type="video/mp4"/>
         </video>
         <div class="step-label">#1- Take a pic of the lesson</div>
@@ -181,7 +181,7 @@
         <img src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/Corner%20up-right.png" alt="arrow" style="width:52px;"/>
       </div>
       <div style="flex: 1; display: flex; flex-direction: column; margin-top: 20%;">
-        <video autoplay muted loop playsinline style="width:100%; border-radius:0; display:block;">
+        <video id="vid2" autoplay muted loop playsinline preload="auto" style="width:100%; border-radius:0; display:block;">
           <source src="https://raw.githubusercontent.com/therosegoldprojectinfo-dev/tenaday/main/public/giftouse2bro.mp4" type="video/mp4"/>
         </video>
         <div class="step-label">#2- Practise</div>
@@ -402,6 +402,24 @@
   <canvas id="confetti-canvas" style="position:fixed; inset:0; pointer-events:none; z-index:10000; display:none;"></canvas>
 
   <script>
+    // Force autoplay on mobile (iOS Safari fix)
+    document.addEventListener('DOMContentLoaded', function() {
+      ['vid1','vid2'].forEach(function(id) {
+        var v = document.getElementById(id);
+        if (!v) return;
+        v.muted = true;
+        var p = v.play();
+        if (p !== undefined) p.catch(function() {});
+      });
+    });
+    // Also try on first user interaction as fallback
+    document.addEventListener('touchstart', function tryPlay() {
+      ['vid1','vid2'].forEach(function(id) {
+        var v = document.getElementById(id);
+        if (v && v.paused) { v.muted = true; v.play().catch(function(){}); }
+      });
+    }, { once: true });
+
     const _end = new Date("2026-08-31T00:01:00").getTime();
     function tick() {
       const d = Math.max(0, _end - Date.now());
