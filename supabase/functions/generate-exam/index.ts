@@ -26,13 +26,14 @@ Detect the language of the educational content in the images. Write ALL question
 Your job is to:
 1. Analyze ALL images together as one document
 2. Detect the language of the content
-3. Generate exactly 15 questions covering the content across all pages
-4. Write EVERYTHING in the detected language
-5. Choose the best question format:
+3. Extract the full readable text from the images (every word, sentence, and number visible)
+4. Generate exactly 15 questions covering the content across all pages
+5. Write EVERYTHING in the detected language
+6. Choose the best question format:
    - Multiple choice (MCQ) for facts, definitions, math
    - True/False for concepts and statements — answers MUST be in the image's language
    - Fill in the blank for vocabulary or simple recall
-6. Make the language simple, fun, and encouraging
+7. Make the language simple, fun, and encouraging
 
 CRITICAL RULES:
 - For MCQ: correct_answer MUST be the exact full text of one of the options — NEVER a letter like "A" or "B"
@@ -46,6 +47,7 @@ You MUST respond with ONLY a valid JSON object — no markdown, no backticks, no
 
 {
   "topic": "Short topic name in the image's language",
+  "page_text": "The full extracted text from the image(s), word for word, preserving paragraphs. This is every readable word on the page.",
   "questions": [
     {
       "id": 1,
@@ -87,7 +89,6 @@ serve(async (req) => {
     const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
     const { data: { user }, error: authError } = await sb.auth.getUser(jwt)
 
-    // Block unauthenticated requests — must be a paid user
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
@@ -96,7 +97,6 @@ serve(async (req) => {
     }
 
     // ── Parse body + validate BEFORE rate limit ───────────────────
-    // So malformed requests don't burn the user's daily quota
     const { images } = await req.json()
 
     const questionCount = 15
@@ -116,7 +116,7 @@ serve(async (req) => {
     }
 
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
-    const MAX_B64 = 7_000_000 // ~5MB decoded
+    const MAX_B64 = 7_000_000
     for (const img of images) {
       if (!ALLOWED_TYPES.includes(img.mediaType)) {
         return new Response(
@@ -132,7 +132,7 @@ serve(async (req) => {
       }
     }
 
-    // ── Subscription check (server-side — client gate is cosmetic) ──
+    // ── Subscription check ──────────────────────────────────────
     {
       const { data: profile, error: profileErr } = await sb
         .from('profiles')
@@ -148,16 +148,13 @@ serve(async (req) => {
       }
     }
 
-    // ── Rate limit (AFTER validation so bad requests don't burn quota) ──
+    // ── Rate limit ──────────────────────────────────────────────
     {
-      // FIX #2: Check global ceiling BEFORE increment so ceiling hit doesn't burn quota
-      // Also fail CLOSED on DB error (null count = treat as at ceiling)
       const today = new Date().toISOString().split('T')[0]
       const { count: authCount, error: countErr } = await sb
         .from('usage_logs')
         .select('id', { count: 'exact', head: true })
         .gte('created_at', `${today}T00:00:00Z`)
-      // Fail CLOSED: DB error, null count, or at ceiling all block the request
       if (countErr || authCount === null || authCount >= 500) {
         if (countErr) console.error('usage_logs count error (failing closed):', countErr)
         return new Response(
@@ -184,7 +181,7 @@ serve(async (req) => {
 
     content.push({
       type: 'text',
-      text: `Generate exactly ${questionCount} quiz questions from the educational content in ${images.length > 1 ? `these ${images.length} pages` : 'this image'}. Only ask about the actual subject matter — never about titles, headers, or document structure. Return only the JSON.`,
+      text: `Generate exactly ${questionCount} quiz questions from the educational content in ${images.length > 1 ? `these ${images.length} pages` : 'this image'}. Also extract the full page_text word for word. Only ask about the actual subject matter — never about titles, headers, or document structure. Return only the JSON.`,
     })
 
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
@@ -218,23 +215,19 @@ serve(async (req) => {
     // ── Parse exam JSON ───────────────────────────────────────────
     let exam
     try {
-      // Strip markdown code fences Claude sometimes adds around JSON
       const clean = rawText
-        .replace(/^```(?:json)?[^\n]*\n?/i, '')  // opening fence
-        .replace(/\n?```\s*$/i, '')                // closing fence
+        .replace(/^```(?:json)?[^\n]*\n?/i, '')
+        .replace(/\n?```\s*$/i, '')
         .trim()
       exam = JSON.parse(clean)
 
-      // Schema validation — reject malformed or empty output before it reaches Quiz.jsx
       if (!exam || !Array.isArray(exam.questions) || exam.questions.length === 0) {
         console.error('Claude returned invalid schema:', JSON.stringify(exam).slice(0, 200))
-        // Log failure so trial ceilings still apply even on bad model output
         return new Response(
           JSON.stringify({ error: 'Quiz generation failed' }),
           { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
         )
       }
-      // Validate each question has required fields
       for (const q of exam.questions) {
         if (!q.type || !q.question || !q.correct_answer) {
           console.error('Claude returned malformed question:', JSON.stringify(q).slice(0, 200))
@@ -243,7 +236,6 @@ serve(async (req) => {
             { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
           )
         }
-        // MCQ must have at least 2 options
         if (q.type === 'mcq' && (!Array.isArray(q.options) || q.options.length < 2)) {
           console.error('Claude returned MCQ without options:', JSON.stringify(q).slice(0, 200))
           return new Response(
@@ -262,20 +254,17 @@ serve(async (req) => {
 
     // ── Usage tracking ────────────────────────────────────────────
     try {
-      // Sonnet 4.6 pricing: $3/M input, $15/M output
       const costUsd =
         ((usage.input_tokens || 0) * 3 / 1_000_000) +
         ((usage.output_tokens || 0) * 15 / 1_000_000)
 
-      // Log usage
       await sb.from('usage_logs').insert({
-          user_id:       user.id,
-          image_count:   images.length,
-          input_tokens:  usage.input_tokens || 0,
-          output_tokens: usage.output_tokens || 0,
-          cost_usd:      costUsd,
-        })
-
+        user_id:       user.id,
+        image_count:   images.length,
+        input_tokens:  usage.input_tokens || 0,
+        output_tokens: usage.output_tokens || 0,
+        cost_usd:      costUsd,
+      })
     } catch (trackErr) {
       console.error('Usage tracking failed (non-fatal):', trackErr)
     }
