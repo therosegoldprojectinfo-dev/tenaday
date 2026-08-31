@@ -91,8 +91,15 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
     setError(null)
     try {
       const compressed = await Promise.all(images.map(img => compressImage(img.file)))
-      const generated = await generateExam(compressed)
-      const saved = await saveExam({ chapterId: chapter.id, topic: generated.topic, questions: generated.questions, kidId })
+      const generated  = await generateExam(compressed)
+      // Save with page_text so revision regeneration can use it later
+      const saved = await saveExam({
+        chapterId: chapter.id,
+        topic:     generated.topic,
+        questions: generated.questions,
+        kidId,
+        pageText:  generated.page_text || null,
+      })
       onExamReady(saved)
     } catch (err) {
       setError(err)
