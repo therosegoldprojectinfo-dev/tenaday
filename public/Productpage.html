@@ -157,18 +157,44 @@
     }
 
     /* ── HOW IT WORKS (GIFs) ── */
-    .how-wrap {
-      padding: 36px 20px 16px;
+    .how-section { padding: 40px 20px 8px; }
+    .how-title {
+      font-size: clamp(24px, 6vw, 30px);
+      font-weight: 900;
+      color: #0A0A0A;
+      text-align: center;
+      margin-bottom: 28px;
+      letter-spacing: -0.02em;
+    }
+    .how-grid {
       display: flex;
       align-items: flex-start;
-      gap: 8px;
+      gap: 0;
+      position: relative;
     }
-    .how-col { flex: 1; display: flex; flex-direction: column; }
-    .how-col video { width: 100%; border-radius: 12px; display: block; }
-    .how-col-right { flex: 1; display: flex; flex-direction: column; margin-top: 20%; }
-    .how-col-right video { width: 100%; border-radius: 12px; display: block; }
-    .step-label { font-size: 13px; font-weight: 800; color: #0A0A0A; margin-top: 10px; }
-    .arrow-col { flex: 0 0 52px; display: flex; align-items: flex-start; justify-content: center; padding-top: 18%; }
+    .how-left { flex: 1; display: flex; flex-direction: column; }
+    .how-left video { width: 100%; border-radius: 16px; display: block; }
+    .how-left .step-label { font-size: 14px; font-weight: 700; color: #0A0A0A; margin-top: 10px; }
+    .how-arrow-col {
+      flex: 0 0 48px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 36%;
+    }
+    .how-arrow-col svg { width: 40px; height: 40px; }
+    .how-right { flex: 1; display: flex; flex-direction: column; margin-top: 30%; }
+    .how-right video { width: 100%; border-radius: 16px; display: block; }
+    .how-right .step-label { font-size: 14px; font-weight: 700; color: #0A0A0A; margin-top: 10px; }
+    .how-thats-it {
+      text-align: center;
+      font-size: clamp(22px, 6vw, 28px);
+      font-weight: 900;
+      color: #0A0A0A;
+      margin-top: 28px;
+      margin-bottom: 24px;
+      letter-spacing: -0.02em;
+    }
 
     /* ── FAQ ── */
     .faq-wrap { padding: 8px 20px 48px; }
@@ -222,25 +248,33 @@
     </div>
 
     <!-- HOW IT WORKS (GIFs) -->
-    <div class="how-wrap">
-      <div style="flex: 1; display: flex; flex-direction: column;">
-        <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high"
-          poster="/Capture%20d%27%C3%A9cran%202026-08-29%20133643.png"
-          style="width:100%; border-radius:12px; display:block;">
-          <source src="/Copie%20de%20Ad%20angle%201-2%20(1).mp4" type="video/mp4"/>
-        </video>
-        <div class="step-label">#1- Take a pic of the lesson</div>
+    <div class="how-section">
+      <div class="how-title">How does it work?</div>
+      <div class="how-grid">
+        <div class="how-left">
+          <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high"
+            poster="/Capture%20d%27%C3%A9cran%202026-08-29%20133643.png">
+            <source src="/Copie%20de%20Ad%20angle%201-2%20(1).mp4" type="video/mp4"/>
+          </video>
+          <div class="step-label">#1- Take a pic of the lesson</div>
+        </div>
+        <div class="how-arrow-col">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 10 Q28 10 30 30" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" fill="none"/>
+            <path d="M24 28 L30 30 L28 24" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <div class="how-right">
+          <video id="vid2" autoplay muted loop playsinline preload="none"
+            poster="/Capture%20d%27%C3%A9cran%202026-08-29%20133751.png">
+            <source src="/giftouse2bro.mp4" type="video/mp4"/>
+          </video>
+          <div class="step-label">#2- Practise</div>
+        </div>
       </div>
-      <div class="arrow-col">
-        <img loading="lazy" src="/Corner%20up-right.png" alt="arrow" style="width:52px;"/>
-      </div>
-      <div style="flex: 1; display: flex; flex-direction: column; margin-top: 20%;">
-        <video id="vid2" autoplay muted loop playsinline preload="none"
-          poster="/Capture%20d%27%C3%A9cran%202026-08-29%20133751.png"
-          style="width:100%; border-radius:12px; display:block;">
-          <source src="/giftouse2bro.mp4" type="video/mp4"/>
-        </video>
-        <div class="step-label">#2- Practise</div>
+      <div class="how-thats-it">That's it!</div>
+      <div style="padding: 0 0 32px;">
+        <button class="cta-btn" onclick="goToCheckout()">Start your child's first practise →</button>
       </div>
     </div>
 
