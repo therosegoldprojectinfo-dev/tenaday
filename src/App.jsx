@@ -20,6 +20,7 @@ import PostPaymentSetup from './screens/PostPaymentSetup'
 import Paywall from './screens/Paywall'
 import { LangContext } from './lib/LangContext'
 import { KidContext } from './lib/KidContext'
+import { getExamsForChapter } from './lib/chapters'
 
 const HIDE_NAV = ['quiz', 'scan', 'quiz_intro']
 
@@ -34,14 +35,12 @@ export default function App() {
     return params.get('session_id') || null
   })
   // Grace period: skip Paywall for 30s after payment while webhook lands
-  // Reads session_id (first load) OR subscribed=true (after reload)
   const [justPaid, setJustPaid] = useState(() => {
     const params = new URLSearchParams(window.location.search)
     return !!(params.get('session_id') || params.get('subscribed'))
   })
   useEffect(() => {
     if (justPaid) {
-      // Clean the subscribed param from URL silently
       const params = new URLSearchParams(window.location.search)
       if (params.get('subscribed')) {
         window.history.replaceState({}, '', window.location.pathname)
@@ -56,6 +55,7 @@ export default function App() {
     document.documentElement.lang = lang
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr'
   }, [lang])
+
   const [onboarded, setOnboarded]     = useState(null)
   const { isInactive, checked } = useSubscription(onboarded === true)
   const [showOnboarding, setShowOnboarding] = useState(false)
@@ -81,10 +81,8 @@ export default function App() {
         if (data?.language) setLang(data.language)
 
         if (data?.display_name) {
-          // Load kids
           const kidList = await getKids()
           if (kidList.length === 0) {
-            // Migrate: create first kid from display_name
             const firstKid = await createKid(data.display_name)
             setKids([firstKid])
             setActiveKid(firstKid)
@@ -105,17 +103,15 @@ export default function App() {
     getStreak(activeKid.id).then(s => setStreak(s.count)).catch(() => {})
   }, [activeKid?.id])
 
-  // Post-payment flow: user just paid but has no account yet
-  // Render BEFORE auth check so nothing overrides it
+  // Post-payment flow
   if (sessionId) {
     return (
       <LangContext.Provider value={lang}>
         <PostPaymentSetup
           sessionId={sessionId}
           onComplete={async ({ kid }) => {
-            // Clean session_id from URL without reload
             window.history.replaceState({}, '', window.location.pathname)
-            setJustPaid(true) // Grace period — don't show Paywall while webhook lands
+            setJustPaid(true)
             if (kid) {
               setKids([kid])
               setActiveKid(kid)
@@ -138,41 +134,38 @@ export default function App() {
   }
 
   if (!onboarded) {
-    // Show Login screen if user tapped "Already have an account"
     return (
-        <LangContext.Provider value={lang}>
-          <Login
-            lang={lang}
-            onLanguageChange={setLang}
-            onTryFree={() => setShowOnboarding(false)}
-            onSuccess={async (setLoginError) => {
-              try {
-                const { supabase } = await import('./lib/supabaseClient')
-                const { data: { user } } = await supabase.auth.getUser()
-                if (user) {
-                  const { data: prof } = await supabase.from('profiles').select('language').eq('id', user.id).single()
-                  if (prof?.language) setLang(prof.language)
-                }
-              } catch (e) { console.error(e) }
-              try {
-                const kidList = await getKids()
-                let kid
-                if (kidList.length === 0) { kid = await createKid('Kid 1'); setKids([kid]) }
-                else { setKids(kidList); kid = kidList[0] }
-                setActiveKid(kid)
-                getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
-                setOnboarded(true)
-              } catch (e) {
-                console.error('Failed to load kids after login:', e)
-                setLoginError?.(lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Please try again.')
+      <LangContext.Provider value={lang}>
+        <Login
+          lang={lang}
+          onLanguageChange={setLang}
+          onTryFree={() => setShowOnboarding(false)}
+          onSuccess={async (setLoginError) => {
+            try {
+              const { supabase } = await import('./lib/supabaseClient')
+              const { data: { user } } = await supabase.auth.getUser()
+              if (user) {
+                const { data: prof } = await supabase.from('profiles').select('language').eq('id', user.id).single()
+                if (prof?.language) setLang(prof.language)
               }
-            }}
-          />
-        </LangContext.Provider>
-      )
+            } catch (e) { console.error(e) }
+            try {
+              const kidList = await getKids()
+              let kid
+              if (kidList.length === 0) { kid = await createKid('Kid 1'); setKids([kid]) }
+              else { setKids(kidList); kid = kidList[0] }
+              setActiveKid(kid)
+              getStreak(kid.id).then(s => setStreak(s.count)).catch(() => {})
+              setOnboarded(true)
+            } catch (e) {
+              console.error('Failed to load kids after login:', e)
+              setLoginError?.(lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Please try again.')
+            }
+          }}
+        />
+      </LangContext.Provider>
+    )
   }
-
-
 
   const { screen, chapter, exam, revisionExams } = nav
 
@@ -184,6 +177,19 @@ export default function App() {
     go({ screen: newTab, chapter: null, exam: null, revisionExams: [] })
   }
 
+  // After a regeneration, the new exam is ready — navigate into it directly
+  // and refresh the revision exam list in the background
+  async function handleNewExamReady(newExam) {
+    go({ screen: 'quiz_intro', exam: newExam })
+    // Refresh revision exams in background so if they go back to Revision list it's up to date
+    if (chapter?.id) {
+      try {
+        const updatedExams = await getExamsForChapter(chapter.id)
+        setNav(prev => ({ ...prev, revisionExams: updatedExams }))
+      } catch { /* non-fatal */ }
+    }
+  }
+
   const showNav = !HIDE_NAV.includes(screen)
 
   const kidContextValue = {
@@ -191,7 +197,6 @@ export default function App() {
     kids,
     setActiveKid: (kid) => {
       setActiveKid(kid)
-      // Reset to chapters when switching kid
       go({ screen: 'chapters', chapter: null, exam: null, revisionExams: [] })
       setTab('chapters')
     },
@@ -210,7 +215,6 @@ export default function App() {
             className={`flex-1 ${showNav ? 'md:ms-56' : ''}`}
             style={{ paddingBottom: showNav ? 'calc(64px + env(safe-area-inset-bottom))' : 0, overflow: 'hidden', minWidth: 0, width: '100%' }}
           >
-            {/* Paywall gate — show if not subscribed */}
             {checked && isInactive && !sessionId && !justPaid ? (
               <Paywall />
             ) : !activeKid && screen !== 'parent_zone' && screen !== 'profile' ? (
@@ -261,7 +265,10 @@ export default function App() {
               <QuizIntro
                 exam={exam}
                 kidName={activeKid?.name}
+                chapterId={chapter?.id}
+                kidId={activeKid?.id}
                 onStart={() => go({ screen: 'quiz' })}
+                onNewExamReady={handleNewExamReady}
                 onBack={() => go({ screen: 'current_chapter' })}
               />
             )}
@@ -274,7 +281,6 @@ export default function App() {
                   go({ screen: 'current_chapter' })
                   if (activeKid) {
                     getStreak(activeKid.id).then(s => setStreak(s.count)).catch(() => {})
-                    // Refresh coin balance so chapters screen shows updated coins instantly
                     getKids().then(kids => {
                       const updated = kids.find(k => k.id === activeKid.id)
                       if (updated) setActiveKid(updated)
