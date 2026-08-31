@@ -39,6 +39,7 @@
     document.head.appendChild(s);
   }
   </script>
+  <link rel="preload" href="/Copie%20de%20thmbs%20up%20bro%20(7).png" as="image"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
@@ -122,8 +123,14 @@
       gap: 0;
       position: relative;
     }
-    .how-left { flex: 1; display: flex; flex-direction: column; }
-    .how-left video { width: 100%; border-radius: 16px; display: block; }
+    .how-left video, .how-right video {
+      width: 100%;
+      border-radius: 16px;
+      display: block;
+      aspect-ratio: 9/16;
+      background: #f0f0f0;
+      object-fit: cover;
+    }
     .how-left .step-label { font-size: 14px; font-weight: 700; color: #0A0A0A; margin-top: 10px; }
     .how-arrow-col {
       flex: 0 0 48px;
@@ -185,6 +192,8 @@
       src="/Copie%20de%20thmbs%20up%20bro%20(7).png"
       alt="Turn your child's lessons into practise in just a pic"
       class="hero-img"
+      width="800" height="800"
+      fetchpriority="high"
     />
 
     <!-- OFFER SECTION -->
@@ -205,7 +214,7 @@
       <div style="border: 3px solid #3513A2; border-radius: 35px; background: #fff; padding: 24px 20px 20px;">
         <!-- Header -->
         <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 24px;">
-          <img src="/numiopic.png" alt="Numio" style="width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;"/>
+          <img src="/numiopic.png" alt="Numio" width="52" height="52" loading="lazy" style="width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;"/>
           <span style="font-size: 24px; font-weight: 800; color: #0A0A0A; letter-spacing: 0.01em;">NUMIO ULTIMATE</span>
         </div>
 
@@ -277,14 +286,14 @@
           <div class="step-label" style="font-size: 16px; font-weight: 700;">#1 Take a picture of<br>their school lesson</div>
         </div>
         <div class="how-arrow-col">
-          <img src="/Corner%20up-right.png" alt="arrow" style="width: 44px; opacity: 0.85;"/>
+          <img src="/Corner%20up-right.png" alt="arrow" loading="lazy" width="44" height="44" style="width: 44px; opacity: 0.85;"/>
         </div>
         <div class="how-right">
           <video id="vid2" autoplay muted loop playsinline preload="none"
             poster="/Capture%20d%27%C3%A9cran%202026-08-29%20133751.png">
             <source src="/giftouse2bro.mp4" type="video/mp4"/>
           </video>
-          <div class="step-label" style="font-size: 16px; font-weight: 700;">#2 Practise as<br>mush as they want!</div>
+          <div class="step-label" style="font-size: 16px; font-weight: 700;">#2 Practise as<br>much as they want!</div>
         </div>
       </div>
       <div class="how-thats-it" style="font-size: 32px; font-weight: 700;">That's it!</div>
@@ -364,7 +373,7 @@
     <!-- GUARANTEE SECTION -->
     <div style="padding: 48px 20px 40px; text-align: center;">
       <h2 style="font-size: clamp(26px, 7vw, 34px); font-weight: 900; color: #0A0A0A; line-height: 1.2; letter-spacing: -0.02em; margin-bottom: 28px;">... still not sure?</h2>
-      <img src="/badgegarantee365daystouse.png" alt="365 Days Money Back Guarantee" style="width: 160px; height: 160px; object-fit: contain; display: block; margin: 0 auto 28px;"/>
+      <img src="/badgegarantee365daystouse.png" alt="365 Days Money Back Guarantee" width="160" height="160" loading="lazy" style="width: 160px; height: 160px; object-fit: contain; display: block; margin: 0 auto 28px;"/>
       <p style="font-size: clamp(17px, 4.5vw, 20px); color: #0A0A0A; line-height: 1.6; margin-bottom: 20px;">You have 365 days to decide if<br>Numio really helps your child,</p>
       <p style="font-size: clamp(17px, 4.5vw, 20px); color: #0A0A0A; line-height: 1.6; margin-bottom: 20px;">If you're not satisfied, you can:</p>
       <p style="font-size: clamp(17px, 4.5vw, 20px); font-weight: 700; color: #0A0A0A; line-height: 1.6; margin-bottom: 36px;">Cancel anytime<br>+ get 100% of your money back!</p>
