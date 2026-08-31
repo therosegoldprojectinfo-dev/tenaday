@@ -46,12 +46,20 @@ export const translations = {
     revision_back: '← Back',
     revision_title: 'Revision',
     revision_exam: (n) => `${n} exam${n !== 1 ? 's' : ''}`,
+    revision_original: 'Original',
+    revision_version: (n) => `v${n}`,
+    revision_no_page_text: 'New questions not available for older exams',
 
     // QuizIntro
     quiz_intro_lets_start: "let's start!",
     quiz_intro_you_can: 'You can do this! 💪',
     quiz_intro_questions: (n) => `${n} questions`,
     quiz_intro_start: 'START →',
+    quiz_intro_new_questions: '✨ New Questions',
+    quiz_intro_generating: 'Generating new questions...',
+    quiz_intro_no_page_text: "This exam was created before revision was supported. Scan a new page to use this feature.",
+    quiz_intro_rate_limit: "You've reached today's quiz limit. Come back tomorrow!",
+    quiz_intro_error: 'Something went wrong. Please try again.',
 
     // Quiz
     quiz_check: 'CHECK',
@@ -189,12 +197,20 @@ export const translations = {
     revision_back: 'رجوع →',
     revision_title: 'مراجعة',
     revision_exam: (n) => `${n} ${n === 1 ? 'اختبار' : 'اختبارات'}`,
+    revision_original: 'الأصلي',
+    revision_version: (n) => `v${n}`,
+    revision_no_page_text: 'الأسئلة الجديدة غير متاحة للاختبارات القديمة',
 
     // QuizIntro
     quiz_intro_lets_start: 'هيا نبدأ!',
     quiz_intro_you_can: 'أنت تستطيع! 💪',
     quiz_intro_questions: (n) => `${n} أسئلة`,
     quiz_intro_start: '← ابدأ',
+    quiz_intro_new_questions: '✨ أسئلة جديدة',
+    quiz_intro_generating: 'جارٍ إنشاء أسئلة جديدة...',
+    quiz_intro_no_page_text: 'هذا الاختبار أُنشئ قبل دعم المراجعة. صوّر صفحة جديدة لاستخدام هذه الميزة.',
+    quiz_intro_rate_limit: 'لقد وصلت إلى حد الاختبارات اليومي. عد غداً!',
+    quiz_intro_error: 'حدث خطأ ما. حاول مرة أخرى.',
 
     // Quiz
     quiz_check: 'تحقق',
