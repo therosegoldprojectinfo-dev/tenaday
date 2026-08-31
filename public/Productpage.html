@@ -39,7 +39,6 @@
     document.head.appendChild(s);
   }
   </script>
-  <link rel="preload" href="/Copie%20de%20thmbs%20up%20bro%20(7).png" as="image"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
@@ -123,14 +122,8 @@
       gap: 0;
       position: relative;
     }
-    .how-left video, .how-right video {
-      width: 100%;
-      border-radius: 16px;
-      display: block;
-      aspect-ratio: 9/16;
-      background: #f0f0f0;
-      object-fit: cover;
-    }
+    .how-left { flex: 1; display: flex; flex-direction: column; }
+    .how-left video { width: 100%; border-radius: 16px; display: block; }
     .how-left .step-label { font-size: 14px; font-weight: 700; color: #0A0A0A; margin-top: 10px; }
     .how-arrow-col {
       flex: 0 0 48px;
@@ -192,8 +185,6 @@
       src="/Copie%20de%20thmbs%20up%20bro%20(7).png"
       alt="Turn your child's lessons into practise in just a pic"
       class="hero-img"
-      width="800" height="800"
-      fetchpriority="high"
     />
 
     <!-- OFFER SECTION -->
