@@ -6,30 +6,31 @@
   <meta name="description" content="Turn your child's school lessons into practice in just a pic! Numio generates personalized quizzes from photos of their textbook. $1/month. 365-day money-back guarantee."/>
   <title>Numio – $1/month</title>
 
-  <!-- Facebook Pixel -->
+  <!-- Facebook Pixel + Clarity — deferred after page load for performance -->
   <script>
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window,document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '1028944262871292');
-  fbq('track', 'PageView');
+  window.addEventListener('load', function() {
+    // Facebook Pixel
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window,document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1028944262871292');
+    fbq('track', 'PageView');
+
+    // Microsoft Clarity
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window,document,"clarity","script","y6hivp7gvm");
+  });
   </script>
   <noscript><img loading="lazy" height="1" width="1" style="display:none"
   src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"/></noscript>
-
-  <!-- Microsoft Clarity -->
-  <script type="text/javascript">
-  (function(c,l,a,r,i,t,y){
-      c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-      t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-      y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-  })(window,document,"clarity","script","y6hivp7gvm");
-  </script>
 
   <script>
   function loadStripe(cb) {
@@ -187,6 +188,7 @@
       src="/Copie%20de%20thmbs%20up%20bro%20(7).webp"
       alt="Turn your child's lessons into practise in just a pic"
       class="hero-img"
+      width="330" height="330"
       fetchpriority="high"
     />
 
@@ -215,15 +217,15 @@
         <!-- Benefits -->
         <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px;">
           <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="/checkstousenowbro.webp" alt="check" style="width: 24px; height: 24px; flex-shrink: 0;"/>
+            <img src="/checkstousenowbro.webp" alt="check" width="24" height="24" style="width: 24px; height: 24px; flex-shrink: 0;"/>
             <span style="font-size: 24px; font-weight: 500; color: #0A0A0A;">Unlimited pictures</span>
           </div>
           <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="/checkstousenowbro.webp" alt="check" style="width: 24px; height: 24px; flex-shrink: 0;"/>
+            <img src="/checkstousenowbro.webp" alt="check" width="24" height="24" style="width: 24px; height: 24px; flex-shrink: 0;"/>
             <span style="font-size: 24px; font-weight: 500; color: #0A0A0A;">Unlimited practise</span>
           </div>
           <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="/checkstousenowbro.webp" alt="check" style="width: 24px; height: 24px; flex-shrink: 0;"/>
+            <img src="/checkstousenowbro.webp" alt="check" width="24" height="24" style="width: 24px; height: 24px; flex-shrink: 0;"/>
             <span style="font-size: 24px; font-weight: 500; color: #0A0A0A;">No ads</span>
           </div>
         </div>
@@ -300,17 +302,17 @@
       <h2 style="font-size: 32px; font-weight: 500; color: #0A0A0A; line-height: 1.2; margin-bottom: 48px; text-align: center;">Here's how it will<br>help you today:</h2>
 
       <div style="margin-bottom: 40px;">
-        <img src="/Target.webp" alt="Target" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
+        <img src="/Target.webp" alt="Target" width="56" height="56" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
         <p style="font-size: 20px; color: #0A0A0A; line-height: 1.5;">They practise <strong>EXACTLY</strong><br>what they're learning at school</p>
       </div>
 
       <div style="margin-bottom: 40px;">
-        <img src="/Check%20circle.webp" alt="Check" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
+        <img src="/Check%20circle.webp" alt="Check" width="56" height="56" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
         <p style="font-size: 20px; color: #0A0A0A; line-height: 1.5;">They can practise <strong>as much<br>as they need</strong> until<br>they understand perfectly!</p>
       </div>
 
       <div style="margin-bottom: 48px;">
-        <img src="/tousebro%20(5).webp" alt="Relax" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
+        <img src="/tousebro%20(5).webp" alt="Relax" width="56" height="56" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
         <p style="font-size: 20px; color: #0A0A0A; line-height: 1.5;">...and you don't have<br>to do <strong>anything!</strong></p>
       </div>
 
@@ -353,13 +355,13 @@
       <!-- Phone images with arrow -->
       <div style="display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 16px; position: relative;">
         <div style="flex: 1; text-align: center;">
-          <img src="/tousebro.webp" alt="Take a pic of their real lesson" loading="lazy" style="width: 100%; max-width: 140px; display: inline-block;"/>
+          <img src="/tousebro.webp" alt="Take a pic of their real lesson" width="140" height="280" loading="lazy" style="width: 100%; max-width: 140px; display: inline-block;"/>
         </div>
         <div style="flex: 0 0 60px; display: flex; align-items: center; justify-content: center;">
-          <img src="/tousebro%20(2).webp" alt="arrow" loading="lazy" style="width: 52px;"/>
+          <img src="/tousebro%20(2).webp" alt="arrow" width="52" height="52" loading="lazy" style="width: 52px;"/>
         </div>
         <div style="flex: 1; text-align: center;">
-          <img src="/tousebro%20(1).webp" alt="Practise as much as they need" loading="lazy" style="width: 100%; max-width: 140px; display: inline-block;"/>
+          <img src="/tousebro%20(1).webp" alt="Practise as much as they need" width="140" height="280" loading="lazy" style="width: 100%; max-width: 140px; display: inline-block;"/>
         </div>
       </div>
       <div style="display: flex; gap: 8px; margin-bottom: 40px;">
