@@ -40,7 +40,7 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link rel="preload" href="/Copie%20de%20thmbs%20up%20bro%20(7).webp" as="image" fetchpriority="high"/>
+  <link rel="preload" href="/firstimagebro.webp" as="image" fetchpriority="high"/>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet"/></noscript>
 
@@ -61,7 +61,7 @@
       display: block;
       width: calc(100% - 32px);
       margin: 48px 16px 0;
-      border-radius: 10%;
+      border-radius: 24px;
       aspect-ratio: 1 / 1;
       height: auto;
     }
@@ -95,42 +95,13 @@
       margin-bottom: 40px;
       letter-spacing: -0.02em;
     }
-    .how-zigzag {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .how-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .how-video-wrap {
-      width: 48%;
-      flex-shrink: 0;
-    }
-    .how-video-wrap video {
-      width: 100%;
-      border-radius: 14px;
-      display: block;
-    }
-    .how-step-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: #0A0A0A;
-      margin-top: 8px;
-      line-height: 1.3;
-    }
-    .how-arrow-col {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .how-arrow-col svg {
-      width: 36px;
-      height: 36px;
-    }
+    .how-zigzag { display: flex; flex-direction: column; gap: 8px; }
+    .how-row { display: flex; align-items: center; gap: 8px; }
+    .how-video-wrap { width: 48%; flex-shrink: 0; }
+    .how-video-wrap video { width: 100%; border-radius: 14px; display: block; }
+    .how-step-label { font-size: 13px; font-weight: 700; color: #0A0A0A; margin-top: 8px; line-height: 1.3; }
+    .how-arrow-col { flex: 1; display: flex; align-items: center; justify-content: center; }
+    .how-arrow-col svg { width: 36px; height: 36px; }
     .how-thats-it {
       text-align: center;
       font-size: 32px;
@@ -174,23 +145,41 @@
 
     <!-- HERO IMAGE -->
     <img
-      src="/Copie%20de%20thmbs%20up%20bro%20(7).webp"
-      alt="Turn your child's lessons into practise in just a pic"
+      src="/firstimagebro.webp"
+      alt="Take a pic of your child's lesson, get a personalised quiz instantly"
       class="hero-img"
-      width="2000" height="2000"
+      width="1080" height="1080"
       fetchpriority="high"
     />
 
     <!-- OFFER SECTION -->
-    <div style="padding: 56px 16px 0;">
-      <div style="font-size: 32px; font-weight: 500; color: #0A0A0A; line-height: 1.2; margin-bottom: 32px;">🚨The new best way<br>to practise is here!</div>
-      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 32px;">
+    <div style="padding: 40px 16px 0;">
+
+      <!-- Title -->
+      <div style="font-size: 32px; font-weight: 500; color: #0A0A0A; line-height: 1.2; margin-bottom: 24px;">🚨 The new way<br>to practise is here!</div>
+
+      <!-- Price row -->
+      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 28px;">
         <span style="font-size: 14px; font-weight: 500; color: #888; text-decoration: line-through;">$5/month</span>
         <span style="font-size: 28px; font-weight: 500; color: #0A0A0A;">$1/month</span>
         <div style="background: #3513A2; border-radius: 23px; padding: 3px 10px; position: relative; top: -16px;">
           <span style="font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap;">😱Save 80%!</span>
         </div>
       </div>
+
+      <!-- 2 icon trust row -->
+      <div style="display: flex; gap: 16px; margin-bottom: 32px;">
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">
+          <img src="/Award.webp" alt="Better practise" width="48" height="48" style="width: 48px; height: 48px;"/>
+          <span style="font-size: 14px; font-weight: 600; color: #0A0A0A; line-height: 1.3;">Better practise<br>for your child</span>
+        </div>
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">
+          <img src="/Smile.webp" alt="No extra work" width="48" height="48" style="width: 48px; height: 48px;"/>
+          <span style="font-size: 14px; font-weight: 600; color: #0A0A0A; line-height: 1.3;">No extra work<br>for parents (You)</span>
+        </div>
+      </div>
+
+      <!-- Card -->
       <div id="offer-card" style="border: 3px solid #3513A2; border-radius: 35px; background: #fff; padding: 32px 24px 28px;">
         <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 32px;">
           <img src="/numiopic.webp" alt="Numio" width="52" height="52" loading="lazy" style="width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0;"/>
@@ -256,7 +245,6 @@
             <div class="how-step-label">#1 They study their lesson</div>
           </div>
           <div class="how-arrow-col">
-            <!-- curved arrow pointing down-right -->
             <svg viewBox="0 0 40 60" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M8 4 C8 28, 32 28, 32 52" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
               <path d="M24 46 L32 54 L38 44" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -269,7 +257,6 @@
         <div class="how-row">
           <div style="width:48%;"></div>
           <div class="how-arrow-col">
-            <!-- curved arrow pointing down-left -->
             <svg viewBox="0 0 40 60" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M32 4 C32 28, 8 28, 8 52" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
               <path d="M16 46 L8 54 L2 44" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -287,7 +274,7 @@
         <div class="how-row">
           <div class="how-video-wrap">
             <video id="vid3" autoplay muted loop playsinline preload="none">
-              <source src="/3%20Practise%20as%20%20mush%20as%20they%20want!.mp4"/>
+              <source src="/3%20Practise%20as%20%20mush%20as%20they%20want!.mp4" type="video/mp4"/>
             </video>
             <div class="how-step-label">#3 Practise as much as they want!</div>
           </div>
@@ -489,7 +476,6 @@
     }
 
     function closePopup() { document.getElementById('popup-overlay').style.display = 'none'; }
-    function scrollToPriceCard() { goToCheckout(); }
 
     let popupShown = false, priceCardTimer = null;
     function showPopup() {
