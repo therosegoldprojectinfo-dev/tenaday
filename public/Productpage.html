@@ -93,33 +93,22 @@
       margin-bottom: 40px;
       letter-spacing: -0.02em;
     }
-
-    .how-step-row {
-      display: flex;
-      align-items: flex-start;
-    }
-    .how-step-row.left { justify-content: flex-start; }
+    .how-step-row { display: flex; }
+    .how-step-row.left  { justify-content: flex-start; }
     .how-step-row.right { justify-content: flex-end; }
-
-    .how-video-wrap { width: 42%; }
+    .how-video-wrap { width: 44%; }
     .how-video-wrap video { width: 100%; border-radius: 14px; display: block; }
-    .how-step-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: #0A0A0A;
-      margin-top: 8px;
-      line-height: 1.3;
-    }
+    .how-step-label { font-size: 13px; font-weight: 700; color: #0A0A0A; margin-top: 8px; line-height: 1.3; }
 
-    /* Full-width arrow connector */
-    .how-connector {
-      width: 100%;
+    /* Arrow row */
+    .how-arrow-row {
       display: flex;
-      padding: 2px 0;
+      align-items: center;
+      padding: 6px 0;
     }
-    .how-connector.to-right { justify-content: center; }
-    .how-connector.to-left  { justify-content: center; }
-    .how-connector svg { width: 100%; height: 64px; }
+    .how-arrow-row.to-right { justify-content: center; }
+    .how-arrow-row.to-left  { justify-content: center; }
+    .how-arrow-row img { width: 72px; height: 72px; opacity: 0.9; }
 
     .how-thats-it {
       text-align: center;
@@ -267,13 +256,10 @@
         </div>
       </div>
 
-      <!-- ARROW 1→2: left side down, sweeps to right -->
-      <div class="how-connector to-right">
-        <svg viewBox="0 0 320 64" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-          <path d="M 60 8 C 60 40, 260 40, 260 58" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-          <!-- arrowhead pointing down-right -->
-          <path d="M 245 50 L 261 60 L 268 44" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
+      <!-- ARROW 1→2: pointing right and down -->
+      <div class="how-arrow-row to-right">
+        <img src="/Corner%20up-right.webp" alt="next step" loading="lazy" width="72" height="72"
+          style="width:72px; height:72px; transform: rotate(90deg); opacity:0.85;"/>
       </div>
 
       <!-- STEP 2 — right -->
@@ -286,13 +272,10 @@
         </div>
       </div>
 
-      <!-- ARROW 2→3: right side down, sweeps to left -->
-      <div class="how-connector to-left">
-        <svg viewBox="0 0 320 64" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-          <path d="M 260 8 C 260 40, 60 40, 60 58" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-          <!-- arrowhead pointing down-left -->
-          <path d="M 75 50 L 59 60 L 52 44" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-        </svg>
+      <!-- ARROW 2→3: pointing left and down -->
+      <div class="how-arrow-row to-left">
+        <img src="/Corner%20up-right.webp" alt="next step" loading="lazy" width="72" height="72"
+          style="width:72px; height:72px; transform: scaleX(-1) rotate(90deg); opacity:0.85;"/>
       </div>
 
       <!-- STEP 3 — left -->
