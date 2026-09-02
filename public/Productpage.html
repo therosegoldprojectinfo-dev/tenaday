@@ -6,10 +6,8 @@
   <meta name="description" content="Turn your child's school lessons into practice in just a pic! Numio generates personalized quizzes from photos of their textbook. $1/month. 365-day money-back guarantee."/>
   <title>Numio – $1/month</title>
 
-  <!-- Facebook Pixel + Clarity — deferred after page load for performance -->
   <script>
   window.addEventListener('load', function() {
-    // Facebook Pixel
     !function(f,b,e,v,n,t,s)
     {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
     n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -21,7 +19,6 @@
     fbq('init', '1028944262871292');
     fbq('track', 'PageView');
 
-    // Microsoft Clarity
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
         t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
@@ -108,7 +105,7 @@
       letter-spacing: -0.01em;
     }
 
-    /* ── HOW IT WORKS (GIFs) ── */
+    /* ── HOW IT WORKS — ZIGZAG ── */
     .how-section { padding: 48px 20px 8px; }
     .how-title {
       font-size: 32px;
@@ -118,30 +115,48 @@
       margin-bottom: 40px;
       letter-spacing: -0.02em;
     }
-    .how-grid {
+    .how-zigzag {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .how-step {
       display: flex;
       align-items: flex-start;
       gap: 0;
       position: relative;
     }
-    .how-left { flex: 1; display: flex; flex-direction: column; }
-    .how-left video { width: 100%; border-radius: 16px; display: block; }
-    .how-left .step-label { font-size: 14px; font-weight: 700; color: #0A0A0A; margin-top: 10px; }
-    .how-arrow-col {
-      flex: 0 0 48px;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding-top: 36%;
+    .how-step.left { justify-content: flex-start; }
+    .how-step.right { justify-content: flex-end; }
+    .how-video-wrap {
+      width: 55%;
+      position: relative;
     }
-    .how-arrow-col svg { width: 40px; height: 40px; }
-    .how-right { flex: 1; display: flex; flex-direction: column; margin-top: 35%; }
-    .how-right video { width: 100%; border-radius: 16px; display: block; }
-    .how-right .step-label { font-size: 14px; font-weight: 700; color: #0A0A0A; margin-top: 10px; }
+    .how-video-wrap video {
+      width: 100%;
+      border-radius: 16px;
+      display: block;
+    }
+    .how-step-label {
+      font-size: 15px;
+      font-weight: 700;
+      color: #0A0A0A;
+      margin-top: 10px;
+      line-height: 1.3;
+    }
+    .how-arrow {
+      width: 45%;
+      display: flex;
+      align-items: center;
+      padding-top: 20%;
+    }
+    .how-step.left .how-arrow { justify-content: flex-end; padding-right: 8px; }
+    .how-step.right .how-arrow { justify-content: flex-start; padding-left: 8px; }
+    .how-arrow img { width: 48px; opacity: 0.85; }
     .how-thats-it {
       text-align: center;
-      font-size: clamp(22px, 6vw, 28px);
-      font-weight: 900;
+      font-size: 32px;
+      font-weight: 700;
       color: #0A0A0A;
       margin-top: 36px;
       margin-bottom: 28px;
@@ -250,29 +265,52 @@
       </div>
     </div>
 
-    <!-- HOW IT WORKS -->
+    <!-- HOW IT WORKS — ZIGZAG -->
     <div class="how-section">
       <div class="how-title">How does it work?</div>
-      <div class="how-grid">
-        <div class="how-left">
-          <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high"
-            poster="/Capture%20d%27%C3%A9cran%202026-08-29%20133643.png">
-            <source src="/Copie%20de%20Ad%20angle%201-2%20(1).mp4" type="video/mp4"/>
-          </video>
-          <div class="step-label" style="font-size: 16px; font-weight: 700;">#1 Take a picture of<br>their school lesson</div>
+      <div class="how-zigzag">
+
+        <!-- STEP 1 — left -->
+        <div class="how-step left">
+          <div class="how-video-wrap">
+            <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high">
+              <source src="/1 They study their  lesson.mp4" type="video/mp4"/>
+            </video>
+            <div class="how-step-label">#1 They study their lesson</div>
+          </div>
+          <div class="how-arrow">
+            <img src="/Corner%20up-right.webp" alt="arrow" loading="lazy" style="transform: rotate(90deg);"/>
+          </div>
         </div>
-        <div class="how-arrow-col">
-          <img src="/Corner%20up-right.webp" alt="arrow" loading="lazy" width="44" height="44" style="width: 44px; opacity: 0.85;"/>
+
+        <!-- STEP 2 — right -->
+        <div class="how-step right">
+          <div class="how-arrow">
+            <img src="/Corner%20up-right.webp" alt="arrow" loading="lazy" style="transform: scaleX(-1) rotate(90deg);"/>
+          </div>
+          <div class="how-video-wrap">
+            <video id="vid2" autoplay muted loop playsinline preload="none">
+              <source src="/2 Take a picture of  their school lesson.mp4" type="video/mp4"/>
+            </video>
+            <div class="how-step-label">#2 Take a picture of their school lesson</div>
+          </div>
         </div>
-        <div class="how-right">
-          <video id="vid2" autoplay muted loop playsinline preload="none"
-            poster="/Capture%20d%27%C3%A9cran%202026-08-29%20133751.png">
-            <source src="/giftouse2bro.mp4" type="video/mp4"/>
-          </video>
-          <div class="step-label" style="font-size: 16px; font-weight: 700;">#2 Practise as<br>much as they want!</div>
+
+        <!-- STEP 3 — left -->
+        <div class="how-step left">
+          <div class="how-video-wrap">
+            <video id="vid3" autoplay muted loop playsinline preload="none">
+              <source src="/3 Practise as  mush as they want .mp4" type="video/mp4"/>
+            </video>
+            <div class="how-step-label">#3 Practise as much as they want!</div>
+          </div>
+          <div class="how-arrow" style="visibility: hidden;">
+            <img src="/Corner%20up-right.webp" alt="" loading="lazy"/>
+          </div>
         </div>
+
       </div>
-      <div class="how-thats-it" style="font-size: 32px; font-weight: 700;">That's it!</div>
+      <div class="how-thats-it">That's it!</div>
       <div style="padding: 0 0 48px;">
         <button onclick="scrollToCard()" style="display: block; width: 100%; background: #3513A2; color: #fff; font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 500; border: none; border-radius: 20px; padding: 14px 20px; cursor: pointer; transition: filter 0.2s;">Try It Risk-Free for $1 →</button>
       </div>
@@ -404,7 +442,7 @@
   <script>
     // Force autoplay on mobile (iOS Safari fix)
     document.addEventListener('DOMContentLoaded', function() {
-      ['vid1','vid2'].forEach(function(id) {
+      ['vid1','vid2','vid3'].forEach(function(id) {
         var v = document.getElementById(id);
         if (!v) return;
         v.muted = true;
@@ -413,7 +451,7 @@
       });
     });
     document.addEventListener('touchstart', function tryPlay() {
-      ['vid1','vid2'].forEach(function(id) {
+      ['vid1','vid2','vid3'].forEach(function(id) {
         var v = document.getElementById(id);
         if (v && v.paused) { v.muted = true; v.play().catch(function(){}); }
       });
@@ -468,7 +506,6 @@
     function closePopup() { document.getElementById('popup-overlay').style.display = 'none'; }
     function scrollToPriceCard() { goToCheckout(); }
 
-    // POPUP on price card visibility
     let popupShown = false, priceCardTimer = null;
     function showPopup() {
       if (popupShown) return;
