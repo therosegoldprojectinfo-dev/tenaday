@@ -18,7 +18,6 @@
     'https://connect.facebook.net/en_US/fbevents.js');
     fbq('init', '1028944262871292');
     fbq('track', 'PageView');
-
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
         t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
@@ -95,44 +94,32 @@
       letter-spacing: -0.02em;
     }
 
-    /* Each step row */
     .how-step-row {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 0;
     }
-    .how-step-row.right {
-      flex-direction: row-reverse;
-    }
-    .how-video-wrap {
-      width: 52%;
-      flex-shrink: 0;
-    }
-    .how-video-wrap video {
-      width: 100%;
-      border-radius: 14px;
-      display: block;
-    }
+    .how-step-row.left { justify-content: flex-start; }
+    .how-step-row.right { justify-content: flex-end; }
+
+    .how-video-wrap { width: 42%; }
+    .how-video-wrap video { width: 100%; border-radius: 14px; display: block; }
     .how-step-label {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       color: #0A0A0A;
       margin-top: 8px;
       line-height: 1.3;
     }
 
-    /* Arrow between steps */
+    /* Full-width arrow connector */
     .how-connector {
+      width: 100%;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px 0;
+      padding: 2px 0;
     }
-    .how-connector svg {
-      width: 80px;
-      height: 80px;
-    }
+    .how-connector.to-right { justify-content: center; }
+    .how-connector.to-left  { justify-content: center; }
+    .how-connector svg { width: 100%; height: 64px; }
 
     .how-thats-it {
       text-align: center;
@@ -198,14 +185,14 @@
       <!-- 2 icon trust row -->
       <div style="display: flex; gap: 16px; margin-bottom: 32px;">
         <div style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="8" r="6"/>
             <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
           </svg>
           <span style="font-size: 14px; font-weight: 600; color: #0A0A0A; line-height: 1.3;">Better practise<br>for your child</span>
         </div>
         <div style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
             <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
             <line x1="9" y1="9" x2="9.01" y2="9"/>
@@ -248,8 +235,7 @@
         <div style="padding: 14px; display: flex; gap: 10px; background: #fff; border: 3px dashed #000; border-top: none; border-radius: 0 0 23px 23px;">
           <div style="flex: 1; background: #F1E9DC; border: 1.5px solid #707070; border-radius: 23px; padding: 18px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;">
             <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="m9 12 2 2 4-4"/>
+              <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
             </svg>
             <span style="font-size: 14px; font-weight: 500; color: #0A0A0A; font-family: 'Inter', sans-serif; line-height: 1.3;">Cancel<br>Anytime</span>
           </div>
@@ -272,7 +258,7 @@
       <div class="how-title">How does it work?</div>
 
       <!-- STEP 1 — left -->
-      <div class="how-step-row">
+      <div class="how-step-row left">
         <div class="how-video-wrap">
           <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high">
             <source src="/1%20They%20study%20their%20%20lesson.mp4" type="video/mp4"/>
@@ -281,11 +267,12 @@
         </div>
       </div>
 
-      <!-- ARROW 1→2: curves from left to right -->
-      <div class="how-connector">
-        <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 30 10 C 30 50, 170 50, 170 70" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" fill="none"/>
-          <path d="M 155 62 L 170 72 L 178 56" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <!-- ARROW 1→2: left side down, sweeps to right -->
+      <div class="how-connector to-right">
+        <svg viewBox="0 0 320 64" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path d="M 60 8 C 60 40, 260 40, 260 58" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <!-- arrowhead pointing down-right -->
+          <path d="M 245 50 L 261 60 L 268 44" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
       </div>
 
@@ -299,16 +286,17 @@
         </div>
       </div>
 
-      <!-- ARROW 2→3: curves from right to left -->
-      <div class="how-connector">
-        <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M 170 10 C 170 50, 30 50, 30 70" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" fill="none"/>
-          <path d="M 45 62 L 30 72 L 22 56" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <!-- ARROW 2→3: right side down, sweeps to left -->
+      <div class="how-connector to-left">
+        <svg viewBox="0 0 320 64" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <path d="M 260 8 C 260 40, 60 40, 60 58" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+          <!-- arrowhead pointing down-left -->
+          <path d="M 75 50 L 59 60 L 52 44" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
         </svg>
       </div>
 
       <!-- STEP 3 — left -->
-      <div class="how-step-row">
+      <div class="how-step-row left">
         <div class="how-video-wrap">
           <video id="vid3" autoplay muted loop playsinline preload="none">
             <source src="/3%20Practise%20as%20%20mush%20as%20they%20want!.mp4" type="video/mp4"/>
@@ -326,36 +314,30 @@
     <!-- HOW DOES IT HELP -->
     <div style="padding: 48px 20px 40px; text-align: center;">
       <h2 style="font-size: 32px; font-weight: 500; color: #0A0A0A; line-height: 1.2; margin-bottom: 48px; text-align: center;">Here's how it will<br>help you today:</h2>
-
       <div style="margin-bottom: 40px;">
         <img src="/Target.webp" alt="Target" width="56" height="56" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
         <p style="font-size: 20px; color: #0A0A0A; line-height: 1.5;">They practise <strong>EXACTLY</strong><br>what they're learning at school</p>
       </div>
-
       <div style="margin-bottom: 40px;">
         <img src="/Check%20circle.webp" alt="Check" width="56" height="56" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
         <p style="font-size: 20px; color: #0A0A0A; line-height: 1.5;">They can practise <strong>as much<br>as they need</strong> until<br>they understand perfectly!</p>
       </div>
-
       <div style="margin-bottom: 48px;">
         <img src="/tousebro%20(5).webp" alt="Relax" width="56" height="56" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
         <p style="font-size: 20px; color: #0A0A0A; line-height: 1.5;">...and you don't have<br>to do <strong>anything!</strong></p>
       </div>
-
       <button class="cta-btn" onclick="scrollToCard()">Try It Risk-Free for $1 →</button>
     </div>
 
     <!-- WHY NUMIO -->
     <div style="padding: 48px 20px 40px; text-align: center;">
       <h2 style="font-size: 32px; font-weight: 500; color: #0A0A0A; line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 48px; text-align: center;">Why is Numio<br>the best option<br>to help your<br>child practise?</h2>
-
       <div style="display: flex; margin-bottom: 28px;">
         <div style="flex: 1;"></div>
         <div style="flex: 1; display: flex; justify-content: flex-start;">
           <div style="background: #FF5757; color: #fff; font-size: 17px; font-weight: 700; padding: 10px 22px; border-radius: 50px;">Problems:</div>
         </div>
       </div>
-
       <div style="text-align: left; border-top: 1px solid #e0e0e0;">
         <div style="display: flex; align-items: flex-start; padding: 24px 0; border-bottom: 1px solid #e0e0e0;">
           <span style="font-size: 14px; font-weight: 600; color: #0A0A0A; flex: 1;">School books</span>
@@ -370,11 +352,9 @@
           <span style="font-size: 14px; font-weight: 600; color: #0A0A0A; flex: 1; text-align: left;"><span style="color: #FF5757;">✕ </span>$50+/hour if you<br>want extra help</span>
         </div>
       </div>
-
       <div style="display: flex; justify-content: center; margin-top: 48px; margin-bottom: 36px;">
         <div style="background: #0AE02D; color: #fff; font-size: 17px; font-weight: 700; padding: 10px 28px; border-radius: 50px;">Solution:</div>
       </div>
-
       <div style="display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 16px; position: relative;">
         <div style="flex: 1; text-align: center;">
           <img src="/tousebro.webp" alt="Take a pic of their real lesson" loading="lazy" style="width: 100%; max-width: 140px; display: inline-block;"/>
@@ -391,7 +371,6 @@
         <div style="flex: 0 0 60px;"></div>
         <div style="flex: 1; font-size: 15px; font-weight: 700; color: #0A0A0A; text-align: center; line-height: 1.3;">Practise as much<br>as they need!</div>
       </div>
-
       <button class="cta-btn" onclick="scrollToCard()">Start your child's first practise →</button>
     </div>
 
@@ -435,9 +414,7 @@
     <div style="background:#9D80FD; max-width:420px; width:100%; padding:48px 32px; position:relative; text-align:center; border-radius:20px;">
       <button onclick="closePopup()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#fff;">✕</button>
       <div style="font-size:clamp(22px, 5vw, 26px); font-weight:900; color:#fff; margin-bottom:24px;">🚨 NO RISK OFFER</div>
-      <div style="font-size:clamp(22px, 6vw, 30px); font-weight:900; color:#fff; line-height:1.2; margin-bottom:40px;">
-        Either your child practices more or you get your $1 back!
-      </div>
+      <div style="font-size:clamp(22px, 6vw, 30px); font-weight:900; color:#fff; line-height:1.2; margin-bottom:40px;">Either your child practices more or you get your $1 back!</div>
       <button onclick="closePopup(); scrollToCard();" style="display:block; width:100%; background:#3513A2; color:#fff; font-family:'Inter',sans-serif; font-size:18px; font-weight:700; border:none; border-radius:50px; padding:18px; cursor:pointer;">Try Numio for $1 →</button>
     </div>
   </div>
@@ -506,7 +483,6 @@
     }
 
     function closePopup() { document.getElementById('popup-overlay').style.display = 'none'; }
-
     let popupShown = false, priceCardTimer = null;
     function showPopup() {
       if (popupShown) return;
