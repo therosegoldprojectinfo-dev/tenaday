@@ -85,26 +85,6 @@
     .cta-btn:hover { filter: brightness(1.12); }
     .cta-btn:active { filter: brightness(0.92); }
 
-    /* ── GUARANTEE CARD ── */
-    .guarantee-card {
-      background: #9D80FD;
-      border: 2.5px solid #3513A2;
-      border-radius: 20px;
-      margin: 14px 16px 0;
-      padding: 36px 24px;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 110px;
-    }
-    .guarantee-card span {
-      font-size: 20px;
-      font-weight: 900;
-      color: #fff;
-      letter-spacing: -0.01em;
-    }
-
     /* ── HOW IT WORKS — ZIGZAG ── */
     .how-section { padding: 48px 20px 8px; }
     .how-title {
@@ -118,47 +98,45 @@
     .how-zigzag {
       display: flex;
       flex-direction: column;
-      gap: 0;
+      gap: 8px;
     }
-    .how-step {
+    .how-row {
       display: flex;
-      align-items: flex-start;
-      gap: 0;
-      position: relative;
+      align-items: center;
+      gap: 8px;
     }
-    .how-step.left { justify-content: flex-start; }
-    .how-step.right { justify-content: flex-end; }
     .how-video-wrap {
-      width: 55%;
-      position: relative;
+      width: 48%;
+      flex-shrink: 0;
     }
     .how-video-wrap video {
       width: 100%;
-      border-radius: 16px;
+      border-radius: 14px;
       display: block;
     }
     .how-step-label {
-      font-size: 15px;
+      font-size: 13px;
       font-weight: 700;
       color: #0A0A0A;
-      margin-top: 10px;
+      margin-top: 8px;
       line-height: 1.3;
     }
-    .how-arrow {
-      width: 45%;
+    .how-arrow-col {
+      flex: 1;
       display: flex;
       align-items: center;
-      padding-top: 20%;
+      justify-content: center;
     }
-    .how-step.left .how-arrow { justify-content: flex-end; padding-right: 8px; }
-    .how-step.right .how-arrow { justify-content: flex-start; padding-left: 8px; }
-    .how-arrow img { width: 48px; opacity: 0.85; }
+    .how-arrow-col svg {
+      width: 36px;
+      height: 36px;
+    }
     .how-thats-it {
       text-align: center;
       font-size: 32px;
       font-weight: 700;
       color: #0A0A0A;
-      margin-top: 36px;
+      margin-top: 32px;
       margin-bottom: 28px;
       letter-spacing: -0.02em;
     }
@@ -173,7 +151,6 @@
     .mfaq-a { font-size: 15px; color: #555; line-height: 1.75; padding-bottom: 20px; display: none; font-weight: 400; }
     .mfaq-item.open .mfaq-a { display: block; }
 
-    /* ── CHECKOUT MODAL ── */
     @keyframes spin { to { transform: rotate(360deg); } }
   </style>
 </head>
@@ -271,42 +248,51 @@
       <div class="how-zigzag">
 
         <!-- STEP 1 — left -->
-        <div class="how-step left">
+        <div class="how-row">
           <div class="how-video-wrap">
             <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high">
-              <source src="/1 They study their  lesson.mp4" type="video/mp4"/>
+              <source src="/1%20They%20study%20their%20%20lesson.mp4" type="video/mp4"/>
             </video>
             <div class="how-step-label">#1 They study their lesson</div>
           </div>
-          <div class="how-arrow">
-            <img src="/Corner%20up-right.webp" alt="arrow" loading="lazy" style="transform: rotate(90deg);"/>
+          <div class="how-arrow-col">
+            <!-- curved arrow pointing down-right -->
+            <svg viewBox="0 0 40 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 4 C8 28, 32 28, 32 52" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M24 46 L32 54 L38 44" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
           </div>
+          <div style="width:48%;"></div>
         </div>
 
         <!-- STEP 2 — right -->
-        <div class="how-step right">
-          <div class="how-arrow">
-            <img src="/Corner%20up-right.webp" alt="arrow" loading="lazy" style="transform: scaleX(-1) rotate(90deg);"/>
+        <div class="how-row">
+          <div style="width:48%;"></div>
+          <div class="how-arrow-col">
+            <!-- curved arrow pointing down-left -->
+            <svg viewBox="0 0 40 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M32 4 C32 28, 8 28, 8 52" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+              <path d="M16 46 L8 54 L2 44" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
           </div>
           <div class="how-video-wrap">
             <video id="vid2" autoplay muted loop playsinline preload="none">
-              <source src="/2 Take a picture of  their school lesson.mp4" type="video/mp4"/>
+              <source src="/2%20Take%20a%20picture%20of%20%20their%20school%20lesson.mp4" type="video/mp4"/>
             </video>
             <div class="how-step-label">#2 Take a picture of their school lesson</div>
           </div>
         </div>
 
         <!-- STEP 3 — left -->
-        <div class="how-step left">
+        <div class="how-row">
           <div class="how-video-wrap">
             <video id="vid3" autoplay muted loop playsinline preload="none">
-              <source src="/3 Practise as  mush as they want .mp4" type="video/mp4"/>
+              <source src="/3%20Practise%20as%20%20mush%20as%20they%20want!%20.mp4" type="video/mp4"/>
             </video>
             <div class="how-step-label">#3 Practise as much as they want!</div>
           </div>
-          <div class="how-arrow" style="visibility: hidden;">
-            <img src="/Corner%20up-right.webp" alt="" loading="lazy"/>
-          </div>
+          <div class="how-arrow-col"></div>
+          <div style="width:48%;"></div>
         </div>
 
       </div>
@@ -440,7 +426,6 @@
   <canvas id="confetti-canvas" style="position:fixed; inset:0; pointer-events:none; z-index:10000; display:none;"></canvas>
 
   <script>
-    // Force autoplay on mobile (iOS Safari fix)
     document.addEventListener('DOMContentLoaded', function() {
       ['vid1','vid2','vid3'].forEach(function(id) {
         var v = document.getElementById(id);
