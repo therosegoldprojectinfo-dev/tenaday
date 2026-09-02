@@ -56,7 +56,6 @@
     }
     .inner { max-width: 480px; margin: 0 auto; }
 
-    /* ── HERO IMAGE ── */
     .hero-img {
       display: block;
       width: calc(100% - 32px);
@@ -85,7 +84,7 @@
     .cta-btn:hover { filter: brightness(1.12); }
     .cta-btn:active { filter: brightness(0.92); }
 
-    /* ── HOW IT WORKS — ZIGZAG ── */
+    /* ── HOW IT WORKS ── */
     .how-section { padding: 48px 20px 8px; }
     .how-title {
       font-size: 32px;
@@ -95,13 +94,46 @@
       margin-bottom: 40px;
       letter-spacing: -0.02em;
     }
-    .how-zigzag { display: flex; flex-direction: column; gap: 8px; }
-    .how-row { display: flex; align-items: center; gap: 8px; }
-    .how-video-wrap { width: 48%; flex-shrink: 0; }
-    .how-video-wrap video { width: 100%; border-radius: 14px; display: block; }
-    .how-step-label { font-size: 13px; font-weight: 700; color: #0A0A0A; margin-top: 8px; line-height: 1.3; }
-    .how-arrow-col { flex: 1; display: flex; align-items: center; justify-content: center; }
-    .how-arrow-col svg { width: 36px; height: 36px; }
+
+    /* Each step row */
+    .how-step-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 0;
+    }
+    .how-step-row.right {
+      flex-direction: row-reverse;
+    }
+    .how-video-wrap {
+      width: 52%;
+      flex-shrink: 0;
+    }
+    .how-video-wrap video {
+      width: 100%;
+      border-radius: 14px;
+      display: block;
+    }
+    .how-step-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0A0A0A;
+      margin-top: 8px;
+      line-height: 1.3;
+    }
+
+    /* Arrow between steps */
+    .how-connector {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 0;
+    }
+    .how-connector svg {
+      width: 80px;
+      height: 80px;
+    }
+
     .how-thats-it {
       text-align: center;
       font-size: 32px;
@@ -154,11 +186,7 @@
 
     <!-- OFFER SECTION -->
     <div style="padding: 40px 16px 0;">
-
-      <!-- Title -->
       <div style="font-size: 32px; font-weight: 500; color: #0A0A0A; line-height: 1.2; margin-bottom: 24px;">🚨 The new way<br>to practise is here!</div>
-
-      <!-- Price row -->
       <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 28px;">
         <span style="font-size: 14px; font-weight: 500; color: #888; text-decoration: line-through;">$5/month</span>
         <span style="font-size: 28px; font-weight: 500; color: #0A0A0A;">$1/month</span>
@@ -167,10 +195,9 @@
         </div>
       </div>
 
-      <!-- 2 icon trust row — inline SVG, no images -->
+      <!-- 2 icon trust row -->
       <div style="display: flex; gap: 16px; margin-bottom: 32px;">
         <div style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">
-          <!-- Lucide Award -->
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
             <circle cx="12" cy="8" r="6"/>
             <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
@@ -178,7 +205,6 @@
           <span style="font-size: 14px; font-weight: 600; color: #0A0A0A; line-height: 1.3;">Better practise<br>for your child</span>
         </div>
         <div style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">
-          <!-- Lucide Smile -->
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
             <circle cx="12" cy="12" r="10"/>
             <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
@@ -241,58 +267,56 @@
       </div>
     </div>
 
-    <!-- HOW IT WORKS — ZIGZAG -->
+    <!-- HOW IT WORKS -->
     <div class="how-section">
       <div class="how-title">How does it work?</div>
-      <div class="how-zigzag">
 
-        <!-- STEP 1 — left -->
-        <div class="how-row">
-          <div class="how-video-wrap">
-            <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high">
-              <source src="/1%20They%20study%20their%20%20lesson.mp4" type="video/mp4"/>
-            </video>
-            <div class="how-step-label">#1 They study their lesson</div>
-          </div>
-          <div class="how-arrow-col">
-            <svg viewBox="0 0 40 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 4 C8 28, 32 28, 32 52" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-              <path d="M24 46 L32 54 L38 44" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            </svg>
-          </div>
-          <div style="width:48%;"></div>
+      <!-- STEP 1 — left -->
+      <div class="how-step-row">
+        <div class="how-video-wrap">
+          <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high">
+            <source src="/1%20They%20study%20their%20%20lesson.mp4" type="video/mp4"/>
+          </video>
+          <div class="how-step-label">#1 They study their lesson</div>
         </div>
-
-        <!-- STEP 2 — right -->
-        <div class="how-row">
-          <div style="width:48%;"></div>
-          <div class="how-arrow-col">
-            <svg viewBox="0 0 40 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M32 4 C32 28, 8 28, 8 52" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-              <path d="M16 46 L8 54 L2 44" stroke="#0A0A0A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            </svg>
-          </div>
-          <div class="how-video-wrap">
-            <video id="vid2" autoplay muted loop playsinline preload="none">
-              <source src="/2%20Take%20a%20picture%20of%20%20their%20school%20lesson.mp4" type="video/mp4"/>
-            </video>
-            <div class="how-step-label">#2 Take a picture of their school lesson</div>
-          </div>
-        </div>
-
-        <!-- STEP 3 — left -->
-        <div class="how-row">
-          <div class="how-video-wrap">
-            <video id="vid3" autoplay muted loop playsinline preload="none">
-              <source src="/3%20Practise%20as%20%20mush%20as%20they%20want!.mp4" type="video/mp4"/>
-            </video>
-            <div class="how-step-label">#3 Practise as much as they want!</div>
-          </div>
-          <div class="how-arrow-col"></div>
-          <div style="width:48%;"></div>
-        </div>
-
       </div>
+
+      <!-- ARROW 1→2: curves from left to right -->
+      <div class="how-connector">
+        <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 30 10 C 30 50, 170 50, 170 70" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M 155 62 L 170 72 L 178 56" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+
+      <!-- STEP 2 — right -->
+      <div class="how-step-row right">
+        <div class="how-video-wrap">
+          <video id="vid2" autoplay muted loop playsinline preload="none">
+            <source src="/2%20Take%20a%20picture%20of%20%20their%20school%20lesson.mp4" type="video/mp4"/>
+          </video>
+          <div class="how-step-label">#2 Take a picture of their school lesson</div>
+        </div>
+      </div>
+
+      <!-- ARROW 2→3: curves from right to left -->
+      <div class="how-connector">
+        <svg viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 170 10 C 170 50, 30 50, 30 70" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" fill="none"/>
+          <path d="M 45 62 L 30 72 L 22 56" stroke="#0A0A0A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+
+      <!-- STEP 3 — left -->
+      <div class="how-step-row">
+        <div class="how-video-wrap">
+          <video id="vid3" autoplay muted loop playsinline preload="none">
+            <source src="/3%20Practise%20as%20%20mush%20as%20they%20want!.mp4" type="video/mp4"/>
+          </video>
+          <div class="how-step-label">#3 Practise as much as they want!</div>
+        </div>
+      </div>
+
       <div class="how-thats-it">That's it!</div>
       <div style="padding: 0 0 48px;">
         <button onclick="scrollToCard()" style="display: block; width: 100%; background: #3513A2; color: #fff; font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 500; border: none; border-radius: 20px; padding: 14px 20px; cursor: pointer; transition: filter 0.2s;">Try It Risk-Free for $1 →</button>
@@ -404,7 +428,6 @@
 
   </div><!-- /inner -->
 
-  <!-- PRICE CARD (scroll target) -->
   <div class="price-card-trigger" style="height:0; overflow:hidden;"></div>
 
   <!-- POPUP -->
@@ -419,7 +442,6 @@
     </div>
   </div>
 
-  <!-- CONFETTI CANVAS -->
   <canvas id="confetti-canvas" style="position:fixed; inset:0; pointer-events:none; z-index:10000; display:none;"></canvas>
 
   <script>
@@ -439,7 +461,6 @@
       });
     }, { once: true });
 
-    // TIMER
     const _end = new Date("2026-09-02T00:01:00").getTime();
     function tick() {
       const d = Math.max(0, _end - Date.now());
@@ -453,7 +474,6 @@
     tick();
     setInterval(tick, 1000);
 
-    // CONFETTI
     const canvas = document.getElementById('confetti-canvas');
     const ctx = canvas.getContext('2d');
     let pieces = [], confettiAnim;
