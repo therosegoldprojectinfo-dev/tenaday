@@ -93,29 +93,49 @@
       margin-bottom: 40px;
       letter-spacing: -0.02em;
     }
-    .how-step-row { display: flex; }
-    .how-step-row.left  { justify-content: flex-start; }
-    .how-step-row.right { justify-content: flex-end; }
-    .how-video-wrap { width: 44%; }
-    .how-video-wrap video { width: 100%; border-radius: 14px; display: block; }
-    .how-step-label { font-size: 13px; font-weight: 700; color: #0A0A0A; margin-top: 8px; line-height: 1.3; }
 
-    /* Arrow row */
-    .how-arrow-row {
+    /* Row 1: vid1 left, arrow, empty right */
+    /* Row 2: empty left, arrow, vid2 right */
+    /* Row 3: vid3 left, nothing */
+    .how-grid-row {
       display: flex;
-      align-items: center;
-      padding: 6px 0;
+      align-items: flex-start;
+      gap: 0;
     }
-    .how-arrow-row.to-right { justify-content: center; }
-    .how-arrow-row.to-left  { justify-content: center; }
-    .how-arrow-row img { width: 72px; height: 72px; opacity: 0.9; }
+    .how-vid {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .how-vid video {
+      width: 100%;
+      border-radius: 16px;
+      display: block;
+    }
+    .how-vid .step-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0A0A0A;
+      margin-top: 10px;
+      line-height: 1.3;
+    }
+    .how-arrow-col {
+      flex: 0 0 48px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding-top: 30%;
+    }
+    .how-spacer { flex: 1; }
+    /* Row 2: vid is on right, offset down like original */
+    .how-vid.offset { margin-top: 35%; }
 
     .how-thats-it {
       text-align: center;
       font-size: 32px;
       font-weight: 700;
       color: #0A0A0A;
-      margin-top: 32px;
+      margin-top: 36px;
       margin-bottom: 28px;
       letter-spacing: -0.02em;
     }
@@ -246,46 +266,48 @@
     <div class="how-section">
       <div class="how-title">How does it work?</div>
 
-      <!-- STEP 1 — left -->
-      <div class="how-step-row left">
-        <div class="how-video-wrap">
+      <!-- ROW 1: vid1 left, arrow pointing right-down, empty right -->
+      <div class="how-grid-row">
+        <div class="how-vid">
           <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high">
             <source src="/1%20They%20study%20their%20%20lesson.mp4" type="video/mp4"/>
           </video>
-          <div class="how-step-label">#1 They study their lesson</div>
+          <div class="step-label" style="font-size: 14px; font-weight: 700;">#1 They study their lesson</div>
         </div>
+        <div class="how-arrow-col">
+          <img src="/Corner%20up-right.webp" alt="next" loading="lazy" width="44" height="44"
+            style="width: 44px; height: 44px; opacity: 0.85; transform: rotate(90deg);"/>
+        </div>
+        <div class="how-spacer"></div>
       </div>
 
-      <!-- ARROW 1→2: pointing right and down -->
-      <div class="how-arrow-row to-right">
-        <img src="/Corner%20up-right.webp" alt="next step" loading="lazy" width="72" height="72"
-          style="width:72px; height:72px; transform: rotate(90deg); opacity:0.85;"/>
-      </div>
-
-      <!-- STEP 2 — right -->
-      <div class="how-step-row right">
-        <div class="how-video-wrap">
+      <!-- ROW 2: empty left, arrow pointing left-down, vid2 right offset down -->
+      <div class="how-grid-row">
+        <div class="how-spacer"></div>
+        <div class="how-arrow-col">
+          <img src="/Corner%20up-right.webp" alt="next" loading="lazy" width="44" height="44"
+            style="width: 44px; height: 44px; opacity: 0.85; transform: scaleX(-1) rotate(90deg);"/>
+        </div>
+        <div class="how-vid offset">
           <video id="vid2" autoplay muted loop playsinline preload="none">
             <source src="/2%20Take%20a%20picture%20of%20%20their%20school%20lesson.mp4" type="video/mp4"/>
           </video>
-          <div class="how-step-label">#2 Take a picture of their school lesson</div>
+          <div class="step-label" style="font-size: 14px; font-weight: 700;">#2 Take a picture of<br>their school lesson</div>
         </div>
       </div>
 
-      <!-- ARROW 2→3: pointing left and down -->
-      <div class="how-arrow-row to-left">
-        <img src="/Corner%20up-right.webp" alt="next step" loading="lazy" width="72" height="72"
-          style="width:72px; height:72px; transform: scaleX(-1) rotate(90deg); opacity:0.85;"/>
-      </div>
-
-      <!-- STEP 3 — left -->
-      <div class="how-step-row left">
-        <div class="how-video-wrap">
+      <!-- ROW 3: vid3 left, no arrow -->
+      <div class="how-grid-row">
+        <div class="how-vid offset">
           <video id="vid3" autoplay muted loop playsinline preload="none">
             <source src="/3%20Practise%20as%20%20mush%20as%20they%20want!.mp4" type="video/mp4"/>
           </video>
-          <div class="how-step-label">#3 Practise as much as they want!</div>
+          <div class="step-label" style="font-size: 14px; font-weight: 700;">#3 Practise as much<br>as they want!</div>
         </div>
+        <div class="how-arrow-col" style="visibility: hidden;">
+          <img src="/Corner%20up-right.webp" alt="" width="44" height="44" style="width: 44px;"/>
+        </div>
+        <div class="how-spacer"></div>
       </div>
 
       <div class="how-thats-it">That's it!</div>
