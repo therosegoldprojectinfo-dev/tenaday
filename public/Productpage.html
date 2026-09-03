@@ -95,40 +95,50 @@
     }
 
     /*
-      Layout: 3 columns — left (vid), center (arrow), right (vid)
-      Each video is ~45% wide.
-      Arrow col is ~10%.
-      Videos stagger: vid1 left top, vid2 right starts at 50% of vid1 height,
-      vid3 left starts at 50% of vid2 height.
-      Arrow 1 sits above vid2, arrow 2 sits above vid3.
+      ZIGZAG LAYOUT — matches Figma:
+      Step 1: left col, full width of left half
+      Arrow: curves right → down
+      Step 2: right col, starts at ~50% down of step 1
+      Arrow: curves left → down
+      Step 3: left col, starts at ~50% down of step 2
+
+      We achieve this with a single relative container + absolute kids,
+      but since video heights are dynamic on mobile we use the staggered
+      flex approach with carefully tuned offsets.
     */
-    .how-container {
+    .how-zigzag {
       position: relative;
       width: 100%;
     }
 
-    /* We use a 3-col flex for each row */
-    .how-row {
-      display: flex;
-      align-items: flex-start;
-      width: 100%;
+    /* Each step block */
+    .how-step {
+      width: 47%;
     }
-
-    .how-col-left  { width: 47%; }
-    .how-col-mid   { width: 6%; display: flex; justify-content: center; }
-    .how-col-right { width: 47%; }
-
-    .how-vid-wrap video {
+    .how-step video {
       width: 100%;
       border-radius: 14px;
       display: block;
     }
-    .how-vid-wrap .step-label {
+    .how-step .step-label {
       font-size: 13px;
       font-weight: 700;
       color: #0A0A0A;
       margin-top: 8px;
       line-height: 1.3;
+    }
+
+    /* Arrow images */
+    .how-arrow {
+      width: 6%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .how-arrow img {
+      width: 36px;
+      height: 36px;
+      opacity: 0.85;
     }
 
     .how-thats-it {
@@ -183,7 +193,7 @@
 
     <!-- OFFER SECTION -->
     <div style="padding: 40px 16px 0;">
-      <div style="font-size: 32px; font-weight: 500; color: #0A0A0A; line-height: 1.2; margin-bottom: 24px;">🚨 The new way<br>to practise is here!</div>
+      <div style="font-size: 32px; font-weight: 500; color: #0A0A0A; line-height: 1.2; margin-bottom: 24px;">Turn any lesson into<br>unlimited practise</div>
       <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 28px;">
         <span style="font-size: 14px; font-weight: 500; color: #888; text-decoration: line-through;">$5/month</span>
         <span style="font-size: 28px; font-weight: 500; color: #0A0A0A;">$1/month</span>
@@ -267,63 +277,63 @@
     <div class="how-section">
       <div class="how-title">How does it work?</div>
 
-      <div class="how-container">
+      <div class="how-zigzag">
 
         <!--
-          Strategy: absolute positioning within a relative container.
-          vid1: left, top 0
-          arrow1: center-ish, at 50% of vid1 height
-          vid2: right, starts at 50% of vid1 height
-          arrow2: center-ish, at 50% of vid1 + 50% of vid2 height
-          vid3: left, starts at 50% of vid1 + 50% of vid2 height
-
-          Since video heights are dynamic, we use a staggered flex approach
-          with negative margins to pull things up.
+          ROW A: Step 1 (left) + arrow in middle (pointing down-right toward step 2)
+          Step 2 (right) is offset down ~40% of the container so it starts at the midpoint of step 1.
+          We use a flex row with step 2 having a top margin.
         -->
-
-        <!-- ROW 1: vid1 left + arrow pointing down-right, at 50% height of vid1 -->
         <div style="display: flex; align-items: flex-start; width: 100%;">
-          <!-- VID 1 — left -->
-          <div style="width: 47%;">
-            <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high" style="width:100%; border-radius:14px; display:block;">
+
+          <!-- STEP 1 — left -->
+          <div class="how-step">
+            <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high">
               <source src="/1%20They%20study%20their%20%20lesson.mp4" type="video/mp4"/>
             </video>
-            <div style="font-size:13px; font-weight:700; color:#0A0A0A; margin-top:8px; line-height:1.3;">#1 They study their lesson</div>
+            <div class="step-label">#1 They study their lesson</div>
           </div>
 
-          <!-- ARROW COL — sits between vid1 and vid2, at midpoint of vid1 -->
-          <div style="width: 6%; display:flex; flex-direction:column; align-items:center; padding-top: 20%;">
-            <img src="/Corner%20up-right.webp" alt="next" loading="lazy" width="44" height="44"
-              style="width:44px; height:44px; opacity:0.85; transform: rotate(90deg);"/>
+          <!-- ARROW 1 — center, at ~30% height to sit at midpoint of vid1 -->
+          <div class="how-arrow" style="padding-top: 28%;">
+            <img src="/Corner%20up-right.webp" alt="next" loading="lazy" width="36" height="36"
+              style="transform: rotate(90deg);"/>
           </div>
 
-          <!-- VID 2 — right, offset down by 50% of its own context = margin-top ~50% of vid1 -->
-          <div style="width: 47%; margin-top: 40%;">
-            <video id="vid2" autoplay muted loop playsinline preload="none" style="width:100%; border-radius:14px; display:block;">
+          <!-- STEP 2 — right, pushed down to overlap at midpoint of step 1 -->
+          <div class="how-step" style="margin-top: 38%;">
+            <video id="vid2" autoplay muted loop playsinline preload="none">
               <source src="/2%20Take%20a%20picture%20of%20%20their%20school%20lesson.mp4" type="video/mp4"/>
             </video>
-            <div style="font-size:13px; font-weight:700; color:#0A0A0A; margin-top:8px; line-height:1.3;">#2 Take a picture of their school lesson</div>
+            <div class="step-label">#2 Take a picture of their school lesson</div>
           </div>
+
         </div>
 
-        <!-- ROW 2: arrow pointing down-left + vid3 left, offset by 50% of vid2 -->
-        <div style="display: flex; align-items: flex-start; width: 100%; margin-top: -30%;">
-          <!-- VID 3 — left, starts at midpoint of vid2 -->
-          <div style="width: 47%; margin-top: 40%;">
-            <video id="vid3" autoplay muted loop playsinline preload="none" style="width:100%; border-radius:14px; display:block;">
+        <!--
+          ROW B: Step 3 (left) + arrow in middle (pointing down-left)
+          Row B starts with a negative margin to pull up under step 2.
+          Step 3 is offset down ~40% within its own row to align at midpoint of step 2.
+        -->
+        <div style="display: flex; align-items: flex-start; width: 100%; margin-top: -32%;">
+
+          <!-- STEP 3 — left, pushed down to sit at midpoint of step 2 -->
+          <div class="how-step" style="margin-top: 38%;">
+            <video id="vid3" autoplay muted loop playsinline preload="none">
               <source src="/3%20Practise%20as%20%20mush%20as%20they%20want!.mp4" type="video/mp4"/>
             </video>
-            <div style="font-size:13px; font-weight:700; color:#0A0A0A; margin-top:8px; line-height:1.3;">#3 Practise as much as they want!</div>
+            <div class="step-label">#3 Practise as much as they want!</div>
           </div>
 
-          <!-- ARROW COL — between vid2 and vid3 -->
-          <div style="width: 6%; display:flex; flex-direction:column; align-items:center; padding-top: 20%;">
-            <img src="/Corner%20up-right.webp" alt="next" loading="lazy" width="44" height="44"
-              style="width:44px; height:44px; opacity:0.85; transform: scaleX(-1) rotate(90deg);"/>
+          <!-- ARROW 2 — center, pointing down-left back to step 3 -->
+          <div class="how-arrow" style="padding-top: 28%;">
+            <img src="/Corner%20up-right.webp" alt="next" loading="lazy" width="36" height="36"
+              style="transform: scaleX(-1) rotate(90deg);"/>
           </div>
 
-          <!-- empty right -->
-          <div style="width: 47%;"></div>
+          <!-- empty right placeholder -->
+          <div class="how-step"></div>
+
         </div>
 
       </div>
