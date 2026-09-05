@@ -159,6 +159,15 @@ export default function Profile({ onLogout, onLanguageChange }) {
           </a>
         </div>
 
+        {/* Refund */}
+        <a href="https://wa.me/14384102068" target="_blank" rel="noopener noreferrer"
+          className="w-full py-4 rounded-2xl font-display font-bold text-base text-center block transition-all active:scale-95 mb-3"
+          style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#16a34a', textDecoration: 'none' }}>
+          {lang === 'ar'
+            ? '💸 تريد استرداد الأموال؟ تواصل معنا'
+            : '💸 Want a refund? Contact us on WhatsApp'}
+        </a>
+
         {/* Logout — clean card not a button */}
         <div onClick={() => setShowLogoutConfirm(true)}
           className="w-full py-4 rounded-2xl font-display font-bold text-base text-center cursor-pointer transition-all active:scale-95"
