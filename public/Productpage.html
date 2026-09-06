@@ -25,8 +25,6 @@
     })(window,document,"clarity","script","y6hivp7gvm");
   });
   </script>
-  <noscript><img loading="lazy" height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"/></noscript>
 
   <script>
   function loadStripe(cb) {
@@ -37,11 +35,12 @@
     document.head.appendChild(s);
   }
   </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="preload" href="/newtopimagebro.webp" as="image" fetchpriority="high"/>
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet"/></noscript>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/></noscript>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -52,9 +51,184 @@
       color: #0A0A0A;
       font-size: 16px;
       line-height: 1.6;
+      overflow-x: hidden;
     }
     .inner { max-width: 480px; margin: 0 auto; }
 
+    /* ─── LEARN MORE SECTION ─── */
+    #learn-more-section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-section { padding: 40px 20px 0; text-align: center; }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 22px;
+      font-weight: 800;
+      color: #0A0A0A;
+      letter-spacing: 0.01em;
+      margin-bottom: 20px;
+    }
+    .hero-headline {
+      font-size: 29px;
+      font-weight: 800;
+      color: #0A0A0A;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      margin-bottom: 28px;
+    }
+    .how-label {
+      font-size: 29px;
+      font-weight: 600;
+      color: #0A0A0A;
+      line-height: 1.3;
+      margin-bottom: 28px;
+    }
+    .video-placeholder {
+      width: 100%;
+      background: #E8E8E8;
+      border-radius: 18px;
+      aspect-ratio: 16 / 9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+    .video-placeholder .play-icon {
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 18px 0 18px 32px;
+      border-color: transparent transparent transparent #888;
+      margin-left: 6px;
+    }
+    .steps-stack { display: flex; flex-direction: column; gap: 16px; padding-bottom: 48px; }
+    .step-card {
+      width: 100%;
+      background: #E8E8E8;
+      border-radius: 18px;
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: flex-end;
+      padding: 16px 20px;
+    }
+    .step-card .step-num-label { font-size: 20px; font-weight: 700; color: #0A0A0A; line-height: 1.3; }
+
+    /* ─── BLURRED PRODUCT ZONE ─── */
+    #product-wrapper {
+      position: relative;
+    }
+
+    #product-content {
+      transition: filter 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      filter: blur(8px);
+      pointer-events: none;
+      user-select: none;
+    }
+    #product-content.unlocked {
+      filter: blur(0px);
+      pointer-events: auto;
+      user-select: auto;
+    }
+
+    /* Confetti canvas lives inside the product wrapper, always visible */
+    #party-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
+      display: block;
+    }
+
+    /* Frosted glass overlay */
+    #unlock-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 60px;
+      background: rgba(53, 19, 162, 0.18);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      transition: opacity 0.7s ease;
+    }
+    #unlock-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Sticky unlock button inside overlay */
+    #unlock-btn-wrap {
+      position: sticky;
+      top: 50vh;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      z-index: 21;
+    }
+
+    #unlock-btn {
+      background: #fff;
+      color: #3513A2;
+      border: 3px solid #3513A2;
+      border-radius: 50px;
+      padding: 18px 28px;
+      font-family: 'Inter', sans-serif;
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 40px rgba(53, 19, 162, 0.35), 0 2px 8px rgba(0,0,0,0.12);
+      transition: transform 0.15s, box-shadow 0.15s;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+    }
+    #unlock-btn:hover { transform: scale(1.04); box-shadow: 0 12px 50px rgba(53, 19, 162, 0.45); }
+    #unlock-btn:active { transform: scale(0.97); }
+
+    .unlock-hint {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      text-align: center;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      line-height: 1.4;
+    }
+
+    /* ─── CONGRATS BANNER (appears after unlock) ─── */
+    #congrats-banner {
+      display: none;
+      background: linear-gradient(135deg, #3513A2 0%, #673FE8 100%);
+      color: #fff;
+      text-align: center;
+      padding: 36px 24px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    #congrats-banner.show { display: block; }
+    .congrats-title {
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+    .congrats-sub {
+      font-size: 16px;
+      font-weight: 500;
+      opacity: 0.9;
+      line-height: 1.5;
+    }
+
+    /* ─── PRODUCT PAGE STYLES (unchanged from original) ─── */
     .hero-img {
       display: block;
       width: calc(100% - 32px);
@@ -63,544 +237,721 @@
       aspect-ratio: 1 / 1;
       height: auto;
     }
-
     .cta-btn {
-      display: block;
-      width: 100%;
-      background: #3513A2;
-      color: #fff;
+      display: block; width: 100%;
+      background: #3513A2; color: #fff;
       font-family: 'Inter', sans-serif;
-      font-size: 17px;
-      font-weight: 700;
-      border: none;
-      border-radius: 50px;
-      padding: 16px 20px;
-      cursor: pointer;
-      margin-top: 24px;
-      transition: filter 0.2s;
+      font-size: 17px; font-weight: 700;
+      border: none; border-radius: 50px;
+      padding: 16px 20px; cursor: pointer;
+      margin-top: 24px; transition: filter 0.2s;
       letter-spacing: 0.01em;
     }
     .cta-btn:hover { filter: brightness(1.12); }
     .cta-btn:active { filter: brightness(0.92); }
 
-    /* ── HOW IT WORKS ── */
     .how-section { padding: 48px 20px 8px; }
     .how-title {
-      font-size: 32px;
-      font-weight: 500;
-      color: #000;
-      text-align: center;
-      margin-bottom: 40px;
-      letter-spacing: -0.02em;
+      font-size: 32px; font-weight: 500;
+      color: #000; text-align: center;
+      margin-bottom: 40px; letter-spacing: -0.02em;
     }
-
-    /* VERTICAL STACK LAYOUT */
     .how-zigzag {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 24px;
+      width: 100%; display: flex;
+      flex-direction: column; align-items: center; gap: 24px;
     }
-
-    /* Each step block */
-    .how-step {
-      width: 72%;
-    }
-    .how-step video {
-      width: 100%;
-      border-radius: 14px;
-      display: block;
-    }
+    .how-step { width: 72%; }
+    .how-step video { width: 100%; border-radius: 14px; display: block; }
     .how-step .step-label {
-      font-size: 17px;
-      font-weight: 700;
-      color: #0A0A0A;
-      margin-top: 10px;
-      line-height: 1.4;
-      text-align: center;
+      font-size: 17px; font-weight: 700;
+      color: #0A0A0A; margin-top: 10px;
+      line-height: 1.4; text-align: center;
     }
-
     .how-thats-it {
-      text-align: center;
-      font-size: 32px;
-      font-weight: 700;
-      color: #000;
-      margin-top: 32px;
-      margin-bottom: 28px;
+      text-align: center; font-size: 32px;
+      font-weight: 700; color: #000;
+      margin-top: 32px; margin-bottom: 28px;
       letter-spacing: -0.02em;
     }
 
-    /* ── FAQ ── */
     .faq-wrap { padding: 8px 20px 48px; }
     .faq-title { font-size: clamp(20px, 5vw, 26px); font-weight: 900; color: #000; margin-bottom: 20px; padding-top: 24px; text-align: center; }
     .mfaq-item { border-bottom: 1px solid #E8D9F5; }
-    .mfaq-q { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 20px 0; font-size: 16px; font-weight: 600; color: #0A0A0A; background: none; border: none; cursor: pointer; text-align: left; font-family: 'Inter', sans-serif; }
+    .mfaq-q {
+      width: 100%; display: flex;
+      justify-content: space-between; align-items: center;
+      gap: 12px; padding: 20px 0;
+      font-size: 16px; font-weight: 600; color: #0A0A0A;
+      background: none; border: none; cursor: pointer;
+      text-align: left; font-family: 'Inter', sans-serif;
+    }
     .mfaq-icon { flex-shrink: 0; transition: transform 0.2s; color: #3513A2; font-size: 18px; }
     .mfaq-item.open .mfaq-icon { transform: rotate(180deg); }
     .mfaq-a { font-size: 15px; color: #555; line-height: 1.75; padding-bottom: 20px; display: none; font-weight: 400; }
     .mfaq-item.open .mfaq-a { display: block; }
 
     @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes bannerIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    #congrats-banner.show { animation: bannerIn 0.5s ease forwards; }
   </style>
 </head>
 <body>
 
-  <!-- TOP BANNER -->
-  <div style="background: #3513A2; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; position: sticky; top: 0; z-index: 1000;">
-    <div style="display: flex; flex-direction: column; gap: 2px;">
-      <div style="font-size: 13px; font-weight: 900; color: #fff; letter-spacing: 0.02em; line-height: 1.2;">🚨 80% OFF ENDS IN:</div>
-      <div style="font-size: 16px; font-weight: 300; color: #fff; letter-spacing: 0.05em; font-family: 'Inter', sans-serif; text-align: center;">
-        <span id="t-h">00</span> : <span id="t-m">00</span> : <span id="t-s">00</span>
-      </div>
-    </div>
-    <div style="background: #673FE8; border: 1px solid #fff; border-radius: 50px; padding: 10px 14px; text-align: center; flex-shrink: 0; max-width: 200px;">
-      <div style="font-size: 12px; font-weight: 500; color: #fff; line-height: 1.4; white-space: nowrap;">😱 First Parents Special</div>
-      <div style="font-size: 12px; font-weight: 700; color: #fff; line-height: 1.4; white-space: nowrap;">Get 80% off today</div>
+<!-- ══════════════════════════════════════════
+     TOP BANNER (sticky, always on top)
+══════════════════════════════════════════ -->
+<div style="background:#3513A2; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; position:sticky; top:0; z-index:1000;">
+  <div style="display:flex; flex-direction:column; gap:2px;">
+    <div style="font-size:13px; font-weight:900; color:#fff; letter-spacing:0.02em; line-height:1.2;">🚨 80% OFF ENDS IN:</div>
+    <div style="font-size:16px; font-weight:300; color:#fff; letter-spacing:0.05em; font-family:'Inter',sans-serif; text-align:center;">
+      <span id="t-h">00</span> : <span id="t-m">00</span> : <span id="t-s">00</span>
     </div>
   </div>
+  <div style="background:#673FE8; border:1px solid #fff; border-radius:50px; padding:10px 14px; text-align:center; flex-shrink:0; max-width:200px;">
+    <div style="font-size:12px; font-weight:500; color:#fff; line-height:1.4; white-space:nowrap;">😱 First Parents Special</div>
+    <div style="font-size:12px; font-weight:700; color:#fff; line-height:1.4; white-space:nowrap;">Get 80% off today</div>
+  </div>
+</div>
 
+<!-- ══════════════════════════════════════════
+     LEARN MORE SECTION
+══════════════════════════════════════════ -->
+<div id="learn-more-section">
   <div class="inner">
+    <div class="hero-section">
 
-    <!-- HERO IMAGE -->
-    <img
-      src="/newtopimagebro.webp"
-      alt="Take a pic of your child's lesson, get a personalised quiz instantly"
-      class="hero-img"
-      width="1080" height="1080"
-      fetchpriority="high"
-    />
+      <div class="hero-eyebrow">🚨 BUSY PARENTS</div>
 
-    <!-- OFFER SECTION -->
-    <div style="padding: 40px 16px 0;">
-      <div style="font-size: 32px; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 24px;">Turn real lessons into<br>unlimited practise</div>
-      <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 28px;">
-        <span style="font-size: 14px; font-weight: 500; color: #888; text-decoration: line-through;">$5/month</span>
-        <span style="font-size: 28px; font-weight: 500; color: #0A0A0A;">$1/month</span>
-        <div style="background: #3513A2; border-radius: 23px; padding: 3px 10px; position: relative; top: -16px;">
-          <span style="font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap;">😱Save 80%!</span>
+      <div class="hero-headline">
+        Help your child<br>practise their lessons<br>... while you relax!
+      </div>
+
+      <div class="how-label">How does it work?</div>
+
+      <!-- VSL placeholder -->
+      <div class="video-placeholder">
+        <div class="play-icon"></div>
+      </div>
+
+      <!-- 3 step placeholders -->
+      <div class="steps-stack">
+        <div class="step-card"><div class="step-num-label">#1 Study</div></div>
+        <div class="step-card"><div class="step-num-label">#2 Take a pic</div></div>
+        <div class="step-card"><div class="step-num-label">#3 Practise</div></div>
+      </div>
+
+      <!-- 7 WAYS SECTION -->
+      <div style="padding: 48px 0 48px;">
+        <h2 style="font-size:29px; font-weight:600; color:#0A0A0A; text-align:center; line-height:1.3; letter-spacing:-0.01em; margin-bottom:36px;">7 Ways Numio Makes Your Life Easier This School Year</h2>
+        <div style="display:flex; flex-direction:column; gap:24px; text-align:left;">
+          <p style="font-size:18px; font-weight:500; color:#0A0A0A; line-height:1.4;">No need to search for online practice</p>
+          <p style="font-size:18px; font-weight:500; color:#0A0A0A; line-height:1.4;">No need to buy expensive books or programs</p>
+          <p style="font-size:18px; font-weight:500; color:#0A0A0A; line-height:1.4;">Your child practises exactly what they're learning at school</p>
+          <p style="font-size:18px; font-weight:500; color:#0A0A0A; line-height:1.4;">They can practise as much as they need</p>
+          <p style="font-size:18px; font-weight:500; color:#0A0A0A; line-height:1.4;">Your child will be more motivated to practise</p>
+          <p style="font-size:18px; font-weight:500; color:#0A0A0A; line-height:1.4;">No distractions — just practice!</p>
+          <p style="font-size:18px; font-weight:800; color:#0A0A0A; line-height:1.4;">Result = they will get better!</p>
         </div>
       </div>
 
-      <!-- 2 icon trust row -->
-      <div style="display: flex; gap: 16px; margin-bottom: 32px;">
-        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8" r="6"/>
-            <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
-          </svg>
-          <span style="font-size: 14px; font-weight: 600; color: #0A0A0A; line-height: 1.3;">Better practise<br>for your child</span>
-        </div>
-        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-            <line x1="9" y1="9" x2="9.01" y2="9"/>
-            <line x1="15" y1="9" x2="15.01" y2="9"/>
-          </svg>
-          <span style="font-size: 14px; font-weight: 600; color: #0A0A0A; line-height: 1.3;">No extra work<br>for parents (You)</span>
-        </div>
-      </div>
-
-      <!-- Card -->
-      <div id="offer-card" style="border: 3px solid #3513A2; border-radius: 35px; background: #fff; padding: 32px 24px 28px;">
-        <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 32px;">
-          <img src="/numioultimateimage.png" alt="Numio" width="52" height="52" loading="lazy" style="width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0; object-fit: cover;"/>
-          <span style="font-size: 24px; font-weight: 800; color: #0A0A0A; letter-spacing: 0.01em;">NUMIO ULTIMATE</span>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 16px; margin-bottom: 28px;">
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="/checkstousenowbro.webp" alt="check" width="24" height="24" style="width: 24px; height: 24px; flex-shrink: 0;"/>
-            <span style="font-size: 24px; font-weight: 500; color: #0A0A0A;">Unlimited pictures</span>
+      <!-- WHY NUMIO SECTION -->
+      <div style="padding:48px 0 48px;">
+        <h2 style="font-size:29px; font-weight:600; color:#0A0A0A; text-align:center; line-height:1.3; letter-spacing:-0.01em; margin-bottom:40px;">Why is Numio the best option to help your child in 2026?</h2>
+        <div style="display:flex; flex-direction:column; gap:24px; text-align:left; margin-bottom:48px;">
+          <div>
+            <div style="font-size:20px; font-weight:700; color:#0A0A0A; line-height:1.3;">YOU (Parents):</div>
+            <div style="font-size:20px; font-weight:400; color:#0A0A0A; line-height:1.4;">❌ Too tired/busy to teach everyday</div>
           </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="/checkstousenowbro.webp" alt="check" width="24" height="24" style="width: 24px; height: 24px; flex-shrink: 0;"/>
-            <span style="font-size: 24px; font-weight: 500; color: #0A0A0A;">Unlimited practise</span>
+          <div>
+            <div style="font-size:20px; font-weight:700; color:#0A0A0A; line-height:1.3;">School books :</div>
+            <div style="font-size:20px; font-weight:400; color:#0A0A0A; line-height:1.4;">❌ Not enough practise</div>
           </div>
-          <div style="display: flex; align-items: center; gap: 12px;">
-            <img src="/checkstousenowbro.webp" alt="check" width="24" height="24" style="width: 24px; height: 24px; flex-shrink: 0;"/>
-            <span style="font-size: 24px; font-weight: 500; color: #0A0A0A;">No ads</span>
+          <div>
+            <div style="font-size:20px; font-weight:700; color:#0A0A0A; line-height:1.3;">Internet :</div>
+            <div style="font-size:20px; font-weight:400; color:#0A0A0A; line-height:1.4;">❌ Don't match their real lessons</div>
+          </div>
+          <div>
+            <div style="font-size:20px; font-weight:700; color:#0A0A0A; line-height:1.3;">Private :</div>
+            <div style="font-size:20px; font-weight:400; color:#0A0A0A; line-height:1.4;">❌ $50+/hour for extra help</div>
           </div>
         </div>
-        <button onclick="goToCheckout()" style="display: block; width: 100%; background: #3513A2; color: #fff; font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 500; border: none; border-radius: 50px; padding: 14px 20px; cursor: pointer; transition: filter 0.2s;">Try It Risk-Free for $1 →</button>
-      </div>
-    </div>
 
-    <!-- FIRST-PARENTS BONUS -->
-    <div style="padding: 36px 16px 0;">
-      <div style="border-radius: 23px; overflow: hidden;">
-        <div style="background: #000; padding: 12px 16px; text-align: center; border: 3px solid #000; border-radius: 23px 23px 0 0;">
-          <span style="font-size: 14px; font-weight: 700; color: #fff; font-family: 'Inter', sans-serif; letter-spacing: 0.01em;">🎁 FIRST-PARENTS SAFETY BONUS</span>
-        </div>
-        <div style="padding: 14px; display: flex; gap: 10px; background: #fff; border: 3px dashed #000; border-top: none; border-radius: 0 0 23px 23px;">
-          <div style="flex: 1; background: #F1E9DC; border: 1.5px solid #707070; border-radius: 23px; padding: 18px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
-            </svg>
-            <span style="font-size: 14px; font-weight: 500; color: #0A0A0A; font-family: 'Inter', sans-serif; line-height: 1.3;">Cancel<br>Anytime</span>
+        <div style="font-size:29px; font-weight:600; color:#0A0A0A; text-align:center; margin-bottom:32px;">Solution:</div>
+
+        <div style="display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:16px;">
+          <div style="flex:1; text-align:center;">
+            <img src="/tousebro.webp" alt="Take a pic of their real lesson" loading="lazy" style="width:100%; max-width:140px; display:inline-block;"/>
           </div>
-          <div style="flex: 1; background: #F1E9DC; border: 1.5px solid #707070; border-radius: 23px; padding: 18px 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; text-align: center;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-              <path d="M21 3v5h-5"/>
-              <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-              <path d="M8 16H3v5"/>
-              <text x="12" y="14.5" text-anchor="middle" font-size="9" font-weight="bold" stroke="none" fill="#000" font-family="Inter,sans-serif">$</text>
-            </svg>
-            <span style="font-size: 14px; font-weight: 500; color: #0A0A0A; font-family: 'Inter', sans-serif; line-height: 1.3;">365 days<br>money-back<br>guarantee</span>
+          <div style="flex:0 0 60px; display:flex; align-items:center; justify-content:center;">
+            <img src="/tousebro%20(2).webp" alt="arrow" loading="lazy" style="width:52px;"/>
+          </div>
+          <div style="flex:1; text-align:center;">
+            <img src="/tousebro%20(1).webp" alt="Practise as much as they need" loading="lazy" style="width:100%; max-width:140px; display:inline-block;"/>
           </div>
         </div>
+
+        <div style="display:flex; gap:8px; margin-bottom:48px;">
+          <div style="flex:1; font-size:16px; font-weight:600; color:#0A0A0A; text-align:center; line-height:1.3;">Take a pic of<br>their real lesson</div>
+          <div style="flex:0 0 60px;"></div>
+          <div style="flex:1; font-size:16px; font-weight:600; color:#0A0A0A; text-align:center; line-height:1.3;">Practise as much<br>as they need!</div>
+        </div>
+
+        <div style="font-size:32px; font-weight:700; color:#0A0A0A; text-align:center; margin-bottom:32px;">That's it!</div>
       </div>
+
     </div>
-
-    <!-- HOW IT WORKS -->
-    <div class="how-section">
-      <div class="how-title">How does it work?</div>
-
-      <div class="how-zigzag">
-
-        <div class="how-step">
-          <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high">
-            <source src="/1%20They%20study%20their%20%20lesson.mp4" type="video/mp4"/>
-          </video>
-          <div class="step-label">#1 They study their lesson</div>
-        </div>
-
-        <div class="how-step">
-          <video id="vid2" autoplay muted loop playsinline preload="none">
-            <source src="/2%20Take%20a%20picture%20of%20%20their%20school%20lesson.mp4" type="video/mp4"/>
-          </video>
-          <div class="step-label">#2 Take a picture of their school lesson</div>
-        </div>
-
-        <div class="how-step">
-          <video id="vid3" autoplay muted loop playsinline preload="none">
-            <source src="/3%20Practise%20as%20%20mush%20as%20they%20want!.mp4" type="video/mp4"/>
-          </video>
-          <div class="step-label">#3 Practise as much as they want!</div>
-        </div>
-
-      </div>
-
-      <div class="how-thats-it">That's it!</div>
-      <div style="padding: 0 0 48px;">
-        <button onclick="scrollToCard()" style="display: block; width: 100%; background: #3513A2; color: #fff; font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 500; border: none; border-radius: 20px; padding: 14px 20px; cursor: pointer; transition: filter 0.2s;">Try It Risk-Free for $1 →</button>
-      </div>
-    </div>
-
-    <!-- HOW DOES IT HELP -->
-    <div style="padding: 48px 20px 40px; text-align: center;">
-      <h2 style="font-size: 32px; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 48px; text-align: center;">Here's how it will<br>help you today:</h2>
-      <div style="margin-bottom: 40px;">
-        <img src="/Target.webp" alt="Target" width="56" height="56" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
-        <p style="font-size: 20px; color: #0A0A0A; line-height: 1.5;">They practise <strong>EXACTLY</strong><br>what they're learning at school</p>
-      </div>
-      <div style="margin-bottom: 40px;">
-        <img src="/Check%20circle.webp" alt="Check" width="56" height="56" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
-        <p style="font-size: 20px; color: #0A0A0A; line-height: 1.5;">They can practise <strong>as much<br>as they need</strong> until<br>they understand perfectly!</p>
-      </div>
-      <div style="margin-bottom: 48px;">
-        <img src="/tousebro%20(5).webp" alt="Relax" width="56" height="56" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
-        <p style="font-size: 20px; color: #0A0A0A; line-height: 1.5;">...and you don't have<br>to do <strong>anything!</strong></p>
-      </div>
-      <button class="cta-btn" onclick="scrollToCard()">Try It Risk-Free for $1 →</button>
-    </div>
-
-    <!-- WHY NUMIO -->
-    <div style="padding: 48px 20px 40px; text-align: center;">
-      <h2 style="font-size: 32px; font-weight: 700; color: #000; line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 48px; text-align: center;">Why is Numio<br>the best option<br>to help your<br>child practise?</h2>
-      <div style="display: flex; margin-bottom: 28px;">
-        <div style="flex: 1;"></div>
-        <div style="flex: 1; display: flex; justify-content: flex-start;">
-          <div style="background: #FF5757; color: #fff; font-size: 17px; font-weight: 700; padding: 10px 22px; border-radius: 50px;">Problems:</div>
-        </div>
-      </div>
-      <div style="text-align: left; border-top: 1px solid #e0e0e0;">
-        <div style="display: flex; align-items: flex-start; padding: 24px 0; border-bottom: 1px solid #e0e0e0;">
-          <span style="font-size: 18px; font-weight: 500; color: #000; flex: 1;">School books</span>
-          <span style="font-size: 14px; font-weight: 600; color: #0A0A0A; flex: 1; text-align: left;"><span style="color: #FF5757;">✕ </span>Not enough practise</span>
-        </div>
-        <div style="display: flex; align-items: flex-start; padding: 24px 0; border-bottom: 1px solid #e0e0e0;">
-          <span style="font-size: 18px; font-weight: 500; color: #000; flex: 1;">Internet</span>
-          <span style="font-size: 14px; font-weight: 600; color: #0A0A0A; flex: 1; text-align: left;"><span style="color: #FF5757;">✕ </span>Don't match<br>exact school lessons</span>
-        </div>
-        <div style="display: flex; align-items: flex-start; padding: 24px 0; border-bottom: 1px solid #e0e0e0;">
-          <span style="font-size: 18px; font-weight: 500; color: #000; flex: 1;">Private</span>
-          <span style="font-size: 14px; font-weight: 600; color: #0A0A0A; flex: 1; text-align: left;"><span style="color: #FF5757;">✕ </span>$50+/hour if you<br>want extra help</span>
-        </div>
-      </div>
-      <div style="display: flex; justify-content: center; margin-top: 48px; margin-bottom: 36px;">
-        <div style="background: #0AE02D; color: #fff; font-size: 17px; font-weight: 700; padding: 10px 28px; border-radius: 50px;">Solution:</div>
-      </div>
-      <div style="display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 16px; position: relative;">
-        <div style="flex: 1; text-align: center;">
-          <img src="/tousebro.webp" alt="Take a pic of their real lesson" loading="lazy" style="width: 100%; max-width: 140px; display: inline-block;"/>
-        </div>
-        <div style="flex: 0 0 60px; display: flex; align-items: center; justify-content: center;">
-          <img src="/tousebro%20(2).webp" alt="arrow" loading="lazy" style="width: 52px;"/>
-        </div>
-        <div style="flex: 1; text-align: center;">
-          <img src="/tousebro%20(1).webp" alt="Practise as much as they need" loading="lazy" style="width: 100%; max-width: 140px; display: inline-block;"/>
-        </div>
-      </div>
-      <div style="display: flex; gap: 8px; margin-bottom: 40px;">
-        <div style="flex: 1; font-size: 15px; font-weight: 700; color: #0A0A0A; text-align: center; line-height: 1.3;">Take a pic of<br>their real lesson</div>
-        <div style="flex: 0 0 60px;"></div>
-        <div style="flex: 1; font-size: 15px; font-weight: 700; color: #0A0A0A; text-align: center; line-height: 1.3;">Practise as much<br>as they need!</div>
-      </div>
-      <button class="cta-btn" onclick="scrollToCard()">Try It Risk-Free for $1 →</button>
-    </div>
-
-    <!-- YOU'LL LOVE IT SECTION -->
-    <div style="padding: 48px 20px 40px; text-align: center;">
-      <h2 style="font-size: 32px; font-weight: 700; color: #000; line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 32px;">You'll love it!</h2>
-      <img
-        src="/imagetousebroforyoullloveitnewsection.webp"
-        alt="Anass & Ismail — Founder + brother"
-        loading="lazy"
-        style="width: 100%; max-width: 307px; aspect-ratio: 307 / 384; object-fit: cover; border-radius: 31px; display: block; margin: 0 auto;"
-      />
-    </div>
-
-    <!-- GUARANTEE SECTION -->
-    <div style="padding: 48px 20px 40px; text-align: center;">
-      <h2 style="font-size: 32px; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 32px; text-align: center;">... still not sure?</h2>
-      <img src="/badgegarantee365daystouse.webp" alt="365 Days Money Back Guarantee" width="160" height="160" loading="lazy" style="width: 160px; height: 160px; object-fit: contain; display: block; margin: 0 auto 36px;"/>
-      <p style="font-size: 20px; font-weight: 500; color: #0A0A0A; line-height: 1.6; margin-bottom: 24px;">You have 365 days to decide if<br>Numio really helps your child,</p>
-      <p style="font-size: 20px; font-weight: 500; color: #0A0A0A; line-height: 1.6; margin-bottom: 24px;">If you're not satisfied, you can:</p>
-      <p style="font-size: 20px; font-weight: 700; color: #0A0A0A; line-height: 1.6; margin-bottom: 48px;">Cancel anytime<br>+ get 100% of your money back!</p>
-      <button class="cta-btn" onclick="scrollToCard()">Try It Risk-Free for $1 →</button>
-    </div>
-
-    <!-- FAQ -->
-    <div class="faq-wrap">
-      <div class="faq-title">Questions you may have</div>
-      <div class="mfaq-item open">
-        <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">Will this actually work for MY child?<span class="mfaq-icon">⌄</span></button>
-        <div class="mfaq-a">Yes. Numio works for any child aged 5–11, any subject, any grade. You take a picture of their actual lesson — so the practice is always built around exactly what they're learning right now. Not a generic child. Your child.</div>
-      </div>
-      <div class="mfaq-item">
-        <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">But won't my child just waste time on their phone?<span class="mfaq-icon">⌄</span></button>
-        <div class="mfaq-a">No. Numio is a short daily practice session — no ads, no videos, no social feed, nothing to get distracted by. Your child opens it, answers their questions, earns their coins, and closes it. That's the whole thing.</div>
-      </div>
-      <div class="mfaq-item">
-        <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">Will my child actually WANT to use this?<span class="mfaq-icon">⌄</span></button>
-        <div class="mfaq-a">Yes. Your child earns coins every time they complete their practice. You decide what those coins unlock — screen time, a snack, a toy, anything they already want. They come back on their own because the reward is waiting.</div>
-      </div>
-      <div class="mfaq-item">
-        <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">What if I pay and it doesn't help?<span class="mfaq-icon">⌄</span></button>
-        <div class="mfaq-a">Then you get every cent back. You have 365 days to try Numio with your child. If you don't feel it's helping them practice — message us and we refund every cent. No forms. No questions. No waiting.</div>
-      </div>
-    </div>
-
   </div><!-- /inner -->
+</div><!-- /#learn-more-section -->
 
-  <div class="price-card-trigger" style="height:0; overflow:hidden;"></div>
 
-  <!-- POPUP -->
-  <div id="popup-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:#9D80FD; max-width:420px; width:100%; padding:48px 32px; position:relative; text-align:center; border-radius:20px;">
-      <button onclick="closePopup()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#fff;">✕</button>
-      <div style="font-size:clamp(28px, 7vw, 36px); font-weight:900; color:#fff; margin-bottom:24px;">🔓 Guarantee Unlocked</div>
-      <div style="font-size:clamp(20px, 5vw, 26px); font-weight:400; color:#fff; line-height:1.3; margin-bottom:40px;">Either your child practices more or you get your $1 back!</div>
-      <button onclick="closePopup(); scrollToCard();" style="display:block; width:100%; background:#3513A2; color:#fff; font-family:'Inter',sans-serif; font-size:18px; font-weight:700; border:none; border-radius:50px; padding:18px; cursor:pointer;">Try Numio for $1 →</button>
-    </div>
-  </div>
+<!-- ══════════════════════════════════════════
+     PRODUCT WRAPPER (blurred until unlock)
+══════════════════════════════════════════ -->
+<div id="product-wrapper">
 
-  <canvas id="confetti-canvas" style="position:fixed; inset:0; pointer-events:none; z-index:10000; display:none;"></canvas>
+  <!-- Confetti rains on the blurred content continuously -->
+  <canvas id="party-canvas"></canvas>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      ['vid1','vid2','vid3'].forEach(function(id) {
-        var v = document.getElementById(id);
-        if (!v) return;
-        v.muted = true;
-        var p = v.play();
-        if (p !== undefined) p.catch(function() {});
-      });
-    });
-    document.addEventListener('touchstart', function tryPlay() {
-      ['vid1','vid2','vid3'].forEach(function(id) {
-        var v = document.getElementById(id);
-        if (v && v.paused) { v.muted = true; v.play().catch(function(){}); }
-      });
-    }, { once: true });
-
-    const _end = new Date("2026-09-07T00:01:00").getTime();
-    function tick() {
-      const d = Math.max(0, _end - Date.now());
-      const hh = String(Math.floor(d / 3600000)).padStart(2,'0');
-      const mm = String(Math.floor((d % 3600000) / 60000)).padStart(2,'0');
-      const ss = String(Math.floor((d % 60000) / 1000)).padStart(2,'0');
-      document.getElementById('t-h').textContent = hh;
-      document.getElementById('t-m').textContent = mm;
-      document.getElementById('t-s').textContent = ss;
-    }
-    tick();
-    setInterval(tick, 1000);
-
-    const canvas = document.getElementById('confetti-canvas');
-    const ctx = canvas.getContext('2d');
-    let pieces = [], confettiAnim;
-    function launchConfetti() {
-      canvas.style.display = 'block';
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      pieces = [];
-      const colors = ['#3513A2','#9D80FD','#34EB41','#FFE656','#fff','#C4B4FF'];
-      for (let i = 0; i < 150; i++) {
-        pieces.push({
-          x: Math.random() * canvas.width, y: Math.random() * -canvas.height,
-          w: Math.random() * 10 + 6, h: Math.random() * 6 + 4,
-          color: colors[Math.floor(Math.random() * colors.length)],
-          speed: Math.random() * 4 + 2, angle: Math.random() * 360,
-          spin: Math.random() * 6 - 3, drift: Math.random() * 2 - 1,
-        });
-      }
-      animateConfetti();
-      setTimeout(() => { cancelAnimationFrame(confettiAnim); canvas.style.display = 'none'; }, 3500);
-    }
-    function animateConfetti() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      pieces.forEach(p => {
-        ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.angle * Math.PI / 180);
-        ctx.fillStyle = p.color; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
-        p.y += p.speed; p.x += p.drift; p.angle += p.spin;
-      });
-      confettiAnim = requestAnimationFrame(animateConfetti);
-    }
-
-    function closePopup() { document.getElementById('popup-overlay').style.display = 'none'; }
-    let popupShown = false;
-    function showPopup() {
-      if (popupShown) return;
-      popupShown = true;
-      document.getElementById('popup-overlay').style.display = 'flex';
-      launchConfetti();
-    }
-
-    // Show popup when user scrolls down then intentionally scrolls back up
-    let lastScrollY = window.scrollY;
-    let maxScrolledDown = 0;
-    let upwardStart = null;
-    const minScrolledDown = 300;  // must have gone down at least 300px first
-    const minScrolledUp = 80;     // must scroll up at least 80px to count as intentional
-
-    window.addEventListener('scroll', function() {
-      const currentY = window.scrollY;
-      if (popupShown) return;
-
-      if (currentY > maxScrolledDown) {
-        maxScrolledDown = currentY;
-        upwardStart = null; // reset upward tracking whenever going further down
-      }
-
-      if (currentY < lastScrollY) {
-        // scrolling up
-        if (upwardStart === null) upwardStart = lastScrollY; // mark where up began
-        const upwardDistance = upwardStart - currentY;
-        if (maxScrolledDown >= minScrolledDown && upwardDistance >= minScrolledUp) {
-          showPopup();
-        }
-      } else {
-        // scrolling down — reset upward tracking
-        upwardStart = null;
-      }
-
-      lastScrollY = currentY;
-    }, { passive: true });
-
-    document.getElementById('popup-overlay').addEventListener('click', function(e) {
-      if (e.target === this) closePopup();
-    });
-  </script>
-
-  <!-- CHECKOUT MODAL -->
-  <div id="checkout-overlay" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(26,10,60,0.72); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px;">
-    <div id="checkout-modal" style="background:white; border-radius:20px; width:100%; max-width:520px; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 24px 80px rgba(53,19,162,0.35);">
-      <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px 14px; border-bottom:1.5px solid #E8D9F5; flex-shrink:0;">
-        <div>
-          <div style="font-size:12px; font-weight:800; color:#3513A2; text-transform:uppercase; letter-spacing:0.05em;">Numio · 30-Day Access</div>
-          <div style="font-size:20px; font-weight:900; color:#0A0A0A;">$1 <span style="font-size:13px; font-weight:400; color:#888;">/month</span></div>
-        </div>
-        <button onclick="closeCheckout()" style="width:32px; height:32px; border-radius:50%; background:#F3EDFF; border:none; cursor:pointer; font-size:18px; color:#3513A2; font-weight:700;">✕</button>
-      </div>
-      <div id="checkout-body" style="flex:1; overflow-y:auto; padding:20px; min-height:420px;">
-        <div id="checkout-loading" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; min-height:380px;">
-          <div style="width:40px; height:40px; border:3px solid #E8D9F5; border-top-color:#3513A2; border-radius:50%; animation:spin 0.7s linear infinite;"></div>
-          <p style="font-size:13px; font-weight:700; color:#8B7BAE;">Loading secure checkout…</p>
-        </div>
-        <div id="checkout-error" style="display:none; text-align:center; padding:40px 20px; font-size:14px; color:#e53e3e;">Something went wrong. <a href="https://buy.stripe.com/6oUaEPgFL0G6cQ27rP7EQ0r" style="color:#3513A2;">Pay directly</a></div>
-        <div id="stripe-checkout-container"></div>
-      </div>
-      <div style="padding:10px 20px 14px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; border-top:1.5px solid #E8D9F5; flex-shrink:0;">
-        <span style="font-size:11px; font-weight:700; color:#8B7BAE;">✓ Secure payment</span>
-        <span style="font-size:11px; font-weight:700; color:#8B7BAE;">✓ SSL encrypted</span>
-        <span style="font-size:11px; font-weight:700; color:#8B7BAE;">✓ 365-day guarantee · min. 7-day trial</span>
+  <!-- Frosted glass overlay with unlock button -->
+  <div id="unlock-overlay">
+    <div id="unlock-btn-wrap">
+      <button id="unlock-btn" onclick="unlockProduct()">
+        🎟️ Unlock your First Parent Discount!
+      </button>
+      <div class="unlock-hint">
+        Secured by 200 Early Founder spots · 365-day guarantee
       </div>
     </div>
   </div>
 
-  <script>
-    const SUPABASE_URL  = 'https://lyedpfhzrvyaskmzhyhl.supabase.co';
-    const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0';
-    const STRIPE_PK     = 'pk_live_51Nu0S3F3Ob4o24uqvgOJGlSwUt5Bi6aWVFzweQddyD9A8FDAFNykkpZbIDq1o9ZhK09tt9pH8fw3MMLUvDRx2Eea00gLhad5Yg';
-    let stripeInstance = null;
-    let checkoutInstance = null;
+  <!-- Congrats banner (hidden until unlock) -->
+  <div id="congrats-banner">
+    <div class="congrats-title">🎉 Congratulations!<br>You've secured your spot!</div>
+    <div class="congrats-sub">One of the 200 First Parent slots for 2026 — yours at 80% off.</div>
+  </div>
 
-    function scrollToCard() {
-      document.getElementById('offer-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+  <!-- Actual blurred product content -->
+  <div id="product-content">
 
-    async function goToCheckout() {
-      fbq('track', 'InitiateCheckout');
-      await new Promise(resolve => loadStripe(resolve));
-      const overlay   = document.getElementById('checkout-overlay');
-      const loading   = document.getElementById('checkout-loading');
-      const errBox    = document.getElementById('checkout-error');
-      const container = document.getElementById('stripe-checkout-container');
-      overlay.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-      loading.style.display = 'flex';
-      errBox.style.display  = 'none';
-      container.innerHTML   = '';
-      try {
-        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout-session`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${SUPABASE_ANON}`,
-            'apikey': SUPABASE_ANON,
-          },
-          body: JSON.stringify({ origin: window.location.origin }),
-        });
-        const { clientSecret, error } = await res.json();
-        if (error) throw new Error(error);
-        if (!stripeInstance) stripeInstance = Stripe(STRIPE_PK);
-        checkoutInstance = await stripeInstance.initEmbeddedCheckout({ clientSecret });
-        loading.style.display = 'none';
-        checkoutInstance.mount('#stripe-checkout-container');
-      } catch (err) {
-        console.error('Checkout error:', err);
-        loading.style.display = 'none';
-        errBox.style.display  = 'block';
-      }
-    }
+    <div class="inner">
 
-    function closeCheckout() {
-      document.getElementById('checkout-overlay').style.display = 'none';
-      document.body.style.overflow = '';
-      if (checkoutInstance) { checkoutInstance.destroy(); checkoutInstance = null; }
-      document.getElementById('stripe-checkout-container').innerHTML = '';
-      document.getElementById('checkout-loading').style.display = 'flex';
-      document.getElementById('checkout-error').style.display   = 'none';
-    }
+      <!-- HERO IMAGE -->
+      <img
+        src="/newtopimagebro.webp"
+        alt="Take a pic of your child's lesson, get a personalised quiz instantly"
+        class="hero-img"
+        width="1080" height="1080"
+        fetchpriority="high"
+      />
 
-    document.getElementById('checkout-overlay').addEventListener('click', function(e) {
-      if (e.target === this) closeCheckout();
+      <!-- OFFER SECTION -->
+      <div style="padding:40px 16px 0;">
+        <div style="font-size:32px; font-weight:700; color:#000; line-height:1.2; margin-bottom:24px;">Turn real lessons into<br>unlimited practise</div>
+        <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:28px;">
+          <span style="font-size:14px; font-weight:500; color:#888; text-decoration:line-through;">$5/month</span>
+          <span style="font-size:28px; font-weight:500; color:#0A0A0A;">$1/month</span>
+          <div style="background:#3513A2; border-radius:23px; padding:3px 10px; position:relative; top:-16px;">
+            <span style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap;">😱Save 80%!</span>
+          </div>
+        </div>
+
+        <!-- 2 icon trust row -->
+        <div style="display:flex; gap:16px; margin-bottom:32px;">
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+            </svg>
+            <span style="font-size:14px; font-weight:600; color:#0A0A0A; line-height:1.3;">Better practise<br>for your child</span>
+          </div>
+          <div style="flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px;">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+              <line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
+            </svg>
+            <span style="font-size:14px; font-weight:600; color:#0A0A0A; line-height:1.3;">No extra work<br>for parents (You)</span>
+          </div>
+        </div>
+
+        <!-- Card -->
+        <div id="offer-card" style="border:3px solid #3513A2; border-radius:35px; background:#fff; padding:32px 24px 28px;">
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:32px;">
+            <img src="/numioultimateimage.png" alt="Numio" width="52" height="52" loading="lazy" style="width:52px; height:52px; border-radius:14px; flex-shrink:0; object-fit:cover;"/>
+            <span style="font-size:24px; font-weight:800; color:#0A0A0A; letter-spacing:0.01em;">NUMIO ULTIMATE</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:28px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <img src="/checkstousenowbro.webp" alt="check" width="24" height="24" style="width:24px; height:24px; flex-shrink:0;"/>
+              <span style="font-size:24px; font-weight:500; color:#0A0A0A;">Unlimited pictures</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <img src="/checkstousenowbro.webp" alt="check" width="24" height="24" style="width:24px; height:24px; flex-shrink:0;"/>
+              <span style="font-size:24px; font-weight:500; color:#0A0A0A;">Unlimited practise</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <img src="/checkstousenowbro.webp" alt="check" width="24" height="24" style="width:24px; height:24px; flex-shrink:0;"/>
+              <span style="font-size:24px; font-weight:500; color:#0A0A0A;">No ads</span>
+            </div>
+          </div>
+          <button onclick="goToCheckout()" style="display:block; width:100%; background:#3513A2; color:#fff; font-family:'Inter',sans-serif; font-size:20px; font-weight:500; border:none; border-radius:50px; padding:14px 20px; cursor:pointer; transition:filter 0.2s;">Try It Risk-Free for $1 →</button>
+        </div>
+      </div>
+
+      <!-- FIRST-PARENTS BONUS -->
+      <div style="padding:36px 16px 0;">
+        <div style="border-radius:23px; overflow:hidden;">
+          <div style="background:#000; padding:12px 16px; text-align:center; border:3px solid #000; border-radius:23px 23px 0 0;">
+            <span style="font-size:14px; font-weight:700; color:#fff; font-family:'Inter',sans-serif; letter-spacing:0.01em;">🎁 FIRST-PARENTS SAFETY BONUS</span>
+          </div>
+          <div style="padding:14px; display:flex; gap:10px; background:#fff; border:3px dashed #000; border-top:none; border-radius:0 0 23px 23px;">
+            <div style="flex:1; background:#F1E9DC; border:1.5px solid #707070; border-radius:23px; padding:18px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>
+              </svg>
+              <span style="font-size:14px; font-weight:500; color:#0A0A0A; font-family:'Inter',sans-serif; line-height:1.3;">Cancel<br>Anytime</span>
+            </div>
+            <div style="flex:1; background:#F1E9DC; border:1.5px solid #707070; border-radius:23px; padding:18px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center;">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                <path d="M21 3v5h-5"/>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                <path d="M8 16H3v5"/>
+                <text x="12" y="14.5" text-anchor="middle" font-size="9" font-weight="bold" stroke="none" fill="#000" font-family="Inter,sans-serif">$</text>
+              </svg>
+              <span style="font-size:14px; font-weight:500; color:#0A0A0A; font-family:'Inter',sans-serif; line-height:1.3;">365 days<br>money-back<br>guarantee</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOW IT WORKS -->
+      <div class="how-section">
+        <div class="how-title">How does it work?</div>
+        <div class="how-zigzag">
+          <div class="how-step">
+            <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high">
+              <source src="/1%20They%20study%20their%20%20lesson.mp4" type="video/mp4"/>
+            </video>
+            <div class="step-label">#1 They study their lesson</div>
+          </div>
+          <div class="how-step">
+            <video id="vid2" autoplay muted loop playsinline preload="none">
+              <source src="/2%20Take%20a%20picture%20of%20%20their%20school%20lesson.mp4" type="video/mp4"/>
+            </video>
+            <div class="step-label">#2 Take a picture of their school lesson</div>
+          </div>
+          <div class="how-step">
+            <video id="vid3" autoplay muted loop playsinline preload="none">
+              <source src="/3%20Practise%20as%20%20mush%20as%20they%20want!.mp4" type="video/mp4"/>
+            </video>
+            <div class="step-label">#3 Practise as much as they want!</div>
+          </div>
+        </div>
+        <div class="how-thats-it">That's it!</div>
+        <div style="padding:0 0 48px;">
+          <button onclick="scrollToCard()" style="display:block; width:100%; background:#3513A2; color:#fff; font-family:'Inter',sans-serif; font-size:20px; font-weight:500; border:none; border-radius:20px; padding:14px 20px; cursor:pointer; transition:filter 0.2s;">Try It Risk-Free for $1 →</button>
+        </div>
+      </div>
+
+      <!-- HOW DOES IT HELP -->
+      <div style="padding:48px 20px 40px; text-align:center;">
+        <h2 style="font-size:32px; font-weight:700; color:#000; line-height:1.2; margin-bottom:48px; text-align:center;">Here's how it will<br>help you today:</h2>
+        <div style="margin-bottom:40px;">
+          <img src="/Target.webp" alt="Target" width="56" height="56" loading="lazy" style="width:56px; height:56px; margin-bottom:16px;"/>
+          <p style="font-size:20px; color:#0A0A0A; line-height:1.5;">They practise <strong>EXACTLY</strong><br>what they're learning at school</p>
+        </div>
+        <div style="margin-bottom:40px;">
+          <img src="/Check%20circle.webp" alt="Check" width="56" height="56" loading="lazy" style="width:56px; height:56px; margin-bottom:16px;"/>
+          <p style="font-size:20px; color:#0A0A0A; line-height:1.5;">They can practise <strong>as much<br>as they need</strong> until<br>they understand perfectly!</p>
+        </div>
+        <div style="margin-bottom:48px;">
+          <img src="/tousebro%20(5).webp" alt="Relax" width="56" height="56" loading="lazy" style="width:56px; height:56px; margin-bottom:16px;"/>
+          <p style="font-size:20px; color:#0A0A0A; line-height:1.5;">...and you don't have<br>to do <strong>anything!</strong></p>
+        </div>
+        <button class="cta-btn" onclick="scrollToCard()">Try It Risk-Free for $1 →</button>
+      </div>
+
+      <!-- WHY NUMIO -->
+      <div style="padding:48px 20px 40px; text-align:center;">
+        <h2 style="font-size:32px; font-weight:700; color:#000; line-height:1.2; letter-spacing:-0.01em; margin-bottom:48px; text-align:center;">Why is Numio<br>the best option<br>to help your<br>child practise?</h2>
+        <div style="display:flex; margin-bottom:28px;">
+          <div style="flex:1;"></div>
+          <div style="flex:1; display:flex; justify-content:flex-start;">
+            <div style="background:#FF5757; color:#fff; font-size:17px; font-weight:700; padding:10px 22px; border-radius:50px;">Problems:</div>
+          </div>
+        </div>
+        <div style="text-align:left; border-top:1px solid #e0e0e0;">
+          <div style="display:flex; align-items:flex-start; padding:24px 0; border-bottom:1px solid #e0e0e0;">
+            <span style="font-size:18px; font-weight:500; color:#000; flex:1;">School books</span>
+            <span style="font-size:14px; font-weight:600; color:#0A0A0A; flex:1; text-align:left;"><span style="color:#FF5757;">✕ </span>Not enough practise</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; padding:24px 0; border-bottom:1px solid #e0e0e0;">
+            <span style="font-size:18px; font-weight:500; color:#000; flex:1;">Internet</span>
+            <span style="font-size:14px; font-weight:600; color:#0A0A0A; flex:1; text-align:left;"><span style="color:#FF5757;">✕ </span>Don't match<br>exact school lessons</span>
+          </div>
+          <div style="display:flex; align-items:flex-start; padding:24px 0; border-bottom:1px solid #e0e0e0;">
+            <span style="font-size:18px; font-weight:500; color:#000; flex:1;">Private</span>
+            <span style="font-size:14px; font-weight:600; color:#0A0A0A; flex:1; text-align:left;"><span style="color:#FF5757;">✕ </span>$50+/hour if you<br>want extra help</span>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:center; margin-top:48px; margin-bottom:36px;">
+          <div style="background:#0AE02D; color:#fff; font-size:17px; font-weight:700; padding:10px 28px; border-radius:50px;">Solution:</div>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:16px; position:relative;">
+          <div style="flex:1; text-align:center;">
+            <img src="/tousebro.webp" alt="Take a pic of their real lesson" loading="lazy" style="width:100%; max-width:140px; display:inline-block;"/>
+          </div>
+          <div style="flex:0 0 60px; display:flex; align-items:center; justify-content:center;">
+            <img src="/tousebro%20(2).webp" alt="arrow" loading="lazy" style="width:52px;"/>
+          </div>
+          <div style="flex:1; text-align:center;">
+            <img src="/tousebro%20(1).webp" alt="Practise as much as they need" loading="lazy" style="width:100%; max-width:140px; display:inline-block;"/>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-bottom:40px;">
+          <div style="flex:1; font-size:15px; font-weight:700; color:#0A0A0A; text-align:center; line-height:1.3;">Take a pic of<br>their real lesson</div>
+          <div style="flex:0 0 60px;"></div>
+          <div style="flex:1; font-size:15px; font-weight:700; color:#0A0A0A; text-align:center; line-height:1.3;">Practise as much<br>as they need!</div>
+        </div>
+        <button class="cta-btn" onclick="scrollToCard()">Try It Risk-Free for $1 →</button>
+      </div>
+
+      <!-- YOU'LL LOVE IT -->
+      <div style="padding:48px 20px 40px; text-align:center;">
+        <h2 style="font-size:32px; font-weight:700; color:#000; line-height:1.2; letter-spacing:-0.01em; margin-bottom:32px;">You'll love it!</h2>
+        <img
+          src="/imagetousebroforyoullloveitnewsection.webp"
+          alt="Anass & Ismail — Founder + brother"
+          loading="lazy"
+          style="width:100%; max-width:307px; aspect-ratio:307/384; object-fit:cover; border-radius:31px; display:block; margin:0 auto;"
+        />
+      </div>
+
+      <!-- GUARANTEE -->
+      <div style="padding:48px 20px 40px; text-align:center;">
+        <h2 style="font-size:32px; font-weight:700; color:#000; line-height:1.2; margin-bottom:32px; text-align:center;">... still not sure?</h2>
+        <img src="/badgegarantee365daystouse.webp" alt="365 Days Money Back Guarantee" width="160" height="160" loading="lazy" style="width:160px; height:160px; object-fit:contain; display:block; margin:0 auto 36px;"/>
+        <p style="font-size:20px; font-weight:500; color:#0A0A0A; line-height:1.6; margin-bottom:24px;">You have 365 days to decide if<br>Numio really helps your child,</p>
+        <p style="font-size:20px; font-weight:500; color:#0A0A0A; line-height:1.6; margin-bottom:24px;">If you're not satisfied, you can:</p>
+        <p style="font-size:20px; font-weight:700; color:#0A0A0A; line-height:1.6; margin-bottom:48px;">Cancel anytime<br>+ get 100% of your money back!</p>
+        <button class="cta-btn" onclick="scrollToCard()">Try It Risk-Free for $1 →</button>
+      </div>
+
+      <!-- FAQ -->
+      <div class="faq-wrap">
+        <div class="faq-title">Questions you may have</div>
+        <div class="mfaq-item open">
+          <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">Will this actually work for MY child?<span class="mfaq-icon">⌄</span></button>
+          <div class="mfaq-a">Yes. Numio works for any child aged 5–11, any subject, any grade. You take a picture of their actual lesson — so the practice is always built around exactly what they're learning right now. Not a generic child. Your child.</div>
+        </div>
+        <div class="mfaq-item">
+          <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">But won't my child just waste time on their phone?<span class="mfaq-icon">⌄</span></button>
+          <div class="mfaq-a">No. Numio is a short daily practice session — no ads, no videos, no social feed, nothing to get distracted by. Your child opens it, answers their questions, earns their coins, and closes it. That's the whole thing.</div>
+        </div>
+        <div class="mfaq-item">
+          <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">Will my child actually WANT to use this?<span class="mfaq-icon">⌄</span></button>
+          <div class="mfaq-a">Yes. Your child earns coins every time they complete their practice. You decide what those coins unlock — screen time, a snack, a toy, anything they already want. They come back on their own because the reward is waiting.</div>
+        </div>
+        <div class="mfaq-item">
+          <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">What if I pay and it doesn't help?<span class="mfaq-icon">⌄</span></button>
+          <div class="mfaq-a">Then you get every cent back. You have 365 days to try Numio with your child. If you don't feel it's helping them practice — message us and we refund every cent. No forms. No questions. No waiting.</div>
+        </div>
+      </div>
+
+    </div><!-- /inner -->
+  </div><!-- /#product-content -->
+
+</div><!-- /#product-wrapper -->
+
+
+<!-- POPUP (exit intent) -->
+<div id="popup-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#9D80FD; max-width:420px; width:100%; padding:48px 32px; position:relative; text-align:center; border-radius:20px;">
+    <button onclick="closePopup()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#fff;">✕</button>
+    <div style="font-size:clamp(28px,7vw,36px); font-weight:900; color:#fff; margin-bottom:24px;">🔓 Guarantee Unlocked</div>
+    <div style="font-size:clamp(20px,5vw,26px); font-weight:400; color:#fff; line-height:1.3; margin-bottom:40px;">Either your child practices more or you get your $1 back!</div>
+    <button onclick="closePopup(); scrollToCard();" style="display:block; width:100%; background:#3513A2; color:#fff; font-family:'Inter',sans-serif; font-size:18px; font-weight:700; border:none; border-radius:50px; padding:18px; cursor:pointer;">Try Numio for $1 →</button>
+  </div>
+</div>
+
+<!-- Big confetti canvas (for the unlock explosion) -->
+<canvas id="confetti-canvas" style="position:fixed; inset:0; pointer-events:none; z-index:10000; display:none;"></canvas>
+
+<!-- CHECKOUT MODAL -->
+<div id="checkout-overlay" style="display:none; position:fixed; inset:0; z-index:99999; background:rgba(26,10,60,0.72); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:16px;">
+  <div id="checkout-modal" style="background:white; border-radius:20px; width:100%; max-width:520px; max-height:92vh; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 24px 80px rgba(53,19,162,0.35);">
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px 14px; border-bottom:1.5px solid #E8D9F5; flex-shrink:0;">
+      <div>
+        <div style="font-size:12px; font-weight:800; color:#3513A2; text-transform:uppercase; letter-spacing:0.05em;">Numio · 30-Day Access</div>
+        <div style="font-size:20px; font-weight:900; color:#0A0A0A;">$1 <span style="font-size:13px; font-weight:400; color:#888;">/month</span></div>
+      </div>
+      <button onclick="closeCheckout()" style="width:32px; height:32px; border-radius:50%; background:#F3EDFF; border:none; cursor:pointer; font-size:18px; color:#3513A2; font-weight:700;">✕</button>
+    </div>
+    <div id="checkout-body" style="flex:1; overflow-y:auto; padding:20px; min-height:420px;">
+      <div id="checkout-loading" style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; min-height:380px;">
+        <div style="width:40px; height:40px; border:3px solid #E8D9F5; border-top-color:#3513A2; border-radius:50%; animation:spin 0.7s linear infinite;"></div>
+        <p style="font-size:13px; font-weight:700; color:#8B7BAE;">Loading secure checkout…</p>
+      </div>
+      <div id="checkout-error" style="display:none; text-align:center; padding:40px 20px; font-size:14px; color:#e53e3e;">Something went wrong. <a href="https://buy.stripe.com/6oUaEPgFL0G6cQ27rP7EQ0r" style="color:#3513A2;">Pay directly</a></div>
+      <div id="stripe-checkout-container"></div>
+    </div>
+    <div style="padding:10px 20px 14px; display:flex; gap:16px; justify-content:center; flex-wrap:wrap; border-top:1.5px solid #E8D9F5; flex-shrink:0;">
+      <span style="font-size:11px; font-weight:700; color:#8B7BAE;">✓ Secure payment</span>
+      <span style="font-size:11px; font-weight:700; color:#8B7BAE;">✓ SSL encrypted</span>
+      <span style="font-size:11px; font-weight:700; color:#8B7BAE;">✓ 365-day guarantee · min. 7-day trial</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── COUNTDOWN ──
+  const _end = new Date("2026-09-07T00:01:00").getTime();
+  function tick() {
+    const d = Math.max(0, _end - Date.now());
+    document.getElementById('t-h').textContent = String(Math.floor(d / 3600000)).padStart(2,'0');
+    document.getElementById('t-m').textContent = String(Math.floor((d % 3600000) / 60000)).padStart(2,'0');
+    document.getElementById('t-s').textContent = String(Math.floor((d % 60000) / 1000)).padStart(2,'0');
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ── VIDEO AUTOPLAY ──
+  document.addEventListener('DOMContentLoaded', function() {
+    ['vid1','vid2','vid3'].forEach(function(id) {
+      var v = document.getElementById(id);
+      if (!v) return;
+      v.muted = true;
+      var p = v.play();
+      if (p !== undefined) p.catch(function() {});
     });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCheckout(); });
-  </script>
+  });
+  document.addEventListener('touchstart', function tryPlay() {
+    ['vid1','vid2','vid3'].forEach(function(id) {
+      var v = document.getElementById(id); if (v && v.paused) { v.muted = true; v.play().catch(function(){}); }
+    });
+  }, { once: true });
+
+  // ── PARTY CONFETTI (continuous, on the blurred zone) ──
+  const partyCanvas = document.getElementById('party-canvas');
+  const partyCtx = partyCanvas.getContext('2d');
+  const PARTY_COLORS = ['#3513A2','#9D80FD','#C4B4FF','#34EB41','#FFE656','#fff','#673FE8','#FF5757'];
+  let partyPieces = [];
+  let partyAnim = null;
+
+  function resizePartyCanvas() {
+    const wrapper = document.getElementById('product-wrapper');
+    partyCanvas.width = wrapper.offsetWidth;
+    partyCanvas.height = wrapper.offsetHeight;
+  }
+
+  function spawnPartyPiece() {
+    return {
+      x: Math.random() * partyCanvas.width,
+      y: -12,
+      w: Math.random() * 11 + 5,
+      h: Math.random() * 5 + 3,
+      color: PARTY_COLORS[Math.floor(Math.random() * PARTY_COLORS.length)],
+      speed: Math.random() * 2.5 + 1,
+      angle: Math.random() * 360,
+      spin: Math.random() * 5 - 2.5,
+      drift: Math.random() * 1.5 - 0.75,
+      opacity: 0.75 + Math.random() * 0.25,
+    };
+  }
+
+  function runParty() {
+    resizePartyCanvas();
+    // Spawn a few per frame
+    if (partyPieces.length < 120) {
+      for (let i = 0; i < 2; i++) partyPieces.push(spawnPartyPiece());
+    }
+    partyCtx.clearRect(0, 0, partyCanvas.width, partyCanvas.height);
+    partyPieces = partyPieces.filter(p => p.y < partyCanvas.height + 20);
+    partyPieces.forEach(p => {
+      partyCtx.save();
+      partyCtx.globalAlpha = p.opacity;
+      partyCtx.translate(p.x, p.y);
+      partyCtx.rotate(p.angle * Math.PI / 180);
+      partyCtx.fillStyle = p.color;
+      partyCtx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      partyCtx.restore();
+      p.y += p.speed; p.x += p.drift; p.angle += p.spin;
+    });
+    partyAnim = requestAnimationFrame(runParty);
+  }
+
+  // Start the party immediately
+  window.addEventListener('load', function() {
+    resizePartyCanvas();
+    runParty();
+  });
+  window.addEventListener('resize', resizePartyCanvas);
+
+  // ── BIG UNLOCK CONFETTI (full screen explosion) ──
+  const bigCanvas = document.getElementById('confetti-canvas');
+  const bigCtx = bigCanvas.getContext('2d');
+  let bigPieces = [], bigAnim;
+
+  function launchBigConfetti() {
+    bigCanvas.style.display = 'block';
+    bigCanvas.width = window.innerWidth;
+    bigCanvas.height = window.innerHeight;
+    bigPieces = [];
+    for (let i = 0; i < 220; i++) {
+      bigPieces.push({
+        x: Math.random() * bigCanvas.width,
+        y: Math.random() * -bigCanvas.height * 0.5,
+        w: Math.random() * 13 + 6,
+        h: Math.random() * 7 + 4,
+        color: PARTY_COLORS[Math.floor(Math.random() * PARTY_COLORS.length)],
+        speed: Math.random() * 5 + 2,
+        angle: Math.random() * 360,
+        spin: Math.random() * 8 - 4,
+        drift: Math.random() * 3 - 1.5,
+      });
+    }
+    animateBig();
+    setTimeout(() => {
+      cancelAnimationFrame(bigAnim);
+      bigCanvas.style.display = 'none';
+    }, 3000);
+  }
+
+  function animateBig() {
+    bigCtx.clearRect(0, 0, bigCanvas.width, bigCanvas.height);
+    bigPieces.forEach(p => {
+      bigCtx.save();
+      bigCtx.translate(p.x, p.y);
+      bigCtx.rotate(p.angle * Math.PI / 180);
+      bigCtx.fillStyle = p.color;
+      bigCtx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+      bigCtx.restore();
+      p.y += p.speed; p.x += p.drift; p.angle += p.spin;
+    });
+    bigAnim = requestAnimationFrame(animateBig);
+  }
+
+  // ── UNLOCK MECHANIC ──
+  let unlocked = false;
+
+  function unlockProduct() {
+    if (unlocked) return;
+    unlocked = true;
+
+    // Haptic on mobile
+    if (navigator.vibrate) navigator.vibrate([80, 40, 80]);
+
+    // Fire big confetti
+    launchBigConfetti();
+
+    // Fade out overlay
+    const overlay = document.getElementById('unlock-overlay');
+    overlay.classList.add('hidden');
+
+    // Stop party confetti after a beat
+    setTimeout(() => {
+      cancelAnimationFrame(partyAnim);
+      partyCtx.clearRect(0, 0, partyCanvas.width, partyCanvas.height);
+    }, 3200);
+
+    // Unblur content
+    setTimeout(() => {
+      document.getElementById('product-content').classList.add('unlocked');
+      overlay.style.display = 'none';
+    }, 700);
+
+    // Show congrats banner
+    setTimeout(() => {
+      const banner = document.getElementById('congrats-banner');
+      banner.classList.add('show');
+      // Smooth scroll to the banner / offer card
+      banner.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 900);
+  }
+
+  // ── EXIT INTENT POPUP ──
+  let lastScrollY = window.scrollY, maxScrolledDown = 0, upwardStart = null;
+  const minScrolledDown = 300, minScrolledUp = 80;
+  let popupShown = false;
+
+  function closePopup() { document.getElementById('popup-overlay').style.display = 'none'; }
+  function showPopup() {
+    if (popupShown || !unlocked) return; // only show after unlock
+    popupShown = true;
+    document.getElementById('popup-overlay').style.display = 'flex';
+    launchBigConfetti();
+  }
+
+  window.addEventListener('scroll', function() {
+    const currentY = window.scrollY;
+    if (popupShown) return;
+    if (currentY > maxScrolledDown) { maxScrolledDown = currentY; upwardStart = null; }
+    if (currentY < lastScrollY) {
+      if (upwardStart === null) upwardStart = lastScrollY;
+      if (maxScrolledDown >= minScrolledDown && (upwardStart - currentY) >= minScrolledUp) showPopup();
+    } else { upwardStart = null; }
+    lastScrollY = currentY;
+  }, { passive: true });
+
+  document.getElementById('popup-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closePopup();
+  });
+
+  // ── SCROLL TO CARD ──
+  function scrollToCard() {
+    document.getElementById('offer-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ── CHECKOUT ──
+  const SUPABASE_URL  = 'https://lyedpfhzrvyaskmzhyhl.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0';
+  const STRIPE_PK     = 'pk_live_51Nu0S3F3Ob4o24uqvgOJGlSwUt5Bi6aWVFzweQddyD9A8FDAFNykkpZbIDq1o9ZhK09tt9pH8fw3MMLUvDRx2Eea00gLhad5Yg';
+  let stripeInstance = null, checkoutInstance = null;
+
+  async function goToCheckout() {
+    if (typeof fbq !== 'undefined') fbq('track', 'InitiateCheckout');
+    await new Promise(resolve => loadStripe(resolve));
+    const overlay   = document.getElementById('checkout-overlay');
+    const loading   = document.getElementById('checkout-loading');
+    const errBox    = document.getElementById('checkout-error');
+    const container = document.getElementById('stripe-checkout-container');
+    overlay.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    loading.style.display = 'flex';
+    errBox.style.display  = 'none';
+    container.innerHTML   = '';
+    try {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON}`, 'apikey': SUPABASE_ANON },
+        body: JSON.stringify({ origin: window.location.origin }),
+      });
+      const { clientSecret, error } = await res.json();
+      if (error) throw new Error(error);
+      if (!stripeInstance) stripeInstance = Stripe(STRIPE_PK);
+      checkoutInstance = await stripeInstance.initEmbeddedCheckout({ clientSecret });
+      loading.style.display = 'none';
+      checkoutInstance.mount('#stripe-checkout-container');
+    } catch (err) {
+      console.error('Checkout error:', err);
+      loading.style.display = 'none';
+      errBox.style.display  = 'block';
+    }
+  }
+
+  function closeCheckout() {
+    document.getElementById('checkout-overlay').style.display = 'none';
+    document.body.style.overflow = '';
+    if (checkoutInstance) { checkoutInstance.destroy(); checkoutInstance = null; }
+    document.getElementById('stripe-checkout-container').innerHTML = '';
+    document.getElementById('checkout-loading').style.display = 'flex';
+    document.getElementById('checkout-error').style.display   = 'none';
+  }
+
+  document.getElementById('checkout-overlay').addEventListener('click', function(e) { if (e.target === this) closeCheckout(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCheckout(); });
+</script>
 
 </body>
 </html>
