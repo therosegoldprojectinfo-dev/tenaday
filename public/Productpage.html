@@ -155,22 +155,29 @@
       justify-content: flex-start;
       padding-top: 80px;
       padding-bottom: 40px;
-      background: linear-gradient(
-        to bottom,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(243, 237, 255, 0.85) 25%
-      );
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      mask-image: linear-gradient(to bottom, transparent 0%, black 15%);
-      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%);
-      box-shadow: none;
-      border-top: none;
       transition: opacity 0.7s ease;
     }
     #unlock-overlay.hidden {
       opacity: 0;
       pointer-events: none;
+    }
+
+    /* Blur layer sits behind the button, with the mask gradient */
+    #unlock-overlay::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(243, 237, 255, 0.85) 25%
+      );
+      mask-image: linear-gradient(to bottom, transparent 0%, black 15%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%);
+      box-shadow: none;
     }
 
     /* Sticky unlock button inside overlay */
