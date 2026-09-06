@@ -153,10 +153,17 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      padding-top: 60px;
-      background: rgba(53, 19, 162, 0.18);
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
+      padding-top: 80px;
+      padding-bottom: 40px;
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(243, 237, 255, 0.85) 25%
+      );
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: none;
+      box-shadow: 0 -20px 40px -20px rgba(0, 0, 0, 0.05);
       transition: opacity 0.7s ease;
     }
     #unlock-overlay.hidden {
@@ -452,9 +459,6 @@
       <button id="unlock-btn" onclick="unlockProduct()">
         🎟️ Unlock your First Parent Discount!
       </button>
-      <div class="unlock-hint">
-        365-day money-back guarantee
-      </div>
     </div>
   </div>
 
