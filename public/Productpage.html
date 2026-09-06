@@ -479,26 +479,34 @@
       launchConfetti();
     }
 
-    // Show popup when user scrolls down then reverses direction (scrolls back up)
+    // Show popup when user scrolls down then intentionally scrolls back up
     let lastScrollY = window.scrollY;
-    let lastDir = null;
     let maxScrolledDown = 0;
-    const minScrolledDown = 300; // must have scrolled at least 300px down first
+    let upwardStart = null;
+    const minScrolledDown = 300;  // must have gone down at least 300px first
+    const minScrolledUp = 80;     // must scroll up at least 80px to count as intentional
 
     window.addEventListener('scroll', function() {
       const currentY = window.scrollY;
       if (popupShown) return;
 
-      if (currentY > maxScrolledDown) maxScrolledDown = currentY;
-
-      const dir = currentY < lastScrollY ? 'up' : 'down';
-
-      // Trigger: direction just flipped from down to up, and user has scrolled enough
-      if (dir === 'up' && lastDir === 'down' && maxScrolledDown >= minScrolledDown) {
-        showPopup();
+      if (currentY > maxScrolledDown) {
+        maxScrolledDown = currentY;
+        upwardStart = null; // reset upward tracking whenever going further down
       }
 
-      lastDir = dir;
+      if (currentY < lastScrollY) {
+        // scrolling up
+        if (upwardStart === null) upwardStart = lastScrollY; // mark where up began
+        const upwardDistance = upwardStart - currentY;
+        if (maxScrolledDown >= minScrolledDown && upwardDistance >= minScrolledUp) {
+          showPopup();
+        }
+      } else {
+        // scrolling down — reset upward tracking
+        upwardStart = null;
+      }
+
       lastScrollY = currentY;
     }, { passive: true });
 
