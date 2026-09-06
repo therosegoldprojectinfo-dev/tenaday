@@ -4,6 +4,7 @@
     { "source": "/terms",       "destination": "/terms.html"       },
     { "source": "/testing",     "destination": "/testing.html"     },
     { "source": "/Productpage", "destination": "/Productpage.html" },
+    { "source": "/learnmore",   "destination": "/learnmore.html"   },
     { "source": "/(.*)",        "destination": "/index.html"       }
   ]
 }
