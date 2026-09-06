@@ -162,8 +162,10 @@
       );
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      mask-image: linear-gradient(to bottom, transparent 0%, black 15%);
+      -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%);
+      box-shadow: none;
       border-top: none;
-      box-shadow: 0 -20px 40px -20px rgba(0, 0, 0, 0.05);
       transition: opacity 0.7s ease;
     }
     #unlock-overlay.hidden {
