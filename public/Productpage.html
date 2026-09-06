@@ -300,21 +300,7 @@
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════
-     TOP BANNER (sticky, always on top)
-══════════════════════════════════════════ -->
-<div style="background:#3513A2; padding:14px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; width:100%; position:sticky; top:0; z-index:1000;">
-  <div style="display:flex; flex-direction:column; gap:2px;">
-    <div style="font-size:13px; font-weight:900; color:#fff; letter-spacing:0.02em; line-height:1.2;">🚨 80% OFF ENDS IN:</div>
-    <div style="font-size:16px; font-weight:300; color:#fff; letter-spacing:0.05em; font-family:'Inter',sans-serif; text-align:center;">
-      <span id="t-h">00</span> : <span id="t-m">00</span> : <span id="t-s">00</span>
-    </div>
-  </div>
-  <div style="background:#673FE8; border:1px solid #fff; border-radius:50px; padding:10px 14px; text-align:center; flex-shrink:0; max-width:200px;">
-    <div style="font-size:12px; font-weight:500; color:#fff; line-height:1.4; white-space:nowrap;">😱 First Parents Special</div>
-    <div style="font-size:12px; font-weight:700; color:#fff; line-height:1.4; white-space:nowrap;">Get 80% off today</div>
-  </div>
-</div>
+
 
 <!-- ══════════════════════════════════════════
      LEARN MORE SECTION
@@ -706,15 +692,7 @@
 </div>
 
 <script>
-  // ── COUNTDOWN ──
-  const _end = new Date("2026-09-07T00:01:00").getTime();
-  function tick() {
-    const d = Math.max(0, _end - Date.now());
-    document.getElementById('t-h').textContent = String(Math.floor(d / 3600000)).padStart(2,'0');
-    document.getElementById('t-m').textContent = String(Math.floor((d % 3600000) / 60000)).padStart(2,'0');
-    document.getElementById('t-s').textContent = String(Math.floor((d % 60000) / 1000)).padStart(2,'0');
-  }
-  tick(); setInterval(tick, 1000);
+
 
   // ── VIDEO AUTOPLAY ──
   document.addEventListener('DOMContentLoaded', function() {
@@ -883,16 +861,8 @@
     launchBigConfetti();
   }
 
-  window.addEventListener('scroll', function() {
-    const currentY = window.scrollY;
-    if (popupShown) return;
-    if (currentY > maxScrolledDown) { maxScrolledDown = currentY; upwardStart = null; }
-    if (currentY < lastScrollY) {
-      if (upwardStart === null) upwardStart = lastScrollY;
-      if (maxScrolledDown >= minScrolledDown && (upwardStart - currentY) >= minScrolledUp) showPopup();
-    } else { upwardStart = null; }
-    lastScrollY = currentY;
-  }, { passive: true });
+  // EXIT INTENT POPUP TEMPORARILY DISABLED
+  // window.addEventListener('scroll', function() { ... });
 
   document.getElementById('popup-overlay').addEventListener('click', function(e) {
     if (e.target === this) closePopup();
