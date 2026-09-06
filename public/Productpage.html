@@ -173,7 +173,7 @@
 
     <!-- OFFER SECTION -->
     <div style="padding: 40px 16px 0;">
-      <div style="font-size: 32px; font-weight: 500; color: #000; line-height: 1.2; margin-bottom: 24px;">Turn real lessons into<br>unlimited practise</div>
+      <div style="font-size: 32px; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 24px;">Turn real lessons into<br>unlimited practise</div>
       <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 28px;">
         <span style="font-size: 14px; font-weight: 500; color: #888; text-decoration: line-through;">$5/month</span>
         <span style="font-size: 28px; font-weight: 500; color: #0A0A0A;">$1/month</span>
@@ -290,7 +290,7 @@
 
     <!-- HOW DOES IT HELP -->
     <div style="padding: 48px 20px 40px; text-align: center;">
-      <h2 style="font-size: 32px; font-weight: 500; color: #000; line-height: 1.2; margin-bottom: 48px; text-align: center;">Here's how it will<br>help you today:</h2>
+      <h2 style="font-size: 32px; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 48px; text-align: center;">Here's how it will<br>help you today:</h2>
       <div style="margin-bottom: 40px;">
         <img src="/Target.webp" alt="Target" width="56" height="56" loading="lazy" style="width: 56px; height: 56px; margin-bottom: 16px;"/>
         <p style="font-size: 20px; color: #0A0A0A; line-height: 1.5;">They practise <strong>EXACTLY</strong><br>what they're learning at school</p>
@@ -308,7 +308,7 @@
 
     <!-- WHY NUMIO -->
     <div style="padding: 48px 20px 40px; text-align: center;">
-      <h2 style="font-size: 32px; font-weight: 500; color: #000; line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 48px; text-align: center;">Why is Numio<br>the best option<br>to help your<br>child practise?</h2>
+      <h2 style="font-size: 32px; font-weight: 700; color: #000; line-height: 1.2; letter-spacing: -0.01em; margin-bottom: 48px; text-align: center;">Why is Numio<br>the best option<br>to help your<br>child practise?</h2>
       <div style="display: flex; margin-bottom: 28px;">
         <div style="flex: 1;"></div>
         <div style="flex: 1; display: flex; justify-content: flex-start;">
@@ -364,7 +364,7 @@
 
     <!-- GUARANTEE SECTION -->
     <div style="padding: 48px 20px 40px; text-align: center;">
-      <h2 style="font-size: 32px; font-weight: 500; color: #000; line-height: 1.2; margin-bottom: 32px; text-align: center;">... still not sure?</h2>
+      <h2 style="font-size: 32px; font-weight: 700; color: #000; line-height: 1.2; margin-bottom: 32px; text-align: center;">... still not sure?</h2>
       <img src="/badgegarantee365daystouse.webp" alt="365 Days Money Back Guarantee" width="160" height="160" loading="lazy" style="width: 160px; height: 160px; object-fit: contain; display: block; margin: 0 auto 36px;"/>
       <p style="font-size: 20px; font-weight: 500; color: #0A0A0A; line-height: 1.6; margin-bottom: 24px;">You have 365 days to decide if<br>Numio really helps your child,</p>
       <p style="font-size: 20px; font-weight: 500; color: #0A0A0A; line-height: 1.6; margin-bottom: 24px;">If you're not satisfied, you can:</p>
@@ -471,26 +471,37 @@
     }
 
     function closePopup() { document.getElementById('popup-overlay').style.display = 'none'; }
-    let popupShown = false, priceCardTimer = null;
+    let popupShown = false;
     function showPopup() {
       if (popupShown) return;
       popupShown = true;
       document.getElementById('popup-overlay').style.display = 'flex';
       launchConfetti();
     }
-    const priceCard = document.querySelector('.price-card-trigger');
-    if (priceCard) {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            if (!priceCardTimer) priceCardTimer = setTimeout(showPopup, 3000);
-          } else {
-            clearTimeout(priceCardTimer); priceCardTimer = null;
-          }
-        });
-      }, { threshold: 0.3 });
-      observer.observe(priceCard);
-    }
+
+    // Show popup when user scrolls down then reverses direction (scrolls back up)
+    let lastScrollY = window.scrollY;
+    let lastDir = null;
+    let maxScrolledDown = 0;
+    const minScrolledDown = 300; // must have scrolled at least 300px down first
+
+    window.addEventListener('scroll', function() {
+      const currentY = window.scrollY;
+      if (popupShown) return;
+
+      if (currentY > maxScrolledDown) maxScrolledDown = currentY;
+
+      const dir = currentY < lastScrollY ? 'up' : 'down';
+
+      // Trigger: direction just flipped from down to up, and user has scrolled enough
+      if (dir === 'up' && lastDir === 'down' && maxScrolledDown >= minScrolledDown) {
+        showPopup();
+      }
+
+      lastDir = dir;
+      lastScrollY = currentY;
+    }, { passive: true });
+
     document.getElementById('popup-overlay').addEventListener('click', function(e) {
       if (e.target === this) closePopup();
     });
