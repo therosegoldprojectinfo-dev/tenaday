@@ -378,7 +378,10 @@
     .mfaq-a { font-size: 15px; color: #555; line-height: 1.75; padding-bottom: 20px; display: none; font-weight: 400; }
     .mfaq-item.open .mfaq-a { display: block; }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pointDown {
+      from { transform: translateY(0); }
+      to   { transform: translateY(10px); }
+    }
     @keyframes bannerIn {
       from { opacity: 0; transform: translateY(-20px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -557,6 +560,7 @@
   <!-- Frosted glass overlay with unlock button -->
   <div id="unlock-overlay">
     <div id="unlock-btn-wrap">
+      <div style="text-align:center; font-size:32px; line-height:1; margin-bottom:8px; animation: pointDown 0.8s ease-in-out infinite alternate;">👇👇</div>
       <button id="unlock-btn" onclick="unlockProduct()">
         🎟️ Unlock your First Parent Discount!
       </button>
