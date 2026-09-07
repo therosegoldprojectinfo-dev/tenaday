@@ -661,50 +661,40 @@
         </div>
       </div>
 
-      <!-- HOW IT WORKS -->
-      <div class="how-section">
-        <div class="how-title">How does it work?</div>
-        <div class="how-zigzag">
-          <div class="how-step">
-            <video id="vid1" autoplay muted loop playsinline preload="auto" fetchpriority="high">
-              <source src="/1%20They%20study%20their%20%20lesson.mp4" type="video/mp4"/>
-            </video>
-            <div class="step-label">#1 They study their lesson</div>
+      <!-- VSL VIDEO IN PRODUCT SECTION -->
+      <div style="padding:40px 16px 0;">
+        <h2 style="font-size:24px; font-weight:700; color:#000; text-align:center; margin-bottom:20px; line-height:1.3;">Here's how it works in 16 seconds:</h2>
+        <div id="vsl-wrap2" style="position:relative; width:100%; cursor:pointer;" onclick="loadVSL2()">
+          <img src="/videoposter.webp" alt="Watch how Numio works" width="1280" height="720" style="width:100%; border-radius:18px; display:block; height:auto;"/>
+          <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:18px; background:rgba(0,0,0,0.2);">
+            <div style="width:64px; height:64px; background:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+              <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="#3513A2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            </div>
           </div>
-          <div class="how-step">
-            <video id="vid2" autoplay muted loop playsinline preload="none">
-              <source src="/2%20Take%20a%20picture%20of%20%20their%20school%20lesson.mp4" type="video/mp4"/>
-            </video>
-            <div class="step-label">#2 Take a picture of their school lesson</div>
-          </div>
-          <div class="how-step">
-            <video id="vid3" autoplay muted loop playsinline preload="none">
-              <source src="/3%20Practise%20as%20%20mush%20as%20they%20want!.mp4" type="video/mp4"/>
-            </video>
-            <div class="step-label">#3 Practise as much as they want!</div>
-          </div>
+          <div style="position:absolute; bottom:12px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.55); color:#fff; font-size:13px; font-weight:700; padding:6px 14px; border-radius:50px; white-space:nowrap; backdrop-filter:blur(4px);">▶ Tap to watch</div>
         </div>
-        <div class="how-thats-it">That's it!</div>
-        <div style="padding:0 0 48px;">
-          <button onclick="scrollToCard()" style="display:block; width:100%; background:#3513A2; color:#fff; font-family:'Inter',sans-serif; font-size:20px; font-weight:500; border:none; border-radius:20px; padding:14px 20px; cursor:pointer; transition:filter 0.2s;">Try It Risk-Free for $1 →</button>
-        </div>
+        <button onclick="goToCheckout()" style="display:block; width:100%; background:#3513A2; color:#fff; font-family:'Inter',sans-serif; font-size:18px; font-weight:700; border:none; border-radius:50px; padding:16px 20px; cursor:pointer; margin-top:20px;">Access now for just $1 →</button>
       </div>
 
-      <!-- HERE'S HOW IT WILL HELP -->
+      <!-- 4 THINGS NUMIO WILL CHANGE -->
+      <div style="padding:48px 16px 0; text-align:center;">
+        <h2 style="font-size:29px; font-weight:700; color:#000; line-height:1.2; margin-bottom:32px;">4 things Numio will change for you:</h2>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:28px;">
+          <div style="aspect-ratio:143/172; border:3px solid #3513A2; border-radius:23px; background:#fff;"></div>
+          <div style="aspect-ratio:143/172; border:3px solid #3513A2; border-radius:23px; background:#fff;"></div>
+          <div style="aspect-ratio:143/172; border:3px solid #3513A2; border-radius:23px; background:#fff;"></div>
+          <div style="aspect-ratio:143/172; border:3px solid #3513A2; border-radius:23px; background:#fff;"></div>
+        </div>
+        <button onclick="goToCheckout()" style="display:block; width:100%; background:#3513A2; color:#fff; font-family:'Inter',sans-serif; font-size:18px; font-weight:700; border:none; border-radius:50px; padding:16px 20px; cursor:pointer; margin-bottom:0;">Access now for just $1 →</button>
+      </div>
+
+      <!-- GUARANTEE -->
       <div style="padding:48px 20px 40px; text-align:center;">
-        <h2 style="font-size:32px; font-weight:700; color:#000; line-height:1.2; margin-bottom:48px; text-align:center;">Here's how it will<br>help you today:</h2>
-        <div style="margin-bottom:40px;">
-          <img src="/Target.webp" alt="Target" width="56" height="56" loading="lazy" style="width:56px; height:56px; margin-bottom:16px;"/>
-          <p style="font-size:20px; color:#0A0A0A; line-height:1.5;">They practise <strong>EXACTLY</strong><br>what they're learning at school</p>
-        </div>
-        <div style="margin-bottom:40px;">
-          <img src="/Check%20circle.webp" alt="Check" width="56" height="56" loading="lazy" style="width:56px; height:56px; margin-bottom:16px;"/>
-          <p style="font-size:20px; color:#0A0A0A; line-height:1.5;">They can practise <strong>as much<br>as they need</strong> until<br>they understand perfectly!</p>
-        </div>
-        <div style="margin-bottom:48px;">
-          <img src="/tousebro%20(5).webp" alt="Relax" width="56" height="56" loading="lazy" style="width:56px; height:56px; margin-bottom:16px;"/>
-          <p style="font-size:20px; color:#0A0A0A; line-height:1.5;">...and you don't have<br>to do <strong>anything!</strong></p>
-        </div>
+        <h2 style="font-size:32px; font-weight:700; color:#000; line-height:1.2; margin-bottom:32px; text-align:center;">... still not sure?</h2>
+        <img src="/badgegarantee365daystouse.webp" alt="365 Days Money Back Guarantee" width="160" height="160" loading="lazy" style="width:160px; height:160px; aspect-ratio:1/1; object-fit:contain; display:block; margin:0 auto 36px;"/>
+        <p style="font-size:20px; font-weight:500; color:#0A0A0A; line-height:1.6; margin-bottom:24px;">You have 365 days to decide if<br>Numio really helps your child,</p>
+        <p style="font-size:20px; font-weight:500; color:#0A0A0A; line-height:1.6; margin-bottom:24px;">If you're not satisfied, you can:</p>
+        <p style="font-size:20px; font-weight:700; color:#0A0A0A; line-height:1.6; margin-bottom:48px;">Cancel anytime<br>+ get 100% of your money back!</p>
         <button class="cta-btn" onclick="scrollToCard()">Try It Risk-Free for $1 →</button>
       </div>
 
@@ -720,16 +710,6 @@
             style="width:100%; aspect-ratio:307/384; object-fit:cover; display:block;"
           />
         </div>
-      </div>
-
-      <!-- GUARANTEE -->
-      <div style="padding:48px 20px 40px; text-align:center;">
-        <h2 style="font-size:32px; font-weight:700; color:#000; line-height:1.2; margin-bottom:32px; text-align:center;">... still not sure?</h2>
-        <img src="/badgegarantee365daystouse.webp" alt="365 Days Money Back Guarantee" width="160" height="160" loading="lazy" style="width:160px; height:160px; aspect-ratio:1/1; object-fit:contain; display:block; margin:0 auto 36px;"/>
-        <p style="font-size:20px; font-weight:500; color:#0A0A0A; line-height:1.6; margin-bottom:24px;">You have 365 days to decide if<br>Numio really helps your child,</p>
-        <p style="font-size:20px; font-weight:500; color:#0A0A0A; line-height:1.6; margin-bottom:24px;">If you're not satisfied, you can:</p>
-        <p style="font-size:20px; font-weight:700; color:#0A0A0A; line-height:1.6; margin-bottom:48px;">Cancel anytime<br>+ get 100% of your money back!</p>
-        <button class="cta-btn" onclick="scrollToCard()">Try It Risk-Free for $1 →</button>
       </div>
 
       <!-- FAQ -->
@@ -784,8 +764,17 @@
     wrap.onclick = null;
     wrap.innerHTML = '<video id="vsl-video" autoplay loop playsinline preload="auto" style="width:100%; border-radius:18px; display:block;"><source src="/videotouse.webm" type="video/webm"/><source src="/videotouse.mp4" type="video/mp4"/></video>';
     const v = document.getElementById('vsl-video');
-    v.muted = false;
-    v.volume = 1;
+    v.muted = false; v.volume = 1;
+    v.play().catch(() => { v.muted = true; v.play(); });
+  }
+
+  function loadVSL2() {
+    const wrap = document.getElementById('vsl-wrap2');
+    if (!wrap) return;
+    wrap.onclick = null;
+    wrap.innerHTML = '<video autoplay loop playsinline preload="auto" style="width:100%; border-radius:18px; display:block;"><source src="/videotouse.webm" type="video/webm"/><source src="/videotouse.mp4" type="video/mp4"/></video>';
+    const v = wrap.querySelector('video');
+    v.muted = false; v.volume = 1;
     v.play().catch(() => { v.muted = true; v.play(); });
   }
 
