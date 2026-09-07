@@ -422,7 +422,7 @@
       <div class="how-label">How does it work?</div>
 
       <!-- VSL video -->
-      <video autoplay muted loop playsinline preload="auto" style="width:100%; border-radius:18px; display:block; margin-bottom:28px;">
+      <video id="vsl-video" autoplay muted loop playsinline preload="auto" controls style="width:100%; border-radius:18px; display:block; margin-bottom:28px;">
         <source src="/videotouse.mp4" type="video/mp4"/>
       </video>
 
@@ -800,6 +800,18 @@
 
 <script>
 
+
+  // ── VSL VIDEO — unmute on first touch ──
+  document.addEventListener('touchstart', function unmuteVSL() {
+    const vsl = document.getElementById('vsl-video');
+    if (vsl) { vsl.muted = false; vsl.volume = 1; }
+    document.removeEventListener('touchstart', unmuteVSL);
+  }, { once: true });
+  document.addEventListener('click', function unmuteVSLClick() {
+    const vsl = document.getElementById('vsl-video');
+    if (vsl) { vsl.muted = false; vsl.volume = 1; }
+    document.removeEventListener('click', unmuteVSLClick);
+  }, { once: true });
 
   // ── VIDEO AUTOPLAY ──
   document.addEventListener('DOMContentLoaded', function() {
