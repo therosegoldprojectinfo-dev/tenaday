@@ -54,6 +54,7 @@
       font-size: 16px;
       line-height: 1.6;
       overflow-x: hidden;
+      padding-top: 58px;
     }
     .inner { max-width: 480px; margin: 0 auto; }
 
@@ -72,7 +73,7 @@
   #progress-wrap.gone {
     opacity: 0;
     pointer-events: none;
-    transform: translateY(-100%);
+    visibility: hidden;
   }
   #progress-row {
     display: flex;
@@ -531,13 +532,13 @@
           <div style="font-size:28px; font-weight:700; color:#0A0A0A; margin-bottom:32px;">Or simply:</div>
           <div style="display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:16px;">
             <div style="flex:1; text-align:center;">
-              <img src="/tousebro.webp" alt="Take a pic of their real lesson" loading="lazy" width="140" height="280" style="width:100%; max-width:140px; display:inline-block; height:auto;"/>
+              <img src="/tousebro.webp" alt="Take a pic of their real lesson" loading="lazy" width="140" height="240" style="width:100%; max-width:140px; display:inline-block; aspect-ratio:140/240; height:auto;"/>
             </div>
             <div style="flex:0 0 60px; display:flex; align-items:center; justify-content:center;">
               <img src="/tousebro%20(2).webp" alt="arrow" loading="lazy" width="52" height="52" style="width:52px; height:auto;"/>
             </div>
             <div style="flex:1; text-align:center;">
-              <img src="/tousebro%20(1).webp" alt="Practise as much as they need" loading="lazy" width="140" height="280" style="width:100%; max-width:140px; display:inline-block; height:auto;"/>
+              <img src="/tousebro%20(1).webp" alt="Practise as much as they need" loading="lazy" width="140" height="240" style="width:100%; max-width:140px; display:inline-block; aspect-ratio:140/240; height:auto;"/>
             </div>
           </div>
           <div style="display:flex; gap:8px; margin-bottom:48px;">
@@ -1004,12 +1005,7 @@
   }
 
   window.addEventListener('scroll', updateProgress, { passive: true });
-  window.addEventListener('load', function() {
-    updateProgress();
-    // Set body padding to exact height of progress bar
-    const barH = document.getElementById('progress-wrap').offsetHeight;
-    document.body.style.paddingTop = barH + 'px';
-  });
+  window.addEventListener('load', updateProgress);
 
   // ── BANNER COUNTDOWN ──
   const _bannerEnd = new Date("2026-09-08T00:00:00").getTime();
