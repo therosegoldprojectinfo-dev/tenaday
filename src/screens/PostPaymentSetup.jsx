@@ -12,6 +12,15 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
   const [error,    setError]    = useState('')
   const [loading,  setLoading]  = useState(false)
 
+  // Fire FB Purchase event once on mount
+  useEffect(() => {
+    try {
+      if (typeof window.fbq === 'function') {
+        window.fbq('track', 'Purchase', { value: 1.00, currency: 'USD' })
+      }
+    } catch (e) { console.warn('FB pixel error:', e) }
+  }, [])
+
   // Fetch email directly from Stripe via edge function
   useEffect(() => {
     if (!sessionId) return
