@@ -5,6 +5,7 @@
     { "source": "/testing",     "destination": "/testing.html"     },
     { "source": "/Productpage", "destination": "/Productpage.html" },
     { "source": "/learnmore",   "destination": "/learnmore.html"   },
+    { "source": "/numiopage",   "destination": "/numiopage.html"   },
     { "source": "/(.*)",        "destination": "/index.html"       }
   ]
 }
