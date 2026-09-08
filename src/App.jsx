@@ -21,10 +21,14 @@ import Paywall from './screens/Paywall'
 import { LangContext } from './lib/LangContext'
 import { KidContext } from './lib/KidContext'
 import { getExamsForChapter } from './lib/chapters'
+import TeacherPrototype from './screens/TeacherPrototype'
 
 const HIDE_NAV = ['quiz', 'scan', 'quiz_intro']
 
 export default function App() {
+  const isProto = new URLSearchParams(window.location.search).get('proto') === 'teacher'
+  if (isProto) return <TeacherPrototype />
+
   const [authReady, setAuthReady]     = useState(false)
   const [streak, setStreak]           = useState(0)
   const [lang, setLang]               = useState('en')
