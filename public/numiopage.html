@@ -43,7 +43,7 @@
       font-size: 16px;
       line-height: 1.6;
       overflow-x: hidden;
-      padding-top: 58px;
+      padding-top: 0;
     }
     .inner { max-width: 480px; margin: 0 auto; }
 
@@ -204,14 +204,7 @@
 </head>
 <body>
 
-<!-- PROGRESS BAR -->
-<div id="progress-wrap">
-  <div id="progress-row">
-    <div id="progress-track"><div id="progress-bar-fill"></div></div>
-    <div id="progress-gift-icon">🎁</div>
-  </div>
-  <div id="progress-sublabel">⏱️ <strong>60 sec read time</strong></div>
-</div>
+
 
 <!-- ══════════════════════════════════════════
      LEARN MORE SECTION (always visible)
@@ -334,6 +327,7 @@
       </div>
 
       <!-- OFFER CARD -->
+      <div style="padding:0 16px 0;">
         <div id="offer-card" style="border:3px solid #3513A2; border-radius:35px; background:#fff; padding:32px 24px 28px; margin-bottom:0;">
           <div style="display:flex; align-items:center; gap:14px; margin-bottom:28px;">
             <img src="/numioultimateimage.png" alt="Numio" width="52" height="52" loading="lazy" style="width:52px;height:52px;border-radius:14px;flex-shrink:0;object-fit:cover;"/>
@@ -371,6 +365,7 @@
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       <!-- VSL VIDEO -->
@@ -495,14 +490,10 @@
       <!-- YOU'LL LOVE IT -->
       <div style="padding:48px 20px 40px; text-align:center;">
         <h2 style="font-size:32px; font-weight:700; color:#000; line-height:1.2; letter-spacing:-0.01em; margin-bottom:32px;">You'll love it!</h2>
-        <div style="width:100%; max-width:307px; margin:0 auto; border-radius:31px; overflow:hidden; position:relative;">
+        <div style="width:100%; max-width:307px; margin:0 auto; border-radius:31px; overflow:hidden;">
           <img src="/imagetousebroforyoullloveitnewsection.webp" alt="Anass & Ismail — Founder + brother"
             loading="lazy" width="307" height="384"
             style="width:100%; aspect-ratio:307/384; object-fit:cover; display:block;"/>
-          <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(0,0,0,0.55); padding:14px 16px; text-align:left;">
-            <p style="font-size:13px; font-weight:500; color:#fff; line-height:1.5; margin-bottom:6px;">"I don't have to search for exercises anymore + I know he's actually practicing the right things. And he prefers it over boring school work."</p>
-            <p style="font-size:12px; font-weight:700; color:#fff;">– Anass & Ismail (Founder + brother)</p>
-          </div>
         </div>
         <button onclick="scrollToCard()" class="cta-btn" style="margin-top:24px;">Access now for just $1 →</button>
       </div>
@@ -626,7 +617,6 @@
   function unlockProduct() {
     if (unlocked) return;
     unlocked = true;
-    document.getElementById('progress-wrap').classList.add('gone');
     if (navigator.vibrate) navigator.vibrate([80,40,80]);
     launchBigConfetti();
     const overlay = document.getElementById('unlock-overlay');
@@ -640,22 +630,6 @@
       banner.scrollIntoView({behavior:'smooth',block:'start'});
     },900);
   }
-
-  // ── PROGRESS BAR ──
-  const progressFill = document.getElementById('progress-bar-fill');
-  const progressGiftIcon = document.getElementById('progress-gift-icon');
-  function updateProgress() {
-    const wrapper=document.getElementById('product-wrapper');
-    if(!wrapper) return;
-    const wrapperTop=wrapper.getBoundingClientRect().top+window.scrollY;
-    const triggerPoint=wrapperTop-window.innerHeight;
-    const pct=Math.min(100,Math.max(0,(window.scrollY/Math.max(1,triggerPoint))*100));
-    progressFill.style.width=pct+'%';
-    if(pct>=99) progressGiftIcon.classList.add('lit');
-    else progressGiftIcon.classList.remove('lit');
-  }
-  window.addEventListener('scroll',updateProgress,{passive:true});
-  window.addEventListener('load',updateProgress);
 
   // ── BANNER COUNTDOWN ──
   const _bannerEnd = new Date("2026-09-09T00:01:00").getTime();
