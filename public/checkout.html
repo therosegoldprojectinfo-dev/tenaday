@@ -431,7 +431,7 @@
   // ── SUPABASE EDGE FUNCTION — creates a Stripe Checkout Session and returns clientSecret ──
   // This calls your existing "pay-first" flow (no supabase_user_id in metadata)
   // The pending_subscription gets stored and claimed in PostPaymentSetup.jsx after signup.
-  const BACKEND_URL = 'https://numiomath.app/api/create-checkout-session'; // ← update this to your actual endpoint
+  const BACKEND_URL = 'https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout-session';
 
   const stripe = Stripe(PUBLISHABLE_KEY);
 
