@@ -81,6 +81,52 @@
       letter-spacing: -0.01em;
     }
 
+    /* ── ORDER SUMMARY HEADER ── */
+    .order-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      background: #f7f5ff;
+      border-radius: 14px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      border: 1.5px solid var(--border);
+    }
+    .order-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--purple);
+    }
+    .order-header-left svg { flex-shrink: 0; }
+    .order-header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .order-header-old { font-size: 13px; color: #aaa; text-decoration: line-through; }
+    .order-header-new { font-size: 18px; font-weight: 800; color: var(--black); }
+    .order-header-chevron { color: var(--purple); font-size: 12px; transition: transform 0.2s; }
+    .order-header-chevron.open { transform: rotate(180deg); }
+    .order-header-details { display: none; padding: 0 4px 4px; }
+    .order-header-details.show { display: block; }
+
+    /* ── PRODUCT IMAGE ── */
+    .product-img-wrap {
+      text-align: center;
+      margin: 20px 0 4px;
+    }
+    .product-img-wrap img {
+      width: 100px;
+      height: 100px;
+      border-radius: 20px;
+      object-fit: cover;
+      display: inline-block;
+    }
+
     /* ── HERO ── */
     .hero {
       text-align: center;
@@ -264,8 +310,7 @@
       padding: 0 8px;
     }
     .trust-item + .trust-item { border-left: 1.5px solid var(--border); }
-    .trust-emoji { font-size: 24px; line-height: 1; }
-    .trust-label { font-size: 11px; font-weight: 700; color: var(--black); line-height: 1.35; }
+    .trust-badge { width: 80px; height: 80px; object-fit: contain; display: block; }
 
     .stripe-note {
       text-align: center;
@@ -289,7 +334,29 @@
   <!-- LOGO -->
   <div class="header">
     <div class="logo-wrap">
-      <img src="/nav-logo.png" alt="Numio" style="height:48px; width:auto; display:block;"/>
+      <img src="/logotousebro.png" alt="Numio" style="height:56px; width:auto; display:block;"/>
+    </div>
+  </div>
+
+  <!-- ORDER SUMMARY HEADER (Trenchies style) -->
+  <div class="order-header" onclick="toggleOrderDetails()">
+    <div class="order-header-left">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      Order summary
+      <span class="order-header-chevron" id="chevron">▼</span>
+    </div>
+    <div class="order-header-right">
+      <span class="order-header-old">$5.00</span>
+      <span class="order-header-new">$1.00</span>
+    </div>
+  </div>
+  <div class="order-header-details" id="order-details">
+    <div style="background:#f7f5ff; border-radius:12px; padding:12px 16px; font-size:13px; color:var(--grey); border: 1.5px solid var(--border); margin-bottom:8px;">
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span style="font-weight:600; color:var(--black);">Numio Ultimate</span>
+        <span style="font-weight:700; color:var(--purple);">$1.00</span>
+      </div>
+      <div style="font-size:12px;">Unlimited practice · No ads · $1/month</div>
     </div>
   </div>
 
@@ -340,6 +407,10 @@
       <div class="order-note">Then $1/month — cancel anytime</div>
     </div>
 
+    <div class="product-img-wrap">
+      <img src="/newtopimagebro.webp" alt="Numio app"/>
+    </div>
+
     <button id="submit-btn" class="cta-btn" disabled>
       <span id="btn-text">START NUMIO FOR $1 →</span>
       <span class="spinner"></span>
@@ -348,19 +419,16 @@
     <div id="payment-message"></div>
   </div>
 
-  <!-- TRUST -->
+  <!-- TRUST BADGES -->
   <div class="trust-row">
     <div class="trust-item">
-      <span class="trust-emoji">🛡️</span>
-      <span class="trust-label">365-Day<br>Money-Back</span>
+      <img src="/moneybackbadgebro.png" alt="365-Day Money-Back Guarantee" class="trust-badge"/>
     </div>
     <div class="trust-item">
-      <span class="trust-emoji">↩️</span>
-      <span class="trust-label">Cancel<br>Anytime</span>
+      <img src="/cancelanytimebadgebro.png" alt="Cancel Anytime" class="trust-badge"/>
     </div>
     <div class="trust-item">
-      <span class="trust-emoji">🔒</span>
-      <span class="trust-label">100% Secure<br>Payment</span>
+      <img src="/scurepayemntbadgebro.png" alt="100% Secure Payment" class="trust-badge"/>
     </div>
   </div>
 
@@ -459,6 +527,13 @@
         : 'Something went wrong. Please try again.');
     }
   });
+
+  function toggleOrderDetails() {
+    const details = document.getElementById('order-details');
+    const chevron = document.getElementById('chevron');
+    details.classList.toggle('show');
+    chevron.classList.toggle('open');
+  }
 
   initStripe();
 </script>
