@@ -6,6 +6,7 @@
     { "source": "/Productpage", "destination": "/Productpage.html" },
     { "source": "/learnmore",   "destination": "/learnmore.html"   },
     { "source": "/numiopage",   "destination": "/numiopage.html"   },
+    { "source": "/checkout",    "destination": "/checkout.html"    },
     { "source": "/(.*)",        "destination": "/index.html"       }
   ]
 }
