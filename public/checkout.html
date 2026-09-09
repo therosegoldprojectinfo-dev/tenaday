@@ -31,7 +31,7 @@
       --purple-light: #673FE8;
       --purple-pale:  #EAE4FF;
       --purple-mid:   #BEB1EA;
-      --green:        #45E031;
+      --green:        #89FF9B;
       --black:        #0A0A0A;
       --grey:         #555;
       --border:       #E0D8FF;
@@ -129,71 +129,33 @@
 
     /* ── HERO ── */
     .hero {
-      text-align: center;
-      padding: 28px 0 24px;
-      border-bottom: 1.5px solid var(--border);
+      text-align: left;
+      padding: 24px 0 20px;
     }
     .hero-headline {
-      font-size: 27px;
+      font-size: 26px;
       font-weight: 800;
       color: var(--black);
       line-height: 1.2;
       letter-spacing: -0.02em;
-      margin-bottom: 16px;
-    }
-    .pricing-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
       margin-bottom: 20px;
-    }
-    .price-old {
-      font-size: 16px;
-      font-weight: 500;
-      color: #aaa;
-      text-decoration: line-through;
-    }
-    .price-new {
-      font-size: 30px;
-      font-weight: 800;
-      color: var(--black);
-      letter-spacing: -0.02em;
-    }
-    .price-badge {
-      background: var(--purple);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 700;
-      border-radius: 99px;
-      padding: 4px 10px;
-      white-space: nowrap;
     }
     .benefits {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 14px;
       text-align: left;
     }
     .benefits li {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 15px;
-      font-weight: 600;
+      gap: 12px;
+      font-size: 16px;
+      font-weight: 400;
       color: var(--black);
     }
-    .check {
-      width: 22px;
-      height: 22px;
-      background: var(--green);
-      border-radius: 50%;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+
 
     /* ── PAYMENT ── */
     .payment-section { padding: 28px 0 0; }
@@ -278,7 +240,7 @@
       display: block;
       width: 100%;
       background: var(--green);
-      color: var(--black);
+      color: #fff;
       font-family: 'Inter', sans-serif;
       font-size: 18px;
       font-weight: 800;
@@ -299,7 +261,7 @@
       display: none;
       width: 20px; height: 20px;
       border: 3px solid rgba(0,0,0,0.2);
-      border-top-color: var(--black);
+      border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
       position: absolute;
@@ -367,7 +329,7 @@
   <!-- LOGO -->
   <div class="header">
     <div class="logo-wrap">
-      <img src="/logotousebro.png" alt="Numio" style="height:72px; width:auto; display:block;"/>
+      <img src="/logotousebro.png" alt="Numio" style="height:120px; width:auto; display:block;"/>
     </div>
   </div>
 
@@ -396,26 +358,21 @@
   <!-- HERO -->
   <div class="hero">
     <h1 class="hero-headline">Give Your Child<br>Better Practice</h1>
-    <div class="pricing-row">
-      <span class="price-old">$5/month</span>
-      <span class="price-new">$1/month</span>
-      <span class="price-badge">😱 Save 80%</span>
-    </div>
     <ul class="benefits">
       <li>
-        <span class="check"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><polyline points="1.5 5 4.5 8 10.5 1.5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
         Unlimited personalised practice
       </li>
       <li>
-        <span class="check"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><polyline points="1.5 5 4.5 8 10.5 1.5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
         Practise exactly what they're learning
       </li>
       <li>
-        <span class="check"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><polyline points="1.5 5 4.5 8 10.5 1.5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
         Unlimited pictures
       </li>
       <li>
-        <span class="check"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><polyline points="1.5 5 4.5 8 10.5 1.5" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
         No ads
       </li>
     </ul>
