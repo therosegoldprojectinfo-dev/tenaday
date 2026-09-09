@@ -31,7 +31,7 @@
       --purple-light: #673FE8;
       --purple-pale:  #EAE4FF;
       --purple-mid:   #BEB1EA;
-      --green:        #89FF9B;
+      --green:        #3DBE5C;
       --black:        #0A0A0A;
       --grey:         #555;
       --border:       #E0D8FF;
@@ -255,7 +255,7 @@
     }
     .cta-btn:hover  { filter: brightness(1.07); }
     .cta-btn:active { transform: scale(0.98); }
-    .cta-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
 
     .spinner {
       display: none;
@@ -406,7 +406,7 @@
       </div>
     </div>
 
-    <button id="submit-btn" class="cta-btn" disabled>
+    <button id="submit-btn" class="cta-btn">
       <span id="btn-text">START NUMIO FOR $1 →</span>
       <span class="spinner"></span>
     </button>
@@ -499,7 +499,7 @@
       skeleton.style.display = 'none';
       elementWrap.style.display = 'block';
       paymentElement.mount('#payment-element');
-      paymentElement.on('ready', () => { submitBtn.disabled = false; });
+
 
     } catch (err) {
       skeleton.textContent = '⚠️ Could not load payment form. Please refresh.';
