@@ -264,9 +264,10 @@
       <div style="padding:40px 16px 0;">
         <!-- CAROUSEL -->
         <div style="margin-bottom:24px;">
-          <div style="position:relative; border-radius:23px; overflow:hidden; background:#5B3FD9;">
-            <!-- Slides -->
-            <div id="carousel-track" style="display:flex; transition:transform 0.35s cubic-bezier(0.4,0,0.2,1); will-change:transform;">
+          <div style="position:relative; border-radius:23px; overflow:hidden; background:#5B3FD9; width:100%;">
+            <!-- Slides wrapper - needs overflow hidden -->
+            <div style="overflow:hidden; border-radius:23px; width:100%;">
+              <div id="carousel-track" style="display:flex; transition:transform 0.35s cubic-bezier(0.4,0,0.2,1); will-change:transform;">
               <div class="c-slide" style="min-width:100%; flex-shrink:0;">
                 <img src="/newtopimagebro.webp" alt="Numio" width="1080" height="1080" fetchpriority="high" style="width:100%;height:auto;display:block;"/>
               </div>
@@ -283,6 +284,7 @@
                 <img src="/carousel-slide2.png" alt="What if you're not happy?" width="1080" height="1080" loading="lazy" style="width:100%;height:auto;display:block;"/>
               </div>
             </div>
+            </div><!-- /slides overflow wrapper -->
             <!-- Left arrow -->
             <button onclick="carouselMove(-1)" id="c-prev" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.85);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);font-size:18px;z-index:5;">‹</button>
             <!-- Right arrow -->
