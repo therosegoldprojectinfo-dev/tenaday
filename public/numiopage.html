@@ -286,37 +286,47 @@
             <button onclick="carouselMove(1)" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.85);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);font-size:18px;z-index:5;">›</button>
           </div>
           <div id="carousel-dots" style="display:flex;justify-content:center;gap:8px;margin-top:12px;">
-            <div class="c-dot" onclick="carouselGo(0)" style="width:10px;height:10px;border-radius:50%;background:#3513A2;cursor:pointer;transition:background 0.2s;"></div>
-            <div class="c-dot" onclick="carouselGo(1)" style="width:10px;height:10px;border-radius:50%;background:#D0C8F0;cursor:pointer;transition:background 0.2s;"></div>
-            <div class="c-dot" onclick="carouselGo(2)" style="width:10px;height:10px;border-radius:50%;background:#D0C8F0;cursor:pointer;transition:background 0.2s;"></div>
-            <div class="c-dot" onclick="carouselGo(3)" style="width:10px;height:10px;border-radius:50%;background:#D0C8F0;cursor:pointer;transition:background 0.2s;"></div>
-            <div class="c-dot" onclick="carouselGo(4)" style="width:10px;height:10px;border-radius:50%;background:#D0C8F0;cursor:pointer;transition:background 0.2s;"></div>
+            <div class="c-dot" onclick="carouselGo(0)" style="width:52px;height:52px;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid #3513A2;flex-shrink:0;">
+              <img src="/newfirstimagebro.webp" width="52" height="52" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+            </div>
+            <div class="c-dot" onclick="carouselGo(1)" style="width:52px;height:52px;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;flex-shrink:0;">
+              <img src="/carousel-slide5.webp" width="52" height="52" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+            </div>
+            <div class="c-dot" onclick="carouselGo(2)" style="width:52px;height:52px;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;flex-shrink:0;">
+              <img src="/carousel-slide4.webp" width="52" height="52" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+            </div>
+            <div class="c-dot" onclick="carouselGo(3)" style="width:52px;height:52px;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;flex-shrink:0;">
+              <img src="/carousel-slide3.webp" width="52" height="52" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+            </div>
+            <div class="c-dot" onclick="carouselGo(4)" style="width:52px;height:52px;border-radius:10px;overflow:hidden;cursor:pointer;border:2px solid transparent;flex-shrink:0;">
+              <img src="/carousel-slide2.webp" width="52" height="52" style="width:100%;height:100%;object-fit:cover;display:block;"/>
+            </div>
           </div>
         </div>
 
-        <!-- 4 feature rows - green icon style -->
+        <!-- 4 feature rows - green circle icons -->
         <div style="display:flex; flex-direction:column; gap:24px; margin-bottom:48px;">
           <div style="display:flex; align-items:center; gap:16px;">
-            <div style="width:44px; height:44px; background:#EAE4FF; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-              <img src="/icon-target.png" alt="Target" width="26" height="26" style="width:26px;height:26px;"/>
+            <div style="width:44px; height:44px; background:#45E031; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <img src="/icon-target.png" alt="Target" width="24" height="24" style="width:24px;height:24px;"/>
             </div>
             <div style="font-size:17px; font-weight:600; color:#0A0A0A;">Practise their exact lessons</div>
           </div>
           <div style="display:flex; align-items:center; gap:16px;">
-            <div style="width:44px; height:44px; background:#EAE4FF; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-              <img src="/icon-infinity.png" alt="Infinity" width="26" height="26" style="width:26px;height:26px;"/>
+            <div style="width:44px; height:44px; background:#45E031; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <img src="/icon-infinity.png" alt="Infinity" width="24" height="24" style="width:24px;height:24px;"/>
             </div>
             <div style="font-size:17px; font-weight:600; color:#0A0A0A;">Practise as much as they need</div>
           </div>
           <div style="display:flex; align-items:center; gap:16px;">
-            <div style="width:44px; height:44px; background:#EAE4FF; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-              <img src="/icon-relax.png" alt="Relax" width="26" height="26" style="width:26px;height:26px;"/>
+            <div style="width:44px; height:44px; background:#45E031; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <img src="/icon-relax.png" alt="Relax" width="24" height="24" style="width:24px;height:24px;"/>
             </div>
             <div style="font-size:17px; font-weight:600; color:#0A0A0A;">You get to relax</div>
           </div>
           <div style="display:flex; align-items:center; gap:16px;">
-            <div style="width:44px; height:44px; background:#EAE4FF; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-              <img src="/icon-nodistraction.png" alt="No ads" width="26" height="26" style="width:26px;height:26px;"/>
+            <div style="width:44px; height:44px; background:#45E031; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <img src="/icon-nodistraction.png" alt="No ads" width="24" height="24" style="width:24px;height:24px;"/>
             </div>
             <div style="font-size:17px; font-weight:600; color:#0A0A0A;">No ads</div>
           </div>
@@ -683,7 +693,8 @@
       if (slide) slide.style.display = i === cIndex ? 'flex' : 'none';
     }
     document.querySelectorAll('.c-dot').forEach((d, i) => {
-      d.style.background = i === cIndex ? '#3513A2' : '#D0C8F0';
+      d.style.border = i === cIndex ? '2px solid #3513A2' : '2px solid transparent';
+      d.style.opacity = i === cIndex ? '1' : '0.5';
     });
   }
   function carouselMove(dir) {
