@@ -243,6 +243,15 @@
     </div>
   </div>
 
+  <!-- Congrats banner -->
+  <div id="congrats-banner">
+    <div style="max-width:480px; margin:0 auto; text-align:center;">
+      <div class="congrats-title" style="margin-bottom:8px;">🎁 First Parent Offer</div>
+      <div style="display:inline-block; background:#673FE8; border:1.5px solid #fff; border-radius:23px; padding:7px 18px;">
+        <div style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap;">😱 Get 80% off today</div>
+      </div>
+    </div>
+  </div>
   <div id="congrats-banner-spacer"></div>
 
   <!-- Actual blurred product content -->
@@ -358,19 +367,13 @@
         </div>
 
         <!-- BIG CTA -->
-        <button onclick="goToCheckout()" style="display:block;width:100%;background:#45E031;color:#000;font-family:'Inter',sans-serif;font-size:20px;font-weight:800;border:none;border-radius:50px;padding:18px 20px;cursor:pointer;transition:filter 0.2s;margin-bottom:20px;letter-spacing:-0.01em;">Start Today For Just $1 →</button>
+        <button onclick="goToCheckout()" style="display:block;width:100%;background:#45E031;color:#000;font-family:'Inter',sans-serif;font-size:20px;font-weight:800;border:none;border-radius:50px;padding:18px 20px;cursor:pointer;transition:filter 0.2s;margin-bottom:12px;letter-spacing:-0.01em;">Start Today For Just $1 →</button>
 
-        <!-- Congrats banner -->
-        <div id="congrats-banner" style="border-radius:18px; margin-bottom:40px;">
-          <div style="max-width:480px; margin:0 auto; text-align:center;">
-            <div style="display:inline-block; background:#673FE8; border:1.5px solid #fff; border-radius:23px; padding:7px 18px; margin-bottom:8px;">
-              <div style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap;">😱 Get 80% off today</div>
-            </div>
-            <div class="congrats-title">🚨 Your Offer ends in:</div>
-            <div class="congrats-timer">
-              <span id="b-h">00</span> : <span id="b-m">00</span> : <span id="b-s">00</span>
-            </div>
-          </div>
+        <div style="text-align:center; margin-bottom:40px;">
+          <span style="font-size:13px; font-weight:600; color:#888;">🚨 Your Offer ends in: </span>
+          <span style="font-size:13px; font-weight:700; color:#3513A2;">
+            <span id="btn-h">00</span> : <span id="btn-m">00</span> : <span id="btn-s">00</span>
+          </span>
         </div>
       </div>
 
@@ -502,6 +505,8 @@
     setTimeout(()=>{
       const banner=document.getElementById('congrats-banner');
       banner.classList.add('show');
+      bannerOriginalTop=null;
+      banner.scrollIntoView({behavior:'smooth',block:'start'});
     },900);
   }
 
@@ -519,8 +524,41 @@
   }
   tickBanner(); setInterval(tickBanner,1000);
 
-  // ── STICKY CONGRATS BANNER — now inline, just show it
-  function updateBannerSticky() { /* banner is inline, no sticky needed */ }
+  // ── STICKY CONGRATS BANNER ──
+  let bannerOriginalTop=null;
+  function updateBannerSticky() {
+    const banner=document.getElementById('congrats-banner');
+    const spacer=document.getElementById('congrats-banner-spacer');
+    if(!banner.classList.contains('show')) return;
+    if(bannerOriginalTop===null) {
+      banner.classList.remove('is-sticky');
+      bannerOriginalTop=banner.getBoundingClientRect().top+window.scrollY;
+    }
+    const bannerH=banner.offsetHeight;
+    if(window.scrollY>bannerOriginalTop) {
+      banner.classList.add('is-sticky');
+      spacer.style.height=bannerH+'px';
+      spacer.classList.add('active');
+    } else {
+      banner.classList.remove('is-sticky');
+      spacer.classList.remove('active');
+    }
+  }
+  window.addEventListener('scroll',updateBannerSticky,{passive:true});
+
+  // ── BUTTON TIMER ──
+  const _btnEnd = new Date("2026-09-13T00:01:00").getTime();
+  function tickBtn() {
+    const d=Math.max(0,_btnEnd-Date.now());
+    const bh=document.getElementById('btn-h');
+    const bm=document.getElementById('btn-m');
+    const bs=document.getElementById('btn-s');
+    if(!bh) return;
+    bh.textContent=String(Math.floor(d/3600000)).padStart(2,'0');
+    bm.textContent=String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+    bs.textContent=String(Math.floor((d%60000)/1000)).padStart(2,'0');
+  }
+  tickBtn(); setInterval(tickBtn,1000);
 
   // ── POPUP ──
   let popupShown=false, lastScrollY=window.scrollY, maxScrolledDown=0;
