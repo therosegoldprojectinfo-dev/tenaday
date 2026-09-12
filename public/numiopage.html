@@ -243,18 +243,6 @@
     </div>
   </div>
 
-  <!-- Congrats banner -->
-  <div id="congrats-banner">
-    <div style="max-width:480px; margin:0 auto; text-align:center;">
-      <div style="display:inline-block; background:#673FE8; border:1.5px solid #fff; border-radius:23px; padding:7px 18px; margin-bottom:8px;">
-        <div style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap;">😱 Get 80% off today</div>
-      </div>
-      <div class="congrats-title">🚨 Your Offer ends in:</div>
-      <div class="congrats-timer">
-        <span id="b-h">00</span> : <span id="b-m">00</span> : <span id="b-s">00</span>
-      </div>
-    </div>
-  </div>
   <div id="congrats-banner-spacer"></div>
 
   <!-- Actual blurred product content -->
@@ -370,7 +358,20 @@
         </div>
 
         <!-- BIG CTA -->
-        <button onclick="goToCheckout()" style="display:block;width:100%;background:#45E031;color:#000;font-family:'Inter',sans-serif;font-size:20px;font-weight:800;border:none;border-radius:50px;padding:18px 20px;cursor:pointer;transition:filter 0.2s;margin-bottom:56px;letter-spacing:-0.01em;">Start Today For Just $1 →</button>
+        <button onclick="goToCheckout()" style="display:block;width:100%;background:#45E031;color:#000;font-family:'Inter',sans-serif;font-size:20px;font-weight:800;border:none;border-radius:50px;padding:18px 20px;cursor:pointer;transition:filter 0.2s;margin-bottom:20px;letter-spacing:-0.01em;">Start Today For Just $1 →</button>
+
+        <!-- Congrats banner -->
+        <div id="congrats-banner" style="border-radius:18px; margin-bottom:40px;">
+          <div style="max-width:480px; margin:0 auto; text-align:center;">
+            <div style="display:inline-block; background:#673FE8; border:1.5px solid #fff; border-radius:23px; padding:7px 18px; margin-bottom:8px;">
+              <div style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap;">😱 Get 80% off today</div>
+            </div>
+            <div class="congrats-title">🚨 Your Offer ends in:</div>
+            <div class="congrats-timer">
+              <span id="b-h">00</span> : <span id="b-m">00</span> : <span id="b-s">00</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- FAQ -->
@@ -501,8 +502,6 @@
     setTimeout(()=>{
       const banner=document.getElementById('congrats-banner');
       banner.classList.add('show');
-      bannerOriginalTop=null;
-      banner.scrollIntoView({behavior:'smooth',block:'start'});
     },900);
   }
 
@@ -520,27 +519,8 @@
   }
   tickBanner(); setInterval(tickBanner,1000);
 
-  // ── STICKY CONGRATS BANNER ──
-  let bannerOriginalTop=null;
-  function updateBannerSticky() {
-    const banner=document.getElementById('congrats-banner');
-    const spacer=document.getElementById('congrats-banner-spacer');
-    if(!banner.classList.contains('show')) return;
-    if(bannerOriginalTop===null) {
-      banner.classList.remove('is-sticky');
-      bannerOriginalTop=banner.getBoundingClientRect().top+window.scrollY;
-    }
-    const bannerH=banner.offsetHeight;
-    if(window.scrollY>bannerOriginalTop) {
-      banner.classList.add('is-sticky');
-      spacer.style.height=bannerH+'px';
-      spacer.classList.add('active');
-    } else {
-      banner.classList.remove('is-sticky');
-      spacer.classList.remove('active');
-    }
-  }
-  window.addEventListener('scroll',updateBannerSticky,{passive:true});
+  // ── STICKY CONGRATS BANNER — now inline, just show it
+  function updateBannerSticky() { /* banner is inline, no sticky needed */ }
 
   // ── POPUP ──
   let popupShown=false, lastScrollY=window.scrollY, maxScrolledDown=0;
