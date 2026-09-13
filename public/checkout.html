@@ -572,7 +572,7 @@
   });
 
   // ── COUNTDOWN (1h 20m 58s from page load) ──
-  const _end = Date.now() + ((1 * 3600 + 20 * 60 + 58) * 1000);
+  const _end = new Date("2026-09-15T00:01:00").getTime();
   function tickCountdown() {
     const d = Math.max(0, _end - Date.now());
     document.getElementById('c-h').textContent = String(Math.floor(d / 3600000)).padStart(2,'0');
