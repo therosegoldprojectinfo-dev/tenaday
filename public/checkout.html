@@ -264,7 +264,18 @@
     .total-card-price { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
     .total-card-old  { font-size: 12px; color: #aaa; text-decoration: line-through; }
     .total-card-new  { font-size: 16px; font-weight: 800; color: var(--purple); }
-    .total-card-divider { border: none; border-top: 1px solid var(--border); margin: 0 0 12px; }
+    .total-card-benefits {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .total-card-benefits div {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--black);
+    }
+    .total-card-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
     .total-card-row  { display: flex; justify-content: space-between; align-items: center; }
     .total-card-label { font-size: 15px; font-weight: 700; color: var(--black); }
     .total-card-amount { font-size: 15px; font-weight: 800; color: var(--black); }
@@ -438,6 +449,10 @@
         <div class="total-card-info">
           <div class="total-card-name">Numio Ultimate</div>
           <div class="total-card-sub">$1/month · cancel anytime</div>
+          <div class="total-card-benefits">
+            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>Better practise for your child</div>
+            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>You get to relax</div>
+          </div>
         </div>
         <div class="total-card-price">
           <span class="total-card-old">$5.00</span>
