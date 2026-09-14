@@ -59,70 +59,62 @@
       border-radius: 50%;
       overflow: hidden;
       flex-shrink: 0;
-      background: #9D80FD;
     }
     .testimonial-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .testimonial-text { font-size: 14px; font-weight: 700; color: #0A0A0A; line-height: 1.3; }
     .testimonial-name { font-size: 13px; font-weight: 500; color: #333; }
     .testimonial-name::before { content: "• "; }
 
-    /* ─── MAIN ─── */
     .page-wrap { padding: 28px 20px 0; }
 
     /* ─── LOGO ─── */
     .logo-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       margin-bottom: 24px;
     }
-    .logo-wrap img {
-      height: 36px;
-      width: auto;
-      display: block;
-    }
+    .logo-wrap img { height: 36px; width: auto; display: block; }
 
     /* ─── HERO IMAGE ─── */
-    .hero-img-wrap {
-      width: 100%;
-      margin: 0 auto 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .hero-img-wrap { width: 100%; margin: 0 auto 20px; }
+    .hero-img-wrap img { width: 100%; height: auto; object-fit: contain; display: block; }
+
+    /* ─── STARS ─── */
+    .stars-row {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 12px;
     }
-    .hero-img-wrap img {
-      width: 100%;
-      height: auto;
-      max-height: 340px;
-      object-fit: contain;
-      display: block;
-    }
+    .stars { color: #A387FF; font-size: 22px; letter-spacing: 2px; }
+    .stars-author { font-size: 14px; font-weight: 600; color: #0A0A0A; text-decoration: underline; }
 
     /* ─── HEADLINE ─── */
     .headline {
-      font-size: 32px;
-      font-weight: 800;
-      color: #0A0A0A;
-      line-height: 1.2;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
+      font-size: 36px; font-weight: 900; color: #0A0A0A;
+      line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 12px;
     }
     .subheadline {
-      font-size: 16px;
-      font-weight: 500;
-      color: #555;
-      margin-bottom: 28px;
-      line-height: 1.5;
+      font-size: 16px; font-weight: 500; color: #555;
+      margin-bottom: 20px; line-height: 1.5;
+    }
+
+    /* ─── PRICE HIGHLIGHT ─── */
+    .price-highlight {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 24px;
+    }
+    .price-old { font-size: 16px; font-weight: 500; color: #aaa; text-decoration: line-through; }
+    .price-new { font-size: 22px; font-weight: 800; color: #3513A2; }
+    .price-badge {
+      background: #3513A2; color: #fff;
+      font-size: 12px; font-weight: 700;
+      border-radius: 50px; padding: 4px 12px;
     }
 
     /* ─── FEATURES ─── */
     .features { display: flex; flex-direction: column; gap: 18px; margin-bottom: 32px; }
     .feature-row { display: flex; align-items: center; gap: 14px; }
     .feature-icon {
-      width: 36px; height: 36px;
-      background: #80F172;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; background: #80F172;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
     .feature-icon img { width: 18px; height: 18px; }
@@ -132,27 +124,17 @@
     .offer-wrap { position: relative; margin-bottom: 20px; padding-top: 18px; }
     .offer-badge {
       position: absolute; top: 0; left: 20px;
-      background: #3513A2;
-      border-radius: 50px;
-      padding: 5px 16px;
-      display: inline-flex; align-items: center; gap: 6px;
+      background: #3513A2; border-radius: 50px;
+      padding: 5px 16px; display: inline-flex; align-items: center; gap: 6px;
       white-space: nowrap; z-index: 2;
     }
     .offer-badge span { font-size: 13px; font-weight: 700; color: #fff; }
     .offer-card {
-      border: 3px solid #3513A2;
-      border-radius: 50px;
-      background: #F7F6FF;
-      padding: 28px 20px;
+      border: 3px solid #3513A2; border-radius: 50px;
+      background: #F7F6FF; padding: 28px 20px;
       display: flex; align-items: center; gap: 14px;
     }
-    .offer-icon {
-      width: 52px; height: 52px;
-      border-radius: 14px;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
+    .offer-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
     .offer-icon img { width: 52px; height: 52px; object-fit: contain; }
     .offer-info { flex: 1; min-width: 0; }
     .offer-name { font-size: 15px; font-weight: 800; color: #0A0A0A; }
@@ -165,31 +147,108 @@
     .cta-btn {
       display: block; width: 100%;
       background: #45E031; color: #000;
-      font-family: 'Inter', sans-serif;
-      font-size: 20px; font-weight: 800;
-      border: none; border-radius: 50px;
-      padding: 18px 20px;
-      cursor: pointer;
-      transition: filter 0.2s;
-      letter-spacing: -0.01em;
+      font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 800;
+      border: none; border-radius: 50px; padding: 18px 20px;
+      cursor: pointer; transition: filter 0.2s; letter-spacing: -0.01em;
       margin-bottom: 24px;
     }
     .cta-btn:hover { filter: brightness(1.08); }
     .cta-btn:active { filter: brightness(0.92); }
 
     /* ─── TRUST BADGES ─── */
-    .badges {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-bottom: 48px;
-    }
-    .badge {
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
-      flex: 1; max-width: 100px;
-    }
+    .badges { display: flex; justify-content: center; gap: 16px; margin-bottom: 48px; }
+    .badge { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; max-width: 100px; }
     .badge img { width: 56px; height: 56px; object-fit: contain; }
     .badge-label { font-size: 11px; font-weight: 600; color: #555; text-align: center; line-height: 1.3; }
+
+    /* ─── DIVIDER ─── */
+    .section-divider { border: none; border-top: 1.5px solid #F0EAFF; margin: 0 20px 40px; }
+
+    /* ─── YOU'LL LOVE IT ─── */
+    .love-section { padding: 0 20px 40px; }
+    .section-title { font-size: 28px; font-weight: 900; color: #0A0A0A; text-align: center; margin-bottom: 20px; }
+    .love-card {
+      border-radius: 20px; overflow: hidden;
+      position: relative;
+    }
+    .love-card img { width: 100%; height: auto; display: block; }
+    .love-quote {
+      background: rgba(0,0,0,0.55);
+      padding: 16px 18px;
+    }
+    .love-quote-text { font-size: 14px; font-weight: 500; color: #fff; line-height: 1.5; margin-bottom: 6px; font-style: italic; }
+    .love-quote-author { font-size: 13px; font-weight: 700; color: #C4B4FF; }
+
+    /* ─── HOW IT WORKS ─── */
+    .how-section { padding: 0 20px 40px; }
+    .video-wrap {
+      border-radius: 20px; overflow: hidden;
+      position: relative; cursor: pointer;
+      background: #000;
+    }
+    .video-wrap video { width: 100%; display: block; border-radius: 20px; }
+    .video-tap {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding-bottom: 16px;
+      background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%);
+    }
+    .video-play {
+      width: 52px; height: 52px; background: rgba(255,255,255,0.9);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 8px;
+    }
+    .video-play svg { margin-left: 4px; }
+    .video-label { font-size: 13px; font-weight: 700; color: #fff; }
+
+    /* ─── STEPS ─── */
+    .steps-section { padding: 0 20px 40px; }
+    .step-card {
+      border-radius: 20px; overflow: hidden;
+      margin-bottom: 16px;
+      background: #F0EAFF;
+    }
+    .step-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .step-label { font-size: 20px; font-weight: 800; color: #0A0A0A; padding: 14px 18px; }
+
+    /* ─── NO NEED TO ─── */
+    .noneed-section { padding: 0 20px 40px; text-align: center; }
+    .noneed-title { font-size: 24px; font-weight: 900; color: #0A0A0A; margin-bottom: 24px; }
+    .noneed-grid { display: flex; justify-content: center; gap: 16px; }
+    .noneed-item { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1; max-width: 100px; }
+    .noneed-x {
+      width: 52px; height: 52px; background: #FF4444;
+      border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 900; color: #fff;
+    }
+    .noneed-label { font-size: 13px; font-weight: 600; color: #0A0A0A; text-align: center; line-height: 1.3; }
+
+    /* ─── STUPIDLY EASY ─── */
+    .easy-section { padding: 0 20px 40px; text-align: center; }
+    .easy-title { font-size: 24px; font-weight: 900; color: #0A0A0A; margin-bottom: 20px; }
+    .easy-img { width: 100%; max-width: 280px; height: auto; display: block; margin: 0 auto 16px; }
+    .easy-labels { display: flex; justify-content: space-around; margin-bottom: 24px; }
+    .easy-label { font-size: 13px; font-weight: 600; color: #555; text-align: center; max-width: 120px; line-height: 1.4; }
+
+    /* ─── BEST INVESTMENT ─── */
+    .invest-section { padding: 0 20px 40px; text-align: center; }
+    .invest-title { font-size: 24px; font-weight: 900; color: #0A0A0A; margin-bottom: 24px; }
+    .invest-grid { display: flex; gap: 12px; margin-bottom: 24px; }
+    .invest-card {
+      flex: 1; background: #EAE4FF; border-radius: 16px;
+      padding: 20px 14px; text-align: center;
+    }
+    .invest-icon { font-size: 28px; margin-bottom: 10px; }
+    .invest-text { font-size: 15px; font-weight: 700; color: #0A0A0A; line-height: 1.3; }
+    .invest-price { font-size: 18px; font-weight: 900; color: #0A0A0A; margin-bottom: 24px; }
+
+    /* ─── STILL NOT SURE ─── */
+    .guarantee-section { padding: 0 20px 40px; text-align: center; }
+    .guarantee-title { font-size: 28px; font-weight: 900; color: #0A0A0A; margin-bottom: 20px; font-style: italic; }
+    .guarantee-badge-img { width: 120px; height: 120px; object-fit: contain; display: block; margin: 0 auto 20px; }
+    .guarantee-text { font-size: 16px; color: #0A0A0A; line-height: 1.6; margin-bottom: 8px; }
+    .guarantee-bold { font-size: 16px; font-weight: 800; color: #0A0A0A; margin-bottom: 24px; }
 
     /* ─── FAQ ─── */
     .faq-wrap { padding: 8px 20px 48px; }
@@ -231,31 +290,38 @@
 
     <!-- HERO IMAGE -->
     <div class="hero-img-wrap">
-      <img src="/thefristimageotusenowbro.webp" alt="Numio app" fetchpriority="high" width="640" height="640"/>
+      <img src="/thefristimageotusenowbro.webp" alt="Numio app" fetchpriority="high"/>
+    </div>
+
+    <!-- STARS + AUTHOR -->
+    <div class="stars-row">
+      <span class="stars">★★★★★</span>
+      <span class="stars-author">Khadija, mother in Canada</span>
     </div>
 
     <!-- HEADLINE -->
-    <h1 class="headline">Help your child<br>practise for school</h1>
-    <p class="subheadline">... Without you having to find, prepare,<br>or explain anything.</p>
+    <h1 class="headline">Help your child practise for school</h1>
+    <p class="subheadline">... Without you having to find, prepare, or explain anything.</p>
+
+    <!-- PRICE -->
+    <div class="price-highlight">
+      <span class="price-old">$5/month</span>
+      <span class="price-new">$1/month</span>
+      <span class="price-badge">💳 Save $48/year!</span>
+    </div>
 
     <!-- FEATURES -->
     <div class="features">
       <div class="feature-row">
-        <div class="feature-icon">
-          <img src="/icon-trophy1.png" alt=""/>
-        </div>
+        <div class="feature-icon"><img src="/icon-trophy1.png" alt=""/></div>
         <div class="feature-text">Just take a picture of their lesson</div>
       </div>
       <div class="feature-row">
-        <div class="feature-icon">
-          <img src="/icon-relax.png" alt=""/>
-        </div>
+        <div class="feature-icon"><img src="/icon-relax.png" alt=""/></div>
         <div class="feature-text">Get questions based on what they're learning</div>
       </div>
       <div class="feature-row">
-        <div class="feature-icon">
-          <img src="/icon-dollar.png" alt=""/>
-        </div>
+        <div class="feature-icon"><img src="/icon-dollar.png" alt=""/></div>
         <div class="feature-text">Generate as many questions as they need</div>
       </div>
       <div class="feature-row">
@@ -268,13 +334,9 @@
 
     <!-- OFFER CARD -->
     <div class="offer-wrap" id="offer-card">
-      <div class="offer-badge">
-        <span>💳 Save $48/year!</span>
-      </div>
+      <div class="offer-badge"><span>💳 Save $48/year!</span></div>
       <div class="offer-card">
-        <div class="offer-icon">
-          <img src="/gold-zag.png" alt="Numio" loading="lazy"/>
-        </div>
+        <div class="offer-icon"><img src="/gold-zag.png" alt="Numio" loading="lazy"/></div>
         <div class="offer-info">
           <div class="offer-name">Numio Full access</div>
           <div class="offer-sub">Only $0.03 per day!</div>
@@ -307,6 +369,124 @@
 
   </div>
 
+  <hr class="section-divider"/>
+
+  <!-- YOU'LL LOVE IT -->
+  <div class="love-section">
+    <div class="section-title">You'll love it!</div>
+    <div class="love-card">
+      <img src="/imagetousebroforyoullloveitnewsection.webp" alt="Anass & Ismail" loading="lazy"/>
+      <div class="love-quote">
+        <div class="love-quote-text">"I don't have to search for exercises anymore + I know he's actually practicing the right things. And he prefers it over boring school work."</div>
+        <div class="love-quote-author">– Anass & Ismail (Founder + brother)</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-section">
+    <div class="section-title">Here's how it works<br>in 16 seconds:</div>
+    <div class="video-wrap" onclick="playVideo(this)">
+      <video id="how-video" preload="none" playsinline poster="/videoposter.webp" style="width:100%;display:block;border-radius:20px;">
+        <source src="/Finalvideofornumio.mp4" type="video/mp4"/>
+      </video>
+      <div class="video-tap" id="video-tap">
+        <div class="video-play">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#3513A2"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-label">▶ Tap to watch</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- STEPS -->
+  <div class="steps-section">
+    <div class="step-card">
+      <img src="/Studypngimagetouse.webp" alt="#1 Study" loading="lazy"/>
+      <div class="step-label">#1 Study</div>
+    </div>
+    <div class="step-card">
+      <img src="/Takeapicpngimagetouse.webp" alt="#2 Take a pic" loading="lazy"/>
+      <div class="step-label">#2 Take a pic</div>
+    </div>
+    <div class="step-card">
+      <img src="/Practisepngimagetouse.webp" alt="#3 Practise!" loading="lazy"/>
+      <div class="step-label">#3 Practise!</div>
+    </div>
+
+    <button class="cta-btn" onclick="goToCheckout()">Start Today For Just $1 →</button>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- NO NEED TO -->
+  <div class="noneed-section">
+    <div class="noneed-title">No need to:</div>
+    <div class="noneed-grid">
+      <div class="noneed-item">
+        <div class="noneed-x">✕</div>
+        <div class="noneed-label">Search for Exercises</div>
+      </div>
+      <div class="noneed-item">
+        <div class="noneed-x">✕</div>
+        <div class="noneed-label">Pay for books</div>
+      </div>
+      <div class="noneed-item">
+        <div class="noneed-x">✕</div>
+        <div class="noneed-label">Pay for private help</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- STUPIDLY EASY -->
+  <div class="easy-section">
+    <div class="easy-title">Stupidly Easy and Fast.</div>
+    <img src="/thefristimageotusenowbro.webp" alt="How it works" class="easy-img" loading="lazy"/>
+    <div class="easy-labels">
+      <div class="easy-label">Just take a pic<br>(That's it)</div>
+      <div class="easy-label">Start practising<br>in just 15 seconds</div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- BEST INVESTMENT -->
+  <div class="invest-section">
+    <div class="invest-title">Simply the best investment<br>for your family:</div>
+    <div class="invest-grid">
+      <div class="invest-card">
+        <div class="invest-icon">🎓</div>
+        <div class="invest-text">1- Kids understand their lessons</div>
+      </div>
+      <div class="invest-card">
+        <div class="invest-icon">😌</div>
+        <div class="invest-text">2- You (parents) can relax!</div>
+      </div>
+    </div>
+    <div class="invest-price">All that for less than $0.03 per day!</div>
+    <button class="cta-btn" onclick="goToCheckout()">Start Today For Just $1 →</button>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- STILL NOT SURE -->
+  <div class="guarantee-section">
+    <div class="guarantee-title">... still not sure?</div>
+    <img src="/badgegarantee365daystouse.webp" alt="365 Day Guarantee" class="guarantee-badge-img" loading="lazy"/>
+    <p class="guarantee-text">You have 365 days to decide if Numio really helps your child,</p>
+    <p class="guarantee-text">If you're not satisfied, you can:</p>
+    <p class="guarantee-bold">Cancel anytime<br>+ get 100% of your money back!</p>
+    <button class="cta-btn" onclick="goToCheckout()">Start Today For Just $1 →</button>
+  </div>
+
+  <hr class="section-divider"/>
+
   <!-- FAQ -->
   <div class="faq-wrap">
     <div class="faq-title">Questions you may have:</div>
@@ -334,6 +514,14 @@
   function goToCheckout() {
     if(typeof fbq!=='undefined') fbq('track','InitiateCheckout');
     window.location.href='https://numiomath.app/checkout';
+  }
+
+  function playVideo(wrap) {
+    const video = wrap.querySelector('video');
+    const tap = wrap.querySelector('#video-tap');
+    tap.style.display = 'none';
+    video.muted = false;
+    video.play().catch(() => { video.muted = true; video.play(); });
   }
 </script>
 
