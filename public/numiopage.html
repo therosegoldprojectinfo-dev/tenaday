@@ -395,7 +395,7 @@
         <div class="offer-icon"><img src="/gold-zag.png" alt="Numio" loading="lazy"/></div>
         <div class="offer-info" style="white-space:nowrap;">
           <div class="offer-name" style="white-space:nowrap;">Numio Full access</div>
-          <div class="offer-sub" style="white-space:nowrap;">Only less than $0.04 per day!</div>
+          <div class="offer-sub" style="white-space:nowrap;">Only $0.04 per day!</div>
         </div>
         <div class="offer-price" style="white-space:nowrap; text-align:right; flex-shrink:0;">
           <div class="offer-price-main" style="white-space:nowrap;">$1/month</div>
@@ -405,7 +405,7 @@
     </div>
 
     <!-- CTA -->
-    <button class="cta-btn" onclick="goToCheckout()">Start Today For Just $1 →</button>
+    <button class="cta-btn" onclick="scrollToOfferCard()">Start Today For Just $1 →</button>
 
     <!-- TRUST BADGES -->
     <div class="badges">
@@ -470,7 +470,7 @@
       <div class="step-label">#3 Practise!</div>
     </div>
 
-    <button class="cta-btn" onclick="goToCheckout()">Start Today For Just $1 →</button>
+    <button class="cta-btn" onclick="scrollToOfferCard()">Start Today For Just $1 →</button>
   </div>
 
   <hr class="section-divider"/>
@@ -532,8 +532,8 @@
         <div class="invest-text">2- You (parents) can relax!</div>
       </div>
     </div>
-    <div class="invest-price">All that for less than less than $0.04 per day!</div>
-    <button class="cta-btn" onclick="goToCheckout()">Start Today For Just $1 →</button>
+    <div class="invest-price">All that for less than $0.04 per day!</div>
+    <button class="cta-btn" onclick="scrollToOfferCard()">Start Today For Just $1 →</button>
   </div>
 
   <hr class="section-divider"/>
@@ -545,7 +545,7 @@
     <p class="guarantee-text">You have 365 days to decide if Numio really helps your child,</p>
     <p class="guarantee-text">If you're not satisfied, you can:</p>
     <p class="guarantee-bold">Cancel anytime<br>+ get 100% of your money back!</p>
-    <button class="cta-btn" onclick="goToCheckout()">Start Today For Just $1 →</button>
+    <button class="cta-btn" onclick="scrollToOfferCard()">Start Today For Just $1 →</button>
   </div>
 
   <hr class="section-divider"/>
@@ -601,6 +601,10 @@
       if (Math.abs(diff) > 40) carouselMove(diff > 0 ? 1 : -1);
     }, { passive: true });
   })();
+
+  function scrollToOfferCard() {
+    document.getElementById('offer-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 
   function goToCheckout() {
     if(typeof fbq!=='undefined') fbq('track','InitiateCheckout');
