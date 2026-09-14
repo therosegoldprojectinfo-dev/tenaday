@@ -606,6 +606,31 @@
     document.getElementById('offer-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  // ── POPUP — scroll up exit intent ──
+  let popupShown = false;
+  let lastScrollY = window.scrollY;
+  let maxScrolledDown = 0;
+
+  function closePopup() { document.getElementById('popup-overlay').style.display = 'none'; }
+  function showPopup() {
+    if (popupShown) return;
+    popupShown = true;
+    document.getElementById('popup-overlay').style.display = 'flex';
+  }
+
+  window.addEventListener('scroll', function() {
+    const currentY = window.scrollY;
+    const halfPage = document.body.scrollHeight / 2;
+    if (currentY > maxScrolledDown) maxScrolledDown = currentY;
+    if (maxScrolledDown >= halfPage && currentY < lastScrollY - 80) showPopup();
+    lastScrollY = currentY;
+  }, { passive: true });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const overlay = document.getElementById('popup-overlay');
+    if (overlay) overlay.addEventListener('click', function(e) { if (e.target === this) closePopup(); });
+  });
+
   function goToCheckout() {
     if(typeof fbq!=='undefined') fbq('track','InitiateCheckout');
     window.location.href='https://numiomath.app/checkout';
@@ -619,6 +644,17 @@
     video.play().catch(() => { video.muted = true; video.play(); });
   }
 </script>
+
+
+<!-- POPUP (scroll up exit intent) -->
+<div id="popup-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#9D80FD; max-width:420px; width:100%; padding:48px 32px; position:relative; text-align:center; border-radius:20px;">
+    <button onclick="closePopup()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#fff;">✕</button>
+    <div style="font-size:clamp(28px,7vw,36px); font-weight:900; color:#fff; margin-bottom:24px;">🔓 Guarantee Unlocked</div>
+    <div style="font-size:clamp(18px,5vw,22px); font-weight:400; color:#fff; line-height:1.3; margin-bottom:40px;">Either your child practises more or you get your $1 back!</div>
+    <button onclick="closePopup(); scrollToOfferCard();" style="display:block;width:100%;background:#45E031;color:#000;font-family:'Inter',sans-serif;font-size:18px;font-weight:700;border:none;border-radius:50px;padding:18px;cursor:pointer;">Start Today For Just $1 →</button>
+  </div>
+</div>
 
 </body>
 </html>
