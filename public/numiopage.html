@@ -437,9 +437,9 @@
   <!-- HOW IT WORKS -->
   <div class="how-section">
     <div class="section-title">Here's how it works<br>in 16 seconds:</div>
-    <div class="video-wrap" onclick="playVideo(this)">
-      <video id="how-video" preload="none" playsinline poster="/videoposter.webp" style="width:100%;display:block;border-radius:20px;">
-        <source src="/Finalvideofornumio.mp4" type="video/mp4"/>
+    <div class="video-wrap" onclick="playVideo(this)" style="max-width:100%;overflow:hidden;">
+      <video id="how-video" preload="none" playsinline poster="/videoposter.webp" style="width:100%;height:100%;display:block;border-radius:20px;object-fit:cover;">
+        <source src="/videotouse.mp4" type="video/mp4"/>
       </video>
       <div class="video-tap" id="video-tap">
         <div class="video-play">
