@@ -52,6 +52,7 @@
       padding: 12px 20px;
       display: flex;
       align-items: center;
+      justify-content: flex-end;
       gap: 12px;
     }
     .testimonial-avatar {
@@ -61,8 +62,8 @@
       flex-shrink: 0;
     }
     .testimonial-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .testimonial-text { font-size: 14px; font-weight: 700; color: #0A0A0A; line-height: 1.3; }
-    .testimonial-name { font-size: 13px; font-weight: 500; color: #333; }
+    .testimonial-text { font-size: 14px; font-weight: 700; color: #0A0A0A; line-height: 1.3; text-align: right; }
+    .testimonial-name { font-size: 13px; font-weight: 500; color: #333; text-align: right; }
     .testimonial-name::before { content: "• "; }
 
     .page-wrap { padding: 28px 20px 0; }
@@ -74,16 +75,40 @@
     }
     .logo-wrap img { height: 36px; width: auto; display: block; }
 
-    /* ─── HERO IMAGE ─── */
-    .hero-img-wrap { width: 100%; margin: 0 auto 20px; }
-    .hero-img-wrap img { width: 100%; height: auto; object-fit: contain; display: block; }
+    /* ─── CAROUSEL ─── */
+    .carousel-wrap { margin-bottom: 20px; }
+    #carousel-outer {
+      position: relative; border-radius: 23px; overflow: hidden;
+      width: 100%; aspect-ratio: 1/1; background: #5B3FD9;
+    }
+    .c-slide { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; }
+    .c-slide.active { display: flex; }
+    .c-slide img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .c-slide video { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .c-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.85); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 18px; z-index: 5;
+    }
+    .c-arrow.prev { left: 10px; }
+    .c-arrow.next { right: 10px; }
+    #carousel-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+    .c-dot {
+      width: 44px; height: 44px; border-radius: 8px; overflow: hidden;
+      cursor: pointer; border: 2px solid transparent; flex-shrink: 0; opacity: 0.5;
+    }
+    .c-dot.active { border-color: #3513A2; opacity: 1; }
+    .c-dot img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
     /* ─── STARS ─── */
-    .stars-row {
-      display: flex; align-items: center; gap: 8px;
-      margin-bottom: 12px;
+    .stars-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+    .stars-gradient {
+      font-size: 22px; letter-spacing: 2px;
+      background: linear-gradient(90deg, #A387FF 0%, #C931E0 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .stars { color: #A387FF; font-size: 22px; letter-spacing: 2px; }
     .stars-author { font-size: 14px; font-weight: 600; color: #0A0A0A; text-decoration: underline; }
 
     /* ─── HEADLINE ─── */
@@ -91,23 +116,17 @@
       font-size: 36px; font-weight: 900; color: #0A0A0A;
       line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 12px;
     }
-    .subheadline {
-      font-size: 16px; font-weight: 500; color: #555;
-      margin-bottom: 20px; line-height: 1.5;
-    }
+    .subheadline { font-size: 16px; font-weight: 500; color: #555; margin-bottom: 16px; line-height: 1.5; }
 
     /* ─── PRICE HIGHLIGHT ─── */
-    .price-highlight {
-      display: flex; align-items: center; gap: 10px;
-      margin-bottom: 24px;
-    }
-    .price-old { font-size: 16px; font-weight: 500; color: #aaa; text-decoration: line-through; }
-    .price-new { font-size: 22px; font-weight: 800; color: #3513A2; }
+    .price-highlight { margin-bottom: 24px; }
     .price-badge {
-      background: #3513A2; color: #fff;
-      font-size: 12px; font-weight: 700;
-      border-radius: 50px; padding: 4px 12px;
+      display: inline-block; background: #3513A2; color: #fff;
+      font-size: 12px; font-weight: 700; border-radius: 50px; padding: 3px 12px; margin-bottom: 6px;
     }
+    .price-row { display: flex; align-items: baseline; gap: 10px; }
+    .price-old { font-size: 16px; font-weight: 500; color: #aaa; text-decoration: line-through; }
+    .price-new { font-size: 28px; font-weight: 900; color: #3513A2; }
 
     /* ─── FEATURES ─── */
     .features { display: flex; flex-direction: column; gap: 18px; margin-bottom: 32px; }
@@ -288,14 +307,52 @@
       <img src="/logotousebro.png" alt="Numio" fetchpriority="high"/>
     </div>
 
-    <!-- HERO IMAGE -->
-    <div class="hero-img-wrap">
-      <img src="/thefristimageotusenowbro.webp" alt="Numio app" fetchpriority="high"/>
+    <!-- CAROUSEL -->
+    <div class="carousel-wrap">
+      <div id="carousel-outer">
+        <div class="c-slide active" id="slide-0">
+          <img src="/thefristimageotusenowbro.webp" alt="Numio" fetchpriority="high"/>
+        </div>
+        <div class="c-slide" id="slide-1" style="background:#000;">
+          <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:contain;display:block;">
+            <source src="/carouselvideo.mp4" type="video/mp4"/>
+          </video>
+        </div>
+        <div class="c-slide" id="slide-2">
+          <img src="/carouselimages__3_.webp" alt="4 reasons to try Numio" loading="lazy"/>
+        </div>
+        <div class="c-slide" id="slide-3">
+          <img src="/carouselimages__2_.webp" alt="How to use Numio" loading="lazy"/>
+        </div>
+        <div class="c-slide" id="slide-4">
+          <img src="/carouselimages__1_.webp" alt="Practise their exact lessons" loading="lazy"/>
+        </div>
+        <div class="c-slide" id="slide-5">
+          <img src="/carouselimages__4_.webp" alt="Why is Numio the best option" loading="lazy"/>
+        </div>
+        <div class="c-slide" id="slide-6">
+          <img src="/carouselimages__5_.webp" alt="Money back guarantee" loading="lazy"/>
+        </div>
+        <button class="c-arrow prev" onclick="carouselMove(-1)">‹</button>
+        <button class="c-arrow next" onclick="carouselMove(1)">›</button>
+      </div>
+      <div id="carousel-dots">
+        <div class="c-dot active" onclick="carouselGo(0)"><img src="/thefristimageotusenowbro.webp"/></div>
+        <div class="c-dot" onclick="carouselGo(1)" style="position:relative;">
+          <img src="/carouselvideo-thumb.webp" style="background:#5B3FD9;object-fit:contain;"/>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);"><span style="font-size:12px;color:#fff;">▶</span></div>
+        </div>
+        <div class="c-dot" onclick="carouselGo(2)"><img src="/carouselimages__3_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(3)"><img src="/carouselimages__2_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(4)"><img src="/carouselimages__1_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(5)"><img src="/carouselimages__4_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(6)"><img src="/carouselimages__5_.webp" loading="lazy"/></div>
+      </div>
     </div>
 
     <!-- STARS + AUTHOR -->
     <div class="stars-row">
-      <span class="stars">★★★★★</span>
+      <span class="stars-gradient">★★★★★</span>
       <span class="stars-author">Khadija, mother in Canada</span>
     </div>
 
@@ -305,9 +362,11 @@
 
     <!-- PRICE -->
     <div class="price-highlight">
-      <span class="price-old">$5/month</span>
-      <span class="price-new">$1/month</span>
-      <span class="price-badge">💳 Save $48/year!</span>
+      <div class="price-badge">% Save $48/year!</div>
+      <div class="price-row">
+        <span class="price-old">$5/month</span>
+        <span class="price-new">$1/month</span>
+      </div>
     </div>
 
     <!-- FEATURES -->
@@ -511,6 +570,34 @@
 </div>
 
 <script>
+  // ── CAROUSEL ──
+  let cIndex = 0;
+  const cTotal = 7;
+  function carouselRender() {
+    for (let i = 0; i < cTotal; i++) {
+      const slide = document.getElementById('slide-' + i);
+      if (!slide) continue;
+      slide.classList.toggle('active', i === cIndex);
+      const vid = slide.querySelector('video');
+      if (vid) { i === cIndex ? vid.play().catch(()=>{}) : vid.pause(); }
+    }
+    document.querySelectorAll('.c-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === cIndex);
+    });
+  }
+  function carouselMove(dir) { cIndex = (cIndex + dir + cTotal) % cTotal; carouselRender(); }
+  function carouselGo(i) { cIndex = i; carouselRender(); }
+  (function() {
+    let startX = 0;
+    const outer = document.getElementById('carousel-outer');
+    if (!outer) return;
+    outer.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    outer.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) carouselMove(diff > 0 ? 1 : -1);
+    }, { passive: true });
+  })();
+
   function goToCheckout() {
     if(typeof fbq!=='undefined') fbq('track','InitiateCheckout');
     window.location.href='https://numiomath.app/checkout';
