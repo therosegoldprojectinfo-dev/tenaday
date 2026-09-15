@@ -6,10 +6,13 @@
   <title>Numio – Start for $1</title>
   <meta name="description" content="Give your child better practice. $1/month. 365-day money-back guarantee."/>
 
+  <link rel="preconnect" href="https://js.stripe.com"/>
+  <link rel="preconnect" href="https://m.stripe.network"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-  <script src="https://js.stripe.com/v3/"></script>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/></noscript>
+  <script src="https://js.stripe.com/v3/" defer></script>
 
   <script>
   window.addEventListener('load', function() {
@@ -381,7 +384,7 @@
   <!-- LOGO -->
   <div class="header">
     <div class="logo-wrap">
-      <img src="/logotousebro.webp" alt="Numio" style="height:40px; width:auto; display:block; object-fit:contain;"/>
+      <img src="/logotousebro.webp" alt="Numio" style="height:40px; width:auto; display:block; object-fit:contain;" width="280" height="70"/>
     </div>
   </div>
 
@@ -409,7 +412,7 @@
 
   <!-- HERO IMAGE -->
   <div class="hero-img-wrap">
-    <img src="/checkoutimage.webp" alt="Numio app" class="hero-img"/>
+    <img src="/checkoutimage.webp" alt="Numio app" class="hero-img" fetchpriority="high" width="700" height="700"/>
   </div>
 
   <!-- COUNTDOWN TIMER -->
@@ -452,7 +455,7 @@
     <!-- TOTAL CARD (Trenchies style) -->
     <div class="total-card">
       <div class="total-card-product">
-        <img src="/numioultimateimage.png" alt="Numio app" class="total-card-img"/>
+        <img src="/numioultimateimage.webp" alt="Numio app" class="total-card-img" width="52" height="52"/>
         <div class="total-card-info">
           <div class="total-card-name">Numio Ultimate</div>
           <div class="total-card-sub">$1/month · cancel anytime</div>
@@ -489,15 +492,15 @@
   <!-- TRUST BADGES -->
   <div class="trust-row">
     <div class="trust-item">
-      <img src="/moneybackbadgebro.webp" alt="365-Day Money-Back Guarantee" class="trust-badge"/>
+      <img src="/moneybackbadgebro.webp" alt="365-Day Money-Back Guarantee" class="trust-badge" width="72" height="72"/>
       <span class="trust-label">365-Day<br>Money-Back</span>
     </div>
     <div class="trust-item">
-      <img src="/cancelanytimebadgebro.webp" alt="Cancel Anytime" class="trust-badge"/>
+      <img src="/cancelanytimebadgebro.webp" alt="Cancel Anytime" class="trust-badge" width="72" height="72"/>
       <span class="trust-label">Cancel<br>Anytime</span>
     </div>
     <div class="trust-item">
-      <img src="/scurepayemntbadgebro.webp" alt="100% Secure Payment" class="trust-badge"/>
+      <img src="/scurepayemntbadgebro.webp" alt="100% Secure Payment" class="trust-badge" width="72" height="72"/>
       <span class="trust-label">100% Secure<br>Payment</span>
     </div>
   </div>
