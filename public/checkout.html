@@ -152,7 +152,8 @@
     }
     .hero-img {
       width: 100%;
-      height: auto;
+      max-height: 220px;
+      object-fit: cover;
       border-radius: 20px;
       display: block;
     }
@@ -210,7 +211,7 @@
       align-items: center;
       justify-content: center;
     }
-    .benefit-icon img { filter: brightness(0) invert(1); }
+    .benefit-icon img { display: block; }
     .benefits li {
       display: flex;
       align-items: center;
@@ -445,10 +446,10 @@
     <div class="countdown-timer"><span id="c-h">01</span> : <span id="c-m">20</span> : <span id="c-s">58</span></div>
   </div>
 
-  <!-- HERO PLACEHOLDER IMAGE -->
-  <div class="hero-placeholder">
-    <img src="/checkoutimage.webp" alt="Numio" class="hero-img" fetchpriority="high" width="700" height="700"/>
-  </div>
+
+
+  <!-- GRAY RECTANGLE PLACEHOLDER -->
+  <div style="width:100%; height:220px; background:#C4C4C4; border-radius:20px; margin:16px 0 0;"></div>
 
   <!-- GUARANTEE COPY -->
   <div class="guarantee-copy">
@@ -466,13 +467,13 @@
       </li>
       <li>
         <span class="benefit-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
         </span>
         Get questions based on what they're learning
       </li>
       <li>
         <span class="benefit-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
         </span>
         Generate as many questions as they need
       </li>
@@ -498,10 +499,7 @@
         <div class="total-card-info">
           <div class="total-card-name">Numio Lifetime Access</div>
           <div class="total-card-sub">One-time payment · yours forever</div>
-          <div class="total-card-benefits">
-            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>Lifetime access · no monthly fees</div>
-            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>365-day money-back guarantee</div>
-          </div>
+
         </div>
         <div class="total-card-price">
           <span class="total-card-old">$10.00</span>
