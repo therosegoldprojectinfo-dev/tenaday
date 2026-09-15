@@ -601,16 +601,7 @@
     }
   });
 
-  // ── COUNTDOWN (1h 20m 58s from page load) ──
-  const _end = new Date("2026-09-16T00:01:00").getTime();
-  function tickCountdown() {
-    const d = Math.max(0, _end - Date.now());
-    document.getElementById('c-h').textContent = String(Math.floor(d / 3600000)).padStart(2,'0');
-    document.getElementById('c-m').textContent = String(Math.floor((d % 3600000) / 60000)).padStart(2,'0');
-    document.getElementById('c-s').textContent = String(Math.floor((d % 60000) / 1000)).padStart(2,'0');
-  }
-  tickCountdown();
-  setInterval(tickCountdown, 1000);
+  // ── COUNTDOWN ──
 
   function toggleOrderDetails() {
     const details = document.getElementById('order-details');
@@ -622,5 +613,22 @@
   initStripe();
 </script>
 
+<script>
+  (function() {
+    var _end = new Date("2026-09-16T00:01:00").getTime();
+    function tick() {
+      var d = Math.max(0, _end - Date.now());
+      var h = document.getElementById('c-h');
+      var m = document.getElementById('c-m');
+      var s = document.getElementById('c-s');
+      if (!h) return;
+      h.textContent = String(Math.floor(d / 3600000)).padStart(2,'0');
+      m.textContent = String(Math.floor((d % 3600000) / 60000)).padStart(2,'0');
+      s.textContent = String(Math.floor((d % 60000) / 1000)).padStart(2,'0');
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
 </body>
 </html>
