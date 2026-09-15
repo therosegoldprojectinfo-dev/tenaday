@@ -3,632 +3,658 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Numio – Start for $1</title>
-  <meta name="description" content="Give your child better practice. $1/month. 365-day money-back guarantee."/>
-
-  <link rel="preconnect" href="https://js.stripe.com"/>
-  <link rel="preconnect" href="https://m.stripe.network"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/></noscript>
-  <script src="https://js.stripe.com/v3/"></script>
+  <meta name="description" content="Help your child understand their lessons while you relax! Numio generates personalized quizzes from photos of their textbook. $1/month. 365-day money-back guarantee."/>
+  <title>Numio – Help your child understand their lessons</title>
 
   <script>
   window.addEventListener('load', function() {
     setTimeout(function() {
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window,document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1028944262871292');
+      fbq('track', 'PageView');
       (function(c,l,a,r,i,t,y){
-        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-        t=l.createElement(r);t.async=1;t.src='https://www.clarity.ms/tag/'+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window,document,'clarity','script','y6hivp7gvm');
+          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window,document,"clarity","script","y6hivp7gvm");
     }, 3000);
   });
   </script>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/></noscript>
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --purple:       #3513A2;
-      --purple-light: #673FE8;
-      --purple-pale:  #EAE4FF;
-      --purple-mid:   #BEB1EA;
-      --green:        #3DBE5C;
-      --black:        #0A0A0A;
-      --grey:         #555;
-      --border:       #E0D8FF;
-      --bg:           #fff;
-    }
-
     html { scroll-behavior: smooth; }
-
+    html, body { overflow-x: hidden; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--black);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #fff;
+      color: #0A0A0A;
       font-size: 16px;
-      line-height: 1.5;
-      min-height: 100dvh;
-      overflow-x: hidden;
+      line-height: 1.6;
     }
+    .inner { max-width: 480px; margin: 0 auto; }
 
-    .page {
-      max-width: 440px;
-      margin: 0 auto;
-      padding: 0 20px 60px;
-    }
-
-    /* ── HEADER ── */
-    .header {
+    /* ─── TESTIMONIAL BAR ─── */
+    .testimonial-bar {
+      background: #C4B4FF;
+      padding: 12px 20px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 24px 0 16px;
-    }
-    .logo-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .logo-img {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      object-fit: cover;
-    }
-    .logo-text {
-      font-size: 22px;
-      font-weight: 900;
-      color: var(--purple);
-      letter-spacing: -0.01em;
-    }
-
-    /* ── ORDER SUMMARY HEADER ── */
-    .order-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 0;
-      background: transparent;
-      border-top: 1px solid #e8e8e8;
-      border-bottom: 1px solid #e8e8e8;
-      margin-bottom: 20px;
-      cursor: pointer;
-    }
-    .order-header-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--black);
-    }
-    .order-header-left svg { flex-shrink: 0; color: var(--black); }
-    .order-header-right {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-    }
-    .order-header-old { font-size: 13px; color: #aaa; text-decoration: line-through; }
-    .order-header-new { font-size: 20px; font-weight: 800; color: var(--black); }
-    .order-header-chevron { color: var(--black); font-size: 11px; transition: transform 0.2s; margin-left: 2px; }
-    .order-header-chevron.open { transform: rotate(180deg); }
-    .order-header-details { display: none; padding: 12px 0 4px; }
-    .order-header-details.show { display: block; }
-
-    /* ── PRODUCT IMAGE ── */
-    .product-img-wrap {
-      text-align: center;
-      margin: 20px 0 4px;
-    }
-    .product-img-wrap img {
-      width: 100px;
-      height: 100px;
-      border-radius: 20px;
-      object-fit: cover;
-      display: inline-block;
-    }
-
-    /* ── HERO IMAGE ── */
-    .hero-img-wrap {
-      width: 100%;
-      margin: 16px 0 16px;
-    }
-    .hero-img {
-      width: 100%;
-      height: auto;
-      border-radius: 20px;
-      display: block;
-    }
-
-    /* ── COUNTDOWN ── */
-    .countdown-box {
-      background: #F3EACD;
-      border: 3px dashed #CCC4AD;
-      border-radius: 23px;
-      padding: 14px 20px;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .countdown-label {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--black);
-      margin-bottom: 6px;
-    }
-    .countdown-timer {
-      font-size: 28px;
-      font-weight: 300;
-      color: var(--black);
-      letter-spacing: 0.06em;
-    }
-
-    /* ── HERO ── */
-    .hero {
-      text-align: left;
-      padding: 0 0 20px;
-    }
-    .hero-headline {
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--black);
-      line-height: 1.2;
-      letter-spacing: -0.02em;
-      margin-bottom: 16px;
-    }
-    .benefits {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      text-align: left;
-    }
-    .benefits li {
-      display: flex;
-      align-items: center;
+      justify-content: flex-end;
       gap: 12px;
-      font-size: 16px;
-      font-weight: 400;
-      color: var(--black);
     }
-
-
-    /* ── PAYMENT ── */
-    .payment-section { padding: 28px 0 0; }
-    .section-label {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--grey);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-    }
-    #payment-element { margin-bottom: 8px; }
-    #element-skeleton {
-      background: #f3f0ff;
-      border-radius: 12px;
-      height: 180px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--grey);
-      font-size: 14px;
-      font-weight: 500;
-    }
-
-    /* ── ORDER SUMMARY ── */
-    .order-summary {
-      background: var(--purple-pale);
-      border-radius: 16px;
-      padding: 16px 18px;
-      margin: 20px 0 0;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .order-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 14px;
-    }
-    .order-row .label { color: var(--grey); font-weight: 500; }
-    .order-row .value { font-weight: 700; color: var(--black); }
-    .order-row.total .label { font-weight: 700; color: var(--black); font-size: 15px; }
-    .order-row.total .value { font-size: 17px; color: var(--purple); }
-    .order-divider { border: none; border-top: 1px solid #d4c8ff; margin: 4px 0; }
-    .order-note { font-size: 12px; color: var(--grey); font-weight: 500; margin-top: 2px; }
-
-    /* ── TOTAL CARD ── */
-    .total-card {
-      background: #f7f5ff;
-      border: 1.5px solid var(--border);
-      border-radius: 16px;
-      padding: 16px;
-      margin: 20px 0 0;
-    }
-    .total-card-product {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .total-card-img {
-      width: 52px;
-      height: 52px;
-      border-radius: 12px;
-      object-fit: cover;
+    .testimonial-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      overflow: hidden;
       flex-shrink: 0;
     }
-    .total-card-info { flex: 1; }
-    .total-card-name { font-size: 14px; font-weight: 700; color: var(--black); }
-    .total-card-sub  { font-size: 12px; color: var(--grey); margin-top: 2px; }
-    .total-card-price { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-    .total-card-old  { font-size: 12px; color: #aaa; text-decoration: line-through; }
-    .total-card-new  { font-size: 16px; font-weight: 800; color: var(--purple); }
-    .total-card-benefits {
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .total-card-benefits div {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--black);
-    }
-    .total-card-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
-    .total-card-row  { display: flex; justify-content: space-between; align-items: center; }
-    .total-card-label { font-size: 15px; font-weight: 700; color: var(--black); }
-    .total-card-amount { font-size: 15px; font-weight: 800; color: var(--black); }
+    .testimonial-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .testimonial-text { font-size: 14px; font-weight: 700; color: #0A0A0A; line-height: 1.3; text-align: right; }
+    .testimonial-name { font-size: 13px; font-weight: 500; color: #333; text-align: right; }
+    .testimonial-name::before { content: "• "; }
 
-    /* ── CTA ── */
+    .page-wrap { padding: 36px 20px 0; }
+
+    /* ─── LOGO ─── */
+    .logo-wrap {
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 32px;
+    }
+    .logo-wrap img { height: 36px; width: auto; display: block; }
+
+    /* ─── CAROUSEL ─── */
+    .carousel-wrap { margin-bottom: 32px; }
+    #carousel-outer {
+      position: relative; border-radius: 23px; overflow: hidden;
+      width: 100%; aspect-ratio: 1/1; background: #5B3FD9;
+    }
+    .c-slide { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; }
+    .c-slide.active { display: flex; }
+    .c-slide img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .c-slide video { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .c-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.85); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 18px; z-index: 5;
+    }
+    .c-arrow.prev { left: 10px; }
+    .c-arrow.next { right: 10px; }
+    #carousel-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+    .c-dot {
+      width: 44px; height: 44px; border-radius: 8px; overflow: hidden;
+      cursor: pointer; border: 2px solid transparent; flex-shrink: 0; opacity: 0.5;
+    }
+    .c-dot.active { border-color: #3513A2; opacity: 1; }
+    .c-dot img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    /* ─── STARS ─── */
+    .stars-row { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .stars-gradient {
+      font-size: 22px; letter-spacing: 2px;
+      background: linear-gradient(90deg, #A387FF 0%, #C931E0 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .stars-author { font-size: 14px; font-weight: 600; color: #0A0A0A; text-decoration: underline; }
+
+    /* ─── HEADLINE ─── */
+    .headline {
+      font-size: 36px; font-weight: 900; color: #0A0A0A;
+      line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 12px;
+    }
+    .subheadline { font-size: 16px; font-weight: 500; color: #555; margin-bottom: 24px; line-height: 1.5; }
+
+    /* ─── PRICE HIGHLIGHT ─── */
+    .price-highlight { margin-bottom: 24px; margin-top: 0; }
+    .price-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .price-old { font-size: 16px; font-weight: 500; color: #aaa; text-decoration: line-through; }
+    .price-new { font-size: 28px; font-weight: 900; color: #673FE8; }
+    .price-badge {
+      display: inline-flex; align-items: center; background: #3513A2; color: #fff;
+      font-size: 12px; font-weight: 700; border-radius: 50px; padding: 4px 12px;
+      white-space: nowrap; margin-left: auto;
+    }
+
+    /* ─── FEATURES ─── */
+    .features { display: flex; flex-direction: column; gap: 24px; margin-bottom: 40px; }
+    .feature-row { display: flex; align-items: center; gap: 14px; }
+    .feature-icon {
+      width: 36px; height: 36px; background: #80F172;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .feature-icon img { width: 18px; height: 18px; }
+    .feature-text { font-size: 16px; font-weight: 700; color: #0A0A0A; line-height: 1.3; }
+
+    /* ─── OFFER CARD ─── */
+    .offer-wrap { position: relative; margin-bottom: 28px; padding-top: 22px; }
+    .offer-badge {
+      position: absolute; top: 0; left: 20px;
+      background: #3513A2; border-radius: 50px;
+      padding: 5px 16px; display: inline-flex; align-items: center; gap: 6px;
+      white-space: nowrap; z-index: 2;
+    }
+    .offer-badge span { font-size: 13px; font-weight: 700; color: #fff; }
+    .offer-card {
+      border: 3px solid #3513A2; border-radius: 50px;
+      background: #F7F6FF; padding: 28px 20px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .offer-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+    .offer-icon img { width: 52px; height: 52px; object-fit: contain; }
+    .offer-info { flex: 1; min-width: 0; }
+    .offer-name { font-size: 15px; font-weight: 800; color: #0A0A0A; }
+    .offer-sub { font-size: 13px; font-weight: 500; color: #555; }
+    .offer-price { text-align: right; flex-shrink: 0; }
+    .offer-price-main { font-size: 20px; font-weight: 800; color: #3513A2; }
+    .offer-price-old { font-size: 13px; font-weight: 500; color: #888; text-decoration: line-through; }
+
+    /* ─── CTA ─── */
     .cta-btn {
-      display: block;
-      width: 100%;
-      background: var(--green);
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-size: 18px;
-      font-weight: 800;
-      border: none;
-      border-radius: 50px;
-      padding: 18px 20px;
-      cursor: pointer;
-      margin-top: 20px;
-      letter-spacing: -0.01em;
-      transition: filter 0.15s, transform 0.1s;
+      display: block; width: 100%;
+      background: #45E031; color: #000;
+      font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 800;
+      border: none; border-radius: 50px; padding: 18px 20px;
+      cursor: pointer; transition: filter 0.2s; letter-spacing: -0.01em;
+      margin-bottom: 24px;
+    }
+    .cta-btn:hover { filter: brightness(1.08); }
+    .cta-btn:active { filter: brightness(0.92); }
+
+    /* ─── TRUST BADGES ─── */
+    .badges { display: flex; justify-content: center; gap: 16px; margin-bottom: 56px; }
+    .badge { display: flex; flex-direction: column; align-items: center; gap: 6px; flex: 1; max-width: 100px; }
+    .badge img { width: 56px; height: 56px; object-fit: contain; }
+    .badge-label { font-size: 11px; font-weight: 600; color: #555; text-align: center; line-height: 1.3; }
+
+    /* ─── DIVIDER ─── */
+    .section-divider { border: none; border-top: 1.5px solid #F0EAFF; margin: 0 20px 56px; }
+
+    /* ─── YOU'LL LOVE IT ─── */
+    .love-section { padding: 0 20px 56px; }
+    .section-title { font-size: 28px; font-weight: 900; color: #0A0A0A; text-align: center; margin-bottom: 28px; }
+    .love-card {
+      border-radius: 20px; overflow: hidden;
       position: relative;
     }
-    .cta-btn:hover  { filter: brightness(1.07); }
-    .cta-btn:active { transform: scale(0.98); }
+    .love-card img { width: 100%; height: auto; display: block; }
+    .love-quote {
+      background: rgba(0,0,0,0.55);
+      padding: 16px 18px;
+    }
+    .love-quote-text { font-size: 14px; font-weight: 500; color: #fff; line-height: 1.5; margin-bottom: 6px; font-style: italic; }
+    .love-quote-author { font-size: 13px; font-weight: 700; color: #C4B4FF; }
 
+    /* ─── HOW IT WORKS ─── */
+    .how-section { padding: 0 20px 56px; }
+    .video-wrap {
+      border-radius: 20px; overflow: hidden;
+      position: relative; cursor: pointer;
+      background: #000;
+    }
+    .video-wrap video { width: 100%; display: block; border-radius: 20px; }
+    .video-tap {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding-bottom: 16px;
+      background: linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 50%);
+    }
+    .video-play {
+      width: 52px; height: 52px; background: rgba(255,255,255,0.9);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 8px;
+    }
+    .video-play svg { margin-left: 4px; }
+    .video-label { font-size: 13px; font-weight: 700; color: #fff; }
 
-    .spinner {
-      display: none;
-      width: 20px; height: 20px;
-      border: 3px solid rgba(0,0,0,0.2);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      position: absolute;
-      right: 22px; top: 50%;
-      transform: translateY(-50%);
+    /* ─── STEPS ─── */
+    .steps-section { padding: 0 20px 56px; }
+    .step-card {
+      border-radius: 20px; overflow: hidden;
+      margin-bottom: 24px;
+      background: #F0EAFF;
+      max-width: 340px;
+      margin-left: auto;
+      margin-right: auto;
     }
-    .cta-btn.loading .spinner { display: block; }
-    @keyframes spin { to { transform: translateY(-50%) rotate(360deg); } }
+    .step-card img { width: 100%; height: 220px; object-fit: cover; object-position: center top; display: block; border-radius: 20px 20px 0 0; }
+    .step-label { font-size: 20px; font-weight: 800; color: #0A0A0A; padding: 14px 18px; }
 
-    /* ── ERROR ── */
-    #payment-message {
-      display: none;
-      background: #fff0f0;
-      border: 1.5px solid #fca5a5;
-      border-radius: 12px;
-      padding: 12px 16px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #b91c1c;
-      margin-top: 14px;
-      text-align: center;
+    /* ─── NO NEED TO ─── */
+    .noneed-section { padding: 0 20px 56px; text-align: center; }
+    .noneed-title { font-size: 24px; font-weight: 900; color: #0A0A0A; margin-bottom: 24px; }
+    .noneed-grid { display: flex; justify-content: center; gap: 16px; }
+    .noneed-item { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1; max-width: 100px; }
+    .noneed-x {
+      width: 52px; height: 52px; background: #FF4444;
+      border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      font-size: 24px; font-weight: 900; color: #fff;
     }
-    #payment-message.show { display: block; }
+    .noneed-label { font-size: 13px; font-weight: 600; color: #0A0A0A; text-align: center; line-height: 1.3; }
 
-    /* ── TRUST ── */
-    .trust-row {
-      display: flex;
-      justify-content: center;
-      margin-top: 28px;
-      border-top: 1.5px solid var(--border);
-      padding-top: 24px;
-    }
-    .trust-item {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      text-align: center;
-      padding: 0 8px;
-    }
-    .trust-item + .trust-item { border-left: 1.5px solid var(--border); }
-    .trust-badge { width: 72px; height: 72px; object-fit: contain; display: block; margin: 0 auto; }
-    .trust-label { font-size: 11px; font-weight: 700; color: var(--black); line-height: 1.35; text-align: center; margin-top: 6px; display: block; }
+    /* ─── STUPIDLY EASY ─── */
+    .easy-section { padding: 0 20px 56px; text-align: center; }
+    .easy-title { font-size: 24px; font-weight: 900; color: #0A0A0A; margin-bottom: 20px; }
+    .easy-img { width: 100%; max-width: 280px; height: auto; display: block; margin: 0 auto 16px; }
+    .easy-labels { display: flex; justify-content: space-around; margin-bottom: 24px; }
+    .easy-label { font-size: 13px; font-weight: 600; color: #555; text-align: center; max-width: 120px; line-height: 1.4; }
 
-    .reassurance {
-      text-align: center;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--black);
-      padding: 14px 0 4px;
+    /* ─── BEST INVESTMENT ─── */
+    .invest-section { padding: 0 20px 56px; text-align: center; }
+    .invest-title { font-size: 24px; font-weight: 900; color: #0A0A0A; margin-bottom: 24px; }
+    .invest-grid { display: flex; gap: 16px; margin-bottom: 32px; }
+    .invest-card {
+      flex: 1; background: #EAE4FF; border-radius: 16px;
+      padding: 20px 14px; text-align: center;
     }
-    .stripe-note {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 12px;
-      color: #aaa;
-      font-weight: 500;
-    }
-    .stripe-note a { color: #aaa; }
+    .invest-icon { font-size: 28px; margin-bottom: 10px; }
+    .invest-text { font-size: 15px; font-weight: 700; color: #0A0A0A; line-height: 1.3; }
+    .invest-price { font-size: 18px; font-weight: 900; color: #0A0A0A; margin-bottom: 32px; }
 
-    @media (max-width: 360px) {
-      .hero-headline { font-size: 23px; }
-      .price-new { font-size: 26px; }
+    /* ─── STILL NOT SURE ─── */
+    .guarantee-section { padding: 0 20px 56px; text-align: center; }
+    .guarantee-title { font-size: 28px; font-weight: 900; color: #0A0A0A; margin-bottom: 20px; }
+    .guarantee-badge-img { width: 120px; height: 120px; object-fit: contain; display: block; margin: 0 auto 20px; }
+    .guarantee-text { font-size: 18px; color: #0A0A0A; line-height: 1.6; margin-bottom: 16px; }
+    .guarantee-bold { font-size: 18px; font-weight: 800; color: #0A0A0A; margin-bottom: 36px; }
+
+    /* ─── FAQ ─── */
+    .faq-wrap { padding: 8px 20px 48px; }
+    .faq-title { font-size: clamp(20px,5vw,26px); font-weight: 900; color: #000; margin-bottom: 20px; padding-top: 24px; text-align: center; }
+    .mfaq-item { border-bottom: 1px solid #E8D9F5; }
+    .mfaq-q {
+      width: 100%; display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; padding: 20px 0; font-size: 16px; font-weight: 600; color: #0A0A0A;
+      background: none; border: none; cursor: pointer; text-align: left;
+      font-family: 'Inter', sans-serif;
     }
+    .mfaq-icon { flex-shrink: 0; transition: transform 0.2s; color: #3513A2; font-size: 18px; }
+    .mfaq-item.open .mfaq-icon { transform: rotate(180deg); }
+    .mfaq-a { font-size: 15px; color: #555; line-height: 1.75; padding-bottom: 20px; display: none; font-weight: 400; }
+    .mfaq-item.open .mfaq-a { display: block; }
   </style>
 </head>
 <body>
 
-<div class="page">
+<div class="inner">
 
-  <!-- LOGO -->
-  <div class="header">
+
+
+  <div class="page-wrap">
+
+    <!-- LOGO -->
     <div class="logo-wrap">
-      <img src="/logotousebro.webp" alt="Numio" style="height:40px; width:auto; display:block; object-fit:contain;" width="280" height="70"/>
+      <img src="/logotousebro.webp" alt="Numio" fetchpriority="high"/>
     </div>
-  </div>
 
-  <!-- ORDER SUMMARY HEADER (Trenchies style) -->
-  <div class="order-header" onclick="toggleOrderDetails()">
-    <div class="order-header-left">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-      Order summary
-      <span class="order-header-chevron" id="chevron">▼</span>
-    </div>
-    <div class="order-header-right">
-      <span class="order-header-old">$5.00</span>
-      <span class="order-header-new">$1.00</span>
-    </div>
-  </div>
-  <div class="order-header-details" id="order-details">
-    <div style="background:#f7f5ff; border-radius:12px; padding:12px 16px; font-size:13px; color:var(--grey); border: 1.5px solid var(--border); margin-bottom:8px;">
-      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
-        <span style="font-weight:600; color:var(--black);">Numio Ultimate</span>
-        <span style="font-weight:700; color:var(--purple);">$1.00</span>
-      </div>
-      <div style="font-size:12px;">Unlimited practice · No ads · $1/month</div>
-    </div>
-  </div>
-
-  <!-- HERO IMAGE -->
-  <div class="hero-img-wrap">
-    <img src="/checkoutimage.webp" alt="Numio app" class="hero-img" fetchpriority="high" width="700" height="700"/>
-  </div>
-
-  <!-- COUNTDOWN TIMER -->
-  <div class="countdown-box">
-    <div class="countdown-label">🚨 <strong>Your limited offer ends in:</strong></div>
-    <div class="countdown-timer"><span id="c-h">01</span> : <span id="c-m">20</span> : <span id="c-s">58</span></div>
-  </div>
-
-  <!-- HERO COPY -->
-  <div class="hero">
-    <h1 class="hero-headline">Help your child practise for school</h1>
-    <ul class="benefits">
-      <li>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-        Better practise for your child
-      </li>
-      <li>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-        You get to relax
-      </li>
-      <li>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-        Only $0.03 per day
-      </li>
-      <li>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-        Money back if not happy
-      </li>
-    </ul>
-  </div>
-
-  <!-- PAYMENT -->
-  <div class="payment-section">
-    <div class="section-label">Payment details</div>
-    <div id="element-skeleton">Loading secure payment form…</div>
-    <div id="payment-element" style="display:none;"></div>
-
-
-
-    <!-- TOTAL CARD (Trenchies style) -->
-    <div class="total-card">
-      <div class="total-card-product">
-        <img src="/numioultimateimage.webp" alt="Numio app" class="total-card-img" width="52" height="52"/>
-        <div class="total-card-info">
-          <div class="total-card-name">Numio Ultimate</div>
-          <div class="total-card-sub">$1/month · cancel anytime</div>
-          <div class="total-card-benefits">
-            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>Better practise for your child</div>
-            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>You get to relax</div>
-          </div>
+    <!-- CAROUSEL -->
+    <div class="carousel-wrap">
+      <div id="carousel-outer">
+        <div class="c-slide active" id="slide-0">
+          <img src="/thefristimageotusenowbro.webp" alt="Numio" fetchpriority="high"/>
         </div>
-        <div class="total-card-price">
-          <span class="total-card-old">$5.00</span>
-          <span class="total-card-new">$1.00</span>
+        <div class="c-slide" id="slide-1" style="background:#000;">
+          <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:contain;display:block;">
+            <source src="/carouselvideo.mp4" type="video/mp4"/>
+          </video>
+        </div>
+        <div class="c-slide" id="slide-2">
+          <img src="/carouselimages__3_.webp" alt="4 reasons to try Numio" loading="lazy"/>
+        </div>
+        <div class="c-slide" id="slide-3">
+          <img src="/carouselimages__2_.webp" alt="How to use Numio" loading="lazy"/>
+        </div>
+        <div class="c-slide" id="slide-4">
+          <img src="/carouselimages__1_.webp" alt="Practise their exact lessons" loading="lazy"/>
+        </div>
+        <div class="c-slide" id="slide-5">
+          <img src="/carouselimages__4_.webp" alt="Why is Numio the best option" loading="lazy"/>
+        </div>
+        <div class="c-slide" id="slide-6">
+          <img src="/carouselimages__5_.webp" alt="Money back guarantee" loading="lazy"/>
+        </div>
+        <button class="c-arrow prev" onclick="carouselMove(-1)">‹</button>
+        <button class="c-arrow next" onclick="carouselMove(1)">›</button>
+      </div>
+      <div id="carousel-dots">
+        <div class="c-dot active" onclick="carouselGo(0)"><img src="/thefristimageotusenowbro.webp"/></div>
+        <div class="c-dot" onclick="carouselGo(1)" style="position:relative;">
+          <img src="/carouselvideo-thumb.webp" style="background:#5B3FD9;object-fit:contain;"/>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);"><span style="font-size:12px;color:#fff;">▶</span></div>
+        </div>
+        <div class="c-dot" onclick="carouselGo(2)"><img src="/carouselimages__3_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(3)"><img src="/carouselimages__2_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(4)"><img src="/carouselimages__1_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(5)"><img src="/carouselimages__4_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(6)"><img src="/carouselimages__5_.webp" loading="lazy"/></div>
+      </div>
+    </div>
+
+    <!-- STARS + AUTHOR -->
+    <div class="stars-row">
+      <span class="stars-gradient">★★★★★</span>
+      <span class="stars-author">Khadija, mother in Canada</span>
+    </div>
+
+    <!-- HEADLINE -->
+    <h1 class="headline">Help your child practise for school</h1>
+    <p class="subheadline">... Without you having to find, prepare, or explain anything.</p>
+
+    <!-- PRICE -->
+    <div class="price-highlight">
+      <div class="price-row">
+        <span class="price-old">$5/month</span>
+        <div style="position:relative; display:inline-block;">
+          <span class="price-badge" style="position:absolute; top:-22px; left:100px; white-space:nowrap;">% Save $48/year!</span>
+          <span class="price-new">$1/month</span>
         </div>
       </div>
-      <hr class="total-card-divider"/>
-      <div class="total-card-row">
-        <span class="total-card-label">Total due now</span>
-        <span class="total-card-amount">USD $1.00</span>
+    </div>
+
+    <!-- FEATURES -->
+    <div class="features">
+      <div class="feature-row">
+        <div class="feature-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg></div>
+        <div class="feature-text">Just take a picture of their lesson</div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><img src="/icon-target.png" alt=""/></div>
+        <div class="feature-text">Get questions based on what they're learning</div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        </div>
+        <div class="feature-text">Generate as many questions as they need</div>
+      </div>
+      <div class="feature-row">
+        <div class="feature-icon"><img src="/icon-run.png" alt=""/></div>
+        <div class="feature-text">Ready to practise in 15 seconds</div>
       </div>
     </div>
 
-    <button id="submit-btn" class="cta-btn">
-      <span id="btn-text">START NUMIO FOR $1 →</span>
-      <span class="spinner"></span>
-    </button>
+    <!-- OFFER CARD -->
+    <div class="offer-wrap" id="offer-card">
+      <div class="offer-badge"><span>% Save $48/year!</span></div>
+      <div class="offer-card">
+        <div class="offer-icon"><img src="/gold-zag.webp" alt="Numio" loading="lazy"/></div>
+        <div class="offer-info" style="white-space:nowrap;">
+          <div class="offer-name" style="white-space:nowrap;">Numio Full access</div>
+          <div class="offer-sub" style="white-space:nowrap;">Only $0.04 per day!</div>
+        </div>
+        <div class="offer-price" style="white-space:nowrap; text-align:right; flex-shrink:0;">
+          <div class="offer-price-main" style="white-space:nowrap;">$1/month</div>
+          <div class="offer-price-old" style="white-space:nowrap;">$5/month</div>
+        </div>
+      </div>
+    </div>
 
-    <div id="payment-message"></div>
+    <!-- CTA -->
+    <button class="cta-btn" onclick="goToCheckout()">Start Today For Just $1 →</button>
+
+    <!-- TRUST BADGES -->
+    <div class="badges">
+      <div class="badge">
+        <img src="/moneybackbadgebro.webp" alt="365-Day Money-Back" loading="lazy"/>
+        <div class="badge-label">365-Day<br>Money-Back</div>
+      </div>
+      <div class="badge">
+        <img src="/cancelanytimebadgebro.webp" alt="Cancel Anytime" loading="lazy"/>
+        <div class="badge-label">Cancel<br>Anytime</div>
+      </div>
+      <div class="badge">
+        <img src="/scurepayemntbadgebro.webp" alt="100% Secure Payment" loading="lazy"/>
+        <div class="badge-label">100% Secure<br>Payment</div>
+      </div>
+    </div>
+
   </div>
 
-  <!-- REASSURANCE LINE -->
-  <div class="reassurance">
-    Better grades for your child and you relax 😉
-  </div>
+  <hr class="section-divider"/>
 
-  <!-- TRUST BADGES -->
-  <div class="trust-row">
-    <div class="trust-item">
-      <img src="/moneybackbadgebro.webp" alt="365-Day Money-Back Guarantee" class="trust-badge" width="72" height="72"/>
-      <span class="trust-label">365-Day<br>Money-Back</span>
-    </div>
-    <div class="trust-item">
-      <img src="/cancelanytimebadgebro.webp" alt="Cancel Anytime" class="trust-badge" width="72" height="72"/>
-      <span class="trust-label">Cancel<br>Anytime</span>
-    </div>
-    <div class="trust-item">
-      <img src="/scurepayemntbadgebro.webp" alt="100% Secure Payment" class="trust-badge" width="72" height="72"/>
-      <span class="trust-label">100% Secure<br>Payment</span>
+  <!-- YOU'LL LOVE IT -->
+  <div class="love-section">
+    <div class="section-title">You'll love it!</div>
+    <div class="love-card">
+      <img src="/imagetousebroforyoullloveitnewsection.webp" alt="Anass & Ismail" loading="lazy"/>
     </div>
   </div>
 
-  <p class="stripe-note">
-    Payments secured by <a href="https://stripe.com" target="_blank" rel="noopener">Stripe</a>
-  </p>
+  <hr class="section-divider"/>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-section">
+    <div class="section-title">Here's how it works<br>in 16 seconds:</div>
+    <div class="video-wrap" onclick="playVideo(this)" style="max-width:100%;overflow:hidden;">
+      <video id="how-video" preload="none" playsinline poster="/videoposter.webp" style="width:100%;height:100%;display:block;border-radius:20px;object-fit:cover;">
+        <source src="/videotouse.mp4" type="video/mp4"/>
+      </video>
+      <div class="video-tap" id="video-tap">
+        <div class="video-play">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#3513A2"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-label">▶ Tap to watch</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- STEPS -->
+  <div class="steps-section">
+    <div class="step-card">
+      <img src="/Studypngimagetouse.webp" alt="#1 Study" loading="lazy"/>
+      <div class="step-label">#1 Study</div>
+    </div>
+    <div class="step-card">
+      <img src="/Takeapicpngimagetouse.webp" alt="#2 Take a pic" loading="lazy"/>
+      <div class="step-label">#2 Take a pic</div>
+    </div>
+    <div class="step-card">
+      <img src="/Practisepngimagetouse.webp" alt="#3 Practise!" loading="lazy"/>
+      <div class="step-label">#3 Practise!</div>
+    </div>
+
+    <button class="cta-btn" onclick="scrollToOfferCard()">Start Today For Just $1 →</button>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- NO NEED TO -->
+  <div class="noneed-section">
+    <div class="noneed-title">No need to:</div>
+    <div class="noneed-grid">
+      <div class="noneed-item">
+        <div class="noneed-x">✕</div>
+        <div class="noneed-label">Search for Exercises</div>
+      </div>
+      <div class="noneed-item">
+        <div class="noneed-x">✕</div>
+        <div class="noneed-label">Pay for books</div>
+      </div>
+      <div class="noneed-item">
+        <div class="noneed-x">✕</div>
+        <div class="noneed-label">Pay for private help</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- STUPIDLY EASY -->
+  <div class="easy-section">
+    <div class="easy-title">Stupidly Easy and Fast.</div>
+    <div style="display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:16px;">
+      <div style="flex:1; text-align:center;">
+        <img src="/tousebro.webp" alt="Take a pic" loading="lazy" style="width:100%; max-width:140px; height:auto; aspect-ratio:1/1; display:inline-block;"/>
+      </div>
+      <div style="flex:0 0 52px; display:flex; align-items:center; justify-content:center;">
+        <img src="/tousebro%20(2).webp" alt="arrow" loading="lazy" style="width:44px; height:auto;"/>
+      </div>
+      <div style="flex:1; text-align:center;">
+        <img src="/tousebro%20(1).webp" alt="Practise" loading="lazy" style="width:100%; max-width:140px; height:auto; aspect-ratio:1/1; display:inline-block;"/>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:space-around; margin-top:12px;">
+      <div style="flex:1; text-align:center; font-size:15px; font-weight:800; color:#0A0A0A; line-height:1.3;">Just take a pic<br>(That's it)</div>
+      <div style="flex:0 0 52px;"></div>
+      <div style="flex:1; text-align:center; font-size:15px; font-weight:800; color:#0A0A0A; line-height:1.3;">Start practising<br>in just 15 seconds</div>
+    </div>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- BEST INVESTMENT -->
+  <div class="invest-section">
+    <div class="invest-title">Simply the best investment<br>for your family:</div>
+    <div class="invest-grid">
+      <div class="invest-card">
+        <div class="invest-icon"><img src="/icon-aplus.png" style="width:32px;height:32px;object-fit:contain;"/></div>
+        <div class="invest-text">1- Kids understand their lessons</div>
+      </div>
+      <div class="invest-card">
+        <div class="invest-icon"><img src="/icon-relax.png" style="width:32px;height:32px;object-fit:contain;"/></div>
+        <div class="invest-text">2- You (parents) can relax!</div>
+      </div>
+    </div>
+    <div class="invest-price">All that for less than $0.04 per day!</div>
+    <button class="cta-btn" onclick="scrollToOfferCard()">Start Today For Just $1 →</button>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- STILL NOT SURE -->
+  <div class="guarantee-section">
+    <div class="guarantee-title">... still not sure?</div>
+    <img src="/badgegarantee365daystouse.webp" alt="365 Day Guarantee" class="guarantee-badge-img" loading="lazy"/>
+    <p class="guarantee-text">You have 365 days to decide if Numio really helps your child,</p>
+    <p class="guarantee-text">If you're not satisfied, you can:</p>
+    <p class="guarantee-bold">Cancel anytime<br>+ get 100% of your money back!</p>
+    <button class="cta-btn" onclick="scrollToOfferCard()">Start Today For Just $1 →</button>
+  </div>
+
+  <hr class="section-divider"/>
+
+  <!-- FAQ -->
+  <div class="faq-wrap">
+    <div class="faq-title">Questions you may have:</div>
+    <div class="mfaq-item open">
+      <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">Will this actually work for MY child?<span class="mfaq-icon">⌄</span></button>
+      <div class="mfaq-a">Yes. Numio works for any child aged 5–11, any subject, any grade. You take a picture of their actual lesson — so the practice is always built around exactly what they're learning right now. Not a generic child. Your child.</div>
+    </div>
+    <div class="mfaq-item">
+      <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">But won't my child just waste time on their phone?<span class="mfaq-icon">⌄</span></button>
+      <div class="mfaq-a">No. Numio is a short daily practice session — no ads, no videos, no social feed, nothing to get distracted by. Your child opens it, answers their questions, earns their coins, and closes it. That's the whole thing.</div>
+    </div>
+    <div class="mfaq-item">
+      <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">Will my child actually WANT to use this?<span class="mfaq-icon">⌄</span></button>
+      <div class="mfaq-a">Yes. Your child earns coins every time they complete their practice. You decide what those coins unlock — screen time, a snack, a toy, anything they already want. They come back on their own because the reward is waiting.</div>
+    </div>
+    <div class="mfaq-item">
+      <button class="mfaq-q" onclick="this.parentElement.classList.toggle('open')">What if I pay and it doesn't help?<span class="mfaq-icon">⌄</span></button>
+      <div class="mfaq-a">Then you get every cent back. You have 365 days to try Numio with your child. If you don't feel it's helping them practice — message us and we refund every cent. No forms. No questions. No waiting.<br><br>To request a refund, message us on WhatsApp: <strong>+1 (438) 410-2068</strong>. Note: a minimum of 7 days of use is required to be eligible for a refund.</div>
+    </div>
+  </div>
 
 </div>
 
 <script>
-  const PUBLISHABLE_KEY = 'pk_live_51Nu0S3F3Ob4o24uqvgOJGlSwUt5Bi6aWVFzweQddyD9A8FDAFNykkpZbIDq1o9ZhK09tt9pH8fw3MMLUvDRx2Eea00gLhad5Yg';
-  const PRICE_ID        = 'price_1UDqvBF3Ob4o24uqrCgIJQPm';
-  const SUCCESS_URL     = 'https://numiomath.app/success';
-  const BACKEND_URL     = 'https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout-session';
-
-  const stripe     = Stripe(PUBLISHABLE_KEY);
-  let   elements;
-
-  const submitBtn   = document.getElementById('submit-btn');
-  const btnText     = document.getElementById('btn-text');
-  const msgEl       = document.getElementById('payment-message');
-  const skeleton    = document.getElementById('element-skeleton');
-  const elementWrap = document.getElementById('payment-element');
-
-  function showError(msg) {
-    msgEl.textContent = msg;
-    msgEl.classList.add('show');
-    submitBtn.disabled = false;
-    submitBtn.classList.remove('loading');
-    btnText.textContent = 'START NUMIO FOR $1 →';
-  }
-
-  async function initStripe() {
-    try {
-      const res = await fetch(BACKEND_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: PRICE_ID }),
-      });
-
-      if (!res.ok) throw new Error('Could not start payment session.');
-
-      const { clientSecret } = await res.json();
-
-      elements = stripe.elements({
-        clientSecret,
-        appearance: {
-          theme: 'stripe',
-          variables: {
-            colorPrimary:    '#3513A2',
-            colorBackground: '#ffffff',
-            colorText:       '#0A0A0A',
-            colorDanger:     '#b91c1c',
-            fontFamily:      'Inter, system-ui, sans-serif',
-            borderRadius:    '12px',
-          },
-          rules: {
-            '.Input': { border: '1.5px solid #D4C8FF', boxShadow: 'none' },
-            '.Input:focus': { border: '1.5px solid #3513A2', boxShadow: '0 0 0 3px rgba(53,19,162,0.12)' },
-            '.Label': { fontWeight: '600', color: '#0A0A0A' },
-          },
-        },
-      });
-
-      const paymentElement = elements.create('payment', {
-        layout: 'tabs',
-        wallets: { applePay: 'auto', googlePay: 'auto' },
-      });
-
-      skeleton.style.display = 'none';
-      elementWrap.style.display = 'block';
-      paymentElement.mount('#payment-element');
-
-
-    } catch (err) {
-      skeleton.textContent = '⚠️ Could not load payment form. Please refresh.';
-      console.error(err);
+  // ── CAROUSEL ──
+  let cIndex = 0;
+  const cTotal = 7;
+  function carouselRender() {
+    for (let i = 0; i < cTotal; i++) {
+      const slide = document.getElementById('slide-' + i);
+      if (!slide) continue;
+      slide.classList.toggle('active', i === cIndex);
+      const vid = slide.querySelector('video');
+      if (vid) { i === cIndex ? vid.play().catch(()=>{}) : vid.pause(); }
     }
-  }
-
-  submitBtn.addEventListener('click', async () => {
-    if (!elements) return;
-    msgEl.classList.remove('show');
-    submitBtn.disabled = true;
-    submitBtn.classList.add('loading');
-    btnText.textContent = 'Processing…';
-
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: { return_url: SUCCESS_URL },
+    document.querySelectorAll('.c-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === cIndex);
     });
+  }
+  function carouselMove(dir) { cIndex = (cIndex + dir + cTotal) % cTotal; carouselRender(); }
+  function carouselGo(i) { cIndex = i; carouselRender(); }
+  (function() {
+    let startX = 0;
+    const outer = document.getElementById('carousel-outer');
+    if (!outer) return;
+    outer.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    outer.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) carouselMove(diff > 0 ? 1 : -1);
+    }, { passive: true });
+  })();
 
-    if (error) {
-      showError(error.type === 'card_error' || error.type === 'validation_error'
-        ? error.message
-        : 'Something went wrong. Please try again.');
-    }
+  function scrollToOfferCard() {
+    document.getElementById('offer-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ── POPUP — scroll up exit intent ──
+  let popupShown = false;
+  let lastScrollY = window.scrollY;
+  let maxScrolledDown = 0;
+
+  function closePopup() { document.getElementById('popup-overlay').style.display = 'none'; }
+  function showPopup() {
+    if (popupShown) return;
+    popupShown = true;
+    document.getElementById('popup-overlay').style.display = 'flex';
+  }
+
+  window.addEventListener('scroll', function() {
+    const currentY = window.scrollY;
+    const halfPage = document.body.scrollHeight / 2;
+    if (currentY > maxScrolledDown) maxScrolledDown = currentY;
+    if (maxScrolledDown >= halfPage && currentY < lastScrollY - 80) showPopup();
+    lastScrollY = currentY;
+  }, { passive: true });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const overlay = document.getElementById('popup-overlay');
+    if (overlay) overlay.addEventListener('click', function(e) { if (e.target === this) closePopup(); });
   });
 
-  // ── COUNTDOWN ──
-
-  function toggleOrderDetails() {
-    const details = document.getElementById('order-details');
-    const chevron = document.getElementById('chevron');
-    details.classList.toggle('show');
-    chevron.classList.toggle('open');
+  function goToCheckout() {
+    if(typeof fbq!=='undefined') fbq('track','InitiateCheckout');
+    window.location.href='https://numiomath.app/checkout';
   }
 
-  initStripe();
+  function playVideo(wrap) {
+    const video = wrap.querySelector('video');
+    const tap = wrap.querySelector('#video-tap');
+    tap.style.display = 'none';
+    video.muted = false;
+    video.play().catch(() => { video.muted = true; video.play(); });
+  }
 </script>
 
-<script>
-  (function() {
-    var _end = new Date("2026-09-16T00:01:00").getTime();
-    function tick() {
-      var d = Math.max(0, _end - Date.now());
-      var h = document.getElementById('c-h');
-      var m = document.getElementById('c-m');
-      var s = document.getElementById('c-s');
-      if (!h) return;
-      h.textContent = String(Math.floor(d / 3600000)).padStart(2,'0');
-      m.textContent = String(Math.floor((d % 3600000) / 60000)).padStart(2,'0');
-      s.textContent = String(Math.floor((d % 60000) / 1000)).padStart(2,'0');
-    }
-    tick();
-    setInterval(tick, 1000);
-  })();
-</script>
+
+<!-- POPUP (scroll up exit intent) -->
+<div id="popup-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#9D80FD; max-width:420px; width:100%; padding:48px 32px; position:relative; text-align:center; border-radius:20px;">
+    <button onclick="closePopup()" style="position:absolute; top:12px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#fff;">✕</button>
+    <div style="font-size:clamp(28px,7vw,36px); font-weight:900; color:#fff; margin-bottom:24px;">🔓 Guarantee Unlocked</div>
+    <div style="font-size:clamp(18px,5vw,22px); font-weight:400; color:#fff; line-height:1.3; margin-bottom:40px;">Either your child practises more or you get your $1 back!</div>
+    <button onclick="closePopup(); scrollToOfferCard();" style="display:block;width:100%;background:#45E031;color:#000;font-family:'Inter',sans-serif;font-size:18px;font-weight:700;border:none;border-radius:50px;padding:18px;cursor:pointer;">Start Today For Just $1 →</button>
+  </div>
+</div>
+
 </body>
 </html>
