@@ -130,10 +130,25 @@
       display: inline-block;
     }
 
+    /* ── GUARANTEE COPY ── */
+    .guarantee-copy {
+      padding: 24px 0 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .guarantee-copy p {
+      font-size: 29px;
+      font-weight: 800;
+      color: var(--black);
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+    }
+
     /* ── HERO IMAGE ── */
-    .hero-img-wrap {
+    .hero-placeholder {
       width: 100%;
-      margin: 16px 0 16px;
+      margin: 16px 0 0;
     }
     .hero-img {
       width: 100%;
@@ -157,6 +172,7 @@
       color: var(--black);
       margin-bottom: 6px;
     }
+    .countdown-sublabel { font-size: 13px; font-weight: 500; color: var(--grey); margin-bottom: 4px; }
     .countdown-timer {
       font-size: 28px;
       font-weight: 300;
@@ -184,13 +200,25 @@
       gap: 14px;
       text-align: left;
     }
+    .benefit-icon {
+      width: 40px;
+      height: 40px;
+      background: #22c55e;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .benefit-icon img { filter: brightness(0) invert(1); }
     .benefits li {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       font-size: 16px;
-      font-weight: 400;
+      font-weight: 700;
       color: var(--black);
+      line-height: 1.3;
     }
 
 
@@ -396,8 +424,8 @@
       <span class="order-header-chevron" id="chevron">▼</span>
     </div>
     <div class="order-header-right">
-      <span class="order-header-old">$5.00</span>
-      <span class="order-header-new">$1.00</span>
+      <span class="order-header-old">$10.00</span>
+      <span class="order-header-new">$5.00</span>
     </div>
   </div>
   <div class="order-header-details" id="order-details">
@@ -410,36 +438,47 @@
     </div>
   </div>
 
-  <!-- HERO IMAGE -->
-  <div class="hero-img-wrap">
-    <img src="/checkoutimage.webp" alt="Numio app" class="hero-img" fetchpriority="high" width="700" height="700"/>
-  </div>
-
   <!-- COUNTDOWN TIMER -->
   <div class="countdown-box">
-    <div class="countdown-label">🚨 <strong>Your limited offer ends in:</strong></div>
+    <div class="countdown-label">🔥 <strong>Save $5 Today!</strong></div>
+    <div class="countdown-sublabel">Your offer expires in</div>
     <div class="countdown-timer"><span id="c-h">01</span> : <span id="c-m">20</span> : <span id="c-s">58</span></div>
   </div>
 
+  <!-- HERO PLACEHOLDER IMAGE -->
+  <div class="hero-placeholder">
+    <img src="/checkoutimage.webp" alt="Numio" class="hero-img" fetchpriority="high" width="700" height="700"/>
+  </div>
+
+  <!-- GUARANTEE COPY -->
+  <div class="guarantee-copy">
+    <p>🛡️ You're protected for 365 days.</p>
+    <p>If your child's grades don't improve,</p>
+    <p>we'll give you 100% of your money back.</p>
+  </div>
+
   <!-- HERO COPY -->
-  <div class="hero">
-    <h1 class="hero-headline">Help your child practise for school</h1>
+  <div class="hero" style="padding-top:20px;">
     <ul class="benefits">
       <li>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-        Better practise for your child
+        <span class="benefit-icon"><img src="/icon-target.png" width="20" height="20" alt=""/></span>
+        Just take a picture of their lesson
       </li>
       <li>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-        You get to relax
+        <span class="benefit-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        </span>
+        Get questions based on what they're learning
       </li>
       <li>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-        Only $0.03 per day
+        <span class="benefit-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+        </span>
+        Generate as many questions as they need
       </li>
       <li>
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg>
-        Money back if not happy
+        <span class="benefit-icon"><img src="/icon-run.png" width="20" height="20" alt=""/></span>
+        Ready to practise in 15 seconds
       </li>
     </ul>
   </div>
@@ -457,27 +496,27 @@
       <div class="total-card-product">
         <img src="/numioultimateimage.webp" alt="Numio app" class="total-card-img" width="52" height="52"/>
         <div class="total-card-info">
-          <div class="total-card-name">Numio Ultimate</div>
-          <div class="total-card-sub">$1/month · cancel anytime</div>
+          <div class="total-card-name">Numio Lifetime Access</div>
+          <div class="total-card-sub">One-time payment · yours forever</div>
           <div class="total-card-benefits">
-            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>Better practise for your child</div>
-            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>You get to relax</div>
+            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>Lifetime access · no monthly fees</div>
+            <div><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;"><polyline points="20 6 9 17 4 12"/></svg>365-day money-back guarantee</div>
           </div>
         </div>
         <div class="total-card-price">
-          <span class="total-card-old">$5.00</span>
-          <span class="total-card-new">$1.00</span>
+          <span class="total-card-old">$10.00</span>
+          <span class="total-card-new">$5.00</span>
         </div>
       </div>
       <hr class="total-card-divider"/>
       <div class="total-card-row">
         <span class="total-card-label">Total due now</span>
-        <span class="total-card-amount">USD $1.00</span>
+        <span class="total-card-amount">USD $5.00</span>
       </div>
     </div>
 
     <button id="submit-btn" class="cta-btn">
-      <span id="btn-text">START NUMIO FOR $1 →</span>
+      <span id="btn-text">Get Lifetime Access for $5 →</span>
       <span class="spinner"></span>
     </button>
 
@@ -486,7 +525,7 @@
 
   <!-- REASSURANCE LINE -->
   <div class="reassurance">
-    Better grades for your child and you relax 😉
+    One payment. Lifetime access. No surprises. 😉
   </div>
 
   <!-- TRUST BADGES -->
@@ -513,7 +552,6 @@
 
 <script>
   const PUBLISHABLE_KEY = 'pk_live_51Nu0S3F3Ob4o24uqvgOJGlSwUt5Bi6aWVFzweQddyD9A8FDAFNykkpZbIDq1o9ZhK09tt9pH8fw3MMLUvDRx2Eea00gLhad5Yg';
-  const PRICE_ID        = 'price_1UDqvBF3Ob4o24uqrCgIJQPm';
   const SUCCESS_URL     = 'https://numiomath.app/success';
   const BACKEND_URL     = 'https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout-session';
 
@@ -531,7 +569,7 @@
     msgEl.classList.add('show');
     submitBtn.disabled = false;
     submitBtn.classList.remove('loading');
-    btnText.textContent = 'START NUMIO FOR $1 →';
+    btnText.textContent = 'Get Lifetime Access for $5 →';
   }
 
   async function initStripe() {
@@ -539,7 +577,7 @@
       const res = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: PRICE_ID }),
+        body: JSON.stringify({}),
       });
 
       if (!res.ok) throw new Error('Could not start payment session.');
