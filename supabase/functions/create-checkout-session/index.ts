@@ -9,36 +9,23 @@ const CORS_HEADERS = {
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS_HEADERS })
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { status: 405, headers: CORS_HEADERS })
   }
 
   try {
-    const { priceId } = await req.json()
-
-    if (!priceId) {
-      return new Response(
-        JSON.stringify({ error: 'Missing priceId' }),
-        { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Create a Stripe Checkout Session in embedded mode
-    // No supabase_user_id in metadata → triggers the "pay-first" flow in your webhook
-    // The pending_subscription gets stored and claimed in PostPaymentSetup.jsx after signup
     const params = new URLSearchParams({
-      'mode':                          'subscription',
-      'ui_mode':                       'embedded',
-      'line_items[0][price]':          priceId,
-      'line_items[0][quantity]':       '1',
-      'return_url':                    'https://numiomath.app/success?session_id={CHECKOUT_SESSION_ID}',
-      'payment_method_types[0]':       'card',
-      'subscription_data[trial_period_days]': '0',
+      'line_items[0][price]':               'price_1UGKk6F3Ob4o24uqDWQw2mCB',
+      'line_items[0][quantity]':            '1',
+      'mode':                               'payment',
+      'automatic_payment_methods[enabled]': 'true',
+      'success_url':                        'https://numiomath.app/success?session_id={CHECKOUT_SESSION_ID}',
+      'cancel_url':                         'https://numiomath.app/checkout',
+      'metadata[product]':                  'numio_lifetime',
     })
 
-    const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${STRIPE_SECRET_KEY}`,
@@ -47,20 +34,15 @@ serve(async (req) => {
       body: params.toString(),
     })
 
-    if (!stripeRes.ok) {
-      const err = await stripeRes.text()
-      console.error('Stripe error:', err)
-      return new Response(
-        JSON.stringify({ error: 'Failed to create payment session' }),
-        { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
+    const session = await res.json()
+
+    if (!res.ok) {
+      console.error('Stripe error:', JSON.stringify(session))
+      throw new Error(session.error?.message || 'Failed to create session')
     }
 
-    const session = await stripeRes.json()
-
-    // Return the clientSecret — this is what the frontend Payment Element needs
     return new Response(
-      JSON.stringify({ clientSecret: session.client_secret }),
+      JSON.stringify({ url: session.url }),
       { status: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
     )
 
