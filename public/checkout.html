@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Numio – Start for $1</title>
-  <meta name="description" content="Give your child better practice. $1/month. 365-day money-back guarantee."/>
+  <title>Numio – Lifetime Access</title>
+  <meta name="description" content="Give your child better practice. One-time payment. 365-day money-back guarantee."/>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/></noscript>
-  
+
+  <!-- Stripe.js — must load before any Stripe calls -->
+  <script src="https://js.stripe.com/v3/"></script>
 
   <script>
   // ── FACEBOOK PIXEL ──
@@ -78,11 +80,6 @@
       justify-content: center;
       padding: 24px 0 16px;
     }
-    .logo-wrap {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
 
     .order-header {
       display: flex;
@@ -103,12 +100,8 @@
       font-weight: 500;
       color: var(--black);
     }
-    .order-header-left svg { flex-shrink: 0; color: var(--black); }
-    .order-header-right {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-    }
+    .order-header-left svg { flex-shrink: 0; }
+    .order-header-right { display: flex; align-items: baseline; gap: 8px; }
     .order-header-old { font-size: 13px; color: #aaa; text-decoration: line-through; }
     .order-header-new { font-size: 20px; font-weight: 800; color: var(--black); }
     .order-header-chevron { color: var(--black); font-size: 11px; transition: transform 0.2s; margin-left: 2px; }
@@ -124,19 +117,9 @@
       text-align: center;
       margin-bottom: 20px;
     }
-    .countdown-label {
-      font-size: 26px;
-      font-weight: 800;
-      color: var(--black);
-      margin-bottom: 2px;
-    }
-    .countdown-sublabel { font-size: 15px; font-weight: 500; color: var(--grey); margin-bottom: 6px; margin-top: 0; }
-    .countdown-timer {
-      font-size: 26px;
-      font-weight: 300;
-      color: var(--black);
-      letter-spacing: 0.06em;
-    }
+    .countdown-label { font-size: 26px; font-weight: 800; color: var(--black); margin-bottom: 2px; }
+    .countdown-sublabel { font-size: 15px; font-weight: 500; color: var(--grey); margin-bottom: 6px; }
+    .countdown-timer { font-size: 26px; font-weight: 300; color: var(--black); letter-spacing: 0.06em; }
 
     .guarantee-copy {
       padding: 24px 0 8px;
@@ -152,13 +135,11 @@
       letter-spacing: -0.02em;
     }
 
-    .hero { text-align: left; padding: 0 0 20px; }
     .benefits {
       list-style: none;
       display: flex;
       flex-direction: column;
       gap: 14px;
-      text-align: left;
     }
     .benefit-icon {
       width: 40px; height: 40px;
@@ -169,7 +150,6 @@
       align-items: center;
       justify-content: center;
     }
-    .benefit-icon img { display: block; }
     .benefits li {
       display: flex;
       align-items: center;
@@ -180,6 +160,7 @@
       line-height: 1.3;
     }
 
+    /* ── PAYMENT SECTION ── */
     .payment-section { padding: 28px 0 0; }
     .section-label {
       font-size: 13px;
@@ -189,11 +170,12 @@
       text-transform: uppercase;
       margin-bottom: 14px;
     }
-    #payment-element { margin-bottom: 8px; }
+
+    /* Skeleton shown while Stripe loads */
     #element-skeleton {
       background: #f3f0ff;
       border-radius: 12px;
-      height: 180px;
+      height: 200px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -202,6 +184,8 @@
       font-weight: 500;
     }
 
+    #payment-element { margin-bottom: 8px; }
+
     .total-card {
       background: #f7f5ff;
       border: 1.5px solid var(--border);
@@ -209,18 +193,8 @@
       padding: 16px;
       margin: 20px 0 0;
     }
-    .total-card-product {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
-    .total-card-img {
-      width: 52px; height: 52px;
-      border-radius: 12px;
-      object-fit: cover;
-      flex-shrink: 0;
-    }
+    .total-card-product { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .total-card-img { width: 52px; height: 52px; border-radius: 12px; object-fit: cover; flex-shrink: 0; }
     .total-card-info { flex: 1; }
     .total-card-name { font-size: 14px; font-weight: 700; color: var(--black); }
     .total-card-sub  { font-size: 12px; color: var(--grey); margin-top: 2px; }
@@ -229,7 +203,7 @@
     .total-card-new  { font-size: 16px; font-weight: 800; color: var(--purple); }
     .total-card-divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
     .total-card-row  { display: flex; justify-content: space-between; align-items: center; }
-    .total-card-label { font-size: 15px; font-weight: 700; color: var(--black); }
+    .total-card-label  { font-size: 15px; font-weight: 700; color: var(--black); }
     .total-card-amount { font-size: 15px; font-weight: 800; color: var(--black); }
 
     .cta-btn {
@@ -251,11 +225,12 @@
     }
     .cta-btn:hover  { filter: brightness(1.07); }
     .cta-btn:active { transform: scale(0.98); }
+    .cta-btn:disabled { opacity: 0.7; cursor: not-allowed; }
 
     .spinner {
       display: none;
       width: 20px; height: 20px;
-      border: 3px solid rgba(0,0,0,0.2);
+      border: 3px solid rgba(255,255,255,0.3);
       border-top-color: #fff;
       border-radius: 50%;
       animation: spin 0.7s linear infinite;
@@ -323,12 +298,10 @@
 
   <!-- LOGO -->
   <div class="header">
-    <div class="logo-wrap">
-      <img src="/logotousebro.webp" alt="Numio" style="height:40px; width:auto; display:block; object-fit:contain;" width="280" height="70"/>
-    </div>
+    <img src="/logotousebro.webp" alt="Numio" style="height:40px; width:auto; display:block; object-fit:contain;" width="280" height="70"/>
   </div>
 
-  <!-- ORDER SUMMARY HEADER -->
+  <!-- ORDER SUMMARY -->
   <div class="order-header" onclick="toggleOrderDetails()">
     <div class="order-header-left">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -341,7 +314,7 @@
     </div>
   </div>
   <div class="order-header-details" id="order-details">
-    <div style="background:#f7f5ff; border-radius:12px; padding:12px 16px; font-size:13px; color:var(--grey); border: 1.5px solid var(--border); margin-bottom:8px;">
+    <div style="background:#f7f5ff; border-radius:12px; padding:12px 16px; font-size:13px; color:var(--grey); border:1.5px solid var(--border); margin-bottom:8px;">
       <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
         <span style="font-weight:600; color:var(--black);">Numio Lifetime Access</span>
         <span style="font-weight:700; color:var(--purple);">$5.00</span>
@@ -350,11 +323,11 @@
     </div>
   </div>
 
-  <!-- COUNTDOWN TIMER -->
+  <!-- COUNTDOWN -->
   <div class="countdown-box">
     <div class="countdown-label">🔥 <strong>Save $5 Today!</strong></div>
     <div class="countdown-sublabel">Your offer expires in</div>
-    <div class="countdown-timer"><span id="c-h">01</span> : <span id="c-m">20</span> : <span id="c-s">58</span></div>
+    <div class="countdown-timer"><span id="c-h">00</span> : <span id="c-m">20</span> : <span id="c-s">00</span></div>
   </div>
 
   <!-- HERO IMAGE -->
@@ -367,8 +340,8 @@
     <p>we'll give you 100% of your money back.</p>
   </div>
 
-  <!-- HERO COPY -->
-  <div class="hero" style="padding-top:20px;">
+  <!-- BENEFITS -->
+  <div style="padding-top:20px; padding-bottom:20px;">
     <ul class="benefits">
       <li>
         <span class="benefit-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
@@ -389,13 +362,20 @@
     </ul>
   </div>
 
-  <!-- PAYMENT -->
+  <!-- PAYMENT SECTION -->
   <div class="payment-section">
+    <p class="section-label">Payment</p>
 
-    <!-- TOTAL CARD -->
+    <!-- Skeleton while Stripe loads -->
+    <div id="element-skeleton">Loading payment options…</div>
+
+    <!-- Stripe mounts here -->
+    <div id="payment-element" style="display:none;"></div>
+
+    <!-- Order total -->
     <div class="total-card">
       <div class="total-card-product">
-        <img src="/numioultimateimage.webp" alt="Numio app" class="total-card-img" width="52" height="52"/>
+        <img src="/numioultimateimage.webp" alt="Numio" class="total-card-img" width="52" height="52"/>
         <div class="total-card-info">
           <div class="total-card-name">Numio Lifetime Access</div>
           <div class="total-card-sub">One-time payment · yours forever</div>
@@ -412,7 +392,7 @@
       </div>
     </div>
 
-    <button id="submit-btn" class="cta-btn" onclick="goToStripeCheckout()">
+    <button id="submit-btn" class="cta-btn" onclick="handlePayment()">
       <span id="btn-text">Get Lifetime Access for $5 →</span>
       <span class="spinner"></span>
     </button>
@@ -420,10 +400,8 @@
     <div id="payment-message"></div>
   </div>
 
-  <!-- REASSURANCE LINE -->
-  <div class="reassurance">
-    One payment. Lifetime access. No surprises. 😉
-  </div>
+  <!-- REASSURANCE -->
+  <div class="reassurance">One payment. Lifetime access. No surprises. 😉</div>
 
   <!-- TRUST BADGES -->
   <div class="trust-row">
@@ -448,17 +426,20 @@
 </div>
 
 <script>
-  const BACKEND_URL = 'https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout-session';
+  const BACKEND_URL   = 'https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout-session';
+  const STRIPE_PK     = 'pk_live_51Nu0S3F3Ob4o24uqvgOJGlSwUt5Bi6aWVFzweQddyD9A8FDAFNykkpZbIDq1o9ZhK09tt9pH8fw3MMLUvDRx2Eea00gLhad5Yg';
 
-  const submitBtn = document.getElementById('submit-btn');
-  const btnText   = document.getElementById('btn-text');
-  const msgEl     = document.getElementById('payment-message');
+  const stripe        = Stripe(STRIPE_PK);
+  const submitBtn     = document.getElementById('submit-btn');
+  const btnText       = document.getElementById('btn-text');
+  const msgEl         = document.getElementById('payment-message');
+  const skeleton      = document.getElementById('element-skeleton');
+  const paymentEl     = document.getElementById('payment-element');
 
-  async function goToStripeCheckout() {
-    submitBtn.disabled = true;
-    submitBtn.classList.add('loading');
-    btnText.textContent = 'Loading…';
+  let elements;
 
+  // ── Init: fetch client_secret and mount Payment Element on page load ──
+  async function initStripe() {
     try {
       const res = await fetch(BACKEND_URL, {
         method: 'POST',
@@ -467,14 +448,57 @@
       });
 
       const data = await res.json();
+      if (!res.ok || !data.clientSecret) throw new Error(data.error || 'Failed to init payment');
 
-      if (!res.ok || !data.url) throw new Error(data.error || 'Could not start checkout.');
+      elements = stripe.elements({
+        clientSecret: data.clientSecret,
+        appearance: {
+          theme: 'stripe',
+          variables: {
+            colorPrimary:       '#3513A2',
+            colorBackground:    '#ffffff',
+            colorText:          '#0A0A0A',
+            colorDanger:        '#b91c1c',
+            fontFamily:         'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+            borderRadius:       '12px',
+            spacingUnit:        '4px',
+          },
+        },
+      });
 
-      window.location.href = data.url;
+      const paymentElement = elements.create('payment');
+      paymentElement.mount('#payment-element');
+
+      paymentElement.on('ready', () => {
+        skeleton.style.display = 'none';
+        paymentEl.style.display = 'block';
+      });
 
     } catch (err) {
-      console.error(err);
-      msgEl.textContent = 'Something went wrong. Please try again.';
+      console.error('Stripe init error:', err);
+      skeleton.textContent = 'Could not load payment form. Please refresh.';
+    }
+  }
+
+  // ── Submit: confirm payment ──
+  async function handlePayment() {
+    if (!elements) return;
+
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    btnText.textContent = 'Processing…';
+    msgEl.classList.remove('show');
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: 'https://numiomath.app/success',
+      },
+    });
+
+    // If we get here, payment failed — success redirects automatically
+    if (error) {
+      msgEl.textContent = error.message || 'Payment failed. Please try again.';
       msgEl.classList.add('show');
       submitBtn.disabled = false;
       submitBtn.classList.remove('loading');
@@ -483,21 +507,18 @@
   }
 
   function toggleOrderDetails() {
-    const details = document.getElementById('order-details');
-    const chevron = document.getElementById('chevron');
-    details.classList.toggle('show');
-    chevron.classList.toggle('open');
+    document.getElementById('order-details').classList.toggle('show');
+    document.getElementById('chevron').classList.toggle('open');
   }
 
-  // ── COUNTDOWN — rolling 20 min from first visit, persists on refresh ──
+  // ── Countdown — rolling 20 min from first visit ──
   (function() {
-    var DURATION = 20 * 60 * 1000; // 20 minutes
+    var DURATION = 20 * 60 * 1000;
     var KEY = 'numio_checkout_end';
     var stored = sessionStorage.getItem(KEY);
     var _end;
     if (stored) {
       _end = parseInt(stored, 10);
-      // If already expired, reset it
       if (_end < Date.now()) {
         _end = Date.now() + DURATION;
         sessionStorage.setItem(KEY, String(_end));
@@ -508,17 +529,16 @@
     }
     function tick() {
       var d = Math.max(0, _end - Date.now());
-      var h = document.getElementById('c-h');
-      var m = document.getElementById('c-m');
-      var s = document.getElementById('c-s');
-      if (!h) return;
-      h.textContent = String(Math.floor(d / 3600000)).padStart(2,'0');
-      m.textContent = String(Math.floor((d % 3600000) / 60000)).padStart(2,'0');
-      s.textContent = String(Math.floor((d % 60000) / 1000)).padStart(2,'0');
+      document.getElementById('c-h').textContent = String(Math.floor(d / 3600000)).padStart(2,'0');
+      document.getElementById('c-m').textContent = String(Math.floor((d % 3600000) / 60000)).padStart(2,'0');
+      document.getElementById('c-s').textContent = String(Math.floor((d % 60000) / 1000)).padStart(2,'0');
     }
     tick();
     setInterval(tick, 1000);
   })();
+
+  // Start Stripe on page load
+  initStripe();
 </script>
 
 </body>
