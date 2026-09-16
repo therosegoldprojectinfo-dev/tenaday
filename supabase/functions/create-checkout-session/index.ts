@@ -19,9 +19,9 @@ serve(async (req) => {
       'line_items[0][price]':               'price_1UGKk6F3Ob4o24uqDWQw2mCB',
       'line_items[0][quantity]':            '1',
       'mode':                               'payment',
+      'ui_mode':                            'embedded',
       'automatic_payment_methods[enabled]': 'true',
-      'success_url':                        'https://numiomath.app/success?session_id={CHECKOUT_SESSION_ID}',
-      'cancel_url':                         'https://numiomath.app/checkout',
+      'return_url':                         'https://numiomath.app/success?session_id={CHECKOUT_SESSION_ID}',
       'metadata[product]':                  'numio_lifetime',
     })
 
@@ -41,8 +41,9 @@ serve(async (req) => {
       throw new Error(session.error?.message || 'Failed to create session')
     }
 
+    // Return client_secret — this is what the frontend Payment Element needs
     return new Response(
-      JSON.stringify({ url: session.url }),
+      JSON.stringify({ clientSecret: session.client_secret }),
       { status: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
     )
 
