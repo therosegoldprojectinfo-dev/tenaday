@@ -489,9 +489,23 @@
     chevron.classList.toggle('open');
   }
 
-  // ── COUNTDOWN ──
+  // ── COUNTDOWN — rolling 20 min from first visit, persists on refresh ──
   (function() {
-    var _end = new Date("2026-09-17T00:01:00").getTime();
+    var DURATION = 20 * 60 * 1000; // 20 minutes
+    var KEY = 'numio_checkout_end';
+    var stored = sessionStorage.getItem(KEY);
+    var _end;
+    if (stored) {
+      _end = parseInt(stored, 10);
+      // If already expired, reset it
+      if (_end < Date.now()) {
+        _end = Date.now() + DURATION;
+        sessionStorage.setItem(KEY, String(_end));
+      }
+    } else {
+      _end = Date.now() + DURATION;
+      sessionStorage.setItem(KEY, String(_end));
+    }
     function tick() {
       var d = Math.max(0, _end - Date.now());
       var h = document.getElementById('c-h');
