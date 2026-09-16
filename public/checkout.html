@@ -6,8 +6,6 @@
   <title>Numio – Start for $1</title>
   <meta name="description" content="Give your child better practice. $1/month. 365-day money-back guarantee."/>
 
-  <link rel="preconnect" href="https://js.stripe.com"/>
-  <link rel="preconnect" href="https://m.stripe.network"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
@@ -393,9 +391,6 @@
 
   <!-- PAYMENT -->
   <div class="payment-section">
-    <div class="section-label">Payment details</div>
-    <div id="element-skeleton">Loading secure payment form…</div>
-    <div id="payment-element" style="display:none;"></div>
 
     <!-- TOTAL CARD -->
     <div class="total-card">
@@ -417,7 +412,7 @@
       </div>
     </div>
 
-    <button id="submit-btn" class="cta-btn">
+    <button id="submit-btn" class="cta-btn" onclick="goToStripeCheckout()">
       <span id="btn-text">Get Lifetime Access for $5 →</span>
       <span class="spinner"></span>
     </button>
@@ -452,31 +447,18 @@
 
 </div>
 
-<script src="https://js.stripe.com/v3/"></script>
-
 <script>
-  const PUBLISHABLE_KEY = 'pk_live_51Nu0S3F3Ob4o24uqvgOJGlSwUt5Bi6aWVFzweQddyD9A8FDAFNykkpZbIDq1o9ZhK09tt9pH8fw3MMLUvDRx2Eea00gLhad5Yg';
-  const SUCCESS_URL     = 'https://numiomath.app/success';
-  const BACKEND_URL     = 'https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout-session';
+  const BACKEND_URL = 'https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout-session';
 
-  const stripe     = Stripe(PUBLISHABLE_KEY);
-  let   elements;
+  const submitBtn = document.getElementById('submit-btn');
+  const btnText   = document.getElementById('btn-text');
+  const msgEl     = document.getElementById('payment-message');
 
-  const submitBtn   = document.getElementById('submit-btn');
-  const btnText     = document.getElementById('btn-text');
-  const msgEl       = document.getElementById('payment-message');
-  const skeleton    = document.getElementById('element-skeleton');
-  const elementWrap = document.getElementById('payment-element');
+  async function goToStripeCheckout() {
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    btnText.textContent = 'Loading…';
 
-  function showError(msg) {
-    msgEl.textContent = msg;
-    msgEl.classList.add('show');
-    submitBtn.disabled = false;
-    submitBtn.classList.remove('loading');
-    btnText.textContent = 'Get Lifetime Access for $5 →';
-  }
-
-  async function initStripe() {
     try {
       const res = await fetch(BACKEND_URL, {
         method: 'POST',
@@ -484,63 +466,21 @@
         body: JSON.stringify({}),
       });
 
-      if (!res.ok) throw new Error('Could not start payment session.');
+      const data = await res.json();
 
-      const { clientSecret } = await res.json();
+      if (!res.ok || !data.url) throw new Error(data.error || 'Could not start checkout.');
 
-      elements = stripe.elements({
-        clientSecret,
-        appearance: {
-          theme: 'stripe',
-          variables: {
-            colorPrimary:    '#3513A2',
-            colorBackground: '#ffffff',
-            colorText:       '#0A0A0A',
-            colorDanger:     '#b91c1c',
-            fontFamily:      'Inter, system-ui, sans-serif',
-            borderRadius:    '12px',
-          },
-          rules: {
-            '.Input': { border: '1.5px solid #D4C8FF', boxShadow: 'none' },
-            '.Input:focus': { border: '1.5px solid #3513A2', boxShadow: '0 0 0 3px rgba(53,19,162,0.12)' },
-            '.Label': { fontWeight: '600', color: '#0A0A0A' },
-          },
-        },
-      });
-
-      const paymentElement = elements.create('payment', {
-        layout: 'tabs',
-        wallets: { applePay: 'auto', googlePay: 'auto' },
-      });
-
-      skeleton.style.display = 'none';
-      elementWrap.style.display = 'block';
-      paymentElement.mount('#payment-element');
+      window.location.href = data.url;
 
     } catch (err) {
-      skeleton.textContent = '⚠️ Could not load payment form. Please refresh.';
       console.error(err);
+      msgEl.textContent = 'Something went wrong. Please try again.';
+      msgEl.classList.add('show');
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('loading');
+      btnText.textContent = 'Get Lifetime Access for $5 →';
     }
   }
-
-  submitBtn.addEventListener('click', async () => {
-    if (!elements) return;
-    msgEl.classList.remove('show');
-    submitBtn.disabled = true;
-    submitBtn.classList.add('loading');
-    btnText.textContent = 'Processing…';
-
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: { return_url: SUCCESS_URL },
-    });
-
-    if (error) {
-      showError(error.type === 'card_error' || error.type === 'validation_error'
-        ? error.message
-        : 'Something went wrong. Please try again.');
-    }
-  });
 
   function toggleOrderDetails() {
     const details = document.getElementById('order-details');
@@ -548,8 +488,6 @@
     details.classList.toggle('show');
     chevron.classList.toggle('open');
   }
-
-  initStripe();
 
   // ── COUNTDOWN ──
   (function() {
