@@ -11,7 +11,8 @@
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/></noscript>
 
-  <script src="https://js.stripe.com/v3/"></script>
+  <!-- Stripe loads async so it doesn't block page render -->
+  <script src="https://js.stripe.com/v3/" async></script>
 
   <script>
   !function(f,b,e,v,n,t,s)
@@ -241,6 +242,7 @@
 </head>
 <body>
 
+<main>
 <div class="page">
 
   <!-- LOGO -->
@@ -278,7 +280,7 @@
   </div>
 
   <!-- HERO IMAGE -->
-  <img src="/imagesellingincheckout.webp" alt="Numio app" loading="lazy" style="width:100%; max-height:280px; object-fit:cover; border-radius:20px; margin:16px 0 0; display:block;"/>
+  <img src="/imagesellingincheckout.webp" alt="Numio app" loading="lazy" width="400" height="280" style="width:100%; max-height:280px; object-fit:cover; border-radius:20px; margin:16px 0 0; display:block;"/>
 
   <!-- GUARANTEE COPY -->
   <div class="guarantee-copy">
@@ -358,15 +360,24 @@
   </p>
 
 </div>
+</main>
 
 <script>
   const BACKEND_URL = 'https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout-session';
   const STRIPE_PK   = 'pk_live_51Nu0S3F3Ob4o24uqvgOJGlSwUt5Bi6aWVFzweQddyD9A8FDAFNykkpZbIDq1o9ZhK09tt9pH8fw3MMLUvDRx2Eea00gLhad5Yg';
 
-  const stripe = Stripe(STRIPE_PK);
+  // Wait for Stripe.js to load since it's async
+  function waitForStripe(cb) {
+    if (window.Stripe) { cb(); return; }
+    var interval = setInterval(function() {
+      if (window.Stripe) { clearInterval(interval); cb(); }
+    }, 50);
+  }
 
   async function initStripe() {
     try {
+      const stripe = Stripe(STRIPE_PK);
+
       const res = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -408,7 +419,8 @@
     setInterval(tick, 1000);
   })();
 
-  initStripe();
+  // Init Stripe after it loads
+  waitForStripe(initStripe);
 </script>
 
 </body>
