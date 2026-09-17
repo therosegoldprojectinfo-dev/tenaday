@@ -7,25 +7,26 @@
   <title>Numio – Help your child understand their lessons</title>
 
   <script>
-  window.addEventListener('load', function() {
-    setTimeout(function() {
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window,document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1028944262871292');
-      fbq('track', 'PageView');
-      (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window,document,"clarity","script","y6hivp7gvm");
-    }, 3000);
-  });
+  // FB Pixel fires immediately on load
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window,document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '1028944262871292');
+  fbq('track', 'PageView');
+  </script>
+
+  <!-- Clarity fires immediately — no delay -->
+  <script>
+  (function(c,l,a,r,i,t,y){
+    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+  })(window,document,"clarity","script","y6hivp7gvm");
   </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -187,17 +188,8 @@
     /* ─── YOU'LL LOVE IT ─── */
     .love-section { padding: 0 20px 56px; }
     .section-title { font-size: 28px; font-weight: 900; color: #0A0A0A; text-align: center; margin-bottom: 28px; }
-    .love-card {
-      border-radius: 20px; overflow: hidden;
-      position: relative;
-    }
+    .love-card { border-radius: 20px; overflow: hidden; position: relative; }
     .love-card img { width: 100%; height: auto; display: block; }
-    .love-quote {
-      background: rgba(0,0,0,0.55);
-      padding: 16px 18px;
-    }
-    .love-quote-text { font-size: 14px; font-weight: 500; color: #fff; line-height: 1.5; margin-bottom: 6px; font-style: italic; }
-    .love-quote-author { font-size: 13px; font-weight: 700; color: #C4B4FF; }
 
     /* ─── HOW IT WORKS ─── */
     .how-section { padding: 0 20px 56px; }
@@ -219,7 +211,6 @@
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
       margin-bottom: 8px;
     }
-    .video-play svg { margin-left: 4px; }
     .video-label { font-size: 13px; font-weight: 700; color: #fff; }
 
     /* ─── STEPS ─── */
@@ -250,9 +241,6 @@
     /* ─── STUPIDLY EASY ─── */
     .easy-section { padding: 0 20px 56px; text-align: center; }
     .easy-title { font-size: 24px; font-weight: 900; color: #0A0A0A; margin-bottom: 20px; }
-    .easy-img { width: 100%; max-width: 280px; height: auto; display: block; margin: 0 auto 16px; }
-    .easy-labels { display: flex; justify-content: space-around; margin-bottom: 24px; }
-    .easy-label { font-size: 13px; font-weight: 600; color: #555; text-align: center; max-width: 120px; line-height: 1.4; }
 
     /* ─── BEST INVESTMENT ─── */
     .invest-section { padding: 0 20px 56px; text-align: center; }
@@ -293,8 +281,6 @@
 
 <div class="inner">
 
-
-
   <div class="page-wrap">
 
     <!-- LOGO -->
@@ -315,11 +301,6 @@
             </div>
             <div style="background:rgba(0,0,0,0.55);color:#fff;font-size:13px;font-weight:700;padding:6px 14px;border-radius:50px;backdrop-filter:blur(4px);">▶ Tap to watch</div>
           </div>
-        </div>
-        <div class="c-slide" id="slide-0" style="background:#000;">
-          <video autoplay loop muted playsinline style="width:100%;height:100%;object-fit:contain;display:block;">
-            <source src="/carouselvideo.mp4" type="video/mp4"/>
-          </video>
         </div>
         <div class="c-slide" id="slide-1">
           <img src="/carouselimages__3_.webp" alt="4 reasons to try Numio" loading="lazy"/>
@@ -344,11 +325,11 @@
           <img src="/carouselvideo-thumb.webp" style="background:#5B3FD9;object-fit:contain;"/>
           <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);"><span style="font-size:12px;color:#fff;">▶</span></div>
         </div>
-        <div class="c-dot" onclick="carouselGo(0)"><img src="/carouselimages__3_.webp" loading="lazy"/></div>
-        <div class="c-dot" onclick="carouselGo(0)"><img src="/carouselimages__2_.webp" loading="lazy"/></div>
-        <div class="c-dot" onclick="carouselGo(0)"><img src="/carouselimages__1_.webp" loading="lazy"/></div>
-        <div class="c-dot" onclick="carouselGo(0)"><img src="/carouselimages__4_.webp" loading="lazy"/></div>
-        <div class="c-dot" onclick="carouselGo(0)"><img src="/carouselimages__5_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(1)"><img src="/carouselimages__3_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(2)"><img src="/carouselimages__2_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(3)"><img src="/carouselimages__1_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(4)"><img src="/carouselimages__4_.webp" loading="lazy"/></div>
+        <div class="c-dot" onclick="carouselGo(5)"><img src="/carouselimages__5_.webp" loading="lazy"/></div>
       </div>
     </div>
 
@@ -418,8 +399,6 @@
       </div>
       <div style="background:#fff; padding:20px 12px 24px;">
         <div style="display:flex; gap:8px; justify-content:space-between;">
-
-          <!-- Item 1 -->
           <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:10px;">
             <div style="position:relative; width:100%;">
               <div style="position:absolute; top:-8px; left:50%; transform:translateX(-50%); background:#0A0A0A; color:#fff; font-size:11px; font-weight:800; border-radius:50px; padding:4px 10px; white-space:nowrap; z-index:2;">FREE <span style="text-decoration:line-through; color:#aaa;">$7</span></div>
@@ -429,8 +408,6 @@
             </div>
             <div style="font-size:13px; font-weight:700; color:#0A0A0A; text-align:center; line-height:1.3;">Add Unlimited Children</div>
           </div>
-
-          <!-- Item 2 -->
           <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:10px;">
             <div style="position:relative; width:100%;">
               <div style="position:absolute; top:-8px; left:50%; transform:translateX(-50%); background:#0A0A0A; color:#fff; font-size:11px; font-weight:800; border-radius:50px; padding:4px 10px; white-space:nowrap; z-index:2;">FREE</div>
@@ -440,8 +417,6 @@
             </div>
             <div style="font-size:13px; font-weight:700; color:#0A0A0A; text-align:center; line-height:1.3;">Track Your Child's Progress</div>
           </div>
-
-          <!-- Item 3 -->
           <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:10px;">
             <div style="position:relative; width:100%;">
               <div style="position:absolute; top:-8px; left:50%; transform:translateX(-50%); background:#0A0A0A; color:#fff; font-size:11px; font-weight:800; border-radius:50px; padding:4px 10px; white-space:nowrap; z-index:2;">FREE</div>
@@ -451,7 +426,6 @@
             </div>
             <div style="font-size:13px; font-weight:700; color:#0A0A0A; text-align:center; line-height:1.3;">No ads or distractions</div>
           </div>
-
         </div>
       </div>
     </div>
@@ -520,7 +494,6 @@
       <img src="/Practisepngimagetouse.webp" alt="#3 Practise!" loading="lazy"/>
       <div class="step-label">#3 Practise!</div>
     </div>
-
     <button class="cta-btn" onclick="scrollToOfferCard()">Start Today For Just $5 →</button>
   </div>
 
@@ -637,7 +610,7 @@
   const cTotal = 6;
   function carouselRender() {
     for (let i = 0; i < cTotal; i++) {
-      const slide = document.getElementById('slide-' + i);
+      const slide = document.querySelectorAll('.c-slide')[i];
       if (!slide) continue;
       slide.classList.toggle('active', i === cIndex);
       const vid = slide.querySelector('video');
@@ -701,7 +674,6 @@
     video.play().catch(() => { video.muted = true; video.play(); });
   }
 </script>
-
 
 <!-- POPUP (scroll up exit intent) -->
 <div id="popup-overlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px;">
