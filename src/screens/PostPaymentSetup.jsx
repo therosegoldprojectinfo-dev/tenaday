@@ -16,7 +16,12 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
   useEffect(() => {
     try {
       if (typeof window.fbq === 'function') {
-        window.fbq('track', 'Purchase', { value: 1.00, currency: 'USD' })
+        window.fbq('track', 'Purchase', {
+          value:        5.00,
+          currency:     'USD',
+          num_items:    1,
+          content_name: 'Numio Lifetime Access',
+        })
       }
     } catch (e) { console.warn('FB pixel error:', e) }
   }, [])
@@ -51,7 +56,6 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
     setLoading(true)
     setError('')
 
-    // Hard 30s timeout — if anything hangs, user sees error + retry instead of infinite spinner
     const timeout = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('Setup is taking too long. Please tap retry.')), 30000)
     )
@@ -89,12 +93,10 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         if (signUpErr.message?.toLowerCase().includes('already registered') ||
             signUpErr.message?.toLowerCase().includes('already been registered') ||
             signUpErr.status === 422 || signUpErr.message?.includes('{}')) {
-          // Try signing in — if it works, this user already set up their account
           const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
             email: fakeEmail, password: derivedPw,
           })
           if (signInErr) {
-            // Sign in failed = username is taken by someone else
             throw new Error('This username is already taken — try adding a number or your initial, like Osman2 or OsmanA.')
           }
           user = signInData?.user
@@ -108,13 +110,12 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       if (!user) throw new Error('Something went wrong creating your account. Please tap retry.')
 
       // ── STEP 2: Create profile if missing (idempotent) ──
-      // Insert — 23505 conflict means profile already exists, that's fine
       const { error: insertErr } = await supabase.from('profiles').insert({
         id: user.id, display_name: username.trim(), language: 'en', stripe_email: email.trim(),
       })
       if (insertErr && insertErr.code !== '23505') throw new Error('Account setup interrupted. Tap retry — your payment is safe.')
 
-      // Check if already subscribed via RPC (respects RLS properly)
+      // Check if already subscribed via RPC
       const { data: subData } = await supabase.rpc('get_subscription_status')
       const alreadyActive = subData?.status === 'active'
 
@@ -126,26 +127,19 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
       }
 
       // ── STEP 4: Link Stripe session ──
-      // Stripe ALWAYS delivers the webhook — just sometimes takes a few seconds.
-      // So we try to link, and if session_not_found we let them in anyway.
-      // The webhook will fire shortly and set subscription_status = active automatically.
-      // alreadyActive already determined above
       if (!alreadyActive) {
-        const { data: linkResult, error: linkErr } = await supabase.rpc('link_pending_subscription', {
+        const { error: linkErr } = await supabase.rpc('link_pending_subscription', {
           p_session_id: sessionId,
           p_user_id:    user.id,
         })
 
         if (linkErr) {
-          // DB error — retry once after 2s
           await new Promise(r => setTimeout(r, 2000))
           await supabase.rpc('link_pending_subscription', {
             p_session_id: sessionId,
             p_user_id:    user.id,
           })
-          // Either way — let them in. Webhook will activate subscription shortly.
         }
-        // session_not_found = webhook not fired yet — let them in, webhook is coming
       }
 
       // ── STEP 5: Create kid if none exists (idempotent) ──
@@ -157,12 +151,11 @@ export default function PostPaymentSetup({ sessionId, onComplete }) {
         kid = await createKid(kidName.trim())
       }
 
-      if (!kid) throw new Error('Almost there! Tap retry to finish setting up your child\'s profile.')
+      if (!kid) throw new Error("Almost there! Tap retry to finish setting up your child's profile.")
 
       // ── Done! ──
       onComplete({ kid })
 
-      // Fallback: if onComplete doesn't navigate within 2s, force reload
       setTimeout(() => {
         window.location.href = '/?subscribed=true'
       }, 2000)
