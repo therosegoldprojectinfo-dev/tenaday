@@ -25,7 +25,12 @@
   'https://connect.facebook.net/en_US/fbevents.js');
   fbq('init', '1028944262871292');
   fbq('track', 'PageView');
-  fbq('track', 'InitiateCheckout');
+  fbq('track', 'InitiateCheckout', {
+    value: 5.00,
+    currency: 'USD',
+    num_items: 1,
+    content_name: 'Numio Lifetime Access',
+  });
   </script>
 
   <script>
@@ -366,7 +371,6 @@
   const BACKEND_URL = 'https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout-session';
   const STRIPE_PK   = 'pk_live_51Nu0S3F3Ob4o24uqvgOJGlSwUt5Bi6aWVFzweQddyD9A8FDAFNykkpZbIDq1o9ZhK09tt9pH8fw3MMLUvDRx2Eea00gLhad5Yg';
 
-  // Wait for Stripe.js to load since it's async
   function waitForStripe(cb) {
     if (window.Stripe) { cb(); return; }
     var interval = setInterval(function() {
@@ -419,7 +423,6 @@
     setInterval(tick, 1000);
   })();
 
-  // Init Stripe after it loads
   waitForStripe(initStripe);
 </script>
 
