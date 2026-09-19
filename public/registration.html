@@ -26,13 +26,11 @@
     .page {
       max-width: 480px;
       margin: 0 auto;
-      padding: 48px 24px 72px;
+      padding: 48px 28px 72px;
       text-align: center;
     }
 
-    .logo-wrap {
-      margin-bottom: 48px;
-    }
+    .logo-wrap { margin-bottom: 48px; }
     .logo-wrap img { height: 36px; width: auto; display: block; margin: 0 auto; }
 
     .event-badge {
@@ -45,11 +43,10 @@
       font-weight: 800;
       border-radius: 50px;
       padding: 7px 18px;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
-    .event-badge svg { flex-shrink: 0; }
 
     .headline {
       font-size: 36px;
@@ -57,15 +54,7 @@
       color: #0A0A0A;
       line-height: 1.12;
       letter-spacing: -0.02em;
-      margin-bottom: 20px;
-    }
-
-    .subline {
-      font-size: 17px;
-      font-weight: 600;
-      color: #555;
       margin-bottom: 48px;
-      line-height: 1.6;
     }
 
     /* IMAGE PLACEHOLDER */
@@ -80,55 +69,40 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      margin-bottom: 56px;
+      margin-bottom: 32px;
     }
-    .img-placeholder svg { color: #C4B4FF; }
-    .img-placeholder-text {
-      font-size: 13px;
-      font-weight: 600;
-      color: #C4B4FF;
-    }
+    .img-placeholder-text { font-size: 13px; font-weight: 600; color: #C4B4FF; }
 
-    /* DISCOVER SECTION */
     .discover-label {
-      font-size: 14px;
-      font-weight: 700;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+      font-size: 17px;
+      font-weight: 500;
+      color: #444;
       margin-bottom: 28px;
+      text-align: left;
+      line-height: 1.5;
     }
 
+    /* BULLETS */
     .bullets {
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: 24px;
       margin-bottom: 56px;
       text-align: left;
     }
     .bullet {
       display: flex;
-      gap: 16px;
+      gap: 14px;
       align-items: flex-start;
     }
     .bullet-check {
-      width: 28px;
-      height: 28px;
-      background: #3513A2;
-      border-radius: 50%;
       flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 1px;
-    }
-    .bullet-check svg {
-      width: 14px;
-      height: 14px;
+      margin-top: 3px;
+      color: #3DBE5C;
     }
     .bullet-text {
       font-size: 17px;
-      font-weight: 500;
+      font-weight: 400;
       color: #0A0A0A;
       line-height: 1.55;
     }
@@ -154,8 +128,7 @@
     }
     .event-detail-row:last-child { border-bottom: none; }
     .event-detail-icon {
-      width: 40px;
-      height: 40px;
+      width: 40px; height: 40px;
       background: #f3f0ff;
       border-radius: 12px;
       display: flex;
@@ -163,12 +136,12 @@
       justify-content: center;
       flex-shrink: 0;
     }
-    .event-detail-icon svg { width: 20px; height: 20px; stroke: #3513A2; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-    .event-detail-label {
-      font-size: 17px;
-      font-weight: 700;
-      color: #0A0A0A;
+    .event-detail-icon svg {
+      width: 20px; height: 20px;
+      stroke: #3513A2; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
+    .event-detail-label { font-size: 17px; font-weight: 700; color: #0A0A0A; }
     .free-pill {
       display: inline-flex;
       align-items: center;
@@ -189,8 +162,8 @@
       justify-content: center;
       gap: 12px;
       width: 100%;
-      background: #25D366;
-      color: #000;
+      background: #3DBE5C;
+      color: #fff;
       font-family: 'Inter', sans-serif;
       font-size: 18px;
       font-weight: 800;
@@ -201,8 +174,9 @@
       text-decoration: none;
       letter-spacing: -0.01em;
       transition: filter 0.15s, transform 0.1s;
-      box-shadow: 0 5px 0 #128C7E;
+      box-shadow: 0 5px 0 #27a348;
       margin-bottom: 20px;
+      text-transform: uppercase;
     }
     .cta-btn:hover  { filter: brightness(1.06); }
     .cta-btn:active { transform: scale(0.98); box-shadow: none; }
@@ -237,31 +211,32 @@
   <!-- HEADLINE -->
   <h1 class="headline">The Simple Way to Help Your Child Succeed at School – Without More Work for You</h1>
 
-  <p class="subline">In this quick 15-minute event, you'll discover:</p>
-
   <!-- IMAGE PLACEHOLDER -->
   <div class="img-placeholder">
     <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#C4B4FF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
     <div class="img-placeholder-text">Your image here</div>
   </div>
 
+  <!-- DISCOVER LABEL -->
+  <p class="discover-label">Here's what you'll discover in this quick <strong>15-minute free event:</strong></p>
+
   <!-- BULLETS -->
   <div class="bullets">
     <div class="bullet">
       <div class="bullet-check">
-        <svg viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 7 5.5 10.5 12 3"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3DBE5C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div class="bullet-text">How your child can <strong>master all their daily school lessons in just 15 minutes a day.</strong></div>
     </div>
     <div class="bullet">
       <div class="bullet-check">
-        <svg viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 7 5.5 10.5 12 3"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3DBE5C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div class="bullet-text">The <strong>"Murayama" scientific method</strong> that keeps kids motivated to practice on their own — even if they hate studying.</div>
     </div>
     <div class="bullet">
       <div class="bullet-check">
-        <svg viewBox="0 0 14 14" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 7 5.5 10.5 12 3"/></svg>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3DBE5C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <div class="bullet-text">How to make sure your child <strong>never falls behind at school</strong> — even if you're working late, busy at home, or just plain tired, using Numio.</div>
     </div>
@@ -297,7 +272,7 @@
 
   <!-- CTA -->
   <a class="cta-btn" href="https://wa.me/14384102068?text=I'm%20ready%20to%20confirm%20my%20spot" target="_blank" rel="noopener">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="#000"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
     Reserve My Free Spot →
   </a>
 
