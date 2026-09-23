@@ -511,9 +511,7 @@
     btn.disabled = true;
     btn.textContent = "Reserving your spot…";
 
-    // TODO Osman: point this at your Supabase edge function that saves the lead
-    // (see the SQL + edge function in chat). It expects { name, phone, slot_label, event_date }.
-    fetch("https://YOUR-PROJECT-REF.functions.supabase.co/register-event-lead", {
+    fetch("https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/register-event-lead", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
