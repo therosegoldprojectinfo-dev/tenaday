@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
-import { generateExam } from '../lib/generateExam'
-import { saveExam } from '../lib/chapters'
+import { generatePractice } from '../lib/generatePractice'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
 
@@ -91,15 +90,11 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
     setError(null)
     try {
       const compressed = await Promise.all(images.map(img => compressImage(img.file)))
-      const generated  = await generateExam(compressed)
-      // Save with page_text so revision regeneration can use it later
-      const saved = await saveExam({
-        chapterId: chapter.id,
-        topic:     generated.topic,
-        questions: generated.questions,
-        kidId,
-        pageText:  generated.page_text || null,
-      })
+      // generatePractice runs the full 4-phase pipeline server-side
+      // (lesson analysis → curriculum alignment → practice plan →
+      // questions) and already inserts the exam row — no separate
+      // saveExam() call needed anymore.
+      const saved = await generatePractice(compressed, { kidId, chapterId: chapter.id })
       onExamReady(saved)
     } catch (err) {
       setError(err)
