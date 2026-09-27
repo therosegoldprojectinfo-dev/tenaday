@@ -379,7 +379,7 @@ serve(async (req) => {
       console.error('Usage tracking failed (non-fatal):', trackErr)
     }
 
-    return jsonResponse({ exam_id: examRow.id, topic: examRow.topic, page_text: examRow.page_text, questions: examRow.questions })
+    return jsonResponse({ id: examRow.id, topic: examRow.topic, page_text: examRow.page_text, questions: examRow.questions })
   } catch (err) {
     console.error('Edge Function error:', err)
     return jsonResponse({ error: 'Service error. Please try again.' }, 500)
