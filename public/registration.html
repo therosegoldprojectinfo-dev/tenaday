@@ -275,63 +275,69 @@
     /* CONFIRMATION */
     .confirm-box { display: none; text-align: left; }
     .confirm-box.show { display: block; }
-    .confirm-badge {
-      font-size: 44px;
-      margin-bottom: 14px;
-      text-align: center;
+
+    .confirm-check-badge {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #3DBE5C;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
     }
+    .confirm-check-badge svg {
+      width: 28px; height: 28px;
+      stroke: #fff; fill: none;
+      stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
+    }
+
     .confirm-title {
       font-size: 28px;
       font-weight: 800;
       color: #0A0A0A;
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 28px;
       line-height: 1.25;
       letter-spacing: -0.01em;
     }
-    .confirm-subtitle {
-      font-size: 16px;
-      font-weight: 500;
-      color: #555;
-      text-align: center;
+
+    /* Event Details section */
+    .confirm-section {
+      border: 2px solid #E0D8FF;
+      border-radius: 20px;
       margin-bottom: 28px;
+      overflow: hidden;
+    }
+    .confirm-section-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0A0A0A;
+      padding: 16px 20px 10px;
+    }
+    .confirm-detail-row {
+      padding: 12px 20px;
+      border-top: 1.5px solid #E0D8FF;
+      font-size: 15px;
       line-height: 1.5;
     }
+    .confirm-detail-row:first-of-type { border-top: none; }
+    .confirm-detail-row:last-of-type { padding-bottom: 18px; }
+    .confirm-detail-label { font-weight: 800; color: #3513A2; }
+    .confirm-detail-value { color: #0A0A0A; font-weight: 500; }
+    .zoom-word { color: #2D8CFF; font-weight: 800; }
 
-    /* Info box, styled like the event-details rows */
-    .confirm-info-box {
-      display: flex;
-      flex-direction: column;
-      border: 2px solid #E0D8FF;
-      border-radius: 24px;
-      overflow: hidden;
-      margin-bottom: 32px;
-    }
-    .confirm-info-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 20px 24px;
-      border-bottom: 1.5px solid #E0D8FF;
-    }
-    .confirm-info-row:last-child { border-bottom: none; }
-    .confirm-info-icon {
-      width: 40px; height: 40px;
-      background: #f3f0ff;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 18px;
-    }
-    .confirm-info-label { font-size: 17px; font-weight: 700; color: #0A0A0A; line-height: 1.35; }
-
+    .confirm-whatsnext { text-align: center; margin-bottom: 28px; }
     .whatsapp-heading {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
-      text-align: center;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .whatsapp-subheading {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 14px;
       line-height: 1.3;
     }
     .whatsapp-word { color: #25D366; }
@@ -341,16 +347,7 @@
       font-weight: 500;
       color: #444;
       text-align: center;
-      margin-bottom: 28px;
       line-height: 1.6;
-    }
-
-    .confirm-question {
-      font-size: 15px;
-      font-weight: 700;
-      color: #0A0A0A;
-      text-align: center;
-      margin-bottom: 14px;
     }
 
     .calendar-btn {
@@ -384,7 +381,7 @@
 <div class="page">
 
   <!-- LOGO -->
-  <div class="logo-wrap">
+  <div class="logo-wrap" id="main-logo">
     <img src="/logotousebro.webp" alt="Numio"/>
   </div>
 
@@ -484,24 +481,24 @@
   <!-- CONFIRMATION VIEW -->
   <div class="confirm-box" id="confirm-view">
 
-    <div class="confirm-title">You're in! Your FREE spot is secured.</div>
-    <div class="confirm-subtitle">You're one of the 3 parents we'll personally help.</div>
+    <div class="confirm-check-badge">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="confirm-title">Your spot is confirmed</div>
 
-    <div class="confirm-info-box">
-      <div class="confirm-info-row">
-        <div class="confirm-info-icon">📅</div>
-        <div class="confirm-info-label" id="confirm-datetime">Thursday, September 24 — 7:00 PM</div>
-      </div>
-      <div class="confirm-info-row">
-        <div class="confirm-info-icon">⏱️</div>
-        <div class="confirm-info-label">15-minute FREE live event</div>
-      </div>
+    <div class="confirm-section">
+      <div class="confirm-section-title">📝 Event Details</div>
+      <div class="confirm-detail-row"><span class="confirm-detail-label">What:</span> <span class="confirm-detail-value">Never worry about your child's education ever again in 3 easy steps</span></div>
+      <div class="confirm-detail-row"><span class="confirm-detail-label">When:</span> <span class="confirm-detail-value" id="confirm-datetime">Thursday, September 24 at 7:00 PM</span></div>
+      <div class="confirm-detail-row"><span class="confirm-detail-label">Where:</span> <span class="confirm-detail-value">Online via <span class="zoom-word">Zoom</span></span></div>
     </div>
 
-    <div class="whatsapp-heading">📲 We'll remind you on <span class="whatsapp-word">WhatsApp</span></div>
-    <p class="confirm-text">We'll send you a WhatsApp message 1 hour before your event with everything you need to join.</p>
+    <div class="confirm-whatsnext">
+      <div class="whatsapp-heading">🕒 What's Next?</div>
+      <div class="whatsapp-subheading">Keep an eye on your <span class="whatsapp-word">WhatsApp</span>!</div>
+      <p class="confirm-text">We'll send you a WhatsApp message exactly 3 hours before the event with your Zoom link and all the information.</p>
+    </div>
 
-    <p class="confirm-question">Want to be sure you won't forget?</p>
     <button type="button" class="calendar-btn" id="calendar-btn">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       Save to Calendar
@@ -598,10 +595,11 @@
         if (window.clarity) clarity("event", "reserve_click");
 
         document.getElementById("booking-view").style.display = "none";
+        document.getElementById("main-logo").style.display = "none";
         document.getElementById("confirm-view").classList.add("show");
 
         var dtEl = document.getElementById("confirm-datetime");
-        if (dtEl) dtEl.textContent = "Thursday, September 24 — " + selected.label;
+        if (dtEl) dtEl.textContent = "Thursday, September 24 at " + selected.label;
 
         window._numioSlotUTC = slotToUTCDate(selected.mtl);
       });
