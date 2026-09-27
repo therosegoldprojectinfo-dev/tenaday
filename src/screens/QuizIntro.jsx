@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
-import { regenerateExam } from '../lib/chapters'
+import { practiceMore } from '../lib/generatePractice'
 
 export default function QuizIntro({ exam, kidName = 'Champ', chapterId, kidId, onStart, onNewExamReady, onBack }) {
   const lang = useLang()
@@ -15,7 +15,11 @@ export default function QuizIntro({ exam, kidName = 'Champ', chapterId, kidId, o
     setError(null)
     setGenerating(true)
     try {
-      const newExam = await regenerateExam({
+      // practiceMore reuses this exam's lesson_analysis + curriculum_alignment
+      // server-side and only re-runs the practice-plan + question-generation
+      // phases — no need to resend page_text or already-asked questions
+      // from the client anymore.
+      const newExam = await practiceMore({
         examId:    exam.id,
         chapterId: chapterId,
         kidId:     kidId,
@@ -24,8 +28,6 @@ export default function QuizIntro({ exam, kidName = 'Champ', chapterId, kidId, o
     } catch (err) {
       if (err.message === 'RATE_LIMIT' || err.message === 'DAILY_LIMIT') {
         setError(t(lang, 'quiz_intro_rate_limit'))
-      } else if (err.message === 'NO_PAGE_TEXT') {
-        setError(t(lang, 'quiz_intro_no_page_text'))
       } else {
         setError(t(lang, 'quiz_intro_error'))
       }
