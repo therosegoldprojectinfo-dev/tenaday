@@ -40,3 +40,17 @@ export async function updateKidStreak(kidId) {
   if (error) throw error
   return data
 }
+
+// Saves the Numio+ Customization fields (country/region/grade) that
+// feed curriculum alignment (Phase B). The DB grants UPDATE on these
+// 3 columns + name only — see education_profile.sql.
+export async function updateKidEducationProfile(kidId, { country, region, grade }) {
+  const { data, error } = await supabase
+    .from('kid_profiles')
+    .update({ country, region: region || null, grade })
+    .eq('id', kidId)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
