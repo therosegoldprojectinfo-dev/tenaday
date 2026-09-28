@@ -1,0 +1,8 @@
+These icons are from OpenMoji (https://openmoji.org)
+License: CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)
+
+Attribution required. Suggested credit line, shown somewhere in the
+app (e.g. an "About"/credits screen):
+
+  Icons by OpenMoji – the open-source emoji and icon project
+  License: CC BY-SA 4.0
