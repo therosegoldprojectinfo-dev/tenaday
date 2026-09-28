@@ -335,7 +335,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
     // Fire-and-forget — never blocks or breaks the quiz UI.
     if (!isTrial && kidId) {
       const timeSeconds = Math.round((Date.now() - questionStartRef.current) / 1000)
-      logQuestionAttempt({ examId: exam.id, kidId, question: q, isCorrect: correct, timeSeconds })
+      logQuestionAttempt({ examId: exam.id, kidId, question: q, isCorrect: correct, givenAnswer: answer, timeSeconds })
     }
   }
 
