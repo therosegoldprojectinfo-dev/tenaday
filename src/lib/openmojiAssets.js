@@ -1,34 +1,33 @@
 // src/lib/openmojiAssets.js
 //
-// Interim asset registry for "visual_count" questions. Keys here
+// Real OpenMoji SVG registry for "visual_count" questions. Keys here
 // MUST exactly match OPENMOJI_ASSETS in
 // supabase/functions/generate-practice/index.ts — add/remove in
 // both places together, or the AI will reference an asset the
 // frontend can't render.
 //
-// Using plain emoji as a placeholder for now (zero asset pipeline
-// needed to ship). Swap ASSET_EMOJI values for real OpenMoji SVGs
-// under /public/assets/openmoji/<name>.svg later — VisualCount in
-// Quiz.jsx is the only place that needs to change when you do.
+// SVGs live in /public/assets/openmoji/<name>.svg — downloaded
+// straight from the official OpenMoji library (CC BY-SA 4.0,
+// https://openmoji.org). Keep the LICENSE.txt file alongside them.
 
-export const ASSET_EMOJI = {
-  bird: '🐦',
-  cow: '🐄',
-  cat: '🐱',
-  dog: '🐶',
-  fish: '🐟',
-  apple: '🍎',
-  banana: '🍌',
-  star: '⭐',
-  ball: '⚽',
-  tree: '🌳',
-  book: '📖',
-  pencil: '✏️',
-  car: '🚗',
-  bus: '🚌',
-  flower: '🌸',
+export const ASSET_PATHS = {
+  bird:   '/assets/openmoji/bird.svg',
+  cow:    '/assets/openmoji/cow.svg',
+  cat:    '/assets/openmoji/cat.svg',
+  dog:    '/assets/openmoji/dog.svg',
+  fish:   '/assets/openmoji/fish.svg',
+  apple:  '/assets/openmoji/apple.svg',
+  banana: '/assets/openmoji/banana.svg',
+  star:   '/assets/openmoji/star.svg',
+  ball:   '/assets/openmoji/ball.svg',
+  tree:   '/assets/openmoji/tree.svg',
+  book:   '/assets/openmoji/book.svg',
+  pencil: '/assets/openmoji/pencil.svg',
+  car:    '/assets/openmoji/car.svg',
+  bus:    '/assets/openmoji/bus.svg',
+  flower: '/assets/openmoji/flower.svg',
 }
 
-export function getAssetEmoji(name) {
-  return ASSET_EMOJI[name] || '❓'
+export function getAssetPath(name) {
+  return ASSET_PATHS[name] || null
 }
