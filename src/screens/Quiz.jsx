@@ -1,5 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect } from 'react'
 import { completeQuiz, updateStreak } from '../lib/economy'
+import { logQuestionAttempt } from '../lib/performance'
+import { getAssetEmoji } from '../lib/openmojiAssets'
 import StreakPopup from './StreakPopup'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
@@ -34,7 +36,7 @@ function QuitPopup({ visible, onStay, onLeave }) {
 
 function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial = false, isReplay = false }) {
   const lang = useLang()
-  const correct = questions.filter((q, i) => answersMatch(answers[i], q.correct_answer)).length
+  const correct = questions.filter((q, i) => isAnswerCorrect(q, answers[i])).length
   const total   = questions.length
   const pct = Math.round((correct / total) * 100)
 
@@ -118,6 +120,7 @@ function normalize(str) {
     .replace(/^\u0627\u0644/, '')
     .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660))
     .replace(/^(les|des|un|une|le|la|l'|the|a|an)\s+/i, '').trim()
+    .replace(/[.,!?;:"']/g, '')
 }
 
 function answersMatch(a, b) {
@@ -126,6 +129,24 @@ function answersMatch(a, b) {
   const isLatin = s => /^[\x20-\x7E]+$/.test(s)
   if (isLatin(na) && isLatin(nb)) return na.replace(/s$/, '') === nb.replace(/s$/, '')
   return false
+}
+
+// Set-equality compare (order doesn't matter) for text_highlight answers.
+function wordSetMatches(selectedWords, targetWords) {
+  if (!Array.isArray(selectedWords) || !Array.isArray(targetWords)) return false
+  if (selectedWords.length !== targetWords.length) return false
+  const norm = arr => arr.map(normalize).sort()
+  const a = norm(selectedWords), b = norm(targetWords)
+  return a.every((w, i) => w === b[i])
+}
+
+// Single source of truth for "was this question answered correctly",
+// across every question type — used for scoring, results, and
+// performance logging alike.
+function isAnswerCorrect(q, answer) {
+  if (!q) return false
+  if (q.type === 'text_highlight') return wordSetMatches(answer, q.target_words)
+  return answersMatch(answer, q.correct_answer)
 }
 
 function MCQCard({ option, selected, revealed, correct, onSelect, big }) {
@@ -148,6 +169,54 @@ function MCQCard({ option, selected, revealed, correct, onSelect, big }) {
     >
       {option}
     </button>
+  )
+}
+
+// ── visual_count: shows N of an OpenMoji-style asset, then reuses
+// MCQCard for the numeric answer options. ──────────────────────
+function VisualCountRow({ asset, quantity }) {
+  const emoji = getAssetEmoji(asset)
+  return (
+    <div className="flex flex-wrap gap-2 justify-center rounded-2xl px-4 py-5 mb-4" style={{ background: '#fafafa', border: '2px solid #f3f4f6' }}>
+      {Array.from({ length: quantity }).map((_, i) => (
+        <span key={i} style={{ fontSize: 36, lineHeight: 1 }}>{emoji}</span>
+      ))}
+    </div>
+  )
+}
+
+// ── text_highlight: tap words to select them, compare against
+// q.target_words on check. ──────────────────────────────────────
+function TextHighlight({ text, selectedIdx, revealed, targetWords, onToggle }) {
+  const words = text.split(' ')
+  const normTargets = (targetWords || []).map(normalize)
+
+  return (
+    <div className="flex flex-wrap gap-2 px-1 py-2">
+      {words.map((word, i) => {
+        const isSelected = selectedIdx.includes(i)
+        const isTarget = normTargets.includes(normalize(word))
+        let bg = '#fafafa', color = '#3C3C3C', border = '2px solid #e5e7eb'
+        if (revealed) {
+          if (isSelected && isTarget)      { bg = '#f0fdf4'; color = '#16a34a'; border = '2px solid #86efac' }
+          else if (isSelected && !isTarget){ bg = '#fff5f5'; color = '#ef4444'; border = '2px solid #fca5a5' }
+          else if (!isSelected && isTarget){ bg = '#fff7ed'; color = '#d97706'; border = '2px dashed #fdba74' }
+        } else if (isSelected) {
+          bg = '#f5f3ff'; color = '#7c3aed'; border = '2px solid #a78bfa'
+        }
+        return (
+          <button
+            key={i}
+            disabled={revealed}
+            onClick={() => onToggle(i)}
+            className="rounded-xl font-display font-bold text-lg px-3 py-2 transition-all active:scale-95"
+            style={{ background: bg, color, border }}
+          >
+            {word}
+          </button>
+        )
+      })}
+    </div>
   )
 }
 
@@ -196,6 +265,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   const [showStreak,  setShowStreak]  = useState(false)
   const [streakCount, setStreakCount] = useState(0)
   const [typedValue,  setTypedValue]  = useState('')
+  const [highlightIdx, setHighlightIdx] = useState([]) // selected word indices for text_highlight
   const [saving,      setSaving]      = useState(false)
   const [coinSaveError, setCoinSaveError] = useState(false)
   const [coinsEarned,   setCoinsEarned]  = useState(0)
@@ -203,16 +273,30 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0)
   const [fireKey, setFireKey] = useState(0)
 
+  const questionStartRef = useRef(Date.now())
+  useEffect(() => { questionStartRef.current = Date.now() }, [idx])
+
   const q             = questions[idx]
   const total         = questions.length
   const progressScale = (idx + (revealed ? 1 : 0)) / Math.max(total, 1)
   const onFire        = consecutiveCorrect >= 2
 
-  function checkCorrect(answer) { return answersMatch(answer, q?.correct_answer) }
-  const isCorrect = revealed && checkCorrect(q?.type === 'fill_blank' ? typedValue : selected)
+  function currentAnswer() {
+    if (q?.type === 'fill_blank') return typedValue
+    if (q?.type === 'text_highlight') return highlightIdx.map(i => q.text.split(' ')[i])
+    return selected
+  }
+
+  function checkCorrect(answer) { return isAnswerCorrect(q, answer) }
+  const isCorrect = revealed && checkCorrect(currentAnswer())
+
+  function toggleHighlightWord(i) {
+    if (revealed) return
+    setHighlightIdx(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i])
+  }
 
   async function handleContinue() {
-    const answer     = q.type === 'fill_blank' ? typedValue : selected
+    const answer     = currentAnswer()
     const newAnswers = [...answers, answer]
     setAnswers(newAnswers)
 
@@ -220,8 +304,8 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
       if (isTrial) { setShowResults(true); return }
       setSaving(true); setCoinSaveError(false)
       try {
-        const correctCount = questions.filter((q, i) => { const a = i === idx ? answer : answers[i]; return answersMatch(a, q.correct_answer) }).length
-        const wrongIds = questions.map((q, i) => ({ q, a: i === idx ? answer : answers[i] })).filter(({ q, a }) => !answersMatch(a, q.correct_answer)).map(({ q }) => q.id)
+        const correctCount = questions.filter((q, i) => { const a = i === idx ? answer : answers[i]; return isAnswerCorrect(q, a) }).length
+        const wrongIds = questions.map((q, i) => ({ q, a: i === idx ? answer : answers[i] })).filter(({ q, a }) => !isAnswerCorrect(q, a)).map(({ q }) => q.id)
         const { coinsAwarded } = await completeQuiz(exam.id, kidId, { correct: correctCount, total, wrongIds })
         setCoinsEarned(coinsAwarded)
         if (coinsAwarded === 0) setIsReplay(true)
@@ -231,17 +315,26 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
       setSaving(false)
       return
     }
-    setIdx(i => i + 1); setSelected(null); setRevealed(false); setTypedValue('')
+    setIdx(i => i + 1); setSelected(null); setRevealed(false); setTypedValue(''); setHighlightIdx([])
   }
 
   function handleCheck() {
-    const answer = q.type === 'fill_blank' ? typedValue : selected
-    if (!answer && answer !== false) return
-    setSelected(q.type === 'fill_blank' ? typedValue : selected)
+    const answer = currentAnswer()
+    const emptyAnswer = q.type === 'text_highlight' ? highlightIdx.length === 0 : (!answer && answer !== false)
+    if (emptyAnswer) return
+
     setRevealed(true)
-    if (checkCorrect(answer)) {
+    const correct = isAnswerCorrect(q, answer)
+    if (correct) {
       setConsecutiveCorrect(c => { const next = c + 1; if (next >= 2) setFireKey(k => k + 1); return next })
     } else { setConsecutiveCorrect(0) }
+
+    // Log performance for adaptation (Phase C reads this next session).
+    // Fire-and-forget — never blocks or breaks the quiz UI.
+    if (!isTrial && kidId) {
+      const timeSeconds = Math.round((Date.now() - questionStartRef.current) / 1000)
+      logQuestionAttempt({ examId: exam.id, kidId, question: q, isCorrect: correct, timeSeconds })
+    }
   }
 
   if (showStreak) return <StreakPopup streakCount={streakCount} onClose={() => { setShowStreak(false); setShowResults(true) }} />
@@ -255,8 +348,8 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
         <button onClick={async () => {
           setCoinSaveError(false); setSaving(true)
           try {
-            const correctCount = questions.filter((q, i) => answersMatch(answers[i], q.correct_answer)).length
-            const wrongIds = questions.filter((q, i) => !answersMatch(answers[i], q.correct_answer)).map(q => q.id)
+            const correctCount = questions.filter((q, i) => isAnswerCorrect(q, answers[i])).length
+            const wrongIds = questions.filter((q, i) => !isAnswerCorrect(q, answers[i])).map(q => q.id)
             const { coinsAwarded } = await completeQuiz(exam.id, kidId, { correct: correctCount, total, wrongIds })
             setCoinsEarned(coinsAwarded); if (coinsAwarded === 0) setIsReplay(true)
             const { streakCount: sc, isNewDay } = await updateStreak(kidId)
@@ -274,6 +367,11 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
 
   if (showResults) return <ResultsScreen questions={questions} answers={answers} topic={topic} onDone={onDone} coinsEarned={coinsEarned} isTrial={isTrial} isReplay={isReplay} />
   if (!q) return null
+
+  const checkDisabled =
+    q.type === 'fill_blank' ? typedValue.trim() === '' :
+    q.type === 'text_highlight' ? highlightIdx.length === 0 :
+    selected === null
 
   return (
     <div className="flex items-center justify-center bg-white" style={{ height: '100dvh', overflow: 'hidden' }}>
@@ -330,6 +428,25 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
               )}
             </div>
           )}
+          {q.type === 'visual_count' && (
+            <div className="flex flex-col gap-3">
+              <VisualCountRow asset={q.asset} quantity={q.quantity} />
+              <div className="grid grid-cols-2 gap-3">
+                {q.options.map((option, optIdx) => (
+                  <MCQCard key={`${optIdx}-${option}`} option={option} selected={selected} revealed={revealed} correct={q.correct_answer} onSelect={setSelected} big />
+                ))}
+              </div>
+            </div>
+          )}
+          {q.type === 'text_highlight' && (
+            <TextHighlight
+              text={q.text}
+              selectedIdx={highlightIdx}
+              revealed={revealed}
+              targetWords={q.target_words}
+              onToggle={toggleHighlightWord}
+            />
+          )}
           {revealed && q.explanation && (
             <div className="mt-4 rounded-2xl px-4 py-3" style={{ background: '#f5f3ff', border: '2px solid #ede9fe' }}>
               <p className="font-body text-sm leading-snug" style={{ color: '#7c3aed' }}>💡 {q.explanation}</p>
@@ -341,7 +458,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
         <div className="flex-shrink-0 px-4 pt-2 pb-6">
           {!revealed ? (
             <button
-              disabled={q.type === 'fill_blank' ? typedValue.trim() === '' : selected === null}
+              disabled={checkDisabled}
               onClick={handleCheck}
               className="w-full disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all tracking-widest active:scale-95"
               style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}
