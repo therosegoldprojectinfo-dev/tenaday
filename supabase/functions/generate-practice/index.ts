@@ -1,15 +1,13 @@
 // supabase/functions/generate-practice/index.ts
 //
-// Replaces generate-exam. Runs all 4 phases of the Numio Practice
-// Protocol in one Edge Function call:
-//   A. Lesson analysis   (photo → what's being taught)      — skipped in "practice_more" mode
-//   B. Curriculum alignment (+ profile → what they should know) — skipped in "practice_more" mode
-//   C. Practice plan      (+ performance → what to practise, how)
-//   D. Question generation (plan + allowed types → structured questions)
+// Numio Universal Test Generation Framework implementation.
+// 2 AI calls (both Haiku 4.5 — Sonnet was too expensive):
+//   1. Lesson analysis → learning objectives (skipped in "practice_more" mode)
+//   2. Framework-driven blueprint + questions, using the kid's
+//      learner profile + per-skill stats for adaptation
 //
-// "practice_more" mode reuses the parent exam's lesson_analysis_id
-// and curriculum_alignment_id (Phase A/B don't change) and only
-// re-runs Phase C/D with fresh performance data.
+// Plus a profile-refresh step (small Haiku call, only runs when
+// there's new attempt data since the last refresh).
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -17,7 +15,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const MODEL = 'claude-sonnet-5'
+const MODEL = 'claude-haiku-4-5-20251001'
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': 'https://numiomath.app',
@@ -25,250 +23,201 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
-// ============================================================
-// LOCKED REGISTRY — the AI may only use a type that has a real
-// frontend component already built. Add to ACTIVE as components
-// ship; never let the AI use anything not in ACTIVE.
-// ============================================================
 const ACTIVE_QUESTION_TYPES = ['mcq', 'true_false', 'fill_blank', 'visual_count', 'text_highlight'] as const
-
-// Approved OpenMoji asset names — must exactly match the keys in
-// src/lib/openmojiAssets.js on the frontend. The AI can only use an
-// asset from this list for "visual_count"; anything else and the
-// question fails validation and gets rejected (see validateQuestions).
 const OPENMOJI_ASSETS = [
   'bird', 'cow', 'cat', 'dog', 'fish', 'apple', 'banana', 'star',
   'ball', 'tree', 'book', 'pencil', 'car', 'bus', 'flower',
 ]
-
-// Full target roster from the master plan — NOT yet active.
-// Move an entry up to ACTIVE_QUESTION_TYPES only once its
-// frontend component exists in src/components/questions/.
-// const PLANNED_QUESTION_TYPES = [
-//   'multi_select', 'order', 'match', 'sort', 'drag_drop',
-//   'number_line', 'visual_compare', 'fraction_visual',
-//   'image_label', 'word_problem',
-// ]
+const KNOWLEDGE_TYPES = [
+  'factual', 'vocabulary', 'definition', 'conceptual', 'procedural',
+  'rule', 'classification', 'sequence', 'cause_effect', 'problem_solving',
+  'reading', 'production',
+]
 
 function jsonResponse(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
-  })
+  return new Response(JSON.stringify(body), { status, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } })
 }
 
-async function callClaude(system: string, content: any[], maxTokens = 4000, tools: any[] | null = null) {
-  const body: any = {
-    model: MODEL,
-    max_tokens: maxTokens,
-    system,
-    messages: [{ role: 'user', content }],
-  }
-  if (tools) body.tools = tools
-
+async function callClaude(system: string, content: any[], maxTokens = 4000) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': ANTHROPIC_API_KEY!,
-      'anthropic-version': '2023-06-01',
-    },
-    body: JSON.stringify(body),
+    headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_API_KEY!, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({ model: MODEL, max_tokens: maxTokens, system, messages: [{ role: 'user', content }] }),
   })
-  if (!res.ok) {
-    const err = await res.text()
-    throw new Error(`Claude API error: ${err}`)
-  }
+  if (!res.ok) throw new Error(`Claude API error: ${await res.text()}`)
   const data = await res.json()
-  // When tools are used (web search), content includes tool_use /
-  // tool_result blocks before the final answer — the JSON we want is
-  // never necessarily content[0]. Join every text block instead.
   const text = (data.content || []).filter((b: any) => b.type === 'text').map((b: any) => b.text).join('\n')
   const usage = data.usage || {}
   const clean = text.replace(/^```(?:json)?[^\n]*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
   return { parsed: JSON.parse(clean), usage }
 }
 
-// ── Phase A — Lesson analysis (multimodal) ────────────────────
-async function analyzeLesson(images: { data: string; mediaType: string }[]) {
-  const system = `You analyze photos of a child's schoolwork (textbook page, worksheet, handwritten notes) for a practice app for kids aged 6-12.
+// ============================================================
+// PHASE 1 — Lesson analysis → learning objectives
+// (Framework sections 1-3)
+// ============================================================
+async function analyzeLesson(images: { data: string; mediaType: string }[], existingSkills: { skill_key: string; skill_label: string }[]) {
+  const system = `You analyze a photo of a child's schoolwork for a practice app (ages 6-12). Follow this process:
 
-Extract ONLY what is actually visible. Do not invent content.
+1. Identify subject, topic, language, and (if inferable from the material) grade/level.
+2. Break the lesson into specific, observable LEARNING OBJECTIVES — not vague topics. "Add fractions with the same denominator" not "understand fractions". Prioritize by importance in the material; don't give every sentence equal weight.
+3. Classify each objective's knowledge type, using exactly one of: ${JSON.stringify(KNOWLEDGE_TYPES)}.
+4. Mark priority: "core" (the lesson's main point), "supporting", or "prerequisite".
+5. Give each objective a stable "skill_key" — a short dotted id like "math.fractions.add_same_denominator". IMPORTANT: this kid already has these skill keys on record — if an objective is the SAME underlying skill as one below, reuse its exact skill_key. Only invent a new one for a genuinely new skill.
 
-Respond with ONLY this JSON, no markdown, no preamble:
-{
-  "subject": "e.g. Mathematics",
-  "topic": "short topic name, in the detected language",
-  "subtopics": ["..."],
-  "concepts": ["..."],
-  "skills": ["specific, testable skills, e.g. 'compare two 2-digit numbers using < > ='"],
-  "language": "detected language of the content",
-  "difficulty": "as implied by the material (e.g. beginner/intermediate)",
-  "vocabulary": ["important terms shown"],
-  "notation": "any special math/grammar/science notation present, or null",
-  "page_text": "full extracted text, word for word, preserving structure"
-}`
-  const content = images.map((img) => ({
-    type: 'image',
-    source: { type: 'base64', media_type: img.mediaType || 'image/jpeg', data: img.data },
-  }))
-  content.push({ type: 'text', text: 'Analyze this lesson content and return only the JSON.' })
-  return callClaude(system, content, 2000)
-}
+Existing skill keys for this kid:
+${JSON.stringify(existingSkills)}
 
-// ── Phase B — Curriculum alignment (text only) ────────────────
-async function alignCurriculum(lesson: any, profile: { country?: string; region?: string; grade?: string }) {
-  const system = `You determine what a child is expected to know/do for a given skill, based on their country/region/grade.
-
-You have a web_search tool. USE IT to find the real, current official curriculum (Tier 1) for this country/region/grade/subject before answering — search for the government education department's curriculum document or official syllabus. If you can't find an official source after searching, fall back to well-established educational standards/organizations (Tier 2), then general age-appropriate pedagogy (Tier 3) — and say so honestly in "source_tier"/"confidence". Never fabricate a specific curriculum code or document name you didn't actually find.
-
-After any searching, respond with ONLY this JSON (no markdown, no preamble, no search commentary in the final answer):
-{
-  "expected_knowledge": ["what the child should know/be able to do at this grade, for this skill"],
-  "source_tier": "official_curriculum" | "educational_standards" | "general_pedagogy",
-  "confidence": "high" | "medium" | "low",
-  "sources": ["short source names/URLs actually found via search, or empty array if none"],
-  "notes": "short note on any grade-level adjustment made"
-}`
-  const userText = `Country: ${profile.country || 'unknown'}
-Region: ${profile.region || 'none specified'}
-Grade: ${profile.grade || 'unknown'}
-
-Lesson analysis:
-${JSON.stringify(lesson, null, 2)}
-
-Search for the official curriculum if possible, then return only the JSON.`
-  return callClaude(
-    system,
-    [{ type: 'text', text: userText }],
-    2000,
-    [{ type: 'web_search_20250305', name: 'web_search' }]
-  )
-}
-
-// ── Phase C — Practice plan ────────────────────────────────────
-async function buildPracticePlan(lesson: any, alignment: any, performance: any[]) {
-  const system = `You design a practice plan following the Numio Practice Protocol:
-1. Identify the exact target skill being practised.
-2. Break it into 4-8 concrete subskills.
-3. Determine a starting difficulty (1-5) and how it should progress, using the performance data given — go easier on skills marked "weak", push harder on skills marked "mastered".
-4. Select a varied SET of exercise forms so the child doesn't just get the same question shape repeated. Only choose forms from ACTIVE_QUESTION_TYPES (given below) — never invent a form with no matching type.
-
-ACTIVE_QUESTION_TYPES: ${JSON.stringify(ACTIVE_QUESTION_TYPES)}
+Extract only what's actually in the photo — don't invent content or assume advanced material wasn't shown.
 
 Respond with ONLY this JSON:
 {
-  "target_skill": "...",
-  "subskills": ["...", "..."],
-  "starting_difficulty": 1,
-  "exercise_forms": ["mcq", "true_false"],
-  "plan_notes": "1-2 sentences on why this mix, referencing the performance data if relevant"
+  "subject": "...", "topic": "...", "language": "...", "grade_hint": "e.g. 'appears to be grade 2 level' or null",
+  "page_text": "full extracted text, word for word",
+  "objectives": [
+    { "id": "obj1", "skill_key": "...", "description": "...", "knowledge_type": "procedural", "priority": "core" }
+  ]
 }`
-  const userText = `Lesson analysis:
-${JSON.stringify(lesson, null, 2)}
-
-Curriculum alignment:
-${JSON.stringify(alignment, null, 2)}
-
-Recent performance for this kid (compact summary, may be empty for a first-ever session):
-${JSON.stringify(performance, null, 2)}
-
-Return only the JSON.`
-  return callClaude(system, [{ type: 'text', text: userText }], 1200)
+  const content = images.map((img) => ({ type: 'image', source: { type: 'base64', media_type: img.mediaType || 'image/jpeg', data: img.data } }))
+  content.push({ type: 'text', text: 'Analyze this lesson and return only the JSON.' })
+  return callClaude(system, content, 2000)
 }
 
-// ── Phase D — Question generation ──────────────────────────────
-async function generateQuestions(plan: any, lesson: any, questionCount: number) {
-  const system = `You generate practice questions for a kids' learning app, following the practice plan exactly.
+// ============================================================
+// PHASE 2 — Framework-driven blueprint + questions
+// (Framework sections 4-19, 22)
+// ============================================================
+const FRAMEWORK_PROMPT = `You are designing a practice session for a kids' learning app, following the Numio Universal Test Generation Framework.
 
-LANGUAGE: write everything in "${lesson.language || 'the language of the lesson'}". True/false answers must be in that language too (e.g. French: "Vrai"/"Faux").
+PRIMARY OBJECTIVE: help the child understand, retrieve, apply, recognize mistakes, and demonstrate mastery — not to generate as many questions as possible. Every question must have a clear purpose: before writing it, know exactly which objective and which practice method (recall/recognition/application/production) it serves.
 
-Only use question types from this exact list — never any other value for "type": ${JSON.stringify(ACTIVE_QUESTION_TYPES)}.
+SELECT PRACTICE METHODS BY KNOWLEDGE TYPE — don't use one pattern for everything:
+- factual/vocabulary: recognition → recall → contextual use
+- definition: recall → recognize examples/non-examples → apply
+- conceptual: explain → compare → predict → apply
+- procedural/rule: guided → independent → variation → error-correction
+- classification: sort → compare → distinguish
+- sequence: order → recall steps → predict next
+- cause_effect: identify cause/effect → explain → predict
+- problem_solving: interpret → select strategy → solve → apply to new context
+- reading: recall → infer → interpret
+- production: construct/apply independently (only if a supported question type can capture it)
 
-Every question MUST include: id, type, question, explanation, skill (one of the plan's subskills, or the target_skill), difficulty (1-5, following the plan's progression).
+COVERAGE: cover the lesson's core objectives meaningfully — not narrowly (all questions on one sub-skill) and not broadly (drifting into untaught material). Stay faithful to what was actually taught; use prerequisites only when needed; avoid extension material.
 
-Per-type rules:
-- "mcq": include "options" (array of 4 strings) and "correct_answer" (exact text of one option, never a letter).
-- "true_false": "correct_answer" must be in the lesson's language.
-- "fill_blank": "question" contains "___"; "correct_answer" is the missing word/value.
-- "visual_count": use ONLY for a skill that genuinely benefits from counting a picture (e.g. counting, comparison, addition/subtraction with small numbers). Include "asset" (must be EXACTLY one of: ${JSON.stringify(OPENMOJI_ASSETS)}), "quantity" (integer 1-12, how many of that asset to show), "options" (4 number strings) and "correct_answer" (one of options, matching the real count/result). If no asset in the list fits the skill, do NOT use this type — pick a different one instead.
-- "text_highlight": use ONLY for language/grammar skills (identifying a word type, a sentence part, key vocabulary). Include "text" (a short sentence, in the lesson's language) and "target_words" (array of the EXACT word(s) copied verbatim from "text" that the child should tap/highlight to answer correctly — e.g. every verb, or every noun). Do not include "options" or "correct_answer" for this type.
+DIFFICULTY: progress from accessible → direct → varied → applied → challenging, but let difficulty come from the THINKING required, never from confusing wording or artificially large numbers.
 
-Generate exactly ${questionCount} questions. Vary the exercise form across the plan's exercise_forms — do not just repeat one shape. Every question must genuinely practise one of the plan's subskills, not just look different.
+VARIETY: vary format, wording, numbers, and representation when it's pedagogically useful — never just for novelty. Don't ask near-duplicate questions.
+
+ADAPT TO PERFORMANCE (you'll be given per-skill stats and a learner profile):
+- "mastered" skills: light retrieval only, or skip in favor of other objectives — don't over-practice what's already solid.
+- "weak" skills: don't just repeat the same question — change the representation/format, reduce complexity, target the specific error pattern described in the profile if one is given.
+- "developing": continue practicing, can vary format.
+- "insufficient" / new: treat as unknown, start accessible.
+
+QUALITY CHECK before including a question — relevance, clear purpose, accuracy, right level, clarity, answerable independently (not guessable from pattern), meaningfully different from other questions in this set.
+
+QUESTION TYPES — you may ONLY use these exact values for "type": ${JSON.stringify(ACTIVE_QUESTION_TYPES)}. Pick whichever best serves the practice method — don't force every objective into "mcq".
+- "mcq": "options" (4 strings), "correct_answer" (exact option text).
+- "true_false": "correct_answer" in the lesson's language.
+- "fill_blank": "question" contains "___"; "correct_answer" is the missing piece — good for recall/production-lite.
+- "visual_count": ONLY for counting/comparison/small arithmetic skills. "asset" (exactly one of ${JSON.stringify(OPENMOJI_ASSETS)}), "quantity" (1-12), "options" (4 numbers), "correct_answer". If no asset fits, don't use this type.
+- "text_highlight": ONLY for language/grammar/classification skills. "text" (a sentence, lesson's language), "target_words" (array of exact words copied verbatim from "text" to tap) — no options/correct_answer for this type.
+
+Every question MUST include: id, type, question, explanation, objective_id (must match one of the given objectives' "id"), skill_key (copy from that objective), practice_method (one of: recall, recognition, application, production), purpose (one short sentence: what exactly will the child have practiced), difficulty (1-5).
 
 Respond with ONLY this JSON:
 {
   "topic": "...",
-  "questions": [
-    { "id": "q1", "type": "mcq", "question": "...", "options": ["...","...","...","..."], "correct_answer": "...", "explanation": "...", "skill": "...", "difficulty": 1 },
-    { "id": "q2", "type": "visual_count", "question": "How many birds are there?", "asset": "bird", "quantity": 6, "options": ["4","6","8","10"], "correct_answer": "6", "explanation": "...", "skill": "...", "difficulty": 2 },
-    { "id": "q3", "type": "text_highlight", "question": "Tap the verb in this sentence.", "text": "The little boy plays football.", "target_words": ["plays"], "explanation": "...", "skill": "...", "difficulty": 2 }
-  ]
+  "blueprint": {
+    "objectives_covered": ["obj1", "obj3"],
+    "notes": "1-2 sentences on the balance/adaptation decisions made and why"
+  },
+  "questions": [ { "id": "q1", "type": "mcq", "question": "...", "options": [...], "correct_answer": "...", "explanation": "...", "objective_id": "obj1", "skill_key": "...", "practice_method": "recall", "purpose": "...", "difficulty": 1 } ]
 }`
-  const userText = `Practice plan:
-${JSON.stringify(plan, null, 2)}
 
-Return only the JSON.`
-  return callClaude(system, [{ type: 'text', text: userText }], 4000)
+async function generateBlueprintAndQuestions(lesson: any, skillStats: any[], learnerProfile: any, questionCount: number) {
+  const userText = `LANGUAGE: write everything in "${lesson.language || 'the language of the lesson'}".
+
+Lesson objectives for this session:
+${JSON.stringify(lesson.objectives, null, 2)}
+
+Per-skill stats for this kid (status is deterministic, computed from real attempts — trust it):
+${JSON.stringify(skillStats, null, 2)}
+
+Learner profile (narrative summary, may be null for a new kid):
+${JSON.stringify(learnerProfile, null, 2)}
+
+Generate exactly ${questionCount} questions. Return only the JSON.`
+  return callClaude(FRAMEWORK_PROMPT, [{ type: 'text', text: userText }], 4000)
 }
 
-function validateQuestions(questions: any[]) {
+function validateQuestions(questions: any[], objectiveIds: string[]) {
   if (!Array.isArray(questions) || questions.length === 0) return 'No questions returned'
   for (const q of questions) {
-    if (!q.id || !q.type || !q.question || !q.explanation || !q.skill || !q.difficulty) {
-      return `Malformed question: ${JSON.stringify(q).slice(0, 200)}`
+    if (!q.id || !q.type || !q.question || !q.explanation || !q.objective_id || !q.skill_key || !q.practice_method || !q.purpose || !q.difficulty) {
+      return `Malformed question (missing required field): ${JSON.stringify(q).slice(0, 200)}`
     }
-    if (!ACTIVE_QUESTION_TYPES.includes(q.type)) {
-      return `Question used inactive type "${q.type}": ${JSON.stringify(q).slice(0, 150)}`
+    if (!objectiveIds.includes(q.objective_id)) return `Question references unknown objective_id "${q.objective_id}": ${q.id}`
+    if (!ACTIVE_QUESTION_TYPES.includes(q.type)) return `Question used inactive type "${q.type}": ${q.id}`
+    if ((q.type === 'mcq' || q.type === 'visual_count') && (!q.correct_answer || !Array.isArray(q.options) || !q.options.includes(q.correct_answer))) {
+      return `${q.type} missing/invalid options or correct_answer: ${q.id}`
     }
-    if (q.type === 'mcq' || q.type === 'visual_count') {
-      if (!q.correct_answer) return `${q.type} missing correct_answer: ${q.id}`
-      if (!Array.isArray(q.options) || q.options.length < 2) return `${q.type} without options: ${q.id}`
-      if (!q.options.includes(q.correct_answer)) return `${q.type} correct_answer not in options: ${q.id}`
-    }
-    if (q.type === 'true_false' && !q.correct_answer) {
-      return `true_false missing correct_answer: ${q.id}`
-    }
-    if (q.type === 'fill_blank' && !q.correct_answer) {
-      return `fill_blank missing correct_answer: ${q.id}`
-    }
+    if ((q.type === 'true_false' || q.type === 'fill_blank') && !q.correct_answer) return `${q.type} missing correct_answer: ${q.id}`
     if (q.type === 'visual_count') {
-      if (!OPENMOJI_ASSETS.includes(q.asset)) return `visual_count used unapproved asset "${q.asset}": ${q.id}`
+      if (!OPENMOJI_ASSETS.includes(q.asset)) return `visual_count unapproved asset "${q.asset}": ${q.id}`
       if (!Number.isInteger(q.quantity) || q.quantity < 1 || q.quantity > 12) return `visual_count bad quantity: ${q.id}`
     }
     if (q.type === 'text_highlight') {
       if (typeof q.text !== 'string' || !q.text.trim()) return `text_highlight missing text: ${q.id}`
       if (!Array.isArray(q.target_words) || q.target_words.length === 0) return `text_highlight missing target_words: ${q.id}`
-      for (const w of q.target_words) {
-        if (!q.text.includes(w)) return `text_highlight target_word "${w}" not found in text: ${q.id}`
-      }
+      for (const w of q.target_words) if (!q.text.includes(w)) return `text_highlight target_word "${w}" not in text: ${q.id}`
     }
   }
   return null
 }
 
-// ── Compact performance summary for this kid ──────────────────
-async function getPerformanceSummary(sb: any, kidId: string) {
-  const { data, error } = await sb
-    .from('question_attempts')
-    .select('skill, is_correct')
-    .eq('kid_id', kidId)
-    .order('created_at', { ascending: false })
-    .limit(200)
-  if (error || !data || data.length === 0) return []
+// ============================================================
+// Learner profile refresh — small Haiku call, only when there's
+// new attempt data since the last refresh.
+// ============================================================
+async function maybeRefreshLearnerProfile(sb: any, kidId: string) {
+  const { count: totalAttempts } = await sb.from('question_attempts').select('id', { count: 'exact', head: true }).eq('kid_id', kidId)
+  const { data: existing } = await sb.from('kid_learner_profiles').select('*').eq('kid_id', kidId).maybeSingle()
 
-  const bySkill: Record<string, { correct: number; total: number }> = {}
-  for (const row of data) {
-    if (!row.skill) continue
-    bySkill[row.skill] ||= { correct: 0, total: 0 }
-    bySkill[row.skill].total++
-    if (row.is_correct) bySkill[row.skill].correct++
+  const total = totalAttempts || 0
+  if (existing && total - existing.attempts_at_last_update < 5) {
+    return existing // not enough new data yet — don't spend a call
   }
-  return Object.entries(bySkill).map(([skill, s]) => {
-    const acc = s.correct / s.total
-    const status = s.total < 2 ? 'new' : acc >= 0.8 ? 'mastered' : acc < 0.5 ? 'weak' : 'developing'
-    return { skill, accuracy: Math.round(acc * 100), attempts: s.total, status }
-  })
+  if (total < 5) return existing || null // too little data for any profile at all
+
+  const { data: recentWrong } = await sb
+    .from('question_attempts')
+    .select('skill_key, question_type, given_answer, is_correct, created_at')
+    .eq('kid_id', kidId).eq('is_correct', false)
+    .order('created_at', { ascending: false }).limit(20)
+
+  const { data: skills } = await sb.from('kid_skills').select('skill_key, skill_label, status, attempts, correct_count, format_stats').eq('kid_id', kidId)
+
+  const system = `You update a short learning profile for a child, based ONLY on their practice data. Stay strictly about learning — skills, error patterns, formats they do better/worse with. NEVER comment on personality, character, effort, or behavior (no "lazy", "impatient", etc). If data is thin, say so honestly rather than overclaiming.
+
+Respond with ONLY this JSON:
+{
+  "strengths": ["short phrases"], "weaknesses": ["short phrases"],
+  "error_patterns": ["e.g. 'sometimes adds numerators and denominators separately when fractions have different denominators'"],
+  "format_notes": "1 sentence, e.g. 'stronger with visual/mcq than fill_blank' or null if not enough evidence",
+  "summary": "2-3 sentence narrative combining the above, written for another AI to use when designing the next practice session"
+}`
+  const userText = `Per-skill stats:\n${JSON.stringify(skills, null, 2)}\n\nRecent incorrect answers:\n${JSON.stringify(recentWrong, null, 2)}\n\nReturn only the JSON.`
+  const { parsed } = await callClaude(system, [{ type: 'text', text: userText }], 800)
+
+  const row = {
+    kid_id: kidId, strengths: parsed.strengths || [], weaknesses: parsed.weaknesses || [],
+    error_patterns: parsed.error_patterns || [], format_notes: parsed.format_notes || null,
+    summary: parsed.summary || null, attempts_at_last_update: total, updated_at: new Date().toISOString(),
+  }
+  await sb.from('kid_learner_profiles').upsert(row)
+  return row
 }
 
 serve(async (req) => {
@@ -290,29 +239,20 @@ serve(async (req) => {
     if (mode === 'new' && (!images || !images.length)) return jsonResponse({ error: 'No images provided' }, 400)
     if (mode === 'practice_more' && !parent_exam_id) return jsonResponse({ error: 'parent_exam_id required for practice_more' }, 400)
 
-    // Subscription check
-    const { data: profileRow, error: profileErr } = await sb
-      .from('profiles').select('subscription_status').eq('id', user.id).single()
-    if (profileErr || !profileRow || profileRow.subscription_status !== 'active') {
-      return jsonResponse({ error: 'SUBSCRIPTION_ACTIVATING' }, 402)
-    }
+    const { data: profileRow, error: profileErr } = await sb.from('profiles').select('subscription_status').eq('id', user.id).single()
+    if (profileErr || !profileRow || profileRow.subscription_status !== 'active') return jsonResponse({ error: 'SUBSCRIPTION_ACTIVATING' }, 402)
 
-    // Rate limit — same RPC as before
     const { error: rateLimitErr } = await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
     if (rateLimitErr) {
       const isRateLimit = rateLimitErr.message?.includes('Daily limit') || rateLimitErr.code === 'P0001'
       return jsonResponse({ error: isRateLimit ? 'RATE_LIMIT' : 'Service error. Please try again.' }, isRateLimit ? 429 : 500)
     }
 
-    // Kid profile — education context
-    const { data: kid, error: kidErr } = await sb
-      .from('kid_profiles').select('id, country, region, grade').eq('id', kid_id).eq('user_id', user.id).single()
+    const { data: kid, error: kidErr } = await sb.from('kid_profiles').select('id, grade').eq('id', kid_id).eq('user_id', user.id).single()
     if (kidErr || !kid) return jsonResponse({ error: 'Kid not found' }, 404)
 
     let lessonAnalysisId: string
-    let curriculumAlignmentId: string
     let lesson: any
-    let alignment: any
     let usageTotal = { input: 0, output: 0 }
 
     if (mode === 'new') {
@@ -324,78 +264,59 @@ serve(async (req) => {
         if (typeof img.data !== 'string' || img.data.length > MAX_B64) return jsonResponse({ error: 'Image too large' }, 400)
       }
 
-      const phaseA = await analyzeLesson(images)
-      lesson = phaseA.parsed
-      usageTotal.input += phaseA.usage.input_tokens || 0
-      usageTotal.output += phaseA.usage.output_tokens || 0
+      const { data: existingSkills } = await sb.from('kid_skills').select('skill_key, skill_label').eq('kid_id', kid_id)
+
+      const phase1 = await analyzeLesson(images, existingSkills || [])
+      lesson = phase1.parsed
+      usageTotal.input += phase1.usage.input_tokens || 0
+      usageTotal.output += phase1.usage.output_tokens || 0
 
       const { data: laRow, error: laErr } = await sb.from('lesson_analyses').insert({
-        user_id: user.id, kid_id,
-        subject: lesson.subject, topic: lesson.topic, subtopics: lesson.subtopics || [],
-        concepts: lesson.concepts || [], skills: lesson.skills || [], language: lesson.language,
-        difficulty: lesson.difficulty, vocabulary: lesson.vocabulary || [], notation: lesson.notation,
-        page_text: lesson.page_text, raw: lesson,
+        user_id: user.id, kid_id, subject: lesson.subject, topic: lesson.topic,
+        language: lesson.language, grade_hint: lesson.grade_hint, page_text: lesson.page_text,
+        objectives: lesson.objectives || [], raw: lesson,
       }).select('id').single()
       if (laErr) throw laErr
       lessonAnalysisId = laRow.id
 
-      const phaseB = await alignCurriculum(lesson, kid)
-      alignment = phaseB.parsed
-      usageTotal.input += phaseB.usage.input_tokens || 0
-      usageTotal.output += phaseB.usage.output_tokens || 0
-
-      const { data: caRow, error: caErr } = await sb.from('curriculum_alignments').insert({
-        lesson_analysis_id: lessonAnalysisId, kid_id,
-        country: kid.country, region: kid.region, grade: kid.grade,
-        expected_knowledge: alignment.expected_knowledge || [], source_tier_used: alignment.source_tier,
-        raw: { ...alignment, sources: alignment.sources || [] },
-      }).select('id').single()
-      if (caErr) throw caErr
-      curriculumAlignmentId = caRow.id
-    } else {
-      // practice_more — reuse Phase A/B from the parent exam
-      const { data: parentExam, error: peErr } = await sb
-        .from('exams').select('lesson_analysis_id, curriculum_alignment_id, topic')
-        .eq('id', parent_exam_id).eq('kid_id', kid_id).single()
-      if (peErr || !parentExam || !parentExam.lesson_analysis_id || !parentExam.curriculum_alignment_id) {
-        return jsonResponse({ error: 'Parent exam has no linked lesson analysis — cannot practice_more on it' }, 400)
+      // Keep skill_label/knowledge_type fresh on kid_skills for any reused keys
+      for (const obj of lesson.objectives || []) {
+        try {
+          await sb.from('kid_skills').upsert(
+            { kid_id, skill_key: obj.skill_key, skill_label: obj.description, knowledge_type: obj.knowledge_type },
+            { onConflict: 'kid_id,skill_key', ignoreDuplicates: false }
+          )
+        } catch (_) { /* best-effort label refresh, never blocks generation */ }
       }
+    } else {
+      const { data: parentExam, error: peErr } = await sb.from('exams').select('lesson_analysis_id, topic').eq('id', parent_exam_id).eq('kid_id', kid_id).single()
+      if (peErr || !parentExam || !parentExam.lesson_analysis_id) return jsonResponse({ error: 'Parent exam has no linked lesson analysis' }, 400)
       lessonAnalysisId = parentExam.lesson_analysis_id
-      curriculumAlignmentId = parentExam.curriculum_alignment_id
-
       const { data: laRow } = await sb.from('lesson_analyses').select('*').eq('id', lessonAnalysisId).single()
-      const { data: caRow } = await sb.from('curriculum_alignments').select('*').eq('id', curriculumAlignmentId).single()
-      lesson = laRow.raw
-      alignment = caRow.raw
+      lesson = { ...laRow.raw, objectives: laRow.objectives }
     }
 
-    // Phase C
-    const performance = await getPerformanceSummary(sb, kid_id)
-    const phaseC = await buildPracticePlan(lesson, alignment, performance)
-    const plan = phaseC.parsed
-    usageTotal.input += phaseC.usage.input_tokens || 0
-    usageTotal.output += phaseC.usage.output_tokens || 0
+    const objectiveIds = (lesson.objectives || []).map((o: any) => o.id)
+    const skillKeys = (lesson.objectives || []).map((o: any) => o.skill_key)
 
-    const { data: ppRow, error: ppErr } = await sb.from('practice_plans').insert({
-      lesson_analysis_id: lessonAnalysisId, curriculum_alignment_id: curriculumAlignmentId, kid_id,
-      target_skill: plan.target_skill, subskills: plan.subskills || [],
-      starting_difficulty: plan.starting_difficulty, exercise_forms: plan.exercise_forms || [],
-      performance_used: performance, raw: plan,
-    }).select('id').single()
-    if (ppErr) throw ppErr
+    const { data: skillStats } = await sb.from('kid_skills').select('*').eq('kid_id', kid_id).in('skill_key', skillKeys)
+    const learnerProfile = await maybeRefreshLearnerProfile(sb, kid_id)
 
-    // Phase D
-    const phaseD = await generateQuestions(plan, lesson, 15)
-    usageTotal.input += phaseD.usage.input_tokens || 0
-    usageTotal.output += phaseD.usage.output_tokens || 0
+    const phase2 = await generateBlueprintAndQuestions(lesson, skillStats || [], learnerProfile, 15)
+    usageTotal.input += phase2.usage.input_tokens || 0
+    usageTotal.output += phase2.usage.output_tokens || 0
 
-    const validationError = validateQuestions(phaseD.parsed?.questions)
+    const validationError = validateQuestions(phase2.parsed?.questions, objectiveIds)
     if (validationError) {
       console.error('Validation failed:', validationError)
       return jsonResponse({ error: 'Quiz generation failed' }, 500)
     }
 
-    // Determine revision chaining (mirrors old regenerate-exam behavior)
+    const { data: bpRow, error: bpErr } = await sb.from('practice_blueprints').insert({
+      lesson_analysis_id: lessonAnalysisId, kid_id, blueprint: phase2.parsed.blueprint || {},
+    }).select('id').single()
+    if (bpErr) throw bpErr
+
     let revisionNumber = 0
     if (mode === 'practice_more') {
       const { count } = await sb.from('exams').select('id', { count: 'exact', head: true }).eq('parent_exam_id', parent_exam_id)
@@ -404,28 +325,18 @@ serve(async (req) => {
 
     const { data: examRow, error: examErr } = await sb.from('exams').insert({
       user_id: user.id, kid_id, chapter_id: chapter_id || null,
-      topic: phaseD.parsed.topic || lesson.topic,
-      questions: phaseD.parsed.questions,
-      page_text: lesson.page_text,
-      is_revision: mode === 'practice_more',
-      revision_number: revisionNumber,
+      topic: phase2.parsed.topic || lesson.topic, questions: phase2.parsed.questions,
+      page_text: lesson.page_text, is_revision: mode === 'practice_more', revision_number: revisionNumber,
       parent_exam_id: mode === 'practice_more' ? parent_exam_id : null,
-      lesson_analysis_id: lessonAnalysisId,
-      curriculum_alignment_id: curriculumAlignmentId,
-      practice_plan_id: ppRow.id,
+      lesson_analysis_id: lessonAnalysisId, blueprint_id: bpRow.id,
     }).select('id, topic, page_text, questions').single()
     if (examErr) throw examErr
 
-    // Usage tracking — Sonnet 5 pricing: $2/M in, $10/M out
+    // Haiku 4.5 pricing: $1/M in, $5/M out
     try {
-      const costUsd = (usageTotal.input * 2 / 1_000_000) + (usageTotal.output * 10 / 1_000_000)
-      await sb.from('usage_logs').insert({
-        user_id: user.id, image_count: mode === 'new' ? images.length : 0,
-        input_tokens: usageTotal.input, output_tokens: usageTotal.output, cost_usd: costUsd,
-      })
-    } catch (trackErr) {
-      console.error('Usage tracking failed (non-fatal):', trackErr)
-    }
+      const costUsd = (usageTotal.input * 1 / 1_000_000) + (usageTotal.output * 5 / 1_000_000)
+      await sb.from('usage_logs').insert({ user_id: user.id, image_count: mode === 'new' ? images.length : 0, input_tokens: usageTotal.input, output_tokens: usageTotal.output, cost_usd: costUsd })
+    } catch (trackErr) { console.error('Usage tracking failed (non-fatal):', trackErr) }
 
     return jsonResponse({ id: examRow.id, topic: examRow.topic, page_text: examRow.page_text, questions: examRow.questions })
   } catch (err) {
