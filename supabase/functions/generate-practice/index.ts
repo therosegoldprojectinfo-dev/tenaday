@@ -30,15 +30,24 @@ const CORS_HEADERS = {
 // frontend component already built. Add to ACTIVE as components
 // ship; never let the AI use anything not in ACTIVE.
 // ============================================================
-const ACTIVE_QUESTION_TYPES = ['mcq', 'true_false', 'fill_blank'] as const
+const ACTIVE_QUESTION_TYPES = ['mcq', 'true_false', 'fill_blank', 'visual_count', 'text_highlight'] as const
+
+// Approved OpenMoji asset names — must exactly match the keys in
+// src/lib/openmojiAssets.js on the frontend. The AI can only use an
+// asset from this list for "visual_count"; anything else and the
+// question fails validation and gets rejected (see validateQuestions).
+const OPENMOJI_ASSETS = [
+  'bird', 'cow', 'cat', 'dog', 'fish', 'apple', 'banana', 'star',
+  'ball', 'tree', 'book', 'pencil', 'car', 'bus', 'flower',
+]
 
 // Full target roster from the master plan — NOT yet active.
 // Move an entry up to ACTIVE_QUESTION_TYPES only once its
 // frontend component exists in src/components/questions/.
 // const PLANNED_QUESTION_TYPES = [
 //   'multi_select', 'order', 'match', 'sort', 'drag_drop',
-//   'text_highlight', 'number_line', 'visual_count',
-//   'visual_compare', 'fraction_visual', 'image_label', 'word_problem',
+//   'number_line', 'visual_compare', 'fraction_visual',
+//   'image_label', 'word_problem',
 // ]
 
 function jsonResponse(body: unknown, status = 200) {
@@ -48,7 +57,15 @@ function jsonResponse(body: unknown, status = 200) {
   })
 }
 
-async function callClaude(system: string, content: any[], maxTokens = 4000) {
+async function callClaude(system: string, content: any[], maxTokens = 4000, tools: any[] | null = null) {
+  const body: any = {
+    model: MODEL,
+    max_tokens: maxTokens,
+    system,
+    messages: [{ role: 'user', content }],
+  }
+  if (tools) body.tools = tools
+
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
@@ -56,19 +73,17 @@ async function callClaude(system: string, content: any[], maxTokens = 4000) {
       'x-api-key': ANTHROPIC_API_KEY!,
       'anthropic-version': '2023-06-01',
     },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: maxTokens,
-      system,
-      messages: [{ role: 'user', content }],
-    }),
+    body: JSON.stringify(body),
   })
   if (!res.ok) {
     const err = await res.text()
     throw new Error(`Claude API error: ${err}`)
   }
   const data = await res.json()
-  const text = data.content?.[0]?.text || ''
+  // When tools are used (web search), content includes tool_use /
+  // tool_result blocks before the final answer — the JSON we want is
+  // never necessarily content[0]. Join every text block instead.
+  const text = (data.content || []).filter((b: any) => b.type === 'text').map((b: any) => b.text).join('\n')
   const usage = data.usage || {}
   const clean = text.replace(/^```(?:json)?[^\n]*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
   return { parsed: JSON.parse(clean), usage }
@@ -105,13 +120,14 @@ Respond with ONLY this JSON, no markdown, no preamble:
 async function alignCurriculum(lesson: any, profile: { country?: string; region?: string; grade?: string }) {
   const system = `You determine what a child is expected to know/do for a given skill, based on their country/region/grade.
 
-Prioritize, in order: (1) official government curriculum for that country/region/grade if you know it, (2) well-established educational standards/organizations, (3) general age-appropriate pedagogy if neither is known with confidence. Be honest in "confidence" — don't fabricate a specific curriculum code you're not sure exists.
+You have a web_search tool. USE IT to find the real, current official curriculum (Tier 1) for this country/region/grade/subject before answering — search for the government education department's curriculum document or official syllabus. If you can't find an official source after searching, fall back to well-established educational standards/organizations (Tier 2), then general age-appropriate pedagogy (Tier 3) — and say so honestly in "source_tier"/"confidence". Never fabricate a specific curriculum code or document name you didn't actually find.
 
-Respond with ONLY this JSON:
+After any searching, respond with ONLY this JSON (no markdown, no preamble, no search commentary in the final answer):
 {
   "expected_knowledge": ["what the child should know/be able to do at this grade, for this skill"],
   "source_tier": "official_curriculum" | "educational_standards" | "general_pedagogy",
   "confidence": "high" | "medium" | "low",
+  "sources": ["short source names/URLs actually found via search, or empty array if none"],
   "notes": "short note on any grade-level adjustment made"
 }`
   const userText = `Country: ${profile.country || 'unknown'}
@@ -121,8 +137,13 @@ Grade: ${profile.grade || 'unknown'}
 Lesson analysis:
 ${JSON.stringify(lesson, null, 2)}
 
-Return only the JSON.`
-  return callClaude(system, [{ type: 'text', text: userText }], 1200)
+Search for the official curriculum if possible, then return only the JSON.`
+  return callClaude(
+    system,
+    [{ type: 'text', text: userText }],
+    2000,
+    [{ type: 'web_search_20250305', name: 'web_search' }]
+  )
 }
 
 // ── Phase C — Practice plan ────────────────────────────────────
@@ -164,17 +185,25 @@ LANGUAGE: write everything in "${lesson.language || 'the language of the lesson'
 
 Only use question types from this exact list — never any other value for "type": ${JSON.stringify(ACTIVE_QUESTION_TYPES)}.
 
-Every question MUST include: id, type, question, correct_answer, explanation, skill (one of the plan's subskills, or the target_skill), difficulty (1-5, following the plan's progression).
-- type "mcq": include "options" (array of 4 strings); correct_answer must be the exact text of one option, never a letter.
-- type "true_false": correct_answer must be in the lesson's language.
-- type "fill_blank": question contains "___"; correct_answer is the missing word/value.
+Every question MUST include: id, type, question, explanation, skill (one of the plan's subskills, or the target_skill), difficulty (1-5, following the plan's progression).
+
+Per-type rules:
+- "mcq": include "options" (array of 4 strings) and "correct_answer" (exact text of one option, never a letter).
+- "true_false": "correct_answer" must be in the lesson's language.
+- "fill_blank": "question" contains "___"; "correct_answer" is the missing word/value.
+- "visual_count": use ONLY for a skill that genuinely benefits from counting a picture (e.g. counting, comparison, addition/subtraction with small numbers). Include "asset" (must be EXACTLY one of: ${JSON.stringify(OPENMOJI_ASSETS)}), "quantity" (integer 1-12, how many of that asset to show), "options" (4 number strings) and "correct_answer" (one of options, matching the real count/result). If no asset in the list fits the skill, do NOT use this type — pick a different one instead.
+- "text_highlight": use ONLY for language/grammar skills (identifying a word type, a sentence part, key vocabulary). Include "text" (a short sentence, in the lesson's language) and "target_words" (array of the EXACT word(s) copied verbatim from "text" that the child should tap/highlight to answer correctly — e.g. every verb, or every noun). Do not include "options" or "correct_answer" for this type.
 
 Generate exactly ${questionCount} questions. Vary the exercise form across the plan's exercise_forms — do not just repeat one shape. Every question must genuinely practise one of the plan's subskills, not just look different.
 
 Respond with ONLY this JSON:
 {
   "topic": "...",
-  "questions": [ { "id": "q1", "type": "mcq", "question": "...", "options": ["...","...","...","..."], "correct_answer": "...", "explanation": "...", "skill": "...", "difficulty": 1 } ]
+  "questions": [
+    { "id": "q1", "type": "mcq", "question": "...", "options": ["...","...","...","..."], "correct_answer": "...", "explanation": "...", "skill": "...", "difficulty": 1 },
+    { "id": "q2", "type": "visual_count", "question": "How many birds are there?", "asset": "bird", "quantity": 6, "options": ["4","6","8","10"], "correct_answer": "6", "explanation": "...", "skill": "...", "difficulty": 2 },
+    { "id": "q3", "type": "text_highlight", "question": "Tap the verb in this sentence.", "text": "The little boy plays football.", "target_words": ["plays"], "explanation": "...", "skill": "...", "difficulty": 2 }
+  ]
 }`
   const userText = `Practice plan:
 ${JSON.stringify(plan, null, 2)}
@@ -186,15 +215,33 @@ Return only the JSON.`
 function validateQuestions(questions: any[]) {
   if (!Array.isArray(questions) || questions.length === 0) return 'No questions returned'
   for (const q of questions) {
-    if (!q.id || !q.type || !q.question || !q.correct_answer || !q.skill || !q.difficulty) {
+    if (!q.id || !q.type || !q.question || !q.explanation || !q.skill || !q.difficulty) {
       return `Malformed question: ${JSON.stringify(q).slice(0, 200)}`
     }
     if (!ACTIVE_QUESTION_TYPES.includes(q.type)) {
       return `Question used inactive type "${q.type}": ${JSON.stringify(q).slice(0, 150)}`
     }
-    if (q.type === 'mcq') {
-      if (!Array.isArray(q.options) || q.options.length < 2) return `MCQ without options: ${q.id}`
-      if (!q.options.includes(q.correct_answer)) return `MCQ correct_answer not in options: ${q.id}`
+    if (q.type === 'mcq' || q.type === 'visual_count') {
+      if (!q.correct_answer) return `${q.type} missing correct_answer: ${q.id}`
+      if (!Array.isArray(q.options) || q.options.length < 2) return `${q.type} without options: ${q.id}`
+      if (!q.options.includes(q.correct_answer)) return `${q.type} correct_answer not in options: ${q.id}`
+    }
+    if (q.type === 'true_false' && !q.correct_answer) {
+      return `true_false missing correct_answer: ${q.id}`
+    }
+    if (q.type === 'fill_blank' && !q.correct_answer) {
+      return `fill_blank missing correct_answer: ${q.id}`
+    }
+    if (q.type === 'visual_count') {
+      if (!OPENMOJI_ASSETS.includes(q.asset)) return `visual_count used unapproved asset "${q.asset}": ${q.id}`
+      if (!Number.isInteger(q.quantity) || q.quantity < 1 || q.quantity > 12) return `visual_count bad quantity: ${q.id}`
+    }
+    if (q.type === 'text_highlight') {
+      if (typeof q.text !== 'string' || !q.text.trim()) return `text_highlight missing text: ${q.id}`
+      if (!Array.isArray(q.target_words) || q.target_words.length === 0) return `text_highlight missing target_words: ${q.id}`
+      for (const w of q.target_words) {
+        if (!q.text.includes(w)) return `text_highlight target_word "${w}" not found in text: ${q.id}`
+      }
     }
   }
   return null
@@ -300,7 +347,8 @@ serve(async (req) => {
       const { data: caRow, error: caErr } = await sb.from('curriculum_alignments').insert({
         lesson_analysis_id: lessonAnalysisId, kid_id,
         country: kid.country, region: kid.region, grade: kid.grade,
-        expected_knowledge: alignment.expected_knowledge || [], source_tier_used: alignment.source_tier, raw: alignment,
+        expected_knowledge: alignment.expected_knowledge || [], source_tier_used: alignment.source_tier,
+        raw: { ...alignment, sources: alignment.sources || [] },
       }).select('id').single()
       if (caErr) throw caErr
       curriculumAlignmentId = caRow.id
@@ -368,9 +416,9 @@ serve(async (req) => {
     }).select('id, topic, page_text, questions').single()
     if (examErr) throw examErr
 
-    // Usage tracking — Sonnet 5 pricing: $3/M in, $15/M out per existing convention
+    // Usage tracking — Sonnet 5 pricing: $2/M in, $10/M out
     try {
-      const costUsd = (usageTotal.input * 3 / 1_000_000) + (usageTotal.output * 15 / 1_000_000)
+      const costUsd = (usageTotal.input * 2 / 1_000_000) + (usageTotal.output * 10 / 1_000_000)
       await sb.from('usage_logs').insert({
         user_id: user.id, image_count: mode === 'new' ? images.length : 0,
         input_tokens: usageTotal.input, output_tokens: usageTotal.output, cost_usd: costUsd,
