@@ -433,7 +433,7 @@
         <div class="event-detail-icon">
           <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
         </div>
-        <div class="event-detail-label">Thursday, September 24</div>
+        <div class="event-detail-label">Tuesday, September 29</div>
       </div>
       <div class="event-detail-row">
         <div class="event-detail-icon">
@@ -490,8 +490,8 @@
     <div class="confirm-title">Your spot is confirmed</div>
 
     <div class="confirm-section">
-      <div class="confirm-detail-row"><span class="confirm-detail-label">What</span><span class="confirm-detail-value">Never worry about your child's education ever again in 3 easy steps</span></div>
-      <div class="confirm-detail-row"><span class="confirm-detail-label">When</span><span class="confirm-detail-value" id="confirm-datetime">Thursday, September 24 at 7:00 PM</span></div>
+      <div class="confirm-detail-row"><span class="confirm-detail-label">What</span><span class="confirm-detail-value">Help your child at school in 3 steps</span></div>
+      <div class="confirm-detail-row"><span class="confirm-detail-label">When</span><span class="confirm-detail-value" id="confirm-datetime">Tuesday, September 29 at 7:00 PM</span></div>
       <div class="confirm-detail-row"><span class="confirm-detail-label">Where</span><span class="confirm-detail-value">Online via <span class="zoom-word">Zoom</span></span></div>
     </div>
 
@@ -511,7 +511,7 @@
 <script>
 (function () {
   // South Africa (SAST, UTC+2, no daylight saving) is Montréal (EDT, UTC-4) + 6 hours.
-  var EVENT_DATE_UTC = "2026-09-24"; // the date in South Africa
+  var EVENT_DATE_UTC = "2026-09-29"; // the date in South Africa
   var slots = document.querySelectorAll(".slot-btn");
   var selected = null;
 
@@ -536,7 +536,7 @@
   function slotToUTCDate(mtlHour) {
     var saHour = mtlHour + 6; // SA local hour
     var utcHour = saHour - 2; // SAST is UTC+2
-    return new Date(Date.UTC(2026, 8, 24, utcHour, 0, 0)); // month 8 = September
+    return new Date(Date.UTC(2026, 8, 29, utcHour, 0, 0)); // month 8 = September
   }
 
   function pad(n) { return String(n).padStart(2, "0"); }
@@ -599,7 +599,7 @@
         document.getElementById("confirm-view").classList.add("show");
 
         var dtEl = document.getElementById("confirm-datetime");
-        if (dtEl) dtEl.textContent = "Thursday, September 24 at " + selected.label;
+        if (dtEl) dtEl.textContent = "Tuesday, September 29 at " + selected.label;
 
         window._numioSlotUTC = slotToUTCDate(selected.mtl);
       });
