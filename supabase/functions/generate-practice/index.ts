@@ -126,17 +126,20 @@ QUESTION TYPES — you may ONLY use these exact values for "type": ${JSON.string
 
 Every question MUST include: id, type, question, explanation, objective_id (must match one of the given objectives' "id"), skill_key (copy from that objective), practice_method (one of: recall, recognition, application, production), purpose (one short sentence: what exactly will the child have practiced), difficulty (1-5).
 
+QUESTION COUNT: decide this yourself, as part of the blueprint — do NOT default to a round number. Base it on how many objectives there are, their importance/complexity, and how much practice each genuinely needs per the framework (section 5). A lesson with 2 tight objectives might need 6-8 questions; a lesson with 5-6 objectives might need 16-20. Hard bounds: minimum 6, maximum 20 questions total.
+
 Respond with ONLY this JSON:
 {
   "topic": "...",
   "blueprint": {
     "objectives_covered": ["obj1", "obj3"],
-    "notes": "1-2 sentences on the balance/adaptation decisions made and why"
+    "question_count": 12,
+    "notes": "1-2 sentences on the balance/adaptation decisions made, including why this many questions"
   },
   "questions": [ { "id": "q1", "type": "mcq", "question": "...", "options": [...], "correct_answer": "...", "explanation": "...", "objective_id": "obj1", "skill_key": "...", "practice_method": "recall", "purpose": "...", "difficulty": 1 } ]
 }`
 
-async function generateBlueprintAndQuestions(lesson: any, skillStats: any[], learnerProfile: any, questionCount: number) {
+async function generateBlueprintAndQuestions(lesson: any, skillStats: any[], learnerProfile: any) {
   const userText = `LANGUAGE: write everything in "${lesson.language || 'the language of the lesson'}".
 
 Lesson objectives for this session:
@@ -148,12 +151,14 @@ ${JSON.stringify(skillStats, null, 2)}
 Learner profile (narrative summary, may be null for a new kid):
 ${JSON.stringify(learnerProfile, null, 2)}
 
-Generate exactly ${questionCount} questions. Return only the JSON.`
-  return callClaude(FRAMEWORK_PROMPT, [{ type: 'text', text: userText }], 4000)
+Decide the right number of questions yourself (minimum 6, maximum 20) based on the objectives and performance data. Return only the JSON.`
+  return callClaude(FRAMEWORK_PROMPT, [{ type: 'text', text: userText }], 4500)
 }
 
 function validateQuestions(questions: any[], objectiveIds: string[]) {
   if (!Array.isArray(questions) || questions.length === 0) return 'No questions returned'
+  if (questions.length < 6) return `Too few questions returned (${questions.length}, minimum 6)`
+  if (questions.length > 20) return `Too many questions returned (${questions.length}, maximum 20)`
   for (const q of questions) {
     if (!q.id || !q.type || !q.question || !q.explanation || !q.objective_id || !q.skill_key || !q.practice_method || !q.purpose || !q.difficulty) {
       return `Malformed question (missing required field): ${JSON.stringify(q).slice(0, 200)}`
@@ -302,7 +307,7 @@ serve(async (req) => {
     const { data: skillStats } = await sb.from('kid_skills').select('*').eq('kid_id', kid_id).in('skill_key', skillKeys)
     const learnerProfile = await maybeRefreshLearnerProfile(sb, kid_id)
 
-    const phase2 = await generateBlueprintAndQuestions(lesson, skillStats || [], learnerProfile, 15)
+    const phase2 = await generateBlueprintAndQuestions(lesson, skillStats || [], learnerProfile)
     usageTotal.input += phase2.usage.input_tokens || 0
     usageTotal.output += phase2.usage.output_tokens || 0
 
