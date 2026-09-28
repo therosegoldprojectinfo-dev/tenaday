@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { completeQuiz, updateStreak } from '../lib/economy'
 import { logQuestionAttempt } from '../lib/performance'
-import { getAssetEmoji } from '../lib/openmojiAssets'
+import { getAssetPath } from '../lib/openmojiAssets'
 import StreakPopup from './StreakPopup'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
@@ -175,11 +175,13 @@ function MCQCard({ option, selected, revealed, correct, onSelect, big }) {
 // ── visual_count: shows N of an OpenMoji-style asset, then reuses
 // MCQCard for the numeric answer options. ──────────────────────
 function VisualCountRow({ asset, quantity }) {
-  const emoji = getAssetEmoji(asset)
+  const src = getAssetPath(asset)
   return (
     <div className="flex flex-wrap gap-2 justify-center rounded-2xl px-4 py-5 mb-4" style={{ background: '#fafafa', border: '2px solid #f3f4f6' }}>
       {Array.from({ length: quantity }).map((_, i) => (
-        <span key={i} style={{ fontSize: 36, lineHeight: 1 }}>{emoji}</span>
+        src
+          ? <img key={i} src={src} alt={asset} style={{ width: 40, height: 40 }} />
+          : <span key={i} style={{ fontSize: 36, lineHeight: 1 }}>❓</span>
       ))}
     </div>
   )
