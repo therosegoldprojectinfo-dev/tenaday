@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { useLang } from '../lib/LangContext'
 import { useKid } from '../lib/KidContext'
 import { createKid, getKids, updateKidEducationProfile } from '../lib/kids'
-import { COUNTRIES, GRADES, getRegionsForCountry } from '../lib/regions'
+import { COUNTRIES, getRegionsForCountry, getGradesForCountryRegion, getFlagEmoji } from '../lib/regions'
 
 const AVATARS = ['🪐', '🌍', '🌙', '⭐', '🌟', '☀️', '🌎', '🌏', '🌑', '💫']
 const ACCENT_COLORS = ['#ede9fe', '#fce7f3', '#dbeafe', '#dcfce7', '#ffedd5']
@@ -295,25 +295,32 @@ function AddKidModal({ lang, onConfirm, onClose }) {
   )
 }
 
-// ── Numio+ Customization modal ──────────────────────────────────
-// Step 1: country. Step 2: region (skipped automatically if the
-// country has none). Step 3: grade. Saves all 3 together at the end
-// so curriculum alignment never runs on a half-filled profile.
+// ── Education Profile modal ─────────────────────────────────────────
+// Step 1: country (with flag emoji). Step 2: region (auto-skipped if
+// country has none). Step 3: grade (real local names per country/region).
+// All 3 saved together so curriculum alignment never runs half-filled.
 function EducationProfileModal({ lang, kid, onConfirm, onClose }) {
   const [step, setStep] = useState(1)
-  const [country, setCountry] = useState(kid.country || '')
+  const [countryName, setCountryName] = useState(kid.country || '')
+  const [countryCode, setCountryCode] = useState(
+    () => COUNTRIES.find(c => c.name === kid.country)?.code || ''
+  )
   const [region, setRegion] = useState(kid.region || '')
   const [grade, setGrade] = useState(kid.grade || '')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
-  const availableRegions = getRegionsForCountry(country)
+  const availableRegions = getRegionsForCountry(countryName)
   const hasRegionStep = !!availableRegions
 
+  // Grades are dynamic: depend on country + region (e.g. Quebec vs Ontario)
+  const grades = getGradesForCountryRegion(countryCode, region || null)
+
   function handlePickCountry(c) {
-    setCountry(c)
-    if (c !== kid.country) setRegion('') // reset region if country changed
-    setStep(getRegionsForCountry(c) ? 2 : 3)
+    setCountryName(c.name)
+    setCountryCode(c.code)
+    if (c.name !== kid.country) setRegion('')
+    setStep(getRegionsForCountry(c.name) ? 2 : 3)
   }
 
   function handlePickRegion(r) {
@@ -325,7 +332,7 @@ function EducationProfileModal({ lang, kid, onConfirm, onClose }) {
     setGrade(g)
     setSaving(true); setError('')
     try {
-      await onConfirm({ country, region: hasRegionStep ? region : null, grade: g })
+      await onConfirm({ country: countryName, region: hasRegionStep ? region : null, grade: g })
     } catch {
       setError(lang === 'ar' ? 'حدث خطأ ما.' : 'Something went wrong.')
       setSaving(false)
@@ -340,8 +347,11 @@ function EducationProfileModal({ lang, kid, onConfirm, onClose }) {
   const titles = {
     1: lang === 'ar' ? 'في أي دولة يدرس طفلك؟' : 'What country does your child study in?',
     2: lang === 'ar' ? 'أي منطقة أو مقاطعة؟' : 'Which province/state/region?',
-    3: lang === 'ar' ? 'في أي صف؟' : 'What grade is your child in?',
+    3: lang === 'ar' ? 'في أي صف دراسي؟' : 'What grade is your child in?',
   }
+
+  const totalSteps = hasRegionStep ? 3 : 2
+  const displayStep = step === 3 ? totalSteps : step
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
@@ -354,7 +364,7 @@ function EducationProfileModal({ lang, kid, onConfirm, onClose }) {
                 {lang === 'ar' ? '→ رجوع' : '← Back'}
               </button>
             : <span />}
-          <span className="font-body text-xs text-muted">{step}/3</span>
+          <span className="font-body text-xs text-muted">{displayStep}/{totalSteps}</span>
         </div>
 
         <h2 className="font-display font-extrabold text-xl text-ink text-center mb-5 flex-shrink-0">
@@ -364,18 +374,23 @@ function EducationProfileModal({ lang, kid, onConfirm, onClose }) {
         {error && <p className="font-body text-sm text-red-500 font-bold text-center mb-3 flex-shrink-0">{error}</p>}
 
         <div className="overflow-y-auto flex flex-col gap-2" style={{ flex: 1 }}>
-          {step === 1 && COUNTRIES.map(c => (
-            <button key={c.code} onClick={() => handlePickCountry(c.name)}
-              disabled={saving}
-              className="w-full text-left px-4 py-3 rounded-2xl font-body font-bold text-base transition-all active:scale-95 disabled:opacity-40"
-              style={{
-                background: country === c.name ? '#f5f3ff' : '#fafafa',
-                color: country === c.name ? '#7c3aed' : '#1a1a2e',
-                border: country === c.name ? '1.5px solid #c4b5fd' : '1.5px solid transparent',
-              }}>
-              {c.name}
-            </button>
-          ))}
+          {step === 1 && COUNTRIES.map(c => {
+            const flag = getFlagEmoji(c.code)
+            const isSelected = countryName === c.name
+            return (
+              <button key={c.code} onClick={() => handlePickCountry(c)}
+                disabled={saving}
+                className="w-full text-left px-4 py-3 rounded-2xl font-body font-bold text-base transition-all active:scale-95 disabled:opacity-40 flex items-center gap-3"
+                style={{
+                  background: isSelected ? '#f5f3ff' : '#fafafa',
+                  color: isSelected ? '#7c3aed' : '#1a1a2e',
+                  border: isSelected ? '1.5px solid #c4b5fd' : '1.5px solid transparent',
+                }}>
+                <span style={{ fontSize: '1.4rem', lineHeight: 1, flexShrink: 0 }}>{flag}</span>
+                <span>{c.name}</span>
+              </button>
+            )
+          })}
 
           {step === 2 && availableRegions?.map(r => (
             <button key={r} onClick={() => handlePickRegion(r)}
@@ -390,7 +405,7 @@ function EducationProfileModal({ lang, kid, onConfirm, onClose }) {
             </button>
           ))}
 
-          {step === 3 && GRADES.map(g => (
+          {step === 3 && grades.map(g => (
             <button key={g} onClick={() => handlePickGrade(g)}
               disabled={saving}
               className="w-full text-left px-4 py-3 rounded-2xl font-body font-bold text-base transition-all active:scale-95 disabled:opacity-40"
