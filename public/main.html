@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Numio – Personalized practice for what your child is learning at school. Educational web app for children ages 5–11."/>
+  <title>Numio – Personalized School Practice</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #fff;
+      color: #0A0A0A;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    .inner {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* ─── HEADER ─── */
+    .site-header {
+      background: #fff;
+      border-bottom: 1px solid #E8E8E8;
+      padding: 16px 20px;
+      text-align: center;
+    }
+    .site-header .logo {
+      font-size: 26px;
+      font-weight: 900;
+      color: #3513A2;
+      letter-spacing: -0.02em;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 52px 20px 48px;
+      text-align: center;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .hero-eyebrow {
+      display: inline-block;
+      background: #EAE4FF;
+      color: #3513A2;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 50px;
+      padding: 6px 14px;
+      margin-bottom: 20px;
+      letter-spacing: 0.02em;
+    }
+    .hero h1 {
+      font-size: 34px;
+      font-weight: 900;
+      color: #0A0A0A;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .hero p {
+      font-size: 17px;
+      font-weight: 400;
+      color: #444;
+      line-height: 1.65;
+      margin-bottom: 32px;
+      max-width: 380px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-cta {
+      display: block;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      background: #45E031;
+      color: #000;
+      font-family: 'Inter', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      padding: 17px 20px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    /* ─── SECTION TITLES ─── */
+    .section-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0A0A0A;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    .how-section {
+      background: #F7F5FF;
+      padding: 52px 20px;
+    }
+    .how-section .inner { }
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .step {
+      background: #fff;
+      border-radius: 20px;
+      padding: 24px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+    .step-num {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      background: linear-gradient(135deg, #3513A2, #673FE8);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step-text h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0A0A0A;
+      margin-bottom: 4px;
+    }
+    .step-text p {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.55;
+    }
+
+    /* ─── PRICING ─── */
+    .pricing-section {
+      padding: 52px 20px;
+      text-align: center;
+    }
+    .pricing-card {
+      background: #fff;
+      border: 3px solid #3513A2;
+      border-radius: 24px;
+      padding: 32px 24px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .pricing-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #3513A2, #673FE8);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 50px;
+      padding: 5px 14px;
+      margin-bottom: 20px;
+      letter-spacing: 0.04em;
+    }
+    .pricing-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0A0A0A;
+      margin-bottom: 8px;
+    }
+    .pricing-price {
+      font-size: 52px;
+      font-weight: 900;
+      color: #3513A2;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+    .pricing-price span {
+      font-size: 20px;
+      font-weight: 600;
+      vertical-align: super;
+      letter-spacing: 0;
+    }
+    .pricing-currency {
+      font-size: 14px;
+      color: #666;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .pricing-features {
+      list-style: none;
+      text-align: left;
+      margin-bottom: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .pricing-features li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 15px;
+      color: #0A0A0A;
+      font-weight: 500;
+    }
+    .pricing-features li::before {
+      content: "✓";
+      color: #45E031;
+      font-weight: 900;
+      font-size: 16px;
+      margin-top: 1px;
+      flex-shrink: 0;
+      background: #0A0A0A;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    .pricing-divider {
+      border: none;
+      border-top: 1px solid #E8E8E8;
+      margin: 20px 0;
+    }
+    .no-recurring {
+      font-size: 13px;
+      color: #888;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
+    .pricing-cta {
+      display: block;
+      width: 100%;
+      background: #45E031;
+      color: #000;
+      font-family: 'Inter', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      border: none;
+      border-radius: 50px;
+      padding: 16px 20px;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    /* ─── GUARANTEE ─── */
+    .guarantee-section {
+      background: #F7F5FF;
+      padding: 52px 20px;
+      text-align: center;
+    }
+    .guarantee-badge {
+      width: 110px;
+      height: 110px;
+      background: linear-gradient(135deg, #3513A2, #673FE8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 24px;
+      font-size: 48px;
+    }
+    .guarantee-section p {
+      font-size: 18px;
+      font-weight: 500;
+      color: #0A0A0A;
+      line-height: 1.6;
+      max-width: 360px;
+      margin: 0 auto 16px;
+    }
+    .guarantee-section strong {
+      font-weight: 800;
+    }
+
+    /* ─── REFUND POLICY ─── */
+    .refund-section {
+      padding: 52px 20px;
+    }
+    .policy-box {
+      background: #F7F5FF;
+      border-radius: 20px;
+      padding: 28px 24px;
+      margin-bottom: 20px;
+    }
+    .policy-box h3 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #3513A2;
+      margin-bottom: 10px;
+    }
+    .policy-box p {
+      font-size: 14px;
+      color: #444;
+      line-height: 1.65;
+    }
+
+    /* ─── CONTACT ─── */
+    .contact-section {
+      background: #0A0A0A;
+      padding: 52px 20px;
+      text-align: center;
+    }
+    .contact-section .section-title {
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .contact-section p {
+      font-size: 15px;
+      color: #aaa;
+      margin-bottom: 28px;
+    }
+    .contact-card {
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 24px 20px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid #2a2a2a;
+      text-align: left;
+    }
+    .contact-item:last-child { border-bottom: none; }
+    .contact-icon {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      background: #2a2a2a;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .contact-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #666;
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+    .contact-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .contact-value a {
+      color: #A387FF;
+      text-decoration: none;
+    }
+
+    /* ─── ABOUT ─── */
+    .about-section {
+      padding: 52px 20px;
+    }
+    .about-section p {
+      font-size: 15px;
+      color: #444;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    /* ─── FOOTER ─── */
+    .site-footer {
+      background: #0A0A0A;
+      padding: 36px 20px 28px;
+      text-align: center;
+    }
+    .footer-logo {
+      font-size: 22px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 24px;
+      margin-bottom: 24px;
+    }
+    .footer-links a {
+      color: #A387FF;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+    .footer-divider {
+      border: none;
+      border-top: 1px solid #2a2a2a;
+      margin-bottom: 20px;
+    }
+    .footer-contact {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+    .footer-contact a {
+      color: #A387FF;
+      text-decoration: none;
+    }
+    .footer-copy {
+      font-size: 12px;
+      color: #555;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 400px) {
+      .hero h1 { font-size: 28px; }
+      .pricing-price { font-size: 44px; }
+      .section-title { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="logo">Numio</div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">Educational Web App</div>
+    <h1>Personalized practice for what your child is learning at school</h1>
+    <p>Numio analyzes a photo of your child's lesson or textbook and creates personalized practice questions — so every session is built around exactly what they're studying right now.</p>
+
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section">
+    <div class="inner">
+      <h2 class="section-title">How Numio Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            <h3>Take a picture</h3>
+            <p>Take a photo of your child's school lesson, textbook page, or worksheet.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            <h3>Create personalized practice</h3>
+            <p>Numio analyzes the material and creates practice questions based on the content.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            <h3>Practice</h3>
+            <p>Your child completes the exercises and can earn coins through Numio's reward system.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text">
+            <h3>Keep practicing</h3>
+            <p>Children can practice their lessons again whenever they need additional reinforcement.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing-section" id="pricing">
+    <div class="inner">
+      <h2 class="section-title" style="text-align:center;">Simple, transparent pricing</h2>
+      <div class="pricing-card">
+        <div class="pricing-badge">LIFETIME ACCESS</div>
+        <div class="pricing-name">Numio Lifetime Access</div>
+        <div class="pricing-price"><span>$</span>5</div>
+        <div class="pricing-currency">USD — One-Time Payment</div>
+        <ul class="pricing-features">
+          <li>Lifetime access to Numio</li>
+          <li>Unlimited lesson pictures</li>
+          <li>Unlimited practice sessions</li>
+          <li>Practice across all school subjects</li>
+          <li>No advertisements</li>
+          <li>Child practice and progress features</li>
+          <li>No recurring subscription</li>
+        </ul>
+        <hr class="pricing-divider"/>
+        <p class="no-recurring">One-time payment · No subscription · No auto-renewal</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUARANTEE -->
+  <section class="guarantee-section">
+    <div class="inner">
+      <div class="guarantee-badge">🛡️</div>
+      <h2 class="section-title">365-Day Money-Back Guarantee</h2>
+      <p>You have <strong>365 days</strong> to decide if Numio really helps your child.</p>
+      <p>If you're not satisfied, contact us and we'll refund every cent. No forms. No questions. No waiting.</p>
+    </div>
+  </section>
+
+
+
+  <!-- CONTACT -->
+  <section class="contact-section" id="contact">
+    <div class="inner">
+      <h2 class="section-title">Customer Support</h2>
+      <p>Questions about Numio, your purchase, or your account? Contact us directly — no login required.</p>
+      <div class="contact-card">
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="contact-label">PHONE / WHATSAPP</div>
+            <div class="contact-value"><a href="tel:+14384102068">+1 (438) 410-2068</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-section">
+    <div class="inner">
+      <h2 class="section-title">About Numio</h2>
+      <p>Numio is an educational technology product designed to make everyday school practice easier for children and parents.</p>
+      <p>Instead of requiring parents to search for exercises or create practice material themselves, they can photograph the lesson their child is currently studying and Numio creates personalized practice from that material.</p>
+      <p>Numio is designed to complement a child's existing education. It does not replace teachers, schools, or classroom instruction. Numio can be used across school subjects, allowing children aged 5–11 to practice different types of lessons in one place.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="footer-logo">Numio</div>
+    <nav class="footer-links">
+      <a href="https://numiomath.app/terms" target="_blank" rel="noopener">Terms of Service</a>
+      <a href="https://numiomath.app/privacy" target="_blank" rel="noopener">Privacy Policy</a>
+      <a href="https://wa.me/14384102068" target="_blank" rel="noopener">Contact Us</a>
+    </nav>
+    <hr class="footer-divider"/>
+    <p class="footer-contact">Customer Support: <a href="tel:+14384102068">+1 (438) 410-2068</a></p>
+    <p class="footer-copy">© 2026 Numio. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>
