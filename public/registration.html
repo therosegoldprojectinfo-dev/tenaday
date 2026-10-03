@@ -180,8 +180,10 @@
 
     /*
       HOW IT WORKS
-      Figma (401px frame): text boxes 358px wide, cards 317×243, radius 23, fill #9271FF
+      Figma (401px frame): text boxes 358px wide, cards 317px wide, radius 23, fill #9271FF
       Gaps: h1→sub ~69px, sub→h2 ~76px, h2→card ~77px, card→card ~54px
+      Images keep their natural ratio (no cropping) → export all 3 at the same size
+      (e.g. 1200×1200) so the 3 cards have the same height.
     */
     .how {
       padding: 56px 0 72px;
@@ -212,25 +214,19 @@
     }
     .step-card {
       width: 79%;                  /* 317 / 401 */
-      aspect-ratio: 317 / 243;
       margin: 0 auto 54px;
       border-radius: 23px;
       overflow: hidden;
       background: #9271FF;
-      display: flex;
-      flex-direction: column;
     }
     .step-card:last-child { margin-bottom: 0; }
     .step-card img {
       width: 100%;
-      flex: 171 1 0;               /* image area */
-      min-height: 0;
-      object-fit: cover;
-      object-position: center 55%;
+      height: auto;                /* natural ratio, no crop */
       display: block;
     }
     .step-label {
-      flex: 72 1 0;                /* purple label area */
+      min-height: 72px;
       display: flex;
       align-items: center;
       padding: 0 20px;
