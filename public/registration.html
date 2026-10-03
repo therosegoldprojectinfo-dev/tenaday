@@ -117,7 +117,7 @@
       align-items: center;
       justify-content: center;
       padding: 0;
-      margin-bottom: 36px;
+      margin-bottom: 48px;
       gap: 0;
     }
     .phone-left {
@@ -143,28 +143,187 @@
     }
 
     /*
-      CTA BUTTON
-      Figma: 347×60px pill, corner radius 30, fill #45E031
-      Bold 18px text
-      347/401 = 86.5% of page width → with 28px padding each side that's ~(401-56)=345px ✓
+      JOIN SECTION (purple, registration form)
+      Figma (401px frame): fill #3513A2, card ~307px wide (77%), radius ~30
+      Heading 32px ExtraBold white, card text 18px, green #45E031 pills/button
+
+      FULL WIDTH: the purple background stretches edge to edge across the whole
+      screen (::before = 100vw), while the content stays in the centered column.
     */
-    .cta-wrap {
-      padding: 0 28px;
+    .join {
+      position: relative;
+      isolation: isolate;
+      background: #3513A2;
+      padding: 54px 0 60px;
+      text-align: center;
     }
-    .cta-btn {
+    .join::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 100vw;
+      transform: translateX(-50%);
+      background: #3513A2;
+    }
+    .join-h {
+      color: #fff;
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.22;
+      letter-spacing: -0.02em;
+      padding: 0 22px;
+      margin-bottom: 64px;
+    }
+    .join-card {
+      width: 77%;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 30px;
+      padding: 30px 26px 32px;
+      text-align: left;
+    }
+    .join-title {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin-bottom: 14px;
+    }
+    .join-sub {
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 28px;
+    }
+    .join-slot-label {
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 26px;
+    }
+
+    /* time slot pills */
+    .slot-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 13px;
+    }
+    .slot-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #000;
+      background: #45E031;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 8px;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, transform 0.1s;
+    }
+    .slot-btn:active { transform: scale(0.97); }
+    .slot-btn.selected {
+      background: #3513A2;
+      color: #fff;
+    }
+    .slot-btn:focus-visible,
+    .join-input:focus-visible,
+    .save-btn:focus-visible {
+      outline: 3px solid #9271FF;
+      outline-offset: 2px;
+    }
+    /* 5th slot sits centered under the other four */
+    .slot-btn:last-child:nth-child(odd) {
+      grid-column: 1 / -1;
+      justify-self: center;
+      width: calc(50% - 6.5px);
+    }
+
+    /* fields */
+    .field-error {
+      display: none;
+      font-size: 13px;
+      font-weight: 600;
+      color: #e53e3e;
+      line-height: 1.4;
+      margin-top: 10px;
+    }
+    .field-error.show { display: block; }
+    .slot-error { margin-bottom: -14px; }
+
+    .join-fields { margin-top: 40px; }
+    .join-label {
+      display: block;
+      font-size: 18px;
+      font-weight: 400;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .join-input {
       display: block;
       width: 100%;
+      height: 48px;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #0A0A0A;
+      background: #fff;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 0 14px;
+    }
+    .join-field + .join-field { margin-top: 28px; }
+
+    /* save button */
+    .save-btn {
+      display: block;
+      width: 92%;
+      margin: 36px auto 0;
       background: #45E031;
       color: #000;
       font-family: 'Inter', sans-serif;
       font-size: 18px;
       font-weight: 700;
       border: none;
-      border-radius: 30px;
-      padding: 19px 20px;
+      border-radius: 50px;
+      padding: 13px 20px;
       cursor: pointer;
       letter-spacing: -0.01em;
       text-align: center;
+      transition: filter 0.15s, transform 0.1s;
+    }
+    .save-btn:hover { filter: brightness(1.05); }
+    .save-btn:active { transform: scale(0.98); }
+    .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* perks under the button (OpenMoji check, inline SVG) */
+    .perks {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .perks-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px 22px;
+    }
+    .perk {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 17px;
+      font-weight: 400;
+      line-height: 1.2;
+    }
+    .om {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
     }
 
     /*
@@ -174,7 +333,7 @@
       Images keep their natural ratio (no cropping).
     */
     .how {
-      padding: 56px 0 80px;
+      padding: 64px 0 80px;
       text-align: center;
     }
     .how-h1 {
@@ -226,7 +385,7 @@
     }
 
     /*
-      LIVE EVENT SECTION (heading + image + booking form)
+      LIVE EVENT SECTION (heading + text only)
     */
     .live {
       padding: 0 0 96px;
@@ -248,150 +407,51 @@
       margin-bottom: 24px;
     }
     .live-p:last-of-type { margin-bottom: 0; }
-    .live-img {
-      display: block;
-      width: 79%;
-      height: auto;
-      margin: 56px auto 60px;
-    }
-    .live-form {
-      width: 81%;
-      margin: 0 auto;
-    }
 
-    /* BOOKING BOX */
-    .booking-box {
-      border: 2px solid #E0D8FF;
-      background: #F9F7FF;
-      border-radius: 24px;
-      padding: 24px 20px;
-      margin-bottom: 28px;
-      text-align: left;
-    }
-    .booking-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: #0A0A0A;
-      line-height: 1.4;
-      margin-bottom: 14px;
-    }
-    .slot-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .slot-btn {
-      font-family: 'Inter', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: #3513A2;
-      background: #fff;
-      border: 2px solid #E0D8FF;
-      border-radius: 14px;
-      padding: 12px 8px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .slot-btn:hover { border-color: #B7A6FF; }
-    .slot-btn.selected {
-      background: #3513A2;
-      border-color: #3513A2;
-      color: #fff;
-    }
-    .field-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 700;
-      color: #555;
-      line-height: 1.4;
-      margin-bottom: 6px;
-    }
-    .field-input {
-      width: 100%;
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      font-weight: 500;
-      color: #0A0A0A;
-      background: #fff;
-      border: 2px solid #E0D8FF;
-      border-radius: 14px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      outline: none;
-    }
-    .field-input:last-of-type { margin-bottom: 0; }
-    .field-input:focus { border-color: #3513A2; }
-    .field-error {
-      display: none;
-      font-size: 13px;
-      font-weight: 600;
-      color: #e53e3e;
-      line-height: 1.4;
-      margin: -10px 0 16px;
-    }
-    .field-error.show { display: block; }
-
-    /* RESERVE BUTTON */
-    .reserve-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      width: 100%;
-      background: #3DBE5C;
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-size: 18px;
-      font-weight: 800;
-      border: none;
-      border-radius: 50px;
-      padding: 22px 24px;
-      cursor: pointer;
-      letter-spacing: -0.01em;
-      transition: filter 0.15s, transform 0.1s;
-      box-shadow: 0 5px 0 #27a348;
-      margin-bottom: 12px;
-      text-transform: uppercase;
-    }
-    .reserve-btn:hover  { filter: brightness(1.06); }
-    .reserve-btn:active { transform: scale(0.98); box-shadow: none; }
-    .reserve-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-    .spots-note {
-      font-size: 12px;
-      font-weight: 500;
-      color: #999;
+    /*
+      CONFIRMATION "PAGE" (same URL, shown after the form is sent)
+    */
+    .confirm-page { display: none; }
+    .confirm-page.show { display: block; }
+    .confirm-inner {
+      padding: 24px 28px 72px;
       text-align: center;
-      line-height: 1.5;
     }
-
-    /* CONFIRMATION */
-    .confirm-box { display: none; text-align: left; }
-    .confirm-box.show { display: block; }
+    .confirm-logo {
+      height: 38px;
+      width: auto;
+      display: block;
+      margin: 0 auto 56px;
+    }
     .confirm-badge {
-      font-size: 40px;
-      margin-bottom: 16px;
-      text-align: center;
+      font-size: 56px;
+      line-height: 1;
+      margin-bottom: 20px;
     }
     .confirm-title {
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 800;
-      color: #0A0A0A;
-      text-align: center;
-      margin-bottom: 20px;
-      line-height: 1.3;
+      line-height: 1.22;
+      letter-spacing: -0.02em;
+      margin-bottom: 28px;
     }
     .confirm-card {
       border: 2px solid #E0D8FF;
       background: #F9F7FF;
-      border-radius: 20px;
-      padding: 20px;
+      border-radius: 24px;
+      padding: 22px 20px;
       margin-bottom: 24px;
-      font-size: 16px;
-      color: #0A0A0A;
-      line-height: 1.6;
+      font-size: 17px;
+      line-height: 1.55;
+      text-align: left;
     }
-    .confirm-card strong { color: #3513A2; }
+    .confirm-card strong { color: #3513A2; font-weight: 800; }
+    .confirm-when {
+      display: block;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1.5px solid #E0D8FF;
+    }
     .calendar-btn {
       display: flex;
       align-items: center;
@@ -407,134 +467,204 @@
       border-radius: 50px;
       padding: 16px 20px;
       cursor: pointer;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .calendar-note {
       font-size: 13px;
       font-weight: 500;
       color: #999;
-      text-align: center;
       line-height: 1.5;
     }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav class="nav">
-    <img class="nav-logo" src="/logotousebro.webp" alt="Numio"/>
-    <button class="nav-btn">See it work live →</button>
-  </nav>
+  <!-- OpenMoji "check mark" (U+2714) drawn in code, no image file -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <symbol id="om-check" viewBox="0 0 80 80">
+      <polygon points="4,42.4 16,30.4 28.9,45.3 63.8,8 76,20.2 28.9,67.3"
+               fill="#B1CC33" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
+    </symbol>
+  </svg>
 
-  <!-- HERO TEXT -->
-  <div class="hero-text">
-    <div class="hero-tag">The new app for<br>busy parents</div>
-    <div class="hero-headline">Turn any lesson<br>into practise<br>with just a picture</div>
-  </div>
+  <!-- ===================== LANDING PAGE ===================== -->
+  <div id="landing">
 
-  <!-- PHONE VISUAL -->
-  <div class="phone-visual">
-    <img class="phone-left"  src="/phonestouse.png"        alt="Take a pic of their lesson"/>
-    <img class="phone-arrow" src="/tousebro%20(2).webp"   alt=""/>
-    <img class="phone-right" src="/phonestouse%20(1).png" alt="Get a quiz instantly"/>
-  </div>
+    <!-- NAV -->
+    <nav class="nav">
+      <img class="nav-logo" src="/logotousebro.webp" alt="Numio"/>
+      <button class="nav-btn" type="button" onclick="document.getElementById('join').scrollIntoView({behavior:'smooth'})">See it work live →</button>
+    </nav>
 
-  <!-- CTA -->
-  <div class="cta-wrap">
-    <button class="cta-btn" onclick="if(typeof fbq!=='undefined')fbq('track','Lead'); window.location.href='https://buy.stripe.com/4gM7sL5Idgbt1nMfY51ZS01'">See it work live →</button>
-  </div>
-
-  <!-- HOW IT WORKS -->
-  <section class="how">
-    <h2 class="how-h1">Want more practise<br>for your child?</h2>
-    <p class="how-sub">... but you don't want to create the questions yourself?</p>
-    <h3 class="how-h2">Here's our simple<br>solution:</h3>
-
-    <div class="step-card">
-      <img src="/takepicimage.png" alt="Take a pic of any lesson" loading="lazy"/>
-      <div class="step-label">#1 Take a pic of any lesson</div>
+    <!-- HERO TEXT -->
+    <div class="hero-text">
+      <div class="hero-tag">The new app for<br>busy parents</div>
+      <div class="hero-headline">Turn any lesson<br>into practise<br>with just a picture</div>
     </div>
-    <div class="step-card">
-      <img src="/wait15secimage.png" alt="Wait 15 seconds" loading="lazy"/>
-      <div class="step-label">#2 Wait 15 seconds</div>
+
+    <!-- PHONE VISUAL -->
+    <div class="phone-visual">
+      <img class="phone-left"  src="/phonestouse.png"        alt="Take a pic of their lesson"/>
+      <img class="phone-arrow" src="/tousebro%20(2).webp"   alt=""/>
+      <img class="phone-right" src="/phonestouse%20(1).png" alt="Get a quiz instantly"/>
     </div>
-    <div class="step-card">
-      <img src="/practiseimage.png" alt="Your child can practise" loading="lazy"/>
-      <div class="step-label">#3 Your child can practise!</div>
-    </div>
-  </section>
 
-  <!-- LIVE EVENT: heading + image + booking form -->
-  <section class="live" id="live">
-    <h2 class="live-h">Test Numio with us<br>LIVE</h2>
-    <p class="live-p">No need to decide today!</p>
-    <p class="live-p">Join and see it work live and decide if it can really help your family.</p>
+    <!-- JOIN (registration form) -->
+    <section class="join" id="join">
+      <h2 class="join-h">Join us Tomorrow</h2>
 
-    <img class="live-img" src="/imageforregistrationbro.webp" alt="Free live event with Numio" width="960" height="540" loading="lazy"/>
+      <div class="join-card">
+        <div class="join-title">Numio live Parents Demo</div>
+        <p class="join-sub">See if Numio can help your family</p>
+        <p class="join-slot-label">Choose your time slot<br>(South Africa time)</p>
 
-    <div class="live-form">
+        <div class="slot-grid" id="slot-grid">
+          <button type="button" class="slot-btn" data-sa="17" data-label="5:00 PM" aria-pressed="false">5:00 PM</button>
+          <button type="button" class="slot-btn" data-sa="18" data-label="6:00 PM" aria-pressed="false">6:00 PM</button>
+          <button type="button" class="slot-btn" data-sa="19" data-label="7:00 PM" aria-pressed="false">7:00 PM</button>
+          <button type="button" class="slot-btn" data-sa="20" data-label="8:00 PM" aria-pressed="false">8:00 PM</button>
+          <button type="button" class="slot-btn" data-sa="21" data-label="9:00 PM" aria-pressed="false">9:00 PM</button>
+        </div>
+        <div class="field-error slot-error" id="slot-error">Please choose a time slot.</div>
 
-      <!-- BOOKING VIEW -->
-      <div id="booking-view">
-        <div class="booking-box">
-          <div class="booking-title">Choose your time slot (South Africa time)</div>
-          <div class="slot-grid" id="slot-grid">
-            <button type="button" class="slot-btn" data-mtl="11" data-label="5:00 PM">5:00 PM</button>
-            <button type="button" class="slot-btn" data-mtl="12" data-label="6:00 PM">6:00 PM</button>
-            <button type="button" class="slot-btn" data-mtl="13" data-label="7:00 PM">7:00 PM</button>
-            <button type="button" class="slot-btn" data-mtl="14" data-label="8:00 PM">8:00 PM</button>
-            <button type="button" class="slot-btn" data-mtl="15" data-label="9:00 PM">9:00 PM</button>
+        <div class="join-fields">
+          <div class="join-field">
+            <label class="join-label" for="parent-name">Name</label>
+            <input class="join-input" type="text" id="parent-name" placeholder="e.g. Thandiwe Nkosi" autocomplete="name"/>
+            <div class="field-error" id="name-error">Please enter your name.</div>
           </div>
-          <div class="field-error" id="slot-error">Please choose a time slot.</div>
-
-          <label class="field-label" for="parent-name">Your name</label>
-          <input class="field-input" type="text" id="parent-name" placeholder="e.g. Thandiwe Nkosi" autocomplete="name"/>
-          <div class="field-error" id="name-error">Please enter your name.</div>
-
-          <label class="field-label" for="parent-phone">WhatsApp number</label>
-          <input class="field-input" type="tel" id="parent-phone" placeholder="e.g. 082 123 4567" autocomplete="tel"/>
-          <div class="field-error" id="phone-error">Please enter a valid WhatsApp number.</div>
+          <div class="join-field">
+            <label class="join-label" for="parent-phone">Phone Number</label>
+            <input class="join-input" type="tel" id="parent-phone" placeholder="e.g. 082 123 4567" autocomplete="tel"/>
+            <div class="field-error" id="phone-error">Please enter a valid phone number.</div>
+          </div>
         </div>
 
-        <button type="button" class="reserve-btn" id="register-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          Reserve My Free Spot
-        </button>
-        <p class="spots-note">Only 3 spots available — first come, first served</p>
-      </div>
+        <button type="button" class="save-btn" id="register-btn">Save your spot →</button>
 
-      <!-- CONFIRMATION VIEW -->
-      <div class="confirm-box" id="confirm-view">
-        <div class="confirm-badge">🎉</div>
-        <div class="confirm-title">Congrats! You're among the 3 parents we'll help.</div>
-        <div class="confirm-card">
-          We'll contact you on <strong id="confirm-phone">your WhatsApp</strong> 1 hour before your slot and give you all the info you need to join.
+        <div class="perks">
+          <div class="perks-row">
+            <span class="perk"><svg class="om" aria-hidden="true"><use href="#om-check"/></svg>Free</span>
+            <span class="perk"><svg class="om" aria-hidden="true"><use href="#om-check"/></svg>No commitment</span>
+          </div>
+          <div class="perks-row">
+            <span class="perk"><svg class="om" aria-hidden="true"><use href="#om-check"/></svg>Only 10 minutes</span>
+          </div>
         </div>
-        <button type="button" class="calendar-btn" id="calendar-btn">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          Don't forget — save it to your calendar
-        </button>
-        <p class="calendar-note">We'll never share your info. See you there!</p>
       </div>
+    </section>
 
+    <!-- HOW IT WORKS -->
+    <section class="how">
+      <h2 class="how-h1">Want more practise<br>for your child?</h2>
+      <p class="how-sub">... but you don't want to create the questions yourself?</p>
+      <h3 class="how-h2">Here's our simple<br>solution:</h3>
+
+      <div class="step-card">
+        <img src="/takepicimage.png" alt="Take a pic of any lesson" loading="lazy"/>
+        <div class="step-label">#1 Take a pic of any lesson</div>
+      </div>
+      <div class="step-card">
+        <img src="/wait15secimage.png" alt="Wait 15 seconds" loading="lazy"/>
+        <div class="step-label">#2 Wait 15 seconds</div>
+      </div>
+      <div class="step-card">
+        <img src="/practiseimage.png" alt="Your child can practise" loading="lazy"/>
+        <div class="step-label">#3 Your child can practise!</div>
+      </div>
+    </section>
+
+    <!-- LIVE EVENT (text only) -->
+    <section class="live" id="live">
+      <h2 class="live-h">Test Numio with us<br>LIVE</h2>
+      <p class="live-p">No need to decide today!</p>
+      <p class="live-p">Join and see it work live and decide if it can really help your family.</p>
+    </section>
+
+  </div>
+
+  <!-- ===================== CONFIRMATION (same page, "another page" view) ===================== -->
+  <div class="confirm-page" id="confirmation-page">
+    <div class="confirm-inner">
+      <img class="confirm-logo" src="/logotousebro.webp" alt="Numio"/>
+      <div class="confirm-badge">🎉</div>
+      <h1 class="confirm-title">Congrats! You're among the 3 parents we'll help.</h1>
+      <div class="confirm-card">
+        We'll contact you on <strong id="confirm-phone">your phone</strong> 1 hour before your slot and give you all the info you need to join.
+        <strong class="confirm-when" id="confirm-when"></strong>
+      </div>
+      <button type="button" class="calendar-btn" id="calendar-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Don't forget — save it to your calendar
+      </button>
+      <p class="calendar-note">We'll never share your info. See you there!</p>
     </div>
-  </section>
+  </div>
 
 <script>
 (function () {
-  // ===== EVENT DATE (the date in South Africa) — change this ONE line for each new event =====
-  var EVENT_DATE = "2026-09-24"; // format YYYY-MM-DD
+  // ===== EVENT DATE =====
+  // "Join us Tomorrow": by default the event date is TOMORROW in South Africa (SAST = UTC+2).
+  // To force a fixed date instead, set e.g. var EVENT_DATE_OVERRIDE = "2026-10-10";
+  var EVENT_DATE_OVERRIDE = null;
 
-  // South Africa (SAST, UTC+2, no daylight saving) is Montréal (EDT, UTC-4) + 6 hours.
+  var LANDING_TITLE = document.title;
+  var landing = document.getElementById("landing");
+  var confirmPage = document.getElementById("confirmation-page");
   var slots = document.querySelectorAll(".slot-btn");
   var selected = null;
+  var chosen = null; // { saHour, label, date }
 
+  function pad(n) { return String(n).padStart(2, "0"); }
+
+  function eventDate() {
+    if (EVENT_DATE_OVERRIDE) return EVENT_DATE_OVERRIDE;
+    var sa = new Date(Date.now() + 2 * 3600 * 1000); // current time in South Africa
+    var t = new Date(Date.UTC(sa.getUTCFullYear(), sa.getUTCMonth(), sa.getUTCDate() + 1));
+    return t.getUTCFullYear() + "-" + pad(t.getUTCMonth() + 1) + "-" + pad(t.getUTCDate());
+  }
+
+  function prettyDate(iso) {
+    var p = iso.split("-");
+    return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])).toLocaleDateString("en-US", {
+      weekday: "long", month: "long", day: "numeric", timeZone: "UTC"
+    });
+  }
+
+  // UTC Date for a South Africa slot on a given YYYY-MM-DD (SAST = UTC+2)
+  function slotToUTCDate(iso, saHour) {
+    var p = iso.split("-");
+    return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], saHour - 2, 0, 0));
+  }
+
+  function icsStamp(d) {
+    return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + "T" +
+      pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + "00Z";
+  }
+
+  function buildICS(startUTC) {
+    var endUTC = new Date(startUTC.getTime() + 10 * 60000); // 10-minute demo
+    return [
+      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Numio//Live Demo//EN",
+      "BEGIN:VEVENT",
+      "UID:" + Date.now() + "@numiomath.app",
+      "DTSTAMP:" + icsStamp(new Date()),
+      "DTSTART:" + icsStamp(startUTC),
+      "DTEND:" + icsStamp(endUTC),
+      "SUMMARY:Numio live Parents Demo",
+      "DESCRIPTION:See if Numio can help your family. We will message you 1 hour before your slot with everything you need to join.",
+      "END:VEVENT", "END:VCALENDAR"
+    ].join("\r\n");
+  }
+
+  // ----- slot picking -----
   slots.forEach(function (btn) {
     btn.addEventListener("click", function () {
-      slots.forEach(function (b) { b.classList.remove("selected"); });
+      slots.forEach(function (b) { b.classList.remove("selected"); b.setAttribute("aria-pressed", "false"); });
       btn.classList.add("selected");
-      selected = { mtl: parseInt(btn.dataset.mtl, 10), label: btn.dataset.label };
-      document.getElementById("slot-error").classList.remove("show");
+      btn.setAttribute("aria-pressed", "true");
+      selected = { saHour: parseInt(btn.dataset.sa, 10), label: btn.dataset.label };
+      hideError("slot-error");
     });
   });
 
@@ -542,44 +672,30 @@
   function hideError(id) { document.getElementById(id).classList.remove("show"); }
 
   function isValidPhone(v) {
-    var digits = v.replace(/[^\d]/g, "");
-    return digits.length >= 9;
+    return v.replace(/[^\d]/g, "").length >= 9;
   }
 
-  // Builds a UTC Date for the chosen SAST slot (SAST = UTC+2)
-  function slotToUTCDate(mtlHour) {
-    var p = EVENT_DATE.split("-");
-    var saHour = mtlHour + 6; // SA local hour
-    var utcHour = saHour - 2; // SAST is UTC+2
-    return new Date(Date.UTC(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10), utcHour, 0, 0));
+  // ----- same-page "confirmation page" -----
+  function showView(confirmed) {
+    landing.style.display = confirmed ? "none" : "";
+    confirmPage.classList.toggle("show", confirmed);
+    document.title = confirmed ? "You're in! – Numio" : LANDING_TITLE;
+    window.scrollTo(0, 0);
   }
 
-  function pad(n) { return String(n).padStart(2, "0"); }
-  function icsStamp(d) {
-    return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + "T" +
-      pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + "00Z";
+  // Browser Back button returns to the landing page
+  window.addEventListener("popstate", function (e) {
+    showView(!!(e.state && e.state.numio === "confirmed"));
+  });
+  // A reload on #confirmed has no form data anymore, so go back to the landing page
+  if (location.hash === "#confirmed") {
+    history.replaceState(null, "", location.pathname + location.search);
   }
 
-  function buildICS(startUTC) {
-    var endUTC = new Date(startUTC.getTime() + 15 * 60000);
-    return [
-      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Numio//Live Event//EN",
-      "BEGIN:VEVENT",
-      "UID:" + Date.now() + "@numiomath.app",
-      "DTSTAMP:" + icsStamp(new Date()),
-      "DTSTART:" + icsStamp(startUTC),
-      "DTEND:" + icsStamp(endUTC),
-      "SUMMARY:Numio Free Live Event for Parents",
-      "DESCRIPTION:The Simple Way to Help Your Child Succeed at School – Without More Work for You. Zoom link sent 20 minutes before start.",
-      "END:VEVENT", "END:VCALENDAR",
-    ].join("\r\n");
-  }
-
+  // ----- submit -----
   document.getElementById("register-btn").addEventListener("click", function () {
-    var nameEl = document.getElementById("parent-name");
-    var phoneEl = document.getElementById("parent-phone");
-    var name = nameEl.value.trim();
-    var phone = phoneEl.value.trim();
+    var name = document.getElementById("parent-name").value.trim();
+    var phone = document.getElementById("parent-phone").value.trim();
     var ok = true;
 
     if (!selected) { showError("slot-error"); ok = false; } else { hideError("slot-error"); }
@@ -589,7 +705,10 @@
 
     var btn = this;
     btn.disabled = true;
-    btn.textContent = "Reserving your spot…";
+    btn.textContent = "Saving your spot…";
+
+    var date = eventDate();
+    chosen = { saHour: selected.saHour, label: selected.label, date: date };
 
     fetch("https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/register-event-lead", {
       method: "POST",
@@ -601,7 +720,7 @@
         name: name,
         phone: phone,
         slot_label: selected.label,
-        event_date: EVENT_DATE,
+        event_date: date,
         timezone: "SAST (South Africa)",
       }),
     }).catch(function (e) { console.error("Lead save failed:", e); })
@@ -609,22 +728,27 @@
         if (window.fbq) fbq("track", "Lead");
         if (window.clarity) clarity("event", "reserve_click");
 
-        document.getElementById("booking-view").style.display = "none";
-        document.getElementById("confirm-view").classList.add("show");
         document.getElementById("confirm-phone").textContent = phone;
+        document.getElementById("confirm-when").textContent =
+          prettyDate(date) + " · " + chosen.label + " (South Africa time)";
 
-        window._numioSlotUTC = slotToUTCDate(selected.mtl);
+        history.pushState({ numio: "confirmed" }, "", "#confirmed");
+        showView(true);
+
+        btn.disabled = false;
+        btn.textContent = "Save your spot →";
       });
   });
 
+  // ----- add to calendar -----
   document.getElementById("calendar-btn").addEventListener("click", function () {
-    var startUTC = window._numioSlotUTC || slotToUTCDate(13);
-    var ics = buildICS(startUTC);
+    var c = chosen || { saHour: 19, date: eventDate() };
+    var ics = buildICS(slotToUTCDate(c.date, c.saHour));
     var blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = url;
-    a.download = "numio-live-event.ics";
+    a.download = "numio-live-demo.ics";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
