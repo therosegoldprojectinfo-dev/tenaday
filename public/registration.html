@@ -3,623 +3,168 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Free Live Event for Parents – Numio</title>
+  <meta name="description" content="The new app for busy parents. Turn any lesson into practise with just a picture."/>
+  <title>Numio</title>
 
   <script>
-  // FB Pixel fires immediately on load
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window,document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '1028944262871292');
-  fbq('track', 'PageView');
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window,document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '1028944262871292');
+      fbq('track', 'PageView');
+      (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+      })(window,document,"clarity","script","y6hivp7gvm");
+    }, 3000);
+  });
   </script>
-
-  <!-- Clarity fires immediately — no delay -->
-  <script>
-  (function(c,l,a,r,i,t,y){
-    c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-  })(window,document,"clarity","script","y6hivp7gvm");
-  </script>
-  <meta name="description" content="Free 15-minute live event for parents. Discover how your child can master their school lessons in just 15 minutes a day."/>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet"/></noscript>
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
+  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/></noscript>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: #fff;
       color: #0A0A0A;
-      font-size: 16px;
-      line-height: 1.6;
-      min-height: 100dvh;
+      overflow-x: hidden;
     }
 
     .page {
       max-width: 480px;
       margin: 0 auto;
-      padding: 48px 28px 72px;
-      text-align: center;
+      padding: 0 20px;
     }
 
-    .logo-wrap { margin-bottom: 32px; }
-    .logo-wrap img { height: 26px; width: auto; display: block; margin: 0 auto; }
-
-    .event-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: #EAE4FF;
-      color: #3513A2;
-      font-size: 12px;
-      font-weight: 800;
-      border-radius: 50px;
-      padding: 7px 18px;
-      margin-bottom: 28px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-
-    .headline {
-      font-size: 36px;
-      font-weight: 700;
-      color: #0A0A0A;
-      line-height: 1.15;
-      letter-spacing: -0.01em;
-      margin-bottom: 0px;
-      position: relative;
-      z-index: 2;
-    }
-    .headline .highlight {
-      font-style: italic;
-      font-weight: 800;
-      background: #3513A2;
-      color: #fff;
-      padding: 0 8px 2px;
-      border-radius: 6px;
-    }
-
-
-
-    .discover-label {
-      font-size: 17px;
-      font-weight: 500;
-      color: #444;
-      margin-bottom: 28px;
-      text-align: left;
-      line-height: 1.5;
-    }
-
-    /* BULLETS */
-    .bullets {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      margin-bottom: 56px;
-      text-align: left;
-    }
-    .bullet {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-    }
-    .bullet-icon {
-      flex-shrink: 0;
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
-      margin-top: 1px;
-    }
-    .bullet-text {
-      font-size: 17px;
-      font-weight: 400;
-      color: #0A0A0A;
-      line-height: 1.5;
-    }
-    .bullet-text strong { font-weight: 800; }
-
-    /* EVENT DETAILS */
-    .event-details {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      margin-bottom: 28px;
-      border: 2px solid #E0D8FF;
-      border-radius: 24px;
-      overflow: hidden;
-      text-align: left;
-    }
-    .event-detail-row {
+    /* NAV */
+    .nav {
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 20px 24px;
-      border-bottom: 1.5px solid #E0D8FF;
+      justify-content: space-between;
+      padding: 18px 0;
     }
-    .event-detail-row:last-child { border-bottom: none; }
-    .event-detail-icon {
-      width: 40px; height: 40px;
-      background: #f3f0ff;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+    .nav-logo {
+      height: 36px;
+      width: auto;
     }
-    .event-detail-icon svg {
-      width: 20px; height: 20px;
-      stroke: #3513A2; fill: none;
-      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    .nav-btn {
+      background: #45E031;
+      color: #000;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 30px;
+      padding: 10px 18px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: filter 0.2s;
     }
-    .event-detail-label { font-size: 17px; font-weight: 700; color: #0A0A0A; }
-    .free-pill {
-      display: inline-flex;
-      align-items: center;
-      background: #3DBE5C;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
-      border-radius: 50px;
-      padding: 3px 10px;
-      margin-left: 10px;
-      letter-spacing: 0.04em;
-    }
+    .nav-btn:hover { filter: brightness(1.07); }
+    .nav-btn:active { filter: brightness(0.93); }
 
-    /* SLOT PICKER + FORM */
-    .booking-box {
-      border: 2px solid #E0D8FF;
-      background: #F9F7FF;
-      border-radius: 24px;
-      padding: 24px 20px;
-      margin-bottom: 28px;
-      text-align: left;
-    }
-    .booking-title {
-      font-size: 16px;
+    /* HERO TEXT */
+    .hero-tag {
+      font-size: 32px;
       font-weight: 800;
       color: #0A0A0A;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-top: 24px;
       margin-bottom: 14px;
     }
-    .slot-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .slot-btn {
-      font-family: 'Inter', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: #3513A2;
-      background: #fff;
-      border: 2px solid #E0D8FF;
-      border-radius: 14px;
-      padding: 12px 8px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .slot-btn:hover { border-color: #B7A6FF; }
-    .slot-btn.selected {
-      background: #3513A2;
-      border-color: #3513A2;
-      color: #fff;
-    }
-    .field-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 700;
-      color: #555;
-      margin-bottom: 6px;
-    }
-    .field-input {
-      width: 100%;
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
+    .hero-headline {
+      font-size: 36px;
       font-weight: 500;
       color: #0A0A0A;
-      background: #fff;
-      border: 2px solid #E0D8FF;
-      border-radius: 14px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
-      outline: none;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin-bottom: 28px;
     }
-    .field-input:focus { border-color: #3513A2; }
-    .field-error {
-      display: none;
-      font-size: 13px;
-      font-weight: 600;
-      color: #e53e3e;
-      margin: -10px 0 16px;
-    }
-    .field-error.show { display: block; }
 
-    /* CTA */
-    .cta-btn {
+    /* PHONE VISUAL */
+    .phone-visual {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      width: 100%;
-      background: #3DBE5C;
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-size: 18px;
-      font-weight: 800;
-      border: none;
-      border-radius: 50px;
-      padding: 22px 24px;
-      cursor: pointer;
-      text-decoration: none;
-      letter-spacing: -0.01em;
-      transition: filter 0.15s, transform 0.1s;
-      box-shadow: 0 5px 0 #27a348;
-      margin-bottom: 12px;
-      text-transform: uppercase;
+      margin-bottom: 32px;
     }
-    .cta-btn:hover  { filter: brightness(1.06); }
-    .cta-btn:active { transform: scale(0.98); box-shadow: none; }
-    .cta-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    /* CONFIRMATION */
-    .confirm-box { display: none; text-align: left; }
-    .confirm-box.show { display: block; }
-
-    .confirm-check-badge {
+    .phone-left {
+      width: 43%;
+      height: auto;
+    }
+    .phone-arrow {
+      width: 13%;
+      height: auto;
       position: relative;
-      width: 76px;
-      height: 76px;
-      margin: 0 auto 24px;
-    }
-    .confirm-check-badge .badge-layer {
-      position: absolute;
-      inset: 0;
-      background: #3DBE5C;
-      border-radius: 30%;
-    }
-    .confirm-check-badge .badge-layer.rotate { transform: rotate(45deg); }
-    .confirm-check-badge .badge-check {
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 32px; height: 32px;
-      transform: translate(-50%, -50%);
-      stroke: #fff; fill: none;
-      stroke-width: 3; stroke-linecap: round; stroke-linejoin: round;
-      z-index: 2;
-    }
-
-    .confirm-title {
-      font-size: 26px;
-      font-weight: 800;
-      color: #0A0A0A;
-      text-align: center;
-      margin-bottom: 28px;
-      line-height: 1.3;
-      letter-spacing: -0.01em;
-    }
-
-    /* Event Details section, styled as label/value rows */
-    .confirm-section {
-      border: 1.5px solid #eee;
-      border-radius: 20px;
-      box-shadow: 0 2px 14px rgba(0,0,0,0.04);
-      margin-bottom: 28px;
-      overflow: hidden;
-    }
-    .confirm-detail-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 20px;
-      padding: 16px 20px;
-      border-bottom: 1px solid #eee;
-    }
-    .confirm-detail-row:last-child { border-bottom: none; }
-    .confirm-detail-label {
-      font-size: 14px;
-      font-weight: 500;
-      color: #aaa;
+      top: 10px;
       flex-shrink: 0;
     }
-    .confirm-detail-value {
-      font-size: 15px;
-      font-weight: 700;
-      color: #0A0A0A;
-      text-align: right;
-    }
-    .zoom-word { color: #2D8CFF; font-weight: 800; }
-
-    .confirm-whatsnext { text-align: center; margin-bottom: 28px; }
-    .whatsapp-word { color: #25D366; font-weight: 800; }
-
-    .confirm-text {
-      font-size: 16px;
-      font-weight: 500;
-      color: #444;
-      text-align: center;
-      line-height: 1.6;
+    .phone-right {
+      width: 40%;
+      height: auto;
     }
 
-    .calendar-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
+    /* CTA BUTTON */
+    .cta-btn {
+      display: block;
       width: 100%;
-      background: #0A0A0A;
-      color: #fff;
+      background: #45E031;
+      color: #000;
       font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      font-weight: 800;
+      font-size: 18px;
+      font-weight: 700;
       border: none;
-      border-radius: 50px;
+      border-radius: 30px;
       padding: 18px 20px;
       cursor: pointer;
-      text-decoration: none;
-      margin-bottom: 10px;
-    }
-    .calendar-note {
-      font-size: 13px;
-      font-weight: 500;
-      color: #999;
+      letter-spacing: -0.01em;
+      transition: filter 0.2s;
       text-align: center;
     }
+    .cta-btn:hover { filter: brightness(1.07); }
+    .cta-btn:active { filter: brightness(0.93); }
   </style>
 </head>
 <body>
 
-<div class="page">
+  <div class="page">
 
-  <!-- LOGO -->
-  <div class="logo-wrap" id="main-logo">
-    <img src="/logotousebro.webp" alt="Numio"/>
-  </div>
+    <!-- NAV -->
+    <nav class="nav">
+      <img class="nav-logo" src="/logotousebro.webp" alt="Numio"/>
+      <button class="nav-btn" onclick="document.querySelector('.cta-btn').scrollIntoView({behavior:'smooth'})">See it work live →</button>
+    </nav>
 
-  <div id="booking-view">
+    <!-- HERO TAG -->
+    <div class="hero-tag">The new app for<br>busy parents</div>
 
-    <!-- BADGE -->
-    <div class="event-badge">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Free Live Event – 3 Parents Only
-    </div>
+    <!-- HERO HEADLINE -->
+    <div class="hero-headline">Turn any lesson<br>into practise<br>with just a picture</div>
 
-    <!-- HEADLINE -->
-    <h1 class="headline">
-      Help Your Child Succeed at School — <em style="font-style:italic; color:#3513A2; font-weight:700;">Without More Work for You</em>
-    </h1>
-
-    <!-- IMAGE — negative top margin uses the image's own white space; z-index keeps it behind the headline -->
-    <img src="/imageforregistrationbro.webp" alt="Free live event with Numio" width="960" height="540" style="width:calc(100% + 16px); margin-left:-8px; margin-top:-10px; height:auto; display:block; margin-bottom:16px; position:relative; z-index:1;"/>
-
-    <!-- DISCOVER LABEL -->
-    <p class="discover-label">In just 15 minutes, you'll discover:</p>
-
-    <!-- BULLETS -->
-    <div class="bullets">
-      <div class="bullet">
-        <img class="bullet-icon" src="/icons8-hundred-points-48.webp" alt="" width="32" height="32"/>
-        <div class="bullet-text"><strong>How your child can easily understand all their lessons</strong> in just 1h/day.</div>
-      </div>
-      <div class="bullet">
-        <img class="bullet-icon" src="/icons8-fire-48.webp" alt="" width="32" height="32"/>
-        <div class="bullet-text"><strong>How to keep your child motivated to practise alone.</strong></div>
-      </div>
-      <div class="bullet">
-        <img class="bullet-icon" src="/nav-profile.webp" alt="" width="32" height="32"/>
-        <div class="bullet-text"><strong>How Numio can do all that for you</strong> — fast and easy!</div>
-      </div>
-    </div>
-
-    <!-- EVENT DETAILS -->
-    <div class="event-details">
-      <div class="event-detail-row">
-        <div class="event-detail-icon">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-        </div>
-        <div class="event-detail-label">Live on Zoom</div>
-      </div>
-      <div class="event-detail-row">
-        <div class="event-detail-icon">
-          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        </div>
-        <div class="event-detail-label">Tuesday, September 29</div>
-      </div>
-      <div class="event-detail-row">
-        <div class="event-detail-icon">
-          <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </div>
-        <div class="event-detail-label">3 Parents Only</div>
-      </div>
-      <div class="event-detail-row">
-        <div class="event-detail-icon">
-          <svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-        </div>
-        <div class="event-detail-label">100% FREE <span class="free-pill">FREE</span></div>
-      </div>
-    </div>
-
-    <!-- BOOKING BOX -->
-    <div class="booking-box">
-      <div class="booking-title">Choose your time slot (South Africa time)</div>
-      <div class="slot-grid" id="slot-grid">
-        <button type="button" class="slot-btn" data-mtl="11" data-label="5:00 PM">5:00 PM</button>
-        <button type="button" class="slot-btn" data-mtl="12" data-label="6:00 PM">6:00 PM</button>
-        <button type="button" class="slot-btn" data-mtl="13" data-label="7:00 PM">7:00 PM</button>
-        <button type="button" class="slot-btn" data-mtl="14" data-label="8:00 PM">8:00 PM</button>
-        <button type="button" class="slot-btn" data-mtl="15" data-label="9:00 PM">9:00 PM</button>
-      </div>
-      <div class="field-error" id="slot-error">Please choose a time slot.</div>
-
-      <label class="field-label" for="parent-name">Your name</label>
-      <input class="field-input" type="text" id="parent-name" placeholder="e.g. Thandiwe Nkosi" autocomplete="name"/>
-      <div class="field-error" id="name-error">Please enter your name.</div>
-
-      <label class="field-label" for="parent-phone">WhatsApp number</label>
-      <input class="field-input" type="tel" id="parent-phone" placeholder="e.g. 082 123 4567" autocomplete="tel"/>
-      <div class="field-error" id="phone-error">Please enter a valid WhatsApp number.</div>
+    <!-- PHONE VISUAL -->
+    <div class="phone-visual">
+      <img class="phone-left"  src="/tousebro.webp"       alt="Take a pic of their lesson"/>
+      <img class="phone-arrow" src="/tousebro%20(2).webp" alt=""/>
+      <img class="phone-right" src="/tousebro%20(1).webp" alt="Get a quiz instantly"/>
     </div>
 
     <!-- CTA -->
-    <button type="button" class="cta-btn" id="register-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      Reserve My Free Spot
-    </button>
-    <p style="font-size:12px; font-weight:500; color:#999; text-align:center; margin-bottom:12px;">Only 3 spots available — first come, first served</p>
+    <button class="cta-btn" onclick="if(typeof fbq!=='undefined')fbq('track','Lead'); window.location.href='https://buy.stripe.com/4gM7sL5Idgbt1nMfY51ZS01'">See it work live →</button>
 
   </div>
-
-  <!-- CONFIRMATION VIEW -->
-  <div class="confirm-box" id="confirm-view">
-
-    <div class="confirm-check-badge">
-      <div class="badge-layer"></div>
-      <div class="badge-layer rotate"></div>
-      <svg class="badge-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-    </div>
-    <div class="confirm-title">Your spot is confirmed</div>
-
-    <div class="confirm-section">
-      <div class="confirm-detail-row"><span class="confirm-detail-label">What</span><span class="confirm-detail-value">Help your child at school in 3 steps</span></div>
-      <div class="confirm-detail-row"><span class="confirm-detail-label">When</span><span class="confirm-detail-value" id="confirm-datetime">Tuesday, September 29 at 7:00 PM</span></div>
-      <div class="confirm-detail-row"><span class="confirm-detail-label">Where</span><span class="confirm-detail-value">Online via <span class="zoom-word">Zoom</span></span></div>
-    </div>
-
-    <div class="confirm-whatsnext">
-      <p class="confirm-text">We'll send you a <span class="whatsapp-word">WhatsApp</span> message exactly 3 hours before the event.</p>
-    </div>
-
-    <button type="button" class="calendar-btn" id="calendar-btn">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      Save to Calendar
-    </button>
-    <p class="calendar-note">We'll never share your info. See you there!</p>
-  </div>
-
-</div>
-
-<script>
-(function () {
-  // South Africa (SAST, UTC+2, no daylight saving) is Montréal (EDT, UTC-4) + 6 hours.
-  var EVENT_DATE_UTC = "2026-09-29"; // the date in South Africa
-  var slots = document.querySelectorAll(".slot-btn");
-  var selected = null;
-
-  slots.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      slots.forEach(function (b) { b.classList.remove("selected"); });
-      btn.classList.add("selected");
-      selected = { mtl: parseInt(btn.dataset.mtl, 10), label: btn.dataset.label };
-      document.getElementById("slot-error").classList.remove("show");
-    });
-  });
-
-  function showError(id) { document.getElementById(id).classList.add("show"); }
-  function hideError(id) { document.getElementById(id).classList.remove("show"); }
-
-  function isValidPhone(v) {
-    var digits = v.replace(/[^\d]/g, "");
-    return digits.length >= 9;
-  }
-
-  // Builds a UTC Date for the chosen SAST slot (SAST = UTC+2)
-  function slotToUTCDate(mtlHour) {
-    var saHour = mtlHour + 6; // SA local hour
-    var utcHour = saHour - 2; // SAST is UTC+2
-    return new Date(Date.UTC(2026, 8, 29, utcHour, 0, 0)); // month 8 = September
-  }
-
-  function pad(n) { return String(n).padStart(2, "0"); }
-  function icsStamp(d) {
-    return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + "T" +
-      pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + "00Z";
-  }
-
-  function buildICS(startUTC) {
-    var endUTC = new Date(startUTC.getTime() + 15 * 60000);
-    return [
-      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Numio//Live Event//EN",
-      "BEGIN:VEVENT",
-      "UID:" + Date.now() + "@numiomath.app",
-      "DTSTAMP:" + icsStamp(new Date()),
-      "DTSTART:" + icsStamp(startUTC),
-      "DTEND:" + icsStamp(endUTC),
-      "SUMMARY:Numio Free Live Event for Parents",
-      "DESCRIPTION:The Simple Way to Help Your Child Succeed at School – Without More Work for You. Zoom link sent 20 minutes before start.",
-      "END:VEVENT", "END:VCALENDAR",
-    ].join("\r\n");
-  }
-
-  document.getElementById("register-btn").addEventListener("click", function () {
-    var nameEl = document.getElementById("parent-name");
-    var phoneEl = document.getElementById("parent-phone");
-    var name = nameEl.value.trim();
-    var phone = phoneEl.value.trim();
-    var ok = true;
-
-    if (!selected) { showError("slot-error"); ok = false; } else { hideError("slot-error"); }
-    if (!name) { showError("name-error"); ok = false; } else { hideError("name-error"); }
-    if (!isValidPhone(phone)) { showError("phone-error"); ok = false; } else { hideError("phone-error"); }
-    if (!ok) return;
-
-    var btn = this;
-    btn.disabled = true;
-    btn.textContent = "Reserving your spot…";
-
-    fetch("https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/register-event-lead", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0",
-      },
-      body: JSON.stringify({
-        name: name,
-        phone: phone,
-        slot_label: selected.label,
-        event_date: EVENT_DATE_UTC,
-        timezone: "SAST (South Africa)",
-      }),
-    }).catch(function (e) { console.error("Lead save failed:", e); })
-      .finally(function () {
-        if (window.fbq) fbq("track", "Lead");
-        if (window.clarity) clarity("event", "reserve_click");
-
-        document.getElementById("booking-view").style.display = "none";
-        document.getElementById("main-logo").style.display = "none";
-        document.getElementById("confirm-view").classList.add("show");
-
-        var dtEl = document.getElementById("confirm-datetime");
-        if (dtEl) dtEl.textContent = "Tuesday, September 29 at " + selected.label;
-
-        window._numioSlotUTC = slotToUTCDate(selected.mtl);
-      });
-  });
-
-  document.getElementById("calendar-btn").addEventListener("click", function () {
-    var startUTC = window._numioSlotUTC || slotToUTCDate(13);
-    var ics = buildICS(startUTC);
-    var blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = "numio-live-event.ics";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
-  });
-})();
-</script>
 
 </body>
 </html>
