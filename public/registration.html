@@ -106,21 +106,9 @@
 
     /*
       PHONE VISUAL
-      Figma page = 401px wide
-      Left phone:  119px wide = 29.7% of 401
-      Arrow:        87px wide = 21.7% of 401
-      Right phone: 117px wide = 29.2% of 401
-      Total used:  323px, rest is whitespace ~39px left padding shown in Figma
-
-      Both phones ~224-227px tall = same height
-      Left phone bottom-aligned with right phone
-      Arrow sits at vertical midpoint between them
-
-      Scale to real screen: use vw units capped at 480px
-      On a 390px phone:
-        left  = 119/401 * 390 = ~115px
-        arrow =  87/401 * 390 =  ~85px
-        right = 117/401 * 390 = ~114px
+      Sizes are now SWAPPED: the left phone (camera) is the smaller one,
+      the right phone (quiz) is the bigger one.
+      To tweak, change the two widths below (left / right).
     */
     .phone-visual {
       width: 100%;
@@ -132,7 +120,7 @@
       gap: 0;
     }
     .phone-left {
-      width: 34%;
+      width: 31%;                  /* was 34% → now smaller */
       height: auto;
       flex-shrink: 0;
       transform: rotate(-8deg);
@@ -146,7 +134,7 @@
       top: 10px;
     }
     .phone-right {
-      width: 31%;
+      width: 34%;                  /* was 31% → now bigger */
       height: auto;
       flex-shrink: 0;
       transform: rotate(6deg);
@@ -182,8 +170,7 @@
       HOW IT WORKS
       Figma (401px frame): text boxes 358px wide, cards 317px wide, radius 23, fill #9271FF
       Gaps: h1→sub ~69px, sub→h2 ~76px, h2→card ~77px, card→card ~54px
-      Images keep their natural ratio (no cropping) → export all 3 at the same size
-      (e.g. 1200×1200) so the 3 cards have the same height.
+      Images keep their natural ratio (no cropping).
     */
     .how {
       padding: 56px 0 72px;
