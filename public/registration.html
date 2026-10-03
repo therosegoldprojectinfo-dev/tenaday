@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="The new app for busy parents. Turn any lesson into practise with just a picture."/>
+  <meta name="description" content="Join our 10 minutes demo - Never worry about practise ever again. Turn any lesson into practise with just a picture."/>
   <title>Numio</title>
 
   <script>
@@ -47,10 +47,7 @@
 
     /*
       NAV
-      Figma: page 401px, nav items at x~24px from edge
-      Logo: "numio" wordmark — height ~36px in Figma
-      Button: 128×17 text inside pill, padding ~10px 20px
-      Corner radius: 30px on button
+      Logo left, green "See it work live →" pill right
     */
     .nav {
       display: flex;
@@ -62,7 +59,6 @@
       height: 38px;
       width: auto;
     }
-    /* Figma button: 128×38px pill, SemiBold 14px, green #45E031 */
     .nav-btn {
       background: #45E031;
       color: #000;
@@ -78,37 +74,35 @@
     }
 
     /*
-      HERO TEXT
-      Figma: text starts at x~24px from left edge
-      "The new app for busy parents" — ExtraBold 32px
-      "Turn any lesson..." — Medium 36px
-      Gap between the two: ~16px
+      HERO TEXT (centered)
+      Title: Bold 32px, 3 lines  |  Sub: Regular 22px, 2 lines
     */
     .hero-text {
       padding: 0 28px;
-      margin-top: 16px;
+      margin-top: 28px;
+      text-align: center;
     }
-    .hero-tag {
+    .hero-title {
       font-size: 32px;
-      font-weight: 800;
+      font-weight: 700;
       color: #0A0A0A;
-      line-height: 1.18;
+      line-height: 1.23;
       letter-spacing: -0.02em;
-      margin-bottom: 28px;
+      max-width: 330px;
+      margin: 0 auto 28px;
     }
-    .hero-headline {
-      font-size: 36px;
-      font-weight: 500;
+    .hero-sub {
+      font-size: 22px;
+      font-weight: 400;
       color: #0A0A0A;
-      line-height: 1.22;
-      letter-spacing: -0.01em;
-      margin-bottom: 64px;
+      line-height: 1.2;
+      max-width: 330px;
+      margin: 0 auto 56px;
     }
 
     /*
       PHONE VISUAL
-      Sizes are SWAPPED: the left phone (camera) is the smaller one,
-      the right phone (quiz) is the bigger one.
+      Left phone (camera) = 31%, right phone (quiz) = 34%
       To tweak, change the two widths below (left / right).
     */
     .phone-visual {
@@ -121,7 +115,7 @@
       gap: 0;
     }
     .phone-left {
-      width: 31%;                  /* was 34% → now smaller */
+      width: 31%;
       height: auto;
       flex-shrink: 0;
       transform: rotate(-8deg);
@@ -135,7 +129,7 @@
       top: 10px;
     }
     .phone-right {
-      width: 34%;                  /* was 31% → now bigger */
+      width: 34%;
       height: auto;
       flex-shrink: 0;
       transform: rotate(6deg);
@@ -143,18 +137,16 @@
     }
 
     /*
-      JOIN SECTION (purple, registration form)
-      Figma (401px frame): fill #3513A2, card ~307px wide (77%), radius ~30
-      Heading 32px ExtraBold white, card text 18px, green #45E031 pills/button
-
-      FULL WIDTH: the purple background stretches edge to edge across the whole
-      screen (::before = 100vw), while the content stays in the centered column.
+      JOIN SECTION (purple #3513A2, full screen width)
+      The purple background stretches edge to edge (::before = 100vw),
+      the content stays in the centered column.
+      Form = the old booking-form design (lavender box, white slot pills).
     */
     .join {
       position: relative;
       isolation: isolate;
       background: #3513A2;
-      padding: 54px 0 60px;
+      padding: 54px 28px 60px;
       text-align: center;
     }
     .join::before {
@@ -174,133 +166,126 @@
       font-weight: 800;
       line-height: 1.22;
       letter-spacing: -0.02em;
-      padding: 0 22px;
-      margin-bottom: 64px;
-    }
-    .join-card {
-      width: 77%;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 30px;
-      padding: 30px 26px 32px;
-      text-align: left;
-    }
-    .join-title {
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 1.2;
-      letter-spacing: -0.01em;
-      margin-bottom: 14px;
-    }
-    .join-sub {
-      font-size: 18px;
-      font-weight: 400;
-      line-height: 1.2;
-      margin-bottom: 28px;
-    }
-    .join-slot-label {
-      font-size: 18px;
-      font-weight: 400;
-      line-height: 1.2;
-      margin-bottom: 26px;
+      margin-bottom: 56px;
     }
 
-    /* time slot pills */
+    /* BOOKING BOX (old design) */
+    .booking-box {
+      border: 2px solid #E0D8FF;
+      background: #F9F7FF;
+      border-radius: 24px;
+      padding: 24px 20px;
+      margin-bottom: 28px;
+      text-align: left;
+    }
+    .booking-head {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0A0A0A;
+      line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    .booking-headsub {
+      font-size: 15px;
+      font-weight: 500;
+      color: #444;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+    .booking-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #0A0A0A;
+      line-height: 1.4;
+      margin-bottom: 14px;
+    }
     .slot-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px 13px;
+      gap: 10px;
+      margin-bottom: 20px;
     }
     .slot-btn {
       font-family: 'Inter', sans-serif;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      color: #000;
-      background: #45E031;
-      border: none;
-      border-radius: 50px;
-      padding: 10px 8px;
+      color: #3513A2;
+      background: #fff;
+      border: 2px solid #E0D8FF;
+      border-radius: 14px;
+      padding: 12px 8px;
       cursor: pointer;
-      transition: background 0.15s, color 0.15s, transform 0.1s;
+      transition: all 0.15s;
     }
-    .slot-btn:active { transform: scale(0.97); }
+    .slot-btn:hover { border-color: #B7A6FF; }
     .slot-btn.selected {
       background: #3513A2;
+      border-color: #3513A2;
       color: #fff;
     }
-    .slot-btn:focus-visible,
-    .join-input:focus-visible,
-    .save-btn:focus-visible {
-      outline: 3px solid #9271FF;
-      outline-offset: 2px;
+    .field-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #555;
+      line-height: 1.4;
+      margin-bottom: 6px;
     }
-    /* 5th slot sits centered under the other four */
-    .slot-btn:last-child:nth-child(odd) {
-      grid-column: 1 / -1;
-      justify-self: center;
-      width: calc(50% - 6.5px);
+    .field-input {
+      width: 100%;
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      color: #0A0A0A;
+      background: #fff;
+      border: 2px solid #E0D8FF;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      outline: none;
     }
-
-    /* fields */
+    .field-input:last-of-type { margin-bottom: 0; }
+    .field-input:focus { border-color: #3513A2; }
     .field-error {
       display: none;
       font-size: 13px;
       font-weight: 600;
       color: #e53e3e;
       line-height: 1.4;
-      margin-top: 10px;
+      margin: -10px 0 16px;
     }
     .field-error.show { display: block; }
-    .slot-error { margin-bottom: -14px; }
+    .field-input + .field-error:last-child { margin-bottom: 0; }
 
-    .join-fields { margin-top: 40px; }
-    .join-label {
-      display: block;
-      font-size: 18px;
-      font-weight: 400;
-      line-height: 1.2;
-      margin-bottom: 12px;
-    }
-    .join-input {
-      display: block;
-      width: 100%;
-      height: 48px;
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      font-weight: 500;
-      color: #0A0A0A;
-      background: #fff;
-      border: 1px solid #222;
-      border-radius: 12px;
-      padding: 0 14px;
-    }
-    .join-field + .join-field { margin-top: 28px; }
-
-    /* save button */
+    /* SAVE BUTTON (old reserve-button design) */
     .save-btn {
-      display: block;
-      width: 92%;
-      margin: 36px auto 0;
-      background: #45E031;
-      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      background: #3DBE5C;
+      color: #fff;
       font-family: 'Inter', sans-serif;
       font-size: 18px;
-      font-weight: 700;
+      font-weight: 800;
       border: none;
       border-radius: 50px;
-      padding: 13px 20px;
+      padding: 22px 24px;
       cursor: pointer;
       letter-spacing: -0.01em;
-      text-align: center;
       transition: filter 0.15s, transform 0.1s;
+      box-shadow: 0 5px 0 #27a348;
+      margin-bottom: 12px;
+      text-transform: uppercase;
     }
-    .save-btn:hover { filter: brightness(1.05); }
-    .save-btn:active { transform: scale(0.98); }
+    .save-btn:hover  { filter: brightness(1.06); }
+    .save-btn:active { transform: scale(0.98); box-shadow: none; }
     .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* perks under the button (OpenMoji check, inline SVG) */
+    /* checks under the button (OpenMoji check, inline SVG) */
     .perks {
-      margin-top: 16px;
+      margin-top: 22px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -316,8 +301,9 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
+      color: #fff;
       font-size: 17px;
-      font-weight: 400;
+      font-weight: 500;
       line-height: 1.2;
     }
     .om {
@@ -329,7 +315,6 @@
     /*
       HOW IT WORKS
       Figma (401px frame): text boxes 358px wide, cards 317px wide, radius 23, fill #9271FF
-      Gaps: h1→sub ~69px, sub→h2 ~76px, h2→card ~77px, card→card ~54px
       Images keep their natural ratio (no cropping).
     */
     .how {
@@ -498,8 +483,8 @@
 
     <!-- HERO TEXT -->
     <div class="hero-text">
-      <div class="hero-tag">The new app for<br>busy parents</div>
-      <div class="hero-headline">Turn any lesson<br>into practise<br>with just a picture</div>
+      <h1 class="hero-title">Turn any lesson into practise with just a picture</h1>
+      <p class="hero-sub">Join our 10 minutes demo - Never worry about practise ever again</p>
     </div>
 
     <!-- PHONE VISUAL -->
@@ -513,11 +498,11 @@
     <section class="join" id="join">
       <h2 class="join-h">Join us Tomorrow</h2>
 
-      <div class="join-card">
-        <div class="join-title">Numio live Parents Demo</div>
-        <p class="join-sub">See if Numio can help your family</p>
-        <p class="join-slot-label">Choose your time slot<br>(South Africa time)</p>
+      <div class="booking-box">
+        <div class="booking-head">Numio live Parents Demo</div>
+        <div class="booking-headsub">See if Numio can help your family</div>
 
+        <div class="booking-title">Choose your time slot (South Africa time)</div>
         <div class="slot-grid" id="slot-grid">
           <button type="button" class="slot-btn" data-sa="17" data-label="5:00 PM" aria-pressed="false">5:00 PM</button>
           <button type="button" class="slot-btn" data-sa="18" data-label="6:00 PM" aria-pressed="false">6:00 PM</button>
@@ -525,31 +510,26 @@
           <button type="button" class="slot-btn" data-sa="20" data-label="8:00 PM" aria-pressed="false">8:00 PM</button>
           <button type="button" class="slot-btn" data-sa="21" data-label="9:00 PM" aria-pressed="false">9:00 PM</button>
         </div>
-        <div class="field-error slot-error" id="slot-error">Please choose a time slot.</div>
+        <div class="field-error" id="slot-error">Please choose a time slot.</div>
 
-        <div class="join-fields">
-          <div class="join-field">
-            <label class="join-label" for="parent-name">Name</label>
-            <input class="join-input" type="text" id="parent-name" placeholder="e.g. Thandiwe Nkosi" autocomplete="name"/>
-            <div class="field-error" id="name-error">Please enter your name.</div>
-          </div>
-          <div class="join-field">
-            <label class="join-label" for="parent-phone">Phone Number</label>
-            <input class="join-input" type="tel" id="parent-phone" placeholder="e.g. 082 123 4567" autocomplete="tel"/>
-            <div class="field-error" id="phone-error">Please enter a valid phone number.</div>
-          </div>
+        <label class="field-label" for="parent-name">Your name</label>
+        <input class="field-input" type="text" id="parent-name" placeholder="e.g. Thandiwe Nkosi" autocomplete="name"/>
+        <div class="field-error" id="name-error">Please enter your name.</div>
+
+        <label class="field-label" for="parent-phone">Phone number</label>
+        <input class="field-input" type="tel" id="parent-phone" placeholder="e.g. 082 123 4567" autocomplete="tel"/>
+        <div class="field-error" id="phone-error">Please enter a valid phone number.</div>
+      </div>
+
+      <button type="button" class="save-btn" id="register-btn">Save your spot →</button>
+
+      <div class="perks">
+        <div class="perks-row">
+          <span class="perk"><svg class="om" aria-hidden="true"><use href="#om-check"/></svg>Free</span>
+          <span class="perk"><svg class="om" aria-hidden="true"><use href="#om-check"/></svg>No commitment</span>
         </div>
-
-        <button type="button" class="save-btn" id="register-btn">Save your spot →</button>
-
-        <div class="perks">
-          <div class="perks-row">
-            <span class="perk"><svg class="om" aria-hidden="true"><use href="#om-check"/></svg>Free</span>
-            <span class="perk"><svg class="om" aria-hidden="true"><use href="#om-check"/></svg>No commitment</span>
-          </div>
-          <div class="perks-row">
-            <span class="perk"><svg class="om" aria-hidden="true"><use href="#om-check"/></svg>Only 10 minutes</span>
-          </div>
+        <div class="perks-row">
+          <span class="perk"><svg class="om" aria-hidden="true"><use href="#om-check"/></svg>Only 10 minutes</span>
         </div>
       </div>
     </section>
