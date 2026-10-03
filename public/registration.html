@@ -44,21 +44,24 @@
       margin: 0 auto;
     }
 
-    .pad {
-      padding: 0 24px;
-    }
-
-    /* NAV */
+    /*
+      NAV
+      Figma: page 401px, nav items at x~24px from edge
+      Logo: "numio" wordmark — height ~36px in Figma
+      Button: 128×17 text inside pill, padding ~10px 20px
+      Corner radius: 30px on button
+    */
     .nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 24px 32px;
+      padding: 24px 28px 32px;
     }
     .nav-logo {
-      height: 36px;
+      height: 38px;
       width: auto;
     }
+    /* Figma button: 128×38px pill, SemiBold 14px, green #45E031 */
     .nav-btn {
       background: #45E031;
       color: #000;
@@ -67,19 +70,29 @@
       font-weight: 600;
       border: none;
       border-radius: 50px;
-      padding: 11px 20px;
+      padding: 10px 20px;
       cursor: pointer;
       white-space: nowrap;
+      letter-spacing: -0.01em;
     }
 
-    /* HERO TEXT */
+    /*
+      HERO TEXT
+      Figma: text starts at x~24px from left edge
+      "The new app for busy parents" — ExtraBold 32px
+      "Turn any lesson..." — Medium 36px
+      Gap between the two: ~16px
+    */
+    .hero-text {
+      padding: 0 28px;
+    }
     .hero-tag {
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 800;
       color: #0A0A0A;
-      line-height: 1.2;
+      line-height: 1.18;
       letter-spacing: -0.02em;
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     .hero-headline {
       font-size: 36px;
@@ -87,47 +100,75 @@
       color: #0A0A0A;
       line-height: 1.22;
       letter-spacing: -0.01em;
-      margin-bottom: 48px;
+      margin-bottom: 40px;
     }
 
-    /* PHONE VISUAL — massive, fills full width */
+    /*
+      PHONE VISUAL
+      Figma page = 401px wide
+      Left phone:  119px wide = 29.7% of 401
+      Arrow:        87px wide = 21.7% of 401
+      Right phone: 117px wide = 29.2% of 401
+      Total used:  323px, rest is whitespace ~39px left padding shown in Figma
+
+      Both phones ~224-227px tall = same height
+      Left phone bottom-aligned with right phone
+      Arrow sits at vertical midpoint between them
+
+      Scale to real screen: use vw units capped at 480px
+      On a 390px phone:
+        left  = 119/401 * 390 = ~115px
+        arrow =  87/401 * 390 =  ~85px
+        right = 117/401 * 390 = ~114px
+    */
     .phone-visual {
       width: 100%;
       display: flex;
-      align-items: center;
+      align-items: center; /* vertical center */
       justify-content: center;
-      margin-bottom: 40px;
+      padding: 0 10px;
+      margin-bottom: 36px;
+      gap: 0;
     }
     .phone-left {
-      width: 52%;
+      /* 119/401 = 29.7% — but use width relative to container */
+      width: 36%;
       height: auto;
       flex-shrink: 0;
     }
     .phone-arrow {
-      width: 16%;
+      /* 87/401 = 21.7% */
+      width: 22%;
       height: auto;
       flex-shrink: 0;
-      position: relative;
-      top: 20px;
     }
     .phone-right {
-      width: 44%;
+      /* 117/401 = 29.2% */
+      width: 35%;
       height: auto;
       flex-shrink: 0;
     }
 
-    /* CTA BUTTON */
+    /*
+      CTA BUTTON
+      Figma: 347×60px pill, corner radius 30, fill #45E031
+      Bold 18px text
+      347/401 = 86.5% of page width → with 28px padding each side that's ~(401-56)=345px ✓
+    */
+    .cta-wrap {
+      padding: 0 28px;
+    }
     .cta-btn {
       display: block;
       width: 100%;
       background: #45E031;
       color: #000;
       font-family: 'Inter', sans-serif;
-      font-size: 19px;
+      font-size: 18px;
       font-weight: 700;
       border: none;
-      border-radius: 50px;
-      padding: 20px;
+      border-radius: 30px;
+      padding: 19px 20px;
       cursor: pointer;
       letter-spacing: -0.01em;
       text-align: center;
@@ -143,12 +184,12 @@
   </nav>
 
   <!-- HERO TEXT -->
-  <div class="pad">
+  <div class="hero-text">
     <div class="hero-tag">The new app for<br>busy parents</div>
     <div class="hero-headline">Turn any lesson<br>into practise<br>with just a picture</div>
   </div>
 
-  <!-- PHONE VISUAL — no pad wrapper, full width -->
+  <!-- PHONE VISUAL -->
   <div class="phone-visual">
     <img class="phone-left"  src="/tousebro.webp"       alt="Take a pic of their lesson"/>
     <img class="phone-arrow" src="/tousebro%20(2).webp" alt=""/>
@@ -156,7 +197,7 @@
   </div>
 
   <!-- CTA -->
-  <div class="pad">
+  <div class="cta-wrap">
     <button class="cta-btn" onclick="if(typeof fbq!=='undefined')fbq('track','Lead'); window.location.href='https://buy.stripe.com/4gM7sL5Idgbt1nMfY51ZS01'">See it work live →</button>
   </div>
 
