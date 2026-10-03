@@ -177,6 +177,69 @@
       letter-spacing: -0.01em;
       text-align: center;
     }
+
+    /*
+      HOW IT WORKS
+      Figma (401px frame): text boxes 358px wide, cards 317×243, radius 23, fill #9271FF
+      Gaps: h1→sub ~69px, sub→h2 ~76px, h2→card ~77px, card→card ~54px
+    */
+    .how {
+      padding: 56px 0 72px;
+      text-align: center;
+    }
+    .how-h1 {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.19;
+      letter-spacing: -0.02em;
+      padding: 0 22px;
+      margin-bottom: 64px;
+    }
+    .how-sub {
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.2;
+      padding: 0 22px;
+      margin-bottom: 76px;
+    }
+    .how-h2 {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.22;
+      letter-spacing: -0.02em;
+      padding: 0 22px;
+      margin-bottom: 76px;
+    }
+    .step-card {
+      width: 79%;                  /* 317 / 401 */
+      aspect-ratio: 317 / 243;
+      margin: 0 auto 54px;
+      border-radius: 23px;
+      overflow: hidden;
+      background: #9271FF;
+      display: flex;
+      flex-direction: column;
+    }
+    .step-card:last-child { margin-bottom: 0; }
+    .step-card img {
+      width: 100%;
+      flex: 171 1 0;               /* image area */
+      min-height: 0;
+      object-fit: cover;
+      object-position: center 55%;
+      display: block;
+    }
+    .step-label {
+      flex: 72 1 0;                /* purple label area */
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      color: #fff;
+      font-size: clamp(15px, 4.6vw, 18px);
+      font-weight: 700;
+      text-align: left;
+      letter-spacing: -0.01em;
+    }
   </style>
 </head>
 <body>
@@ -204,6 +267,26 @@
   <div class="cta-wrap">
     <button class="cta-btn" onclick="if(typeof fbq!=='undefined')fbq('track','Lead'); window.location.href='https://buy.stripe.com/4gM7sL5Idgbt1nMfY51ZS01'">See it work live →</button>
   </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <h2 class="how-h1">Want more practise<br>for your child?</h2>
+    <p class="how-sub">... but you don't want to create the questions yourself?</p>
+    <h3 class="how-h2">Here's our simple<br>solution:</h3>
+
+    <div class="step-card">
+      <img src="/takepicimage.png" alt="Take a pic of any lesson" loading="lazy"/>
+      <div class="step-label">#1 Take a pic of any lesson</div>
+    </div>
+    <div class="step-card">
+      <img src="/wait15secimage.png" alt="Wait 15 seconds" loading="lazy"/>
+      <div class="step-label">#2 Wait 15 seconds</div>
+    </div>
+    <div class="step-card">
+      <img src="/practiseimage.png" alt="Your child can practise" loading="lazy"/>
+      <div class="step-label">#3 Your child can practise!</div>
+    </div>
+  </section>
 
 </body>
 </html>
