@@ -95,13 +95,14 @@
       background: #3DBE5C;
       color: #fff;
       font-family: 'Inter', sans-serif;
-      font-size: 17px;
+      font-size: 14px;
       font-weight: 800;
       border: none;
       border-radius: 50px;
-      padding: 20px 24px;
+      padding: 20px 20px;
       cursor: pointer;
       letter-spacing: -0.01em;
+      white-space: nowrap;
       box-shadow: 0 5px 0 #27a348;
       margin-bottom: 20px;
       transition: filter 0.15s, transform 0.1s;
@@ -151,8 +152,20 @@
 
     /* HOW IT WORKS */
     .how {
+      position: relative;
+      isolation: isolate;
       padding: 56px 28px 64px;
       text-align: center;
+      background: #fafafa;
+    }
+    .how::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      top: 0; bottom: 0;
+      left: 50%;
+      width: 100vw;
+      transform: translateX(-50%);
       background: #fafafa;
     }
     .how-h1 {
@@ -160,14 +173,14 @@
       font-weight: 800;
       line-height: 1.22;
       letter-spacing: -0.02em;
-      margin-bottom: 12px;
+      margin-bottom: 20px;
     }
     .how-sub {
       font-size: 19px;
       font-weight: 400;
       color: #444;
       line-height: 1.3;
-      margin-bottom: 16px;
+      margin-bottom: 28px;
     }
     .how-h2 {
       font-size: 22px;
@@ -182,7 +195,7 @@
       overflow: hidden;
       background: #9271FF;
     }
-    .step-card:last-of-type { margin-bottom: 40px; }
+    .step-card:last-of-type { margin-bottom: 48px; }
     .step-card img { width: 100%; height: auto; display: block; }
     .step-label {
       min-height: 68px;
@@ -623,7 +636,7 @@
     <!-- 4. READY -->
     <div class="ready">
       <h2 class="ready-h">Ready to See It For Yourself?</h2>
-      <p class="ready-sub">Pick a time for your free 10-minute live test.</p>
+      <p class="ready-sub">Join and see it work live and decide if it can really help your family.</p>
     </div>
 
     <!-- 5. EVENT INFO BOX -->
@@ -641,12 +654,7 @@
           </div>
           <div class="event-detail-label">Thursday, September 24</div>
         </div>
-        <div class="event-detail-row">
-          <div class="event-detail-icon">
-            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <div class="event-detail-label">3 Parents Only</div>
-        </div>
+
         <div class="event-detail-row">
           <div class="event-detail-icon">
             <svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
