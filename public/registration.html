@@ -205,6 +205,12 @@
       line-height: 1.4;
       margin-bottom: 14px;
     }
+    /* South Africa flag emoji drawn in code (inline SVG, no image file) */
+    .flag-za {
+      width: 1.45em;
+      height: 0.9em;
+      vertical-align: -0.12em;
+    }
     .slot-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -470,11 +476,22 @@
 </head>
 <body>
 
-  <!-- OpenMoji "check mark" (U+2714) drawn in code, no image file -->
+  <!-- OpenMoji-style icons drawn in code, no image files -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <!-- check mark (U+2714) -->
     <symbol id="om-check" viewBox="0 0 80 80">
       <polygon points="4,42.4 16,30.4 28.9,45.3 63.8,8 76,20.2 28.9,67.3"
                fill="#B1CC33" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
+    </symbol>
+    <!-- flag: South Africa (1F1FF-1F1E6) -->
+    <symbol id="om-za" viewBox="0 0 64 40">
+      <rect x="0" y="0" width="64" height="40" rx="2.5" fill="#000"/>
+      <rect x="2" y="2" width="60" height="18" fill="#D22F27"/>
+      <rect x="2" y="20" width="60" height="18" fill="#1E50A0"/>
+      <polygon points="2,2 5,2 22,12.9 62,12.9 62,27.1 22,27.1 5,38 2,38" fill="#FFFFFF"/>
+      <polygon points="2,4 22,15 62,15 62,25 22,25 2,36" fill="#5C9E31"/>
+      <polygon points="2,9 17,20 2,31" fill="#F1B31C"/>
+      <polygon points="2,12.5 14,20 2,27.5" fill="#000"/>
     </symbol>
   </svg>
 
@@ -505,10 +522,10 @@
       <h2 class="join-h">Join us Tomorrow</h2>
 
       <div class="booking-box">
-        <div class="booking-head">Numio live Parents Demo</div>
-        <div class="booking-headsub">See if Numio can help your family</div>
+        <div class="booking-head">Numio Live: 10-Minute Visit for Parents</div>
+        <div class="booking-headsub">Test and see if Numio can help your family.</div>
 
-        <div class="booking-title">Choose your time slot (South Africa time)</div>
+        <div class="booking-title">Choose your time slot (<svg class="flag-za" role="img" aria-label="South Africa"><use href="#om-za"/></svg> time)</div>
         <div class="slot-grid" id="slot-grid">
           <button type="button" class="slot-btn" data-sa="17" data-label="5:00 PM" aria-pressed="false">5:00 PM</button>
           <button type="button" class="slot-btn" data-sa="18" data-label="6:00 PM" aria-pressed="false">6:00 PM</button>
