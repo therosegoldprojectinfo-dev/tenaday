@@ -385,7 +385,7 @@
       LIVE EVENT SECTION (heading + text only)
     */
     .live {
-      padding: 0 0 96px;
+      padding: 0 0 48px;
       text-align: center;
     }
     .live-h {
@@ -404,6 +404,59 @@
       margin-bottom: 24px;
     }
     .live-p:last-of-type { margin-bottom: 0; }
+
+    /*
+      EVENT DETAILS (bottom of page, under "Test Numio with us LIVE")
+    */
+    .event-section {
+      padding: 0 28px 72px;
+    }
+    .event-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 28px;
+      border: 2px solid #E0D8FF;
+      border-radius: 24px;
+      overflow: hidden;
+      text-align: left;
+    }
+    .event-detail-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 24px;
+      border-bottom: 1.5px solid #E0D8FF;
+    }
+    .event-detail-row:last-child { border-bottom: none; }
+    .event-detail-icon {
+      width: 40px; height: 40px;
+      background: #f3f0ff;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .event-detail-icon svg {
+      width: 20px; height: 20px;
+      stroke: #3513A2; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .event-detail-label { font-size: 17px; font-weight: 700; color: #0A0A0A; }
+    .free-pill {
+      display: inline-flex;
+      align-items: center;
+      background: #3DBE5C;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 50px;
+      padding: 3px 10px;
+      margin-left: 10px;
+      letter-spacing: 0.04em;
+    }
+    .event-section .save-btn { margin-bottom: 0; }
 
     /*
       CONFIRMATION "PAGE" (same URL, shown after the form is sent)
@@ -582,6 +635,38 @@
       <h2 class="live-h">Test Numio with us<br>LIVE</h2>
       <p class="live-p">No need to decide today!</p>
       <p class="live-p">Join and see it work live and decide if it can really help your family.</p>
+    </section>
+
+    <!-- EVENT DETAILS + SAVE YOUR SPOT (scrolls up to the form) -->
+    <section class="event-section">
+      <div class="event-details">
+        <div class="event-detail-row">
+          <div class="event-detail-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          </div>
+          <div class="event-detail-label">Live on Zoom</div>
+        </div>
+        <div class="event-detail-row">
+          <div class="event-detail-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="event-detail-label">Thursday, September 24</div>
+        </div>
+        <div class="event-detail-row">
+          <div class="event-detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="event-detail-label">3 Parents Only</div>
+        </div>
+        <div class="event-detail-row">
+          <div class="event-detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          </div>
+          <div class="event-detail-label">100% FREE <span class="free-pill">FREE</span></div>
+        </div>
+      </div>
+
+      <button type="button" class="save-btn" onclick="document.getElementById('join').scrollIntoView({behavior:'smooth'})">Save your spot →</button>
     </section>
 
   </div>
