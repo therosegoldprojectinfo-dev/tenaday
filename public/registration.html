@@ -45,20 +45,14 @@
       margin: 0 auto;
     }
 
-    /*
-      NAV
-      Logo left, green "See it work live →" pill right
-    */
+    /* NAV */
     .nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 24px 28px 32px;
     }
-    .nav-logo {
-      height: 38px;
-      width: auto;
-    }
+    .nav-logo { height: 38px; width: auto; }
     .nav-btn {
       background: #45E031;
       color: #000;
@@ -73,10 +67,7 @@
       letter-spacing: -0.01em;
     }
 
-    /*
-      HERO TEXT (centered)
-      Title: Bold 32px, 3 lines  |  Sub: Regular 22px, 2 lines
-    */
+    /* HERO TEXT */
     .hero-text {
       padding: 0 28px;
       margin-top: 28px;
@@ -91,12 +82,8 @@
       max-width: 330px;
       margin: 0 auto 28px;
     }
-    .hero-title .hl {
-      color: #9271FF;
-    }
-    .hero-title em {
-      font-style: italic;
-    }
+    .hero-title .hl { color: #9271FF; }
+    .hero-title em { font-style: italic; }
     .hero-sub {
       font-size: 22px;
       font-weight: 400;
@@ -106,18 +93,14 @@
       margin: 0 auto 56px;
     }
 
-    /*
-      PHONE VISUAL
-      Left phone (camera) = 31%, right phone (quiz) = 34%
-      To tweak, change the two widths below (left / right).
-    */
+    /* PHONE VISUAL */
     .phone-visual {
       width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 0;
-      margin-bottom: 48px;
+      margin-bottom: 0;
       gap: 0;
     }
     .phone-left {
@@ -142,40 +125,153 @@
       transform-origin: bottom center;
     }
 
-    /*
-      JOIN SECTION (purple #3513A2, full screen width)
-      The purple background stretches edge to edge (::before = 100vw),
-      the content stays in the centered column.
-      Form = the old booking-form design (lavender box, white slot pills).
-    */
-    .join {
+    /* PURPLE BLOCK */
+    .tomorrow {
       position: relative;
       isolation: isolate;
       background: #3513A2;
       padding: 54px 28px 60px;
       text-align: center;
+      margin-top: 48px;
     }
-    .join::before {
+    .tomorrow::before {
       content: "";
       position: absolute;
       z-index: -1;
-      top: 0;
-      bottom: 0;
+      top: 0; bottom: 0;
       left: 50%;
       width: 100vw;
       transform: translateX(-50%);
       background: #3513A2;
     }
-    .join-h {
+    .tomorrow-h {
       color: #fff;
       font-size: 32px;
       font-weight: 800;
       line-height: 1.22;
       letter-spacing: -0.02em;
-      margin-bottom: 56px;
+      margin-bottom: 40px;
+    }
+    .tomorrow-label {
+      color: #B7A6FF;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .tomorrow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: left;
+    }
+    .tomorrow-step {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      border-radius: 18px;
+      padding: 18px 20px;
+    }
+    .tomorrow-icon {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tomorrow-icon svg { width: 52px; height: 52px; }
+    .tomorrow-text {
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+    }
+    .tomorrow-text span {
+      display: block;
+      color: #B7A6FF;
+      font-size: 13px;
+      font-weight: 500;
+      margin-top: 3px;
     }
 
-    /* BOOKING BOX (old design) */
+    /* WHAT ARE YOU WAITING FOR */
+    .cta-section {
+      padding: 64px 28px 0;
+      text-align: center;
+    }
+    .cta-h {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.22;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .cta-sub {
+      font-size: 22px;
+      font-weight: 400;
+      line-height: 1.25;
+      color: #333;
+      margin-bottom: 48px;
+    }
+
+    /* EVENT DETAILS BOX */
+    .event-section {
+      padding: 0 28px 48px;
+    }
+    .event-details {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 28px;
+      border: 2px solid #E0D8FF;
+      border-radius: 24px;
+      overflow: hidden;
+      text-align: left;
+    }
+    .event-detail-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 20px 24px;
+      border-bottom: 1.5px solid #E0D8FF;
+    }
+    .event-detail-row:last-child { border-bottom: none; }
+    .event-detail-icon {
+      width: 40px; height: 40px;
+      background: #f3f0ff;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .event-detail-icon svg {
+      width: 20px; height: 20px;
+      stroke: #3513A2; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .event-detail-label { font-size: 17px; font-weight: 700; color: #0A0A0A; }
+    .free-pill {
+      display: inline-flex;
+      align-items: center;
+      background: #3DBE5C;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      border-radius: 50px;
+      padding: 3px 10px;
+      margin-left: 10px;
+      letter-spacing: 0.04em;
+    }
+
+    /* REGISTRATION FORM */
+    .register-section {
+      padding: 0 28px 72px;
+    }
     .booking-box {
       border: 2px solid #E0D8FF;
       background: #F9F7FF;
@@ -205,7 +301,6 @@
       line-height: 1.4;
       margin-bottom: 14px;
     }
-    /* South Africa flag emoji drawn in code (inline SVG, no image file) */
     .flag-za {
       width: 1.45em;
       height: 0.9em;
@@ -267,9 +362,8 @@
       margin: -10px 0 16px;
     }
     .field-error.show { display: block; }
-    .field-input + .field-error:last-child { margin-bottom: 0; }
 
-    /* SAVE BUTTON (old reserve-button design) */
+    /* SAVE BUTTON */
     .save-btn {
       display: flex;
       align-items: center;
@@ -295,7 +389,7 @@
     .save-btn:active { transform: scale(0.98); box-shadow: none; }
     .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
-    /* checks under the button (OpenMoji check, inline SVG) */
+    /* PERKS */
     .perks {
       margin-top: 22px;
       display: flex;
@@ -313,154 +407,14 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
-      color: #fff;
+      color: #0A0A0A;
       font-size: 17px;
       font-weight: 500;
       line-height: 1.2;
     }
-    .om {
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
-    }
+    .om { width: 20px; height: 20px; flex-shrink: 0; }
 
-    /*
-      HOW IT WORKS
-      Figma (401px frame): text boxes 358px wide, cards 317px wide, radius 23, fill #9271FF
-      Images keep their natural ratio (no cropping).
-    */
-    .how {
-      padding: 64px 0 80px;
-      text-align: center;
-    }
-    .how-h1 {
-      font-size: 32px;
-      font-weight: 800;
-      line-height: 1.19;
-      letter-spacing: -0.02em;
-      padding: 0 22px;
-      margin-bottom: 64px;
-    }
-    .how-sub {
-      font-size: 24px;
-      font-weight: 400;
-      line-height: 1.2;
-      padding: 0 22px;
-      margin-bottom: 76px;
-    }
-    .how-h2 {
-      font-size: 32px;
-      font-weight: 800;
-      line-height: 1.22;
-      letter-spacing: -0.02em;
-      padding: 0 22px;
-      margin-bottom: 76px;
-    }
-    .step-card {
-      width: 79%;                  /* 317 / 401 */
-      margin: 0 auto 54px;
-      border-radius: 23px;
-      overflow: hidden;
-      background: #9271FF;
-    }
-    .step-card:last-child { margin-bottom: 0; }
-    .step-card img {
-      width: 100%;
-      height: auto;                /* natural ratio, no crop */
-      display: block;
-    }
-    .step-label {
-      min-height: 72px;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      color: #fff;
-      font-size: clamp(15px, 4.6vw, 18px);
-      font-weight: 700;
-      text-align: left;
-      letter-spacing: -0.01em;
-    }
-
-    /*
-      LIVE EVENT SECTION (heading + text only)
-    */
-    .live {
-      padding: 0 0 48px;
-      text-align: center;
-    }
-    .live-h {
-      font-size: 32px;
-      font-weight: 800;
-      line-height: 1.22;
-      letter-spacing: -0.02em;
-      padding: 0 22px;
-      margin-bottom: 44px;
-    }
-    .live-p {
-      font-size: 24px;
-      font-weight: 400;
-      line-height: 1.22;
-      padding: 0 32px;
-      margin-bottom: 24px;
-    }
-    .live-p:last-of-type { margin-bottom: 0; }
-
-    /*
-      EVENT DETAILS (bottom of page, under "Test Numio with us LIVE")
-    */
-    .event-section {
-      padding: 0 28px 72px;
-    }
-    .event-details {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      margin-bottom: 28px;
-      border: 2px solid #E0D8FF;
-      border-radius: 24px;
-      overflow: hidden;
-      text-align: left;
-    }
-    .event-detail-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 20px 24px;
-      border-bottom: 1.5px solid #E0D8FF;
-    }
-    .event-detail-row:last-child { border-bottom: none; }
-    .event-detail-icon {
-      width: 40px; height: 40px;
-      background: #f3f0ff;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .event-detail-icon svg {
-      width: 20px; height: 20px;
-      stroke: #3513A2; fill: none;
-      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-    }
-    .event-detail-label { font-size: 17px; font-weight: 700; color: #0A0A0A; }
-    .free-pill {
-      display: inline-flex;
-      align-items: center;
-      background: #3DBE5C;
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
-      border-radius: 50px;
-      padding: 3px 10px;
-      margin-left: 10px;
-      letter-spacing: 0.04em;
-    }
-    .event-section .save-btn { margin-bottom: 0; }
-
-    /*
-      CONFIRMATION "PAGE" (same URL, shown after the form is sent)
-    */
+    /* CONFIRMATION PAGE */
     .confirm-page { display: none; }
     .confirm-page.show { display: block; }
     .confirm-inner {
@@ -468,16 +422,11 @@
       text-align: center;
     }
     .confirm-logo {
-      height: 38px;
-      width: auto;
+      height: 38px; width: auto;
       display: block;
       margin: 0 auto 56px;
     }
-    .confirm-badge {
-      font-size: 56px;
-      line-height: 1;
-      margin-bottom: 20px;
-    }
+    .confirm-badge { font-size: 56px; line-height: 1; margin-bottom: 20px; }
     .confirm-title {
       font-size: 28px;
       font-weight: 800;
@@ -529,14 +478,11 @@
 </head>
 <body>
 
-  <!-- OpenMoji-style icons drawn in code, no image files -->
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-    <!-- check mark (U+2714) -->
     <symbol id="om-check" viewBox="0 0 80 80">
       <polygon points="4,42.4 16,30.4 28.9,45.3 63.8,8 76,20.2 28.9,67.3"
                fill="#B1CC33" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
     </symbol>
-    <!-- flag: South Africa (1F1FF-1F1E6) -->
     <symbol id="om-za" viewBox="0 0 64 40">
       <rect x="0" y="0" width="64" height="40" rx="2.5" fill="#000"/>
       <rect x="2" y="2" width="60" height="18" fill="#D22F27"/>
@@ -546,34 +492,132 @@
       <polygon points="2,9 17,20 2,31" fill="#F1B31C"/>
       <polygon points="2,12.5 14,20 2,27.5" fill="#000"/>
     </symbol>
+    <!-- OpenMoji: Unlocked (1F513) — Lisa Schulz / OpenMoji CC BY-SA 4.0 -->
+    <symbol id="om-unlocked" viewBox="0 0 72 72">
+      <path d="M50 34V22C50 13.16 42.84 6 34 6C25.16 6 18 13.16 18 22" fill="none" stroke="#000" stroke-width="5" stroke-linecap="round"/>
+      <rect x="10" y="34" width="44" height="32" rx="4" fill="#FCEA2B" stroke="#000" stroke-width="3"/>
+      <polygon points="54,47 54,66 35,66" fill="#F1B31C" opacity="0.7"/>
+      <circle cx="32" cy="49" r="5" fill="#000" opacity="0.25"/>
+      <rect x="29.5" y="51" width="5" height="7" rx="1.5" fill="#000" opacity="0.25"/>
+    </symbol>
+    <!-- OpenMoji: Eyes (1F440) — Julian Grüneberg / OpenMoji CC BY-SA 4.0 -->
+    <symbol id="om-eyes" viewBox="0 0 72 72">
+      <ellipse cx="20" cy="36" rx="14" ry="20" fill="#fff" stroke="#000" stroke-width="3.5"/>
+      <circle cx="20" cy="38" r="8" fill="#C19A65"/>
+      <circle cx="20" cy="38" r="4.5" fill="#000"/>
+      <circle cx="22.5" cy="35" r="1.8" fill="#fff"/>
+      <ellipse cx="52" cy="36" rx="14" ry="20" fill="#fff" stroke="#000" stroke-width="3.5"/>
+      <circle cx="52" cy="38" r="8" fill="#C19A65"/>
+      <circle cx="52" cy="38" r="4.5" fill="#000"/>
+      <circle cx="54.5" cy="35" r="1.8" fill="#fff"/>
+    </symbol>
+    <!-- OpenMoji: Handshake (1F91D) — Julian Grüneberg / OpenMoji CC BY-SA 4.0 -->
+    <symbol id="om-handshake" viewBox="0 0 72 72">
+      <path d="M8 40 C8 40 14 28 24 30 L34 26 L42 30 C50 26 60 34 64 40" fill="#FCEA2B" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M14 40 L26 52 C30 56 36 56 40 52 L58 38" fill="#FCEA2B" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M8 40 C6 42 8 48 14 50 L26 52" fill="#FCEA2B" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+      <path d="M64 40 C66 42 64 46 60 48 L50 52 C46 54 42 54 40 52" fill="#FCEA2B" stroke="#000" stroke-width="3" stroke-linejoin="round"/>
+      <ellipse cx="36" cy="40" rx="8" ry="6" fill="#F1B31C" stroke="#000" stroke-width="2"/>
+    </symbol>
   </svg>
 
-  <!-- ===================== LANDING PAGE ===================== -->
+  <!-- LANDING PAGE -->
   <div id="landing">
 
-    <!-- NAV -->
+    <!-- 1. NAV -->
     <nav class="nav">
       <img class="nav-logo" src="/logotousebro.webp" alt="Numio"/>
-      <button class="nav-btn" type="button" onclick="document.getElementById('join').scrollIntoView({behavior:'smooth'})">See it work live →</button>
+      <button class="nav-btn" type="button" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">See it work live →</button>
     </nav>
 
-    <!-- HERO TEXT -->
+    <!-- 2. HERO TEXT -->
     <div class="hero-text">
       <h1 class="hero-title">Test Numio with your child's lesson <em>Tomorrow</em> for <span class="hl">FREE</span>!</h1>
       <p class="hero-sub">See how you can turn any school lesson into unlimited practice with just a picture!</p>
     </div>
 
-    <!-- PHONE VISUAL -->
+    <!-- 3. PHONE MOCKUP -->
     <div class="phone-visual">
       <img class="phone-left"  src="/phonestouse.png"        alt="Take a pic of their lesson"/>
       <img class="phone-arrow" src="/tousebro%20(2).webp"   alt=""/>
       <img class="phone-right" src="/phonestouse%20(1).png" alt="Get a quiz instantly"/>
     </div>
 
-    <!-- JOIN (registration form) -->
-    <section class="join" id="join">
-      <h2 class="join-h">Join us Tomorrow</h2>
+    <!-- 4. PURPLE BLOCK — Tomorrow you'll -->
+    <section class="tomorrow">
+      <h2 class="tomorrow-h">Tomorrow in 10 minutes<br>you'll:</h2>
 
+      <div class="tomorrow-steps">
+        <div class="tomorrow-step">
+          <div class="tomorrow-icon">
+            <svg aria-label="Exclusive access" role="img"><use href="#om-unlocked"/></svg>
+          </div>
+          <div class="tomorrow-text">
+            Have exclusive access to Numio
+            <span>Free trial — no card needed</span>
+          </div>
+        </div>
+
+        <div class="tomorrow-step">
+          <div class="tomorrow-icon">
+            <svg aria-label="See how it works" role="img"><use href="#om-eyes"/></svg>
+          </div>
+          <div class="tomorrow-text">
+            See with your own eyes how Numio works
+            <span>Live demo — no slides, no fluff</span>
+          </div>
+        </div>
+
+        <div class="tomorrow-step">
+          <div class="tomorrow-icon">
+            <svg aria-label="Decide" role="img"><use href="#om-handshake"/></svg>
+          </div>
+          <div class="tomorrow-text">
+            Decide if Numio can help your family
+            <span>Test it with your child's lesson</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. WHAT ARE YOU WAITING FOR -->
+    <div class="cta-section">
+      <h2 class="cta-h">What are you waiting for?!</h2>
+      <p class="cta-sub">Test Numio live with us</p>
+    </div>
+
+    <!-- 7. EVENT INFO BOX -->
+    <section class="event-section">
+      <div class="event-details">
+        <div class="event-detail-row">
+          <div class="event-detail-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+          </div>
+          <div class="event-detail-label">Live on Zoom</div>
+        </div>
+        <div class="event-detail-row">
+          <div class="event-detail-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="event-detail-label">Thursday, September 24</div>
+        </div>
+        <div class="event-detail-row">
+          <div class="event-detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="event-detail-label">3 Parents Only</div>
+        </div>
+        <div class="event-detail-row">
+          <div class="event-detail-icon">
+            <svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+          </div>
+          <div class="event-detail-label">100% FREE <span class="free-pill">FREE</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. REGISTRATION FORM -->
+    <section class="register-section" id="register">
       <div class="booking-box">
         <div class="booking-head">10 min Numio Visit for Parents</div>
         <div class="booking-headsub">See if Numio can help your family.</div>
@@ -610,68 +654,9 @@
       </div>
     </section>
 
-    <!-- HOW IT WORKS -->
-    <section class="how">
-      <h2 class="how-h1">Want more practise<br>for your child?</h2>
-      <p class="how-sub">... but you don't want to create the questions yourself?</p>
-      <h3 class="how-h2">Here's our simple<br>solution:</h3>
-
-      <div class="step-card">
-        <img src="/takepicimage.png" alt="Take a pic of any lesson" loading="lazy"/>
-        <div class="step-label">#1 Take a pic of any lesson</div>
-      </div>
-      <div class="step-card">
-        <img src="/wait15secimage.png" alt="Wait 15 seconds" loading="lazy"/>
-        <div class="step-label">#2 Wait 15 seconds</div>
-      </div>
-      <div class="step-card">
-        <img src="/practiseimage.png" alt="Your child can practise" loading="lazy"/>
-        <div class="step-label">#3 Your child can practise!</div>
-      </div>
-    </section>
-
-    <!-- LIVE EVENT (text only) -->
-    <section class="live" id="live">
-      <h2 class="live-h">Test Numio with us<br>LIVE</h2>
-      <p class="live-p">No need to decide today!</p>
-      <p class="live-p">Join and see it work live and decide if it can really help your family.</p>
-    </section>
-
-    <!-- EVENT DETAILS + SAVE YOUR SPOT (scrolls up to the form) -->
-    <section class="event-section">
-      <div class="event-details">
-        <div class="event-detail-row">
-          <div class="event-detail-icon">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-          </div>
-          <div class="event-detail-label">Live on Zoom</div>
-        </div>
-        <div class="event-detail-row">
-          <div class="event-detail-icon">
-            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          </div>
-          <div class="event-detail-label">Thursday, September 24</div>
-        </div>
-        <div class="event-detail-row">
-          <div class="event-detail-icon">
-            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <div class="event-detail-label">3 Parents Only</div>
-        </div>
-        <div class="event-detail-row">
-          <div class="event-detail-icon">
-            <svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-          </div>
-          <div class="event-detail-label">100% FREE <span class="free-pill">FREE</span></div>
-        </div>
-      </div>
-
-      <button type="button" class="save-btn" onclick="document.getElementById('join').scrollIntoView({behavior:'smooth'})">Save your spot →</button>
-    </section>
-
   </div>
 
-  <!-- ===================== CONFIRMATION (same page, "another page" view) ===================== -->
+  <!-- CONFIRMATION PAGE -->
   <div class="confirm-page" id="confirmation-page">
     <div class="confirm-inner">
       <img class="confirm-logo" src="/logotousebro.webp" alt="Numio"/>
@@ -691,23 +676,19 @@
 
 <script>
 (function () {
-  // ===== EVENT DATE =====
-  // "Join us Tomorrow": by default the event date is TOMORROW in South Africa (SAST = UTC+2).
-  // To force a fixed date instead, set e.g. var EVENT_DATE_OVERRIDE = "2026-10-10";
   var EVENT_DATE_OVERRIDE = null;
-
   var LANDING_TITLE = document.title;
   var landing = document.getElementById("landing");
   var confirmPage = document.getElementById("confirmation-page");
   var slots = document.querySelectorAll(".slot-btn");
   var selected = null;
-  var chosen = null; // { saHour, label, date }
+  var chosen = null;
 
   function pad(n) { return String(n).padStart(2, "0"); }
 
   function eventDate() {
     if (EVENT_DATE_OVERRIDE) return EVENT_DATE_OVERRIDE;
-    var sa = new Date(Date.now() + 2 * 3600 * 1000); // current time in South Africa
+    var sa = new Date(Date.now() + 2 * 3600 * 1000);
     var t = new Date(Date.UTC(sa.getUTCFullYear(), sa.getUTCMonth(), sa.getUTCDate() + 1));
     return t.getUTCFullYear() + "-" + pad(t.getUTCMonth() + 1) + "-" + pad(t.getUTCDate());
   }
@@ -719,7 +700,6 @@
     });
   }
 
-  // UTC Date for a South Africa slot on a given YYYY-MM-DD (SAST = UTC+2)
   function slotToUTCDate(iso, saHour) {
     var p = iso.split("-");
     return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], saHour - 2, 0, 0));
@@ -731,7 +711,7 @@
   }
 
   function buildICS(startUTC) {
-    var endUTC = new Date(startUTC.getTime() + 10 * 60000); // 10-minute demo
+    var endUTC = new Date(startUTC.getTime() + 10 * 60000);
     return [
       "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Numio//Live Demo//EN",
       "BEGIN:VEVENT",
@@ -745,7 +725,6 @@
     ].join("\r\n");
   }
 
-  // ----- slot picking -----
   slots.forEach(function (btn) {
     btn.addEventListener("click", function () {
       slots.forEach(function (b) { b.classList.remove("selected"); b.setAttribute("aria-pressed", "false"); });
@@ -758,12 +737,8 @@
 
   function showError(id) { document.getElementById(id).classList.add("show"); }
   function hideError(id) { document.getElementById(id).classList.remove("show"); }
+  function isValidPhone(v) { return v.replace(/[^\d]/g, "").length >= 9; }
 
-  function isValidPhone(v) {
-    return v.replace(/[^\d]/g, "").length >= 9;
-  }
-
-  // ----- same-page "confirmation page" -----
   function showView(confirmed) {
     landing.style.display = confirmed ? "none" : "";
     confirmPage.classList.toggle("show", confirmed);
@@ -771,16 +746,14 @@
     window.scrollTo(0, 0);
   }
 
-  // Browser Back button returns to the landing page
   window.addEventListener("popstate", function (e) {
     showView(!!(e.state && e.state.numio === "confirmed"));
   });
-  // A reload on #confirmed has no form data anymore, so go back to the landing page
+
   if (location.hash === "#confirmed") {
     history.replaceState(null, "", location.pathname + location.search);
   }
 
-  // ----- submit -----
   document.getElementById("register-btn").addEventListener("click", function () {
     var name = document.getElementById("parent-name").value.trim();
     var phone = document.getElementById("parent-phone").value.trim();
@@ -828,7 +801,6 @@
       });
   });
 
-  // ----- add to calendar -----
   document.getElementById("calendar-btn").addEventListener("click", function () {
     var c = chosen || { saHour: 19, date: eventDate() };
     var ics = buildICS(slotToUTCDate(c.date, c.saHour));
