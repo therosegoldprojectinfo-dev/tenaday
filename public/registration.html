@@ -706,15 +706,40 @@
   <div class="confirm-page" id="confirmation-page">
     <div class="confirm-inner">
       <img class="confirm-logo" src="/logotousebro.webp" alt="Numio"/>
-      <div class="confirm-badge">🎉</div>
-      <h1 class="confirm-title">Congrats! You're among the 3 parents we'll help.</h1>
-      <div class="confirm-card">
-        We'll contact you on <strong id="confirm-phone">your phone</strong> 1 hour before your slot and give you all the info you need to join.
-        <strong class="confirm-when" id="confirm-when"></strong>
+
+      <!-- Green badge -->
+      <div class="confirm-check-badge">
+        <svg viewBox="0 0 80 80" width="80" height="80">
+          <circle cx="40" cy="40" r="38" fill="#3DBE5C"/>
+          <!-- scalloped edge -->
+          <circle cx="40" cy="40" r="38" fill="none" stroke="#3DBE5C" stroke-width="0"/>
+          <polyline points="22,40 35,53 58,28" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
+
+      <h1 class="confirm-title">Your spot is confirmed</h1>
+
+      <!-- What / When / Where card -->
+      <div class="confirm-section">
+        <div class="confirm-detail-row">
+          <span class="confirm-detail-label">What</span>
+          <span class="confirm-detail-value">Test Numio live with your child's lesson</span>
+        </div>
+        <div class="confirm-detail-row">
+          <span class="confirm-detail-label">When</span>
+          <span class="confirm-detail-value" id="confirm-datetime">Wednesday, October 7</span>
+        </div>
+        <div class="confirm-detail-row">
+          <span class="confirm-detail-label">Where</span>
+          <span class="confirm-detail-value">Online via <span class="zoom-word">Zoom</span></span>
+        </div>
+      </div>
+
+      <p class="confirm-text">We'll send you a <span class="whatsapp-word">WhatsApp</span> message 1 hour before your slot with everything you need to join.</p>
+
       <button type="button" class="calendar-btn" id="calendar-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3513A2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Don't forget — save it to your calendar
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Save to Calendar
       </button>
       <p class="calendar-note">We'll never share your info. See you there!</p>
     </div>
