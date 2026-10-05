@@ -112,7 +112,7 @@ function getTrueFalseOptions(correctAnswer) {
 }
 
 function normalize(str) {
-  return (str || '').trim().toLowerCase()
+  return (String(str ?? '')).trim().toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[\u064B-\u0652\u0640]/g, '')
     .replace(/[\u0622\u0623\u0625]/g, '\u0627')
