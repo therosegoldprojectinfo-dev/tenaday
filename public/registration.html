@@ -150,6 +150,66 @@
       transform-origin: bottom center;
     }
 
+    /* HOW IT WORKS */
+    .how {
+      position: relative;
+      isolation: isolate;
+      padding: 56px 28px 64px;
+      text-align: center;
+      background: #fafafa;
+    }
+    .how::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      top: 0; bottom: 0;
+      left: 50%;
+      width: 100vw;
+      transform: translateX(-50%);
+      background: #fafafa;
+    }
+    .how-h1 {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.22;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .how-sub {
+      font-size: 19px;
+      font-weight: 400;
+      color: #444;
+      line-height: 1.3;
+      margin-bottom: 28px;
+    }
+    .how-h2 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 40px;
+    }
+    .step-card {
+      width: 82%;
+      margin: 0 auto 40px;
+      border-radius: 23px;
+      overflow: hidden;
+      background: #9271FF;
+    }
+    .step-card:last-of-type { margin-bottom: 48px; }
+    .step-card img { width: 100%; height: auto; display: block; }
+    .step-label {
+      min-height: 68px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      color: #fff;
+      font-size: clamp(15px, 4.6vw, 18px);
+      font-weight: 700;
+      text-align: left;
+      letter-spacing: -0.01em;
+    }
+    .how .cta-btn { margin-top: 8px; }
+
     /* WHAT WE'LL DO — purple block */
     .what {
       position: relative;
@@ -501,11 +561,12 @@
     <!-- NAV -->
     <nav class="nav">
       <img class="nav-logo" src="/logotousebro.webp" alt="Numio"/>
+      <button class="nav-btn" type="button" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Book free test →</button>
     </nav>
 
     <!-- 1. HERO -->
     <section class="hero">
-      <h1 class="hero-title"><span style="display:block;font-size:22px;margin-bottom:14px;">Busy Parents:</span>Get unlimited practice for your child <span style="background:#3DBE5C;color:#fff;padding:2px 8px;border-radius:6px;-webkit-box-decoration-break:clone;box-decoration-break:clone;">without writing a single question.</span></h1>
+      <h1 class="hero-title">Never worry about school practice ever again!</h1>
       <p class="hero-sub">Your child can now take a pic of their lesson and start practising in just 15 seconds.</p>
 
       <div class="phone-visual">
@@ -514,7 +575,7 @@
         <img class="phone-right" src="/phonestouse%20(1).png" alt="Get a quiz instantly"/>
       </div>
 
-      <button class="cta-btn" type="button" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Start live FREE trial →</button>
+      <button class="cta-btn" type="button" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Book Your Free Live Test →</button>
       <div class="perks">
         <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>100% Free</span>
         <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>10 minutes</span>
@@ -522,9 +583,36 @@
       </div>
     </section>
 
-    <!-- 2. WHAT WE'LL DO — purple block -->
+    <!-- 2. HOW IT WORKS -->
+    <section class="how">
+      <h2 class="how-h1">Want your child to practise more…</h2>
+      <p class="how-sub">But don't want to create the questions yourself?</p>
+      <h3 class="how-h2">Here's our simple solution:</h3>
+
+      <div class="step-card">
+        <img src="/takepicimage.png" alt="Take a pic of their lesson" loading="lazy"/>
+        <div class="step-label">#1 Take a pic of their lesson</div>
+      </div>
+      <div class="step-card">
+        <img src="/wait15secimage.png" alt="Wait 15 seconds" loading="lazy"/>
+        <div class="step-label">#2 Wait 15 seconds</div>
+      </div>
+      <div class="step-card">
+        <img src="/practiseimage.png" alt="Your child can practise!" loading="lazy"/>
+        <div class="step-label">#3 Your child can practise!</div>
+      </div>
+
+      <button class="cta-btn" type="button" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Book Your Free Live Test →</button>
+      <div class="perks">
+        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>100% Free</span>
+        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>10 minutes</span>
+        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>No commitment</span>
+      </div>
+    </section>
+
+    <!-- 3. WHAT WE'LL DO — purple block -->
     <section class="what">
-      <h2 class="what-h">What you'll do in the free trial</h2>
+      <h2 class="what-h">What we'll do in 10 minutes</h2>
       <div class="what-steps">
 
         <div class="what-step">
@@ -560,13 +648,13 @@
       </div>
     </section>
 
-    <!-- 3. READY -->
+    <!-- 4. READY -->
     <div class="ready">
       <h2 class="ready-h">Ready to See It For Yourself?</h2>
       <p class="ready-sub">Join and see it work live and decide if it can really help your family.</p>
     </div>
 
-    <!-- 4. EVENT INFO BOX -->
+    <!-- 5. EVENT INFO BOX -->
     <section class="event-section">
       <div class="event-details">
         <div class="event-detail-row">
@@ -591,7 +679,7 @@
       </div>
     </section>
 
-    <!-- 5. REGISTRATION FORM -->
+    <!-- 6. REGISTRATION FORM -->
     <section class="register-section" id="register">
       <div class="booking-box">
         <div class="booking-head">10 min Numio test</div>
@@ -616,7 +704,7 @@
         <div class="field-error" id="phone-error">Please enter a valid phone number.</div>
       </div>
 
-      <button type="button" class="save-btn" id="register-btn">Start live FREE trial →</button>
+      <button type="button" class="save-btn" id="register-btn">Save your spot →</button>
 
       <div class="perks">
         <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>100% Free</span>
@@ -795,7 +883,7 @@
         showView(true);
 
         btn.disabled = false;
-        btn.textContent = "Start live FREE trial →";
+        btn.textContent = "Save your spot →";
       });
   });
 
@@ -817,3 +905,4 @@
 
 </body>
 </html>
+
