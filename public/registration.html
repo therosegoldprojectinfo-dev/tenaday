@@ -156,7 +156,7 @@
       position: relative;
       isolation: isolate;
       background: #120F25;
-      padding: 52px 28px 60px;
+      padding: 60px 28px 72px;
       text-align: left;
     }
     .what::before {
@@ -189,36 +189,36 @@
     .what-meta {
       display: flex;
       flex-direction: column;
-      gap: 28px;
-      margin-bottom: 36px;
+      gap: 36px;
+      margin-bottom: 48px;
     }
     .what-meta-item {}
     .what-meta-label {
       color: #fff;
-      font-size: 32px;
+      font-size: 34px;
       font-weight: 800;
       line-height: 1.1;
       letter-spacing: -0.02em;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
     .what-meta-value {
       color: #fff;
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 500;
       line-height: 1.4;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
-    .what-meta-value .emoji { font-size: 22px; }
+    .what-meta-value .emoji { font-size: 24px; }
     /* What will happen heading */
     .what-happen-h {
       color: #fff;
-      font-size: 32px;
+      font-size: 34px;
       font-weight: 800;
       line-height: 1.1;
       letter-spacing: -0.02em;
-      margin-bottom: 28px;
+      margin-bottom: 36px;
     }
     /* Steps */
     .what-steps {
@@ -229,7 +229,7 @@
     .what-step {
       display: flex;
       align-items: flex-start;
-      gap: 18px;
+      gap: 20px;
     }
     .what-step-left {
       display: flex;
@@ -239,12 +239,12 @@
       gap: 0;
     }
     .what-step-num {
-      width: 50px;
-      height: 50px;
+      width: 54px;
+      height: 54px;
       border-radius: 50%;
       background: #1EFF00;
       color: #000;
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 900;
       display: flex;
       align-items: center;
@@ -256,25 +256,25 @@
       color: #fff;
       font-size: 22px;
       line-height: 1;
-      padding: 6px 0;
+      padding: 10px 0;
       text-align: center;
     }
     .what-step-text {
-      padding-top: 6px;
+      padding-top: 8px;
     }
     .what-step-title {
       color: #fff;
-      font-size: 22px;
+      font-size: 23px;
       font-weight: 800;
       line-height: 1.2;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
     .what-step-sub {
       color: rgba(255,255,255,0.75);
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 400;
-      line-height: 1.45;
-      margin-bottom: 8px;
+      line-height: 1.5;
+      margin-bottom: 4px;
     }
 
     /* READY SECTION */
@@ -372,7 +372,7 @@
     .choose-time-head {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 16px;
       font-size: 20px;
       font-weight: 800;
       color: #0A0A0A;
@@ -384,6 +384,7 @@
       border-radius: 50%;
       background: #FF3B30;
       flex-shrink: 0;
+      box-shadow: 0 0 0 7px rgba(255, 59, 48, 0.18);
     }
 
     /* Slot grid */
@@ -604,7 +605,12 @@
       <div class="what-meta">
         <div class="what-meta-item">
           <div class="what-meta-label">Where?</div>
-          <div class="what-meta-value"><span class="emoji">💬</span> On a WhatsApp call</div>
+          <div class="what-meta-value">
+            <svg width="26" height="26" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
+              <path d="M34.5 13.4C32.1 11 28.9 9.6 25.5 9.6C18.5 9.6 12.8 15.3 12.8 22.3C12.8 24.6 13.4 26.8 14.6 28.7L12.6 36L20.1 34C21.9 35.1 24 35.7 26.1 35.7H26.2C33.2 35.7 38.9 30 38.9 23C38.8 19.6 37.4 16.4 34.5 13.4ZM25.5 33.4H25.4C23.5 33.4 21.7 32.8 20.1 31.8L19.7 31.6L15.6 32.7L16.7 28.7L16.5 28.3C15.4 26.6 14.8 24.6 14.8 22.5C14.8 16.5 19.7 11.6 25.7 11.6C28.6 11.6 31.3 12.7 33.4 14.8C35.5 16.9 36.6 19.6 36.6 22.5C36.7 28.5 31.8 33.4 25.5 33.4ZM31.8 25.1C31.5 24.95 29.9 24.15 29.6 24.05C29.3 23.95 29.1 23.9 28.9 24.2C28.7 24.5 28.05 25.25 27.9 25.45C27.75 25.65 27.55 25.7 27.25 25.55C26.95 25.4 25.95 25.1 24.75 24.05C23.85 23.25 23.25 22.25 23.1 21.95C22.95 21.65 23.1 21.5 23.25 21.35C23.4 21.2 23.55 21 23.7 20.85C23.85 20.7 23.9 20.6 24 20.4C24.1 20.2 24.05 20.05 23.975 19.9C23.9 19.75 23.3 18.15 23.05 17.55C22.8 16.95 22.55 17.05 22.35 17.05C22.2 17.05 22 17 21.8 17C21.6 17 21.25 17.075 20.95 17.375C20.65 17.675 19.85 18.425 19.85 20.025C19.85 21.625 21 23.175 21.15 23.375C21.3 23.575 23.3 26.625 26.3 28.025C27.05 28.375 27.625 28.575 28.075 28.725C28.825 28.975 29.5 28.925 30.05 28.85C30.65 28.75 31.9 28.075 32.15 27.325C32.4 26.575 32.4 25.95 32.325 25.825C32.25 25.7 32.05 25.625 31.8 25.1Z" fill="#25D366"/>
+            </svg>
+            On a WhatsApp call
+          </div>
         </div>
         <div class="what-meta-item">
           <div class="what-meta-label">How long?</div>
