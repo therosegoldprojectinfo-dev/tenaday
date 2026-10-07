@@ -69,24 +69,48 @@
 
     /* HERO */
     .hero {
-      padding: 0 28px 28px;
+      padding: 0 28px 36px;
       text-align: center;
     }
     .hero-title {
-      font-size: 32px;
-      font-weight: 800;
+      font-size: 36px;
+      font-weight: 900;
       color: #0A0A0A;
-      line-height: 1.23;
-      letter-spacing: -0.02em;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
       margin-bottom: 20px;
     }
     .hero-sub {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 400;
       color: #333;
-      line-height: 1.35;
+      line-height: 1.5;
       margin-bottom: 32px;
     }
+
+    /* PHONE VISUAL */
+    .phone-visual {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 36px;
+    }
+    .phone-left {
+      width: 31%; height: auto; flex-shrink: 0;
+      transform: rotate(-8deg);
+      transform-origin: bottom center;
+    }
+    .phone-arrow {
+      width: 11%; height: auto; flex-shrink: 0;
+      position: relative; top: 10px;
+    }
+    .phone-right {
+      width: 34%; height: auto; flex-shrink: 0;
+      transform: rotate(6deg);
+      transform-origin: bottom center;
+    }
+
     .cta-btn {
       display: flex;
       align-items: center;
@@ -95,11 +119,11 @@
       background: #3DBE5C;
       color: #fff;
       font-family: 'Inter', sans-serif;
-      font-size: 17px;
+      font-size: 20px;
       font-weight: 800;
       border: none;
       border-radius: 50px;
-      padding: 20px 20px;
+      padding: 22px 20px;
       cursor: pointer;
       letter-spacing: -0.01em;
       white-space: nowrap;
@@ -127,96 +151,13 @@
     }
     .om-check { width: 20px; height: 20px; flex-shrink: 0; }
 
-    /* PHONE VISUAL */
-    .phone-visual {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 32px;
-    }
-    .phone-left {
-      width: 31%; height: auto; flex-shrink: 0;
-      transform: rotate(-8deg);
-      transform-origin: bottom center;
-    }
-    .phone-arrow {
-      width: 11%; height: auto; flex-shrink: 0;
-      position: relative; top: 10px;
-    }
-    .phone-right {
-      width: 34%; height: auto; flex-shrink: 0;
-      transform: rotate(6deg);
-      transform-origin: bottom center;
-    }
-
-    /* HOW IT WORKS */
-    .how {
-      position: relative;
-      isolation: isolate;
-      padding: 56px 28px 64px;
-      text-align: center;
-      background: #fafafa;
-    }
-    .how::before {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      top: 0; bottom: 0;
-      left: 50%;
-      width: 100vw;
-      transform: translateX(-50%);
-      background: #fafafa;
-    }
-    .how-h1 {
-      font-size: 28px;
-      font-weight: 800;
-      line-height: 1.22;
-      letter-spacing: -0.02em;
-      margin-bottom: 20px;
-    }
-    .how-sub {
-      font-size: 19px;
-      font-weight: 400;
-      color: #444;
-      line-height: 1.3;
-      margin-bottom: 28px;
-    }
-    .how-h2 {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
-      margin-bottom: 40px;
-    }
-    .step-card {
-      width: 82%;
-      margin: 0 auto 40px;
-      border-radius: 23px;
-      overflow: hidden;
-      background: #9271FF;
-    }
-    .step-card:last-of-type { margin-bottom: 48px; }
-    .step-card img { width: 100%; height: auto; display: block; }
-    .step-label {
-      min-height: 68px;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      color: #fff;
-      font-size: clamp(15px, 4.6vw, 18px);
-      font-weight: 700;
-      text-align: left;
-      letter-spacing: -0.01em;
-    }
-    .how .cta-btn { margin-top: 8px; }
-
-    /* WHAT WE'LL DO — purple block */
+    /* DETAILS SECTION — dark navy block */
     .what {
       position: relative;
       isolation: isolate;
-      background: #3513A2;
-      padding: 54px 28px 60px;
-      text-align: center;
+      background: #120F25;
+      padding: 52px 28px 60px;
+      text-align: left;
     }
     .what::before {
       content: "";
@@ -226,53 +167,114 @@
       left: 50%;
       width: 100vw;
       transform: translateX(-50%);
-      background: #3513A2;
+      background: #120F25;
     }
+    /* Title */
     .what-h {
       color: #fff;
-      font-size: 30px;
+      font-size: 32px;
       font-weight: 800;
-      line-height: 1.22;
-      letter-spacing: -0.02em;
-      margin-bottom: 40px;
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+      margin-bottom: 36px;
+      text-align: center;
     }
+    .what-h .underline-magenta {
+      text-decoration: underline;
+      text-decoration-color: #F200FF;
+      text-decoration-thickness: 3px;
+      text-underline-offset: 4px;
+    }
+    /* Where / How long blocks */
+    .what-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      margin-bottom: 36px;
+    }
+    .what-meta-item {}
+    .what-meta-label {
+      color: #fff;
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .what-meta-value {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .what-meta-value .emoji { font-size: 22px; }
+    /* What will happen heading */
+    .what-happen-h {
+      color: #fff;
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      margin-bottom: 28px;
+    }
+    /* Steps */
     .what-steps {
       display: flex;
       flex-direction: column;
-      gap: 16px;
-      text-align: left;
+      gap: 0;
     }
     .what-step {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 18px;
-      background: rgba(255,255,255,0.08);
-      border: 1.5px solid rgba(255,255,255,0.15);
-      border-radius: 18px;
-      padding: 18px 20px;
     }
-    .what-icon {
-      width: 52px; height: 52px;
+    .what-step-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       flex-shrink: 0;
+      gap: 0;
+    }
+    .what-step-num {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #1EFF00;
+      color: #000;
+      font-size: 26px;
+      font-weight: 900;
       display: flex;
       align-items: center;
       justify-content: center;
+      flex-shrink: 0;
+      font-family: 'Inter', sans-serif;
     }
-    .what-icon svg { width: 52px; height: 52px; }
-    .what-text {
+    .what-step-arrow {
       color: #fff;
-      font-size: 16px;
-      font-weight: 700;
-      line-height: 1.3;
-      letter-spacing: -0.01em;
+      font-size: 22px;
+      line-height: 1;
+      padding: 6px 0;
+      text-align: center;
     }
-    .what-text span {
-      display: block;
-      color: #B7A6FF;
-      font-size: 14px;
-      font-weight: 500;
-      margin-top: 4px;
-      line-height: 1.4;
+    .what-step-text {
+      padding-top: 6px;
+    }
+    .what-step-title {
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 4px;
+    }
+    .what-step-sub {
+      color: rgba(255,255,255,0.75);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.45;
+      margin-bottom: 8px;
     }
 
     /* READY SECTION */
@@ -328,125 +330,148 @@
       stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
     }
     .event-detail-label { font-size: 17px; font-weight: 700; color: #0A0A0A; }
-    .free-pill {
-      display: inline-flex;
-      align-items: center;
-      background: #3DBE5C;
+
+    /* REGISTRATION SECTION — purple bg wrap */
+    .register-section {
+      position: relative;
+      isolation: isolate;
+      background: #661AE9;
+      padding: 44px 24px 60px;
+      text-align: center;
+    }
+    .register-section::before {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      top: 0; bottom: 0;
+      left: 50%;
+      width: 100vw;
+      transform: translateX(-50%);
+      background: #661AE9;
+    }
+    .register-title {
       color: #fff;
-      font-size: 11px;
+      font-size: 32px;
       font-weight: 800;
-      border-radius: 50px;
-      padding: 3px 10px;
-      margin-left: 10px;
-      letter-spacing: 0.04em;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 28px;
+      text-align: center;
     }
 
-    /* REGISTRATION FORM */
-    .register-section { padding: 0 28px 72px; }
+    /* White card */
     .booking-box {
-      border: 2px solid #E0D8FF;
-      background: #F9F7FF;
-      border-radius: 24px;
-      padding: 24px 20px;
-      margin-bottom: 28px;
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 40px;
+      padding: 28px 22px 24px;
       text-align: left;
     }
-    .booking-head {
-      font-size: 18px;
+
+    /* "Choose your time" header inside card */
+    .choose-time-head {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
       font-weight: 800;
       color: #0A0A0A;
-      line-height: 1.3;
-      margin-bottom: 4px;
-    }
-    .booking-headsub {
-      font-size: 15px;
-      font-weight: 500;
-      color: #444;
-      line-height: 1.4;
       margin-bottom: 20px;
+      line-height: 1.2;
     }
-    .booking-title {
-      font-size: 16px;
-      font-weight: 800;
-      color: #0A0A0A;
-      line-height: 1.4;
-      margin-bottom: 14px;
+    .choose-time-dot {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: #FF3B30;
+      flex-shrink: 0;
     }
+
+    /* Slot grid */
     .flag-za { width: 1.45em; height: 0.9em; vertical-align: -0.12em; }
     .slot-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
     .slot-btn {
       font-family: 'Inter', sans-serif;
       font-size: 15px;
       font-weight: 700;
-      color: #3513A2;
-      background: #fff;
-      border: 2px solid #E0D8FF;
-      border-radius: 14px;
-      padding: 12px 8px;
+      color: #0A0A0A;
+      background: #F3F3F3;
+      border: 2px solid #000;
+      border-radius: 16px;
+      padding: 10px 8px;
       cursor: pointer;
       transition: all 0.15s;
     }
-    .slot-btn:hover { border-color: #B7A6FF; }
-    .slot-btn.selected { background: #3513A2; border-color: #3513A2; color: #fff; }
+    .slot-btn:hover { background: #e8e8e8; }
+    .slot-btn.selected { background: #7B61FF; border-color: #7B61FF; color: #fff; }
+
+    /* Field labels + inputs */
     .field-label {
       display: block;
-      font-size: 13px;
+      font-size: 15px;
       font-weight: 700;
-      color: #555;
+      color: #0A0A0A;
       line-height: 1.4;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
+    }
+    .field-sublabel {
+      display: block;
+      font-size: 13px;
+      font-weight: 400;
+      color: #666;
+      margin-bottom: 8px;
+      margin-top: -4px;
     }
     .field-input {
       width: 100%;
       font-family: 'Inter', sans-serif;
       font-size: 16px;
-      font-weight: 500;
+      font-weight: 400;
       color: #0A0A0A;
-      background: #fff;
-      border: 2px solid #E0D8FF;
-      border-radius: 14px;
-      padding: 14px 16px;
-      margin-bottom: 16px;
+      background: #F3F3F3;
+      border: 2px solid #000;
+      border-radius: 19px;
+      padding: 13px 16px;
+      margin-bottom: 18px;
       outline: none;
     }
-    .field-input:last-of-type { margin-bottom: 0; }
-    .field-input:focus { border-color: #3513A2; }
+    .field-input::placeholder { color: #aaa; }
+    .field-input:focus { border-color: #661AE9; background: #fff; }
     .field-error {
       display: none;
       font-size: 13px;
       font-weight: 600;
       color: #e53e3e;
       line-height: 1.4;
-      margin: -10px 0 16px;
+      margin: -12px 0 14px;
     }
     .field-error.show { display: block; }
+
+    /* Save button */
     .save-btn {
       display: flex;
       align-items: center;
       justify-content: center;
       width: 100%;
-      background: #3DBE5C;
+      background: #20DD16;
       color: #fff;
       font-family: 'Inter', sans-serif;
-      font-size: 18px;
+      font-size: 20px;
       font-weight: 800;
       border: none;
       border-radius: 50px;
-      padding: 22px 24px;
+      padding: 16px 24px;
       cursor: pointer;
       letter-spacing: -0.01em;
-      box-shadow: 0 5px 0 #27a348;
-      margin-bottom: 20px;
-      text-transform: uppercase;
+      margin-bottom: 18px;
       transition: filter 0.15s, transform 0.1s;
     }
     .save-btn:hover  { filter: brightness(1.06); }
-    .save-btn:active { transform: scale(0.98); box-shadow: none; }
+    .save-btn:active { transform: scale(0.98); }
     .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
     /* CONFIRMATION PAGE */
@@ -538,16 +563,6 @@
       <circle cx="52" cy="38" r="4.5" fill="#000"/>
       <circle cx="54.5" cy="35" r="1.8" fill="#fff"/>
     </symbol>
-    <!-- OpenMoji: Handshake (1F91D) -->
-    <symbol id="om-handshake" viewBox="0 0 72 72">
-      <path d="M62 28 L46 22 L34 30 L28 28 L18 36 L24 44 L30 40 L38 46 L50 42 L58 36 Z" fill="#FCEA2B" stroke="#000" stroke-width="2.5" stroke-linejoin="round"/>
-      <path d="M10 28 L26 22 L34 30 L40 28 L50 36 L44 44 L38 40 L30 46 L18 42 L14 36 Z" fill="#FCEA2B" stroke="#000" stroke-width="2.5" stroke-linejoin="round"/>
-      <ellipse cx="36" cy="34" rx="9" ry="7" fill="#F1B31C" stroke="#000" stroke-width="2.5"/>
-      <line x1="20" y1="38" x2="26" y2="44" stroke="#000" stroke-width="2" stroke-linecap="round"/>
-      <line x1="24" y1="35" x2="29" y2="42" stroke="#000" stroke-width="2" stroke-linecap="round"/>
-      <line x1="52" y1="38" x2="46" y2="44" stroke="#000" stroke-width="2" stroke-linecap="round"/>
-      <line x1="48" y1="35" x2="43" y2="42" stroke="#000" stroke-width="2" stroke-linecap="round"/>
-    </symbol>
     <!-- Question mark bubble (for Ask anything) -->
     <symbol id="om-question" viewBox="0 0 72 72">
       <circle cx="36" cy="36" r="30" fill="#60C3F5" stroke="#000" stroke-width="3"/>
@@ -561,13 +576,12 @@
     <!-- NAV -->
     <nav class="nav">
       <img class="nav-logo" src="/logotousebro.webp" alt="Numio"/>
-      <button class="nav-btn" type="button" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Book free test →</button>
     </nav>
 
     <!-- 1. HERO -->
     <section class="hero">
-      <h1 class="hero-title">Never worry about school practice ever again!</h1>
-      <p class="hero-sub">Your child can now take a pic of their lesson and start practising in just 15 seconds.</p>
+      <h1 class="hero-title">Never worry about school practice again!</h1>
+      <p class="hero-sub">Your child can now take a pic of any lesson and start practising in just 15 seconds.</p>
 
       <div class="phone-visual">
         <img class="phone-left"  src="/phonestouse.png"        alt="Take a pic of their lesson"/>
@@ -575,117 +589,80 @@
         <img class="phone-right" src="/phonestouse%20(1).png" alt="Get a quiz instantly"/>
       </div>
 
-      <button class="cta-btn" type="button" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Book Your Free Live Test →</button>
+      <button class="cta-btn" type="button" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Try Numio today →</button>
       <div class="perks">
         <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>100% Free</span>
-        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>10 minutes</span>
+        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg><strong>5 minutes</strong></span>
         <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>No commitment</span>
       </div>
     </section>
 
-    <!-- 2. HOW IT WORKS -->
-    <section class="how">
-      <h2 class="how-h1">Want your child to practise more…</h2>
-      <p class="how-sub">But don't want to create the questions yourself?</p>
-      <h3 class="how-h2">Here's our simple solution:</h3>
-
-      <div class="step-card">
-        <img src="/takepicimage.png" alt="Take a pic of their lesson" loading="lazy"/>
-        <div class="step-label">#1 Take a pic of their lesson</div>
-      </div>
-      <div class="step-card">
-        <img src="/wait15secimage.png" alt="Wait 15 seconds" loading="lazy"/>
-        <div class="step-label">#2 Wait 15 seconds</div>
-      </div>
-      <div class="step-card">
-        <img src="/practiseimage.png" alt="Your child can practise!" loading="lazy"/>
-        <div class="step-label">#3 Your child can practise!</div>
-      </div>
-
-      <button class="cta-btn" type="button" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Book Your Free Live Test →</button>
-      <div class="perks">
-        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>100% Free</span>
-        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>10 minutes</span>
-        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>No commitment</span>
-      </div>
-    </section>
-
-    <!-- 3. WHAT WE'LL DO — purple block -->
+    <!-- 2. DETAILS SECTION — dark navy block -->
     <section class="what">
-      <h2 class="what-h">What we'll do in 10 minutes</h2>
+      <h2 class="what-h"><span class="underline-magenta">Details</span> about the live free trial:</h2>
+
+      <div class="what-meta">
+        <div class="what-meta-item">
+          <div class="what-meta-label">Where?</div>
+          <div class="what-meta-value"><span class="emoji">💬</span> On a WhatsApp call</div>
+        </div>
+        <div class="what-meta-item">
+          <div class="what-meta-label">How long?</div>
+          <div class="what-meta-value"><span class="emoji">⏱️</span> It's about 5 minutes max</div>
+        </div>
+      </div>
+
+      <div class="what-happen-h">What will happen?</div>
+
       <div class="what-steps">
 
         <div class="what-step">
-          <div class="what-icon">
-            <svg aria-label="See it" role="img"><use href="#om-eyes"/></svg>
+          <div class="what-step-left">
+            <div class="what-step-num">1</div>
+            <div class="what-step-arrow">↓</div>
           </div>
-          <div class="what-text">
-            See it.
-            <span>Watch Numio turn a real school lesson into practice.</span>
-          </div>
-        </div>
-
-        <div class="what-step">
-          <div class="what-icon">
-            <svg aria-label="Try it" role="img"><use href="#om-unlocked"/></svg>
-          </div>
-          <div class="what-text">
-            Try it.
-            <span>Test Numio yourself with your child's real school lesson.</span>
+          <div class="what-step-text">
+            <div class="what-step-title">See it</div>
+            <div class="what-step-sub">Watch Numio turn a real school lesson into practice.</div>
           </div>
         </div>
 
         <div class="what-step">
-          <div class="what-icon">
-            <svg aria-label="Ask anything" role="img"><use href="#om-question"/></svg>
+          <div class="what-step-left">
+            <div class="what-step-num">2</div>
+            <div class="what-step-arrow">↓</div>
           </div>
-          <div class="what-text">
-            Ask anything.
-            <span>We'll answer any questions you have.</span>
+          <div class="what-step-text">
+            <div class="what-step-title">Try it</div>
+            <div class="what-step-sub">Test Numio yourself with your child's real school lesson.</div>
+          </div>
+        </div>
+
+        <div class="what-step">
+          <div class="what-step-left">
+            <div class="what-step-num">3</div>
+          </div>
+          <div class="what-step-text">
+            <div class="what-step-title">Decide</div>
+            <div class="what-step-sub">Decide if Numio can really help your family</div>
           </div>
         </div>
 
       </div>
     </section>
 
-    <!-- 4. READY -->
-    <div class="ready">
-      <h2 class="ready-h">Ready to See It For Yourself?</h2>
-      <p class="ready-sub">Join and see it work live and decide if it can really help your family.</p>
-    </div>
-
-    <!-- 5. EVENT INFO BOX -->
-    <section class="event-section">
-      <div class="event-details">
-        <div class="event-detail-row">
-          <div class="event-detail-icon">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-          </div>
-          <div class="event-detail-label">Live on Zoom</div>
-        </div>
-        <div class="event-detail-row">
-          <div class="event-detail-icon">
-            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          </div>
-          <div class="event-detail-label">Wednesday, October 7</div>
-        </div>
-
-        <div class="event-detail-row">
-          <div class="event-detail-icon">
-            <svg viewBox="0 0 24 24"><path d="M20 12V22H4V12"/><path d="M22 7H2v5h20V7z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
-          </div>
-          <div class="event-detail-label">100% FREE</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 6. REGISTRATION FORM -->
+    <!-- 5. REGISTRATION FORM — purple section -->
     <section class="register-section" id="register">
-      <div class="booking-box">
-        <div class="booking-head">10 min Numio test</div>
-        <div class="booking-headsub">See if Numio can help your family.</div>
+      <h2 class="register-title">Try Numio today<br>for FREE</h2>
 
-        <div class="booking-title">Choose your time slot <svg class="flag-za" role="img" aria-label="South Africa"><use href="#om-za"/></svg> time</div>
+      <div class="booking-box">
+        <!-- Choose your time header -->
+        <div class="choose-time-head">
+          <span class="choose-time-dot"></span>
+          Choose your time
+        </div>
+
+        <!-- Time slots -->
         <div class="slot-grid" id="slot-grid">
           <button type="button" class="slot-btn" data-sa="17" data-label="5:00 PM" aria-pressed="false">5:00 PM</button>
           <button type="button" class="slot-btn" data-sa="18" data-label="6:00 PM" aria-pressed="false">6:00 PM</button>
@@ -695,21 +672,26 @@
         </div>
         <div class="field-error" id="slot-error">Please choose a time slot.</div>
 
-        <label class="field-label" for="parent-name">Your name</label>
-        <input class="field-input" type="text" id="parent-name" placeholder="e.g. Thandiwe Nkosi" autocomplete="name"/>
+        <!-- Name -->
+        <label class="field-label" for="parent-name">What's your name?</label>
+        <input class="field-input" type="text" id="parent-name" placeholder="e.g. Ahmed mohsin" autocomplete="name"/>
         <div class="field-error" id="name-error">Please enter your name.</div>
 
-        <label class="field-label" for="parent-phone">Phone number</label>
-        <input class="field-input" type="tel" id="parent-phone" placeholder="e.g. 082 123 4567" autocomplete="tel"/>
+        <!-- WhatsApp number -->
+        <label class="field-label" for="parent-phone">WhatsApp number</label>
+        <span class="field-sublabel">(We'll only use it to send your meeting link)</span>
+        <input class="field-input" type="tel" id="parent-phone" placeholder="e.g. 438-409-9964" autocomplete="tel"/>
         <div class="field-error" id="phone-error">Please enter a valid phone number.</div>
-      </div>
 
-      <button type="button" class="save-btn" id="register-btn">Save your spot →</button>
+        <!-- CTA -->
+        <button type="button" class="save-btn" id="register-btn">Save your spot →</button>
 
-      <div class="perks">
-        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>100% Free</span>
-        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>10 minutes</span>
-        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>No commitment</span>
+        <!-- Perks inside card -->
+        <div class="perks">
+          <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>100% Free</span>
+          <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg><strong>5 minutes</strong></span>
+          <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>No commitment</span>
+        </div>
       </div>
     </section>
 
@@ -873,7 +855,6 @@
           if (window.clarity) clarity("event", "reserve_click");
         } catch (e) { console.error("Tracking failed:", e); }
 
-        // FIX: the element is "confirm-datetime" (there is no "confirm-phone" / "confirm-when" in the HTML)
         var whenEl = document.getElementById("confirm-datetime");
         if (whenEl) {
           whenEl.textContent = prettyDate(date) + " · " + chosen.label + " (South Africa time)";
@@ -883,7 +864,7 @@
         showView(true);
 
         btn.disabled = false;
-        btn.textContent = "Save your spot →";
+        btn.textContent = "Start live FREE trial →";
       });
   });
 
@@ -905,4 +886,3 @@
 
 </body>
 </html>
-
