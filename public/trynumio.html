@@ -701,7 +701,6 @@ function render() {
   const lang = s.lang
   const dir = lang === 'ar' ? 'rtl' : 'ltr'
   document.documentElement.lang = lang
-  document.documentElement.dir = dir
 
   const hideNav = ['quiz', 'quiz_intro', 'scan'].includes(s.screen) ||
     (s.screen === 'quiz' && s.quizShowResults) ||
@@ -793,11 +792,9 @@ function renderBlocked() {
     <div style="font-size:64px;">🎁</div>
     <div>
       <h2 class="font-display" style="font-size:28px;font-weight:800;color:var(--ink);">Enjoy your free trial!</h2>
-      <p style="font-size:16px;color:var(--muted);margin-top:8px;max-width:280px;margin-left:auto;margin-right:auto;">This section is part of the full Numio experience. Get the full app to unlock everything!</p>
+      <p style="font-size:16px;color:var(--muted);margin-top:8px;max-width:280px;margin-left:auto;margin-right:auto;">This section is part of the full Numio experience.</p>
     </div>
-    <a href="https://numiomath.app" target="_blank" style="text-decoration:none;">
-      <button class="btn-purple" style="max-width:280px;">Get Full Numio →</button>
-    </a>
+    <button class="btn-purple" style="max-width:280px;" onclick="setState({ activeTab: 'chapters', screen: 'chapters', chapter: null, exam: null })">← Back to Home</button>
   </div>`
 }
 
@@ -829,10 +826,7 @@ function renderChapters() {
     </div>
   </div>`
 
-  const leaderboardLink = `<button class="leaderboard-link" onclick="window.open('https://numiomath.app','_blank')">
-    <span>${lang==='ar'?'تحقق من لوحة نجوم Numio':'Check the Numio Stars leaderboard'}</span>
-    <span style="font-size:13px;">→</span>
-  </button>`
+  const leaderboardLink = ''  // leaderboard removed in trial
 
   const chaptersTitle = `<div class="chapters-title">
     <h1>${lang==='ar'?'فصولي':'My Chapters'}</h1>
@@ -1109,7 +1103,7 @@ function renderQuiz() {
       <input type="text" id="fill-input" class="fill-input ${s.quizRevealed?(fillCorrect?'correct':'wrong'):''}" 
         value="${s.quizTypedValue.replace(/"/g,'&quot;')}" 
         placeholder="${t(lang,'quiz_fill_placeholder')}"
-        ${s.quizRevealed?'disabled':''} />
+        ${s.quizRevealed?'disabled':''} dir="auto" />
       ${s.quizRevealed && !fillCorrect ? `<p class="correct-answer-hint">${t(lang,'quiz_correct_answer',q.correct_answer)}</p>` : ''}
     </div>`
   } else if (q.type === 'visual_count') {
@@ -1275,14 +1269,7 @@ function renderResults() {
           <p class="font-display" style="font-size:36px;font-weight:800;color:var(--purple);line-height:1;">${correct}/${total}</p>
         </div>
       </div>
-      <div style="width:100%;border-radius:16px;padding:20px;background:#f5f3ff;border:2px solid #ede9fe;text-align:center;">
-        <p class="font-display" style="font-size:18px;font-weight:800;color:var(--purple);">🎉 You just tried Numio!</p>
-        <p style="font-size:14px;color:var(--muted);margin-top:8px;">Get the full app to scan any lesson, build a streak, and unlock rewards.</p>
-        <a href="https://numiomath.app" target="_blank" style="text-decoration:none;display:block;margin-top:16px;">
-          <button class="btn-purple" style="max-width:100%;">Get Full Numio →</button>
-        </a>
-      </div>
-      <button class="btn-purple" id="btn-results-done" style="background:white;color:var(--purple);border:2px solid #ede9fe;box-shadow:none;">Back to chapters</button>
+      <button class="btn-purple" id="btn-results-done">← Back to Home</button>
     </div>
     <style>@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}</style>
   </div>`
@@ -1325,10 +1312,7 @@ function renderTrialUsed() {
       <span style="font-size:48px;">🎉</span>
       <h2 class="font-display" style="font-size:24px;font-weight:800;color:var(--ink);">You've used your free trial!</h2>
       <p style="font-size:15px;color:var(--muted);max-width:280px;">You already generated your trial quiz. Get the full Numio app to scan unlimited lessons!</p>
-      <a href="https://numiomath.app" target="_blank" style="text-decoration:none;width:100%;">
-        <button class="btn-purple" style="max-width:100%;">Get Full Numio →</button>
-      </a>
-      <button class="btn-ghost" id="btn-dismiss-trial">Maybe later</button>
+      <button class="btn-purple" style="max-width:100%;" id="btn-dismiss-trial">← Back to Home</button>
     </div>
   </div>`
 }
@@ -1481,7 +1465,7 @@ function attachListeners() {
 
   // Trial used dismiss
   const btnDismissTrial = document.getElementById('btn-dismiss-trial')
-  if (btnDismissTrial) btnDismissTrial.addEventListener('click', () => setState({ trialUsedVisible: false }))
+  if (btnDismissTrial) btnDismissTrial.addEventListener('click', () => setState({ trialUsedVisible: false, activeTab: 'chapters', screen: 'chapters', chapter: null, exam: null }))
 
   // Quiz streak/coins modals overlay close
   const closeQuizStreak = document.getElementById('closeQuizStreakModal')
