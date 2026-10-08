@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
   :root {
     --purple: #7c3aed;
@@ -361,7 +361,7 @@
 const SUPABASE_URL = 'https://lyedpfhzrvyaskmzhyhl.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0'
 const EDGE_URL = `${SUPABASE_URL}/functions/v1/generate-practice-trial`
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // ── CARD ACCENTS ──────────────────────────────────────────────────────────
 const CARD_ACCENTS = ['#ede9fe','#fce7f3','#dbeafe','#fef9c3','#dcfce7','#ffedd5','#ccfbf1','#fee2e2']
