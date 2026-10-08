@@ -479,9 +479,12 @@ function answersMatch(a, b) {
 }
 function wordSetMatches(sel, targets) {
   if (!Array.isArray(sel) || !Array.isArray(targets)) return false
-  if (sel.length !== targets.length) return false
+  // Flatten: target_words may contain multi-word strings like "les oiseaux"
+  // Split each target by spaces so ["les oiseaux"] == selecting ["les","oiseaux"]
+  const flatTargets = targets.flatMap(t => t.split(' ').filter(Boolean))
+  if (sel.length !== flatTargets.length) return false
   const norm = arr => arr.map(normalize).sort()
-  const a = norm(sel), b = norm(targets)
+  const a = norm(sel), b = norm(flatTargets)
   return a.every((w, i) => w === b[i])
 }
 function isAnswerCorrect(q, answer) {
@@ -1160,7 +1163,7 @@ function renderQuiz() {
     </div>`
   } else if (q.type === 'text_highlight') {
     const words = q.text.split(' ')
-    const normTargets = (q.target_words||[]).map(normalize)
+    const normTargets = (q.target_words||[]).flatMap(t => t.split(' ').filter(Boolean)).map(normalize)
     answersHtml = `<div class="highlight-wrap">
       ${words.map((word,i)=>{
         const isSel = s.quizHighlightIdx.includes(i)
