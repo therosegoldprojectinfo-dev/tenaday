@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Try Numio – Free Trial</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+<style>
+  :root {
+    --purple: #7c3aed;
+    --purple-dark: #5b21b6;
+    --purple-light: #ede9fe;
+    --pink: #ff2d78;
+    --pink-dark: #c4005a;
+    --gold: #fbbf24;
+    --ink: #1f2937;
+    --muted: #9ca3af;
+    --bg: #ffffff;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *, *::before, *::after { box-sizing: inherit; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #f3f4f6; font-family: 'Nunito', sans-serif; }
+  body { overflow: hidden; }
+
+  .font-display { font-family: 'Baloo 2', sans-serif; }
+  .font-body { font-family: 'Nunito', sans-serif; }
+
+  #app { height: 100dvh; display: flex; position: relative; }
+
+  /* ── SIDEBAR desktop ── */
+  .sidebar {
+    display: none;
+    position: fixed; top: 0; bottom: 0; left: 0;
+    width: 224px; background: white;
+    border-right: 1px solid #f3f4f6;
+    flex-direction: column; z-index: 40;
+  }
+  @media (min-width: 768px) { .sidebar { display: flex; } }
+
+  .sidebar-logo { padding: 20px 16px 8px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+  .sidebar-logo img { height: 50px; width: auto; object-fit: contain; }
+  .streak-badge { display: flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 999px; background: #ede9fe; }
+  .streak-badge img { width: 16px; height: 16px; object-fit: contain; }
+  .streak-badge span { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 12px; color: #7c3aed; }
+
+  .nav-items { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 16px;
+    font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px;
+    color: var(--muted); background: none; border: none; cursor: pointer;
+    text-align: left; width: 100%; transition: background 0.15s;
+  }
+  .nav-item:hover { background: #f9fafb; }
+  .nav-item.active { background: #f5f3ff; color: var(--purple); }
+  .nav-item-icon { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .nav-item-icon img { width: 100%; height: 100%; object-fit: contain; }
+
+  .sidebar-streak {
+    margin: auto 8px 16px;
+    display: flex; align-items: center; gap: 12px;
+    background: #f5f3ff; border-radius: 16px; padding: 12px;
+  }
+  .sidebar-streak img { width: 40px; height: 40px; object-fit: contain; }
+
+  /* ── BOTTOM NAV mobile ── */
+  .bottom-nav {
+    display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+    background: white; border-top: 1px solid #f3f4f6;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (min-width: 768px) { .bottom-nav { display: none; } }
+  .bottom-nav-item {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 12px 0; background: none; border: none; cursor: pointer;
+  }
+  .bottom-nav-icon {
+    width: 56px; height: 40px; display: flex; align-items: center; justify-content: center;
+    border-radius: 16px; transition: background 0.15s;
+  }
+  .bottom-nav-icon.active { background: #ede9fe; }
+  .bottom-nav-icon img { width: 36px; height: 36px; object-fit: contain; }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    flex: 1; height: 100dvh; overflow: hidden;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+  }
+  @media (min-width: 768px) { .main { margin-left: 224px; padding-bottom: 0; } }
+
+  .screen { height: 100%; overflow-y: auto; background: white; }
+
+  /* ── CHAPTERS SCREEN ── */
+  .chapters-inner { max-width: 672px; margin: 0 auto; padding: 48px 20px 40px; }
+
+  .streak-row { margin-bottom: 24px; }
+  .streak-row-headline { margin-bottom: 16px; }
+  .streak-row-headline h2 { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 24px; color: var(--ink); }
+  .streak-row-headline p { font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--muted); margin-top: 2px; }
+  .streak-cards { display: flex; gap: 12px; }
+  .streak-card {
+    display: flex; align-items: center; gap: 8px;
+    border-radius: 16px; padding: 12px 16px; flex: 1;
+    background: #f9fafb; box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+    border: none; cursor: pointer; text-align: left; transition: transform 0.15s;
+  }
+  .streak-card:active { transform: scale(0.95); }
+  .streak-card img { width: 40px; height: 40px; object-fit: contain; flex-shrink: 0; }
+  .streak-num { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 24px; line-height: 1; }
+  .streak-label { font-family: 'Nunito', sans-serif; font-size: 12px; color: var(--muted); }
+
+  .leaderboard-link { display: flex; align-items: center; gap: 6px; margin-bottom: 16px; background: none; border: none; cursor: pointer; padding: 0; }
+  .leaderboard-link span { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; color: var(--purple); }
+
+  .chapters-title { margin-bottom: 16px; }
+  .chapters-title h1 { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 24px; color: var(--ink); }
+  .chapters-title p { font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+  .chapters-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .chapter-card {
+    border-radius: 24px; background: white; overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: none; cursor: pointer; text-align: left; transition: transform 0.15s;
+    width: 100%;
+  }
+  .chapter-card:active { transform: scale(0.95); }
+  .chapter-card-top { display: flex; align-items: center; justify-content: center; height: 110px; border-radius: 24px 24px 0 0; }
+  .chapter-card-emoji { font-size: 56px; }
+  .chapter-card-body { padding: 12px 16px; }
+  .chapter-card-name { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 16px; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chapter-card-sub { font-family: 'Nunito', sans-serif; font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .add-chapter-btn {
+    width: 100%; padding: 16px; border-radius: 16px; margin-top: 16px;
+    border: 2px dashed #c4b5fd; color: var(--purple); background: white;
+    font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 16px;
+    cursor: pointer; transition: transform 0.15s;
+  }
+  .add-chapter-btn:active { transform: scale(0.98); }
+
+  .chapters-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 40px; gap: 24px; text-align: center; padding-left: 16px; padding-right: 16px; }
+  .chapters-empty img { width: 128px; height: auto; animation: float 3s ease-in-out infinite; }
+  .chapters-empty h2 { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 24px; color: var(--ink); }
+  .chapters-empty p { font-family: 'Nunito', sans-serif; font-size: 16px; color: var(--muted); margin-top: 8px; }
+  .btn-purple { background: var(--purple); box-shadow: 0 4px 0 var(--purple-dark); color: white; border: none; border-radius: 16px; padding: 20px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 18px; cursor: pointer; width: 100%; max-width: 320px; transition: transform 0.15s; }
+  .btn-purple:active { transform: scale(0.97); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4);
+    display: flex; align-items: flex-end; justify-content: center;
+  }
+  @media (min-width: 768px) { .modal-overlay { align-items: center; } }
+  .modal-sheet {
+    width: 100%; max-width: 512px; background: white;
+    border-radius: 24px 24px 0 0; max-height: 90dvh; display: flex; flex-direction: column;
+  }
+  @media (min-width: 768px) { .modal-sheet { border-radius: 24px; } }
+  .modal-handle { flex-shrink: 0; padding: 12px 0 4px; display: flex; justify-content: center; }
+  .modal-handle div { width: 40px; height: 4px; border-radius: 999px; background: #e5e7eb; }
+  .modal-body { flex: 1; overflow-y: auto; padding: 0 20px 32px; display: flex; flex-direction: column; gap: 20px; }
+  .modal-title { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 24px; color: var(--ink); text-align: center; padding-top: 8px; }
+  .form-label { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 8px; }
+  .form-input {
+    width: 100%; border-radius: 16px; padding: 12px 16px;
+    font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 18px; color: var(--ink);
+    border: 2px solid #e5e7eb; background: #fafafa; outline: none; transition: border-color 0.15s;
+  }
+  .form-input:focus { border-color: var(--purple); }
+  .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+  @media (min-width: 480px) { .emoji-grid { grid-template-columns: repeat(8, 1fr); } }
+  .emoji-btn {
+    height: 44px; border-radius: 12px; font-size: 20px;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #f3f4f6; background: #f9fafb; cursor: pointer; transition: all 0.1s;
+  }
+  .emoji-btn.selected { border-color: var(--purple); background: #f5f3ff; }
+  .chapter-preview { display: flex; align-items: center; gap: 12px; border-radius: 16px; padding: 12px 16px; background: #f5f3ff; }
+  .chapter-preview span:first-child { font-size: 28px; }
+  .chapter-preview span:last-child { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 18px; color: var(--ink); }
+  .btn-ghost { background: none; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; color: var(--muted); padding: 8px; width: 100%; text-align: center; }
+
+  /* ── CURRENT CHAPTER ── */
+  .current-inner { max-width: 672px; margin: 0 auto; padding: 48px 20px 40px; display: flex; flex-direction: column; }
+  .back-btn { font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; color: var(--muted); background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; margin-bottom: 24px; padding: 0; }
+  .chapter-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; }
+  .chapter-icon-box { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: #ede9fe; flex-shrink: 0; font-size: 36px; }
+  .chapter-header-title { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 24px; color: var(--ink); }
+  .chapter-header-sub { font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--muted); margin-top: 2px; }
+  .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 32px; }
+  .action-card {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; border-radius: 24px; padding: 32px 0;
+    border: none; cursor: pointer; transition: transform 0.15s;
+  }
+  .action-card:active { transform: scale(0.95); }
+  .action-card-new { background: var(--purple); box-shadow: 0 6px 24px rgba(124,58,237,0.3); }
+  .action-card-revision { background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  .action-card-revision:disabled { opacity: 0.4; cursor: not-allowed; }
+  .action-icon-circle { width: 52px; height: 52px; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+  .action-label { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 20px; }
+
+  /* ── HOME / SCAN ── */
+  .scan-inner { max-width: 512px; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; height: 100%; }
+  .scan-idle { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px; padding-bottom: 40px; }
+  .camera-btn {
+    width: 110px; height: 110px; border-radius: 50%; background: var(--purple);
+    box-shadow: 0 8px 32px rgba(124,58,237,0.35); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: transform 0.15s;
+  }
+  .camera-btn:active { transform: scale(0.95); }
+  .scan-hint { font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--muted); text-align: center; }
+
+  .img-previews { display: flex; flex-wrap: wrap; gap: 12px; }
+  .img-preview-wrap { position: relative; width: 90px; height: 90px; border-radius: 16px; overflow: hidden; border: 2px solid #f3f4f6; }
+  .img-preview-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .img-remove { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; background: #ef4444; color: white; border: none; border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .img-num { position: absolute; bottom: 4px; left: 4px; background: rgba(0,0,0,0.5); color: white; font-size: 12px; font-weight: 700; border-radius: 4px; padding: 0 4px; }
+  .img-add-btn { width: 90px; height: 90px; border-radius: 16px; border: 2px dashed #e5e7eb; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 24px; transition: background 0.15s; }
+  .img-add-btn:active { background: #f9fafb; }
+  .generate-btn { width: 100%; background: var(--purple); box-shadow: 0 4px 16px rgba(124,58,237,0.3); color: white; border: none; border-radius: 16px; padding: 20px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 18px; cursor: pointer; transition: transform 0.15s; }
+  .generate-btn:active { transform: scale(0.97); }
+  .cancel-btn { width: 100%; background: none; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; color: var(--muted); padding: 8px; text-align: center; }
+
+  .loading-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding-bottom: 40px; text-align: center; }
+  .spinner { width: 48px; height: 48px; border: 4px solid #f3f4f6; border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 0 16px 40px; text-align: center; }
+
+  /* ── QUIZ INTRO ── */
+  .quiz-intro { height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; background: white; position: relative; }
+  .quiz-intro-inner { width: 100%; max-width: 320px; display: flex; flex-direction: column; align-items: center; gap: 24px; }
+
+  /* ── QUIZ ── */
+  .quiz-wrap { height: 100dvh; display: flex; align-items: center; justify-content: center; background: white; overflow: hidden; }
+  .quiz-inner { display: flex; flex-direction: column; background: white; width: 100%; max-width: 384px; height: 100dvh; }
+  .quiz-topbar { flex-shrink: 0; display: flex; align-items: center; gap: 12px; padding: 8px 16px 4px; }
+  .quit-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 999px; color: #d1d5db; background: none; border: none; cursor: pointer; }
+  .quit-btn:active { background: #f3f4f6; }
+  .progress-bar-wrap { flex: 1; height: 12px; border-radius: 999px; overflow: hidden; background: #f3f4f6; }
+  .progress-bar { height: 100%; border-radius: 999px; background: var(--purple); transition: transform 350ms cubic-bezier(0.4,0,0.2,1); transform-origin: left; }
+  .progress-bar.on-fire { background: linear-gradient(90deg, #ff4b4b, #ff9600); }
+  .quiz-qnum { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; color: var(--muted); }
+  .quiz-topic { flex-shrink: 0; padding: 8px 20px 4px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--purple); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .quiz-question { flex-shrink: 0; padding: 16px 24px 12px; max-height: 30%; overflow-y: auto; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 24px; color: var(--ink); line-height: 1.3; }
+  .quiz-answers { padding: 0 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+  .quiz-bottom { flex-shrink: 0; padding: 8px 16px 24px; }
+
+  .mcq-btn {
+    width: 100%; border-radius: 16px; border: 2px solid #e5e7eb; background: white;
+    color: var(--ink); font-family: 'Baloo 2', sans-serif; font-weight: 700;
+    font-size: 18px; padding: 16px 20px; text-align: left; cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.1s;
+  }
+  .mcq-btn:disabled { cursor: not-allowed; }
+  .mcq-btn.selected { border-color: #a78bfa; background: #f5f3ff; color: var(--purple); }
+  .mcq-btn.correct { border-color: #86efac; background: #f0fdf4; color: #16a34a; }
+  .mcq-btn.wrong { border-color: #fca5a5; background: #fff5f5; color: #ef4444; }
+  .mcq-btn.faded { border-color: #f3f4f6; color: #d1d5db; }
+
+  .tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tf-btn { width: 100%; height: 112px; border-radius: 16px; border: 2px solid #e5e7eb; background: white; color: var(--ink); font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 30px; cursor: pointer; transition: all 0.1s; display: flex; align-items: center; justify-content: center; }
+  .tf-btn:disabled { cursor: not-allowed; }
+  .tf-btn.selected { border-color: #a78bfa; background: #f5f3ff; color: var(--purple); }
+  .tf-btn.correct { border-color: #86efac; background: #f0fdf4; color: #16a34a; }
+  .tf-btn.wrong { border-color: #fca5a5; background: #fff5f5; color: #ef4444; }
+  .tf-btn.faded { border-color: #f3f4f6; color: #d1d5db; }
+
+  .fill-input { width: 100%; border-radius: 16px; padding: 16px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 20px; color: var(--ink); border: 2px solid #e5e7eb; background: #fafafa; outline: none; transition: border-color 0.15s; }
+  .fill-input:focus { border-color: var(--purple); }
+  .fill-input.correct { border-color: #86efac; background: #f0fdf4; }
+  .fill-input.wrong { border-color: #fca5a5; background: #fff5f5; }
+  .correct-answer-hint { font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; color: var(--purple); padding: 0 4px; margin-top: 4px; }
+
+  .visual-count-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; border-radius: 16px; padding: 20px 16px; margin-bottom: 16px; background: #fafafa; border: 2px solid #f3f4f6; }
+
+  .highlight-wrap { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 4px; }
+  .highlight-word { border-radius: 12px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 18px; padding: 8px 12px; border: 2px solid #e5e7eb; background: #fafafa; color: var(--ink); cursor: pointer; transition: all 0.1s; }
+  .highlight-word:disabled { cursor: not-allowed; }
+  .highlight-word.selected { background: #f5f3ff; color: var(--purple); border-color: #a78bfa; }
+  .highlight-word.correct-selected { background: #f0fdf4; color: #16a34a; border-color: #86efac; }
+  .highlight-word.wrong-selected { background: #fff5f5; color: #ef4444; border-color: #fca5a5; }
+  .highlight-word.missed { background: #fff7ed; color: #d97706; border: 2px dashed #fdba74; }
+
+  .explanation-box { margin-top: 16px; border-radius: 16px; padding: 12px 16px; background: #f5f3ff; border: 2px solid #ede9fe; font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--purple); line-height: 1.5; }
+
+  .check-btn { width: 100%; background: var(--purple); box-shadow: 0 4px 0 var(--purple-dark); color: white; border: none; border-radius: 16px; padding: 20px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.05em; cursor: pointer; transition: transform 0.1s; }
+  .check-btn:active { transform: scale(0.97); }
+  .check-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .feedback-box { border-radius: 16px; overflow: hidden; border: 2px solid; }
+  .feedback-top { display: flex; align-items: center; gap: 12px; padding: 12px 16px; }
+  .feedback-label { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 18px; color: var(--ink); }
+  .continue-btn { width: 100%; padding: 16px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.05em; color: white; border: none; cursor: pointer; transition: transform 0.1s; }
+  .continue-btn:active { transform: scale(0.98); }
+
+  /* ── STREAK POPUP ── */
+  .streak-popup { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; background: #1a0a14; height: 100dvh; }
+  .streak-popup-inner { width: 100%; max-width: 320px; display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center; }
+  .streak-dots { display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .streak-dot { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: white; background: var(--pink); font-family: 'Baloo 2', sans-serif; }
+
+  /* ── RESULTS ── */
+  .results-screen { height: 100dvh; overflow-y: auto; background: white; display: flex; flex-direction: column; align-items: center; padding: 40px 24px; gap: 20px; }
+  .results-inner { width: 100%; max-width: 384px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+  .score-box { display: flex; align-items: center; gap: 16px; border-radius: 16px; padding: 16px 24px; width: 100%; }
+  .score-label { font-family: 'Nunito', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+  .score-num { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 36px; line-height: 1; }
+  .coins-box { background: #1a1200; box-shadow: 0 4px 24px rgba(251,191,36,0.2); }
+  .coins-label { color: rgba(251,191,36,0.6); }
+  .coins-num { color: #fbbf24; }
+  .trial-score-box { background: #f5f3ff; }
+  .trial-score-label { color: var(--purple); }
+  .trial-score-num { color: var(--purple); }
+
+  /* ── TRIAL USED POPUP ── */
+  .trial-used-overlay { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; background: rgba(255,255,255,0.95); }
+  .trial-used-sheet { background: white; border-radius: 24px 24px 0 0; border: 2px solid #e5e7eb; padding: 32px 24px; max-width: 420px; width: 100%; margin-bottom: 0; box-shadow: 0 -8px 40px rgba(0,0,0,0.12); display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px)); }
+
+  /* ── MODAL OVERLAYS ── */
+  .streak-modal-overlay { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(10,10,20,0.85); }
+  .streak-modal { width: 100%; max-width: 384px; border-radius: 24px; background: #1a1a2e; display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 40px 24px; text-align: center; position: relative; }
+  .modal-close { position: absolute; top: 16px; left: 16px; width: 36px; height: 36px; border-radius: 999px; background: rgba(255,255,255,0.1); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .weekly-dots { display: flex; gap: 8px; }
+  .weekly-dot { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .weekly-dot-inner { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; }
+  .weekly-dot-letter { font-family: 'Nunito', sans-serif; font-size: 12px; }
+
+  .coins-modal { background: #1a1200; }
+
+  /* ── QUIT POPUP ── */
+  .quit-overlay { position: fixed; inset: 0; z-index: 70; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; background: rgba(255,255,255,0.92); }
+  .quit-sheet { background: white; border-radius: 24px; border: 2px solid #e5e7eb; padding: 20px 24px; max-width: 320px; width: 90%; margin-bottom: 16px; box-shadow: 0 8px 32px rgba(0,0,0,0.10); display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .quit-btns { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+
+  /* ── FIRE MODE ── */
+  .fire-overlay { position: fixed; inset: 0; pointer-events: none; z-index: 30; overflow: hidden; }
+
+  /* ── BLOCKED SCREEN ── */
+  .blocked-screen { height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 24px; text-align: center; gap: 24px; background: white; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  @keyframes fire-rise { 0%{opacity:1;transform:translateY(0) rotate(0deg) scale(1)} 80%{opacity:0.9} 100%{opacity:0;transform:translateY(-110vh) rotate(180deg) scale(0.5)} }
+
+  .float { animation: float 2s ease-in-out infinite; }
+  .float-slow { animation: float 3s ease-in-out infinite; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+// ── SUPABASE ──────────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://lyedpfhzrvyaskmzhyhl.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0'
+const EDGE_URL = `${SUPABASE_URL}/functions/v1/generate-practice-trial`
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+// ── CARD ACCENTS ──────────────────────────────────────────────────────────
+const CARD_ACCENTS = ['#ede9fe','#fce7f3','#dbeafe','#fef9c3','#dcfce7','#ffedd5','#ccfbf1','#fee2e2']
+const EMOJI_OPTIONS = ['📐','📖','🔬','🌍','🎨','🎵','🏃','💻','🧮','📝','🦋','🌿','⚗️','🗺️','🎭','📚','🧠','🔭','🏛️','✏️','🧪','🌊','🦁','🎯','🧩','🌸','⚽','🎸','🍎','🚀']
+
+// ── OPENMOJI ASSETS ───────────────────────────────────────────────────────
+const OPENMOJI_CDNS = {
+  bird:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F426.svg',
+  cow:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F404.svg',
+  cat:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F408.svg',
+  dog:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F415.svg',
+  fish:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F41F.svg',
+  apple:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F34E.svg',
+  banana:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F34C.svg',
+  star:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/2B50.svg',
+  ball:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/26BD.svg',
+  tree:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F333.svg',
+  book:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F4D6.svg',
+  pencil:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/270F.svg',
+  car:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F697.svg',
+  bus:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F68C.svg',
+  flower:'https://cdn.jsdelivr.net/npm/openmoji@14.0.0/color/svg/1F338.svg',
+}
+function getAssetUrl(asset) { return OPENMOJI_CDNS[asset] || null }
+
+// ── I18N ─────────────────────────────────────────────────────────────────
+const i18n = {
+  en: {
+    nav_chapters:'Chapters', nav_rewards:'Rewards', nav_parent_zone:'Parent Zone',
+    chapters_add:'+ Add chapter', chapters_empty_title:'No chapters yet',
+    chapters_empty_sub:'Create your first chapter to start learning!',
+    chapters_empty_cta:'Set up my first chapter', chapters_tap:'Tap to study →',
+    chapters_modal_title:'New Chapter', chapters_modal_name_label:'Chapter name',
+    chapters_modal_name_placeholder:'e.g. Math, French, Science...',
+    chapters_modal_icon_label:'Pick an icon', chapters_modal_cta:'Create Chapter →',
+    chapters_modal_creating:'Creating...', chapters_modal_cancel:'Cancel',
+    current_back:'← Back', current_new:'New', current_revision:'Revision',
+    current_no_exams:'No exams yet', current_exams_saved:(n)=>`${n} exam${n!==1?'s':''} saved`,
+    home_generating:'Generating your quiz...', home_reading:'Numio is reading the image ✨',
+    home_error_title:'Something went wrong', home_try_again:'Try Again',
+    quiz_intro_lets_start:"let's start!", quiz_intro_you_can:'You can do this! 💪',
+    quiz_intro_questions:(n)=>`${n} questions`, quiz_intro_start:'START →',
+    quiz_check:'CHECK', quiz_continue:'CONTINUE →', quiz_correct:'Correct!',
+    quiz_not_quite:'Not quite!', quiz_correct_answer:(a)=>`✓ Correct answer: ${a}`,
+    quiz_fill_placeholder:'Type your answer...',
+    quiz_results_perfect:'Perfect score!', quiz_results_perfect_sub:'If this was a real exam, you just aced it!',
+    quiz_results_great:'Almost perfect!', quiz_results_great_sub:"You'd pass this exam easily!",
+    quiz_results_good:'Good effort!', quiz_results_good_sub:"You'd pass, but there's room to grow.",
+    quiz_results_keep:'Keep going!', quiz_results_keep_sub:'Re-read the page and try again — you got this!',
+    quiz_results_continue:'Continue →',
+    quiz_quit_title:'Leave the quiz? 😢', quiz_quit_sub:"Your progress won't be saved.",
+    quiz_quit_stay:'KEEP GOING 💪', quiz_quit_leave:'Yes, leave',
+    streak_first_headline:"You're on a streak! ⚡", streak_first_sub:'Come back tomorrow to keep it going!',
+    streak_milestone_headline:(n)=>`${n} days in a row! 🔥`, streak_milestone_sub:"That's incredible — keep it up!",
+    streak_default_headline:(n)=>`${n} day streak! ⚡`, streak_default_sub:"You're building great habits!",
+    streak_cta:'Keep it up! 💪',
+  },
+  ar: {
+    nav_chapters:'الفصول', nav_rewards:'المكافآت', nav_parent_zone:'منطقة الأهل',
+    chapters_add:'+ إضافة فصل', chapters_empty_title:'لا توجد فصول بعد',
+    chapters_empty_sub:'أنشئ فصلك الأول لتبدأ التعلم!',
+    chapters_empty_cta:'إعداد أول فصل', chapters_tap:'اضغط للدراسة ←',
+    chapters_modal_title:'فصل جديد', chapters_modal_name_label:'اسم الفصل',
+    chapters_modal_name_placeholder:'مثلاً: رياضيات، علوم، تاريخ...',
+    chapters_modal_icon_label:'اختر أيقونة', chapters_modal_cta:'إنشاء الفصل ←',
+    chapters_modal_creating:'جارٍ الإنشاء...', chapters_modal_cancel:'إلغاء',
+    current_back:'رجوع →', current_new:'جديد', current_revision:'مراجعة',
+    current_no_exams:'لا توجد اختبارات بعد', current_exams_saved:(n)=>`${n} ${n===1?'اختبار':'اختبارات'} محفوظة`,
+    home_generating:'جارٍ إنشاء الاختبار...', home_reading:'Numio يقرأ الصورة ✨',
+    home_error_title:'حدث خطأ ما', home_try_again:'حاول مجدداً',
+    quiz_intro_lets_start:'هيا نبدأ!', quiz_intro_you_can:'أنت تستطيع! 💪',
+    quiz_intro_questions:(n)=>`${n} أسئلة`, quiz_intro_start:'← ابدأ',
+    quiz_check:'تحقق', quiz_continue:'استمر ←', quiz_correct:'صحيح!',
+    quiz_not_quite:'ليس تماماً!', quiz_correct_answer:(a)=>`✓ الإجابة الصحيحة: ${a}`,
+    quiz_fill_placeholder:'اكتب إجابتك...',
+    quiz_results_perfect:'نتيجة مثالية!', quiz_results_perfect_sub:'لو كان امتحاناً حقيقياً، لنجحت بامتياز!',
+    quiz_results_great:'شبه مثالي!', quiz_results_great_sub:'ستنجح في هذا الامتحان بسهولة!',
+    quiz_results_good:'جهد رائع!', quiz_results_good_sub:'ستنجح، لكن يمكنك التحسين أكثر.',
+    quiz_results_keep:'واصل المحاولة!', quiz_results_keep_sub:'أعد قراءة الصفحة وحاول مجدداً — أنت تستطيع!',
+    quiz_results_continue:'استمر ←',
+    quiz_quit_title:'هل تريد الخروج؟ 😢', quiz_quit_sub:'لن يتم حفظ تقدمك.',
+    quiz_quit_stay:'واصل 💪', quiz_quit_leave:'نعم، اخرج',
+    streak_first_headline:'أنت في سلسلة! ⚡', streak_first_sub:'عد غداً للحفاظ عليها!',
+    streak_milestone_headline:(n)=>`${n} أيام متتالية! 🔥`, streak_milestone_sub:'رائع جداً — استمر!',
+    streak_default_headline:(n)=>`سلسلة ${n} أيام! ⚡`, streak_default_sub:'أنت تبني عادات رائعة!',
+    streak_cta:'استمر! 💪',
+  }
+}
+function t(lang, key, ...args) {
+  const d = i18n[lang] || i18n.en
+  const v = d[key] ?? i18n.en[key]
+  if (typeof v === 'function') return v(...args)
+  return v ?? key
+}
+
+// ── NORMALIZE (for answer checking) ──────────────────────────────────────
+function normalize(str) {
+  return String(str ?? '').trim().toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u064B-\u0652\u0640]/g, '')
+    .replace(/[\u0622\u0623\u0625]/g, '\u0627')
+    .replace(/\u0629/g, '\u0647').replace(/\u0649/g, '\u064a')
+    .replace(/^\u0627\u0644/, '')
+    .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660))
+    .replace(/^(les|des|un|une|le|la|l'|the|a|an)\s+/i, '').trim()
+    .replace(/[.,!?;:"']/g, '')
+}
+function answersMatch(a, b) {
+  const na = normalize(a), nb = normalize(b)
+  if (na === nb) return true
+  const isLatin = s => /^[\x20-\x7E]+$/.test(s)
+  if (isLatin(na) && isLatin(nb)) return na.replace(/s$/, '') === nb.replace(/s$/, '')
+  return false
+}
+function wordSetMatches(sel, targets) {
+  if (!Array.isArray(sel) || !Array.isArray(targets)) return false
+  if (sel.length !== targets.length) return false
+  const norm = arr => arr.map(normalize).sort()
+  const a = norm(sel), b = norm(targets)
+  return a.every((w, i) => w === b[i])
+}
+function isAnswerCorrect(q, answer) {
+  if (!q) return false
+  if (q.type === 'text_highlight') return wordSetMatches(answer, q.target_words)
+  return answersMatch(answer, q.correct_answer)
+}
+function getTrueFalseOptions(ca) {
+  const a = (ca || '').toLowerCase()
+  if (a === 'vrai' || a === 'faux') return ['Vrai', 'Faux']
+  if (a === 'صحيح' || a === 'خطأ') return ['صحيح', 'خطأ']
+  return ['True', 'False']
+}
+
+// ── IMAGE COMPRESSION ────────────────────────────────────────────────────
+async function compressImage(file, maxW = 1600, quality = 0.82) {
+  return new Promise(resolve => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const scale = Math.min(1, maxW / img.width)
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(img.width * scale)
+      canvas.height = Math.round(img.height * scale)
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+      canvas.toBlob(blob => resolve(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', quality)
+    }
+    img.src = url
+  })
+}
+async function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader()
+    r.onload = () => resolve(r.result.split(',')[1])
+    r.onerror = reject
+    r.readAsDataURL(file)
+  })
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let state = {
+  lang: 'en',
+  // session
+  session: null, // supabase session
+  trialSessionId: null, // trial_sessions row id
+  trialUsed: false,
+  // app
+  streak: 0,
+  coins: 0,
+  chapters: [],
+  activeTab: 'chapters',
+  // nav stack
+  screen: 'chapters', // chapters | current_chapter | scan | quiz_intro | quiz | blocked
+  chapter: null,
+  exam: null,
+  // scan
+  scanImages: [],
+  scanStatus: 'idle', // idle | review | loading | error
+  scanError: null,
+  // quiz
+  quizIdx: 0,
+  quizAnswers: [],
+  quizSelected: null,
+  quizRevealed: false,
+  quizTypedValue: '',
+  quizHighlightIdx: [],
+  quizShowQuit: false,
+  quizShowResults: false,
+  quizShowStreak: false,
+  quizShowStreakModal: false,
+  quizShowCoinsModal: false,
+  quizStreakCount: 0,
+  quizCoinsEarned: 0,
+  quizConsecutiveCorrect: 0,
+  quizFireKey: 0,
+  // modals
+  showChapterModal: false,
+  showStreakModal: false,
+  showCoinsModal: false,
+  trialUsedVisible: false,
+  newChapterName: '',
+  newChapterEmoji: '📐',
+}
+
+function setState(updates) {
+  state = { ...state, ...updates }
+  render()
+}
+
+// ── SUPABASE AUTH + TRIAL SESSION ────────────────────────────────────────
+async function init() {
+  render() // show spinner
+  try {
+    // Sign in anonymously
+    const { data, error } = await sb.auth.signInAnonymously()
+    if (error) throw error
+    state.session = data.session
+
+    // Check or create trial session (browser fingerprint = anon user id)
+    const userId = data.session.user.id
+    const { data: existing } = await sb.from('trial_sessions').select('*').eq('anonymous_id', userId).maybeSingle()
+    if (existing) {
+      state.trialSessionId = existing.id
+      state.trialUsed = existing.quiz_used
+      state.streak = existing.streak || 0
+      state.coins = existing.coins || 0
+      state.chapters = existing.chapters || []
+    } else {
+      const { data: created } = await sb.from('trial_sessions').insert({ anonymous_id: userId }).select().single()
+      state.trialSessionId = created.id
+    }
+  } catch (e) {
+    console.error('Init error:', e)
+  }
+  setState({})
+}
+
+async function saveTrialSession(updates) {
+  if (!state.trialSessionId) return
+  await sb.from('trial_sessions').update(updates).eq('id', state.trialSessionId)
+}
+
+// ── GENERATE QUIZ ─────────────────────────────────────────────────────────
+async function generateTrialQuiz(images) {
+  const token = state.session?.access_token
+  const res = await fetch(EDGE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ images, trial_session_id: state.trialSessionId })
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Unknown error' }))
+    throw new Error(err.error || 'Failed to generate quiz')
+  }
+  return res.json()
+}
+
+// ── NAV HELPERS ───────────────────────────────────────────────────────────
+function go(screen, extra = {}) { setState({ screen, ...extra }) }
+
+function handleTabChange(tab) {
+  if (tab === 'rewards' || tab === 'parent_zone' || tab === 'profile') {
+    setState({ activeTab: tab, screen: 'blocked', chapter: null, exam: null })
+    return
+  }
+  setState({ activeTab: tab, screen: 'chapters', chapter: null, exam: null })
+}
+
+// ── CHAPTER HELPERS ───────────────────────────────────────────────────────
+function createChapter(name, emoji) {
+  const chapter = { id: Date.now().toString(), name, emoji, examCount: 0 }
+  const chapters = [...state.chapters, chapter]
+  setState({ chapters, showChapterModal: false, newChapterName: '', newChapterEmoji: '📐' })
+  saveTrialSession({ chapters })
+}
+
+// ── QUIZ FLOW ─────────────────────────────────────────────────────────────
+async function handleGenerate() {
+  if (!state.scanImages.length) return
+  if (state.trialUsed) { setState({ trialUsedVisible: true }); return }
+  setState({ scanStatus: 'loading', scanError: null })
+  try {
+    const compressed = await Promise.all(state.scanImages.map(i => compressImage(i.file)))
+    const b64images = await Promise.all(compressed.map(async f => ({ data: await fileToBase64(f), mediaType: 'image/jpeg' })))
+    const exam = await generateTrialQuiz(b64images)
+    // mark trial used
+    const newStreak = state.streak + 1
+    const newCoins = state.coins + (exam.questions?.length || 3) * 2
+    setState({ trialUsed: true, streak: newStreak, coins: newCoins, exam, scanStatus: 'idle', scanImages: [] })
+    saveTrialSession({ quiz_used: true, streak: newStreak, coins: newCoins })
+    go('quiz_intro', { exam })
+  } catch (err) {
+    setState({ scanStatus: 'error', scanError: err })
+  }
+}
+
+// ── QUIZ LOGIC ────────────────────────────────────────────────────────────
+function currentAnswer() {
+  const q = state.exam?.questions?.[state.quizIdx]
+  if (!q) return null
+  if (q.type === 'fill_blank') return state.quizTypedValue
+  if (q.type === 'text_highlight') return state.quizHighlightIdx.map(i => q.text.split(' ')[i])
+  return state.quizSelected
+}
+
+function handleCheck() {
+  const answer = currentAnswer()
+  const q = state.exam?.questions?.[state.quizIdx]
+  const empty = q?.type === 'text_highlight' ? state.quizHighlightIdx.length === 0 : (!answer && answer !== false)
+  if (empty) return
+  const correct = isAnswerCorrect(q, answer)
+  const newConsec = correct ? state.quizConsecutiveCorrect + 1 : 0
+  setState({ quizRevealed: true, quizConsecutiveCorrect: newConsec, quizFireKey: correct && newConsec >= 2 ? state.quizFireKey + 1 : state.quizFireKey })
+}
+
+function handleContinue() {
+  const answer = currentAnswer()
+  const questions = state.exam?.questions || []
+  const newAnswers = [...state.quizAnswers, answer]
+  if (state.quizIdx === questions.length - 1) {
+    // quiz done — show streak popup then results
+    const newStreak = state.streak // already updated
+    setState({ quizAnswers: newAnswers, quizShowStreak: true, quizStreakCount: newStreak })
+    return
+  }
+  setState({ quizIdx: state.quizIdx + 1, quizAnswers: newAnswers, quizSelected: null, quizRevealed: false, quizTypedValue: '', quizHighlightIdx: [] })
+}
+
+function resetQuizState() {
+  setState({ quizIdx: 0, quizAnswers: [], quizSelected: null, quizRevealed: false, quizTypedValue: '', quizHighlightIdx: [], quizShowQuit: false, quizShowResults: false, quizShowStreak: false, quizConsecutiveCorrect: 0, quizFireKey: 0, quizCoinsEarned: 0 })
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function render() {
+  const app = document.getElementById('app')
+  const s = state
+  const lang = s.lang
+  const dir = lang === 'ar' ? 'rtl' : 'ltr'
+  document.documentElement.lang = lang
+  document.documentElement.dir = dir
+
+  const hideNav = ['quiz', 'quiz_intro', 'scan'].includes(s.screen) ||
+    (s.screen === 'quiz' && s.quizShowResults) ||
+    (s.screen === 'quiz' && s.quizShowStreak)
+
+  if (!s.session && !s.trialSessionId) {
+    app.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;background:white;">
+      <div class="spinner"></div></div>`
+    return
+  }
+
+  let mainContent = ''
+
+  if (s.screen === 'chapters') mainContent = renderChapters()
+  else if (s.screen === 'current_chapter') mainContent = renderCurrentChapter()
+  else if (s.screen === 'scan') mainContent = renderScan()
+  else if (s.screen === 'quiz_intro') mainContent = renderQuizIntro()
+  else if (s.screen === 'quiz') mainContent = renderQuiz()
+  else if (s.screen === 'blocked') mainContent = renderBlocked()
+
+  app.innerHTML = `
+    ${!hideNav ? renderSidebar() : ''}
+    <div class="main" ${hideNav ? 'style="padding-bottom:0;margin-left:0;"' : ''}>
+      <div class="screen">${mainContent}</div>
+    </div>
+    ${!hideNav ? renderBottomNav() : ''}
+    ${s.showChapterModal ? renderChapterModal() : ''}
+    ${s.trialUsedVisible ? renderTrialUsed() : ''}
+    ${s.quizShowStreakModal ? renderStreakModalOverlay() : ''}
+    ${s.quizShowCoinsModal ? renderCoinsModalOverlay() : ''}
+  `
+  attachListeners()
+}
+
+// ── SIDEBAR ───────────────────────────────────────────────────────────────
+function renderSidebar() {
+  const s = state; const lang = s.lang
+  const tabs = [
+    { id: 'chapters', icon: '/nav-chapters.png', label: t(lang, 'nav_chapters') },
+    { id: 'rewards',  icon: '/nav-gift.png',     label: t(lang, 'nav_rewards') },
+    { id: 'parent_zone', icon: '/nav-parent.png', label: t(lang, 'nav_parent_zone') },
+    { id: 'profile',  icon: '/nav-profile.png',  label: 'Profile' },
+  ]
+  return `<aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/nav-logo.png" alt="Numio" />
+      ${s.streak > 0 ? `<div class="streak-badge"><img src="/streak-mascot.png" alt=""/><span>${s.streak}</span></div>` : ''}
+    </div>
+    <div class="nav-items">
+      ${tabs.map(tab => `
+        <button class="nav-item${s.activeTab === tab.id ? ' active' : ''}" data-nav="${tab.id}">
+          <div class="nav-item-icon"><img src="${tab.icon}" alt="" /></div>
+          ${tab.label}
+        </button>
+      `).join('')}
+    </div>
+    ${s.streak > 0 ? `<div class="sidebar-streak">
+      <img src="/streak-mascot.png" alt="" />
+      <div>
+        <p class="font-display" style="font-size:18px;font-weight:700;color:#7c3aed;">${s.streak} day${s.streak!==1?'s':''}</p>
+        <p style="font-size:12px;color:var(--muted);">Current streak ⚡</p>
+      </div>
+    </div>` : ''}
+  </aside>`
+}
+
+function renderBottomNav() {
+  const s = state; const lang = s.lang
+  const tabs = [
+    { id: 'chapters', icon: '/nav-chapters.png' },
+    { id: 'rewards',  icon: '/nav-gift.png' },
+    { id: 'parent_zone', icon: '/nav-parent.png' },
+    { id: 'profile',  icon: '/nav-profile.png' },
+  ]
+  return `<nav class="bottom-nav">
+    ${tabs.map(tab => `
+      <button class="bottom-nav-item" data-nav="${tab.id}">
+        <div class="bottom-nav-icon${s.activeTab === tab.id ? ' active' : ''}">
+          <img src="${tab.icon}" alt="" />
+        </div>
+      </button>
+    `).join('')}
+  </nav>`
+}
+
+// ── BLOCKED ───────────────────────────────────────────────────────────────
+function renderBlocked() {
+  return `<div class="blocked-screen">
+    <div style="font-size:64px;">🎁</div>
+    <div>
+      <h2 class="font-display" style="font-size:28px;font-weight:800;color:var(--ink);">Enjoy your free trial!</h2>
+      <p style="font-size:16px;color:var(--muted);margin-top:8px;max-width:280px;margin-left:auto;margin-right:auto;">This section is part of the full Numio experience. Get the full app to unlock everything!</p>
+    </div>
+    <a href="https://numiomath.app" target="_blank" style="text-decoration:none;">
+      <button class="btn-purple" style="max-width:280px;">Get Full Numio →</button>
+    </a>
+  </div>`
+}
+
+// ── CHAPTERS ──────────────────────────────────────────────────────────────
+function renderChapters() {
+  const s = state; const lang = s.lang
+  const chapters = s.chapters
+
+  const streakRow = `<div class="streak-row">
+    <div class="streak-row-headline">
+      <h2>${s.streak > 0 ? (lang==='ar'?'استمر في التعلم كل يوم!':'Keep learning every day!') : (lang==='ar'?'ابدأ سلسلتك اليوم!':'Start your streak today!')}</h2>
+      <p>${lang==='ar'?'أكمل اختباراً كل يوم لبناء سلسلة':'Complete a quiz daily to build a streak'}</p>
+    </div>
+    <div class="streak-cards">
+      <button class="streak-card" style="background:${s.streak>0?'#fff0f6':'#f9fafb'};" id="btn-streak-modal">
+        <img src="/streak-fire.png" alt="streak" style="${s.streak===0?'filter:grayscale(1) opacity(0.4)':''}" />
+        <div>
+          <p class="streak-num" style="color:${s.streak>0?'#ff2d78':'#d1d5db'}">${s.streak}</p>
+          <p class="streak-label">${lang==='ar'?'أيام':'day streak'}</p>
+        </div>
+      </button>
+      <button class="streak-card" style="background:#fffbeb;" id="btn-coins-modal">
+        <img src="/coin-flower.png" alt="coins" />
+        <div>
+          <p class="streak-num" style="color:#f59e0b">${s.coins}</p>
+          <p class="streak-label">${lang==='ar'?'عملات':'coins'}</p>
+        </div>
+      </button>
+    </div>
+  </div>`
+
+  const leaderboardLink = `<button class="leaderboard-link" onclick="window.open('https://numiomath.app','_blank')">
+    <span>${lang==='ar'?'تحقق من لوحة نجوم Numio':'Check the Numio Stars leaderboard'}</span>
+    <span style="font-size:13px;">→</span>
+  </button>`
+
+  const chaptersTitle = `<div class="chapters-title">
+    <h1>${lang==='ar'?'فصولي':'My Chapters'}</h1>
+    <p>${lang==='ar'?'اختر فصلاً لتبدأ':'Pick a chapter to start learning'}</p>
+  </div>`
+
+  let chaptersContent
+  if (chapters.length === 0) {
+    chaptersContent = `<div class="chapters-empty">
+      <img src="/nav-profile.png" alt="" class="float-slow" />
+      <div>
+        <h2>${t(lang,'chapters_empty_title')}</h2>
+        <p>${t(lang,'chapters_empty_sub')}</p>
+      </div>
+      <button class="btn-purple" id="btn-add-chapter">${t(lang,'chapters_empty_cta')}</button>
+    </div>`
+  } else {
+    chaptersContent = `<div class="chapters-grid">
+      ${chapters.map((ch, i) => `
+        <button class="chapter-card" data-chapter="${ch.id}">
+          <div class="chapter-card-top" style="background:${CARD_ACCENTS[i%CARD_ACCENTS.length]}">
+            <span class="chapter-card-emoji">${ch.emoji}</span>
+          </div>
+          <div class="chapter-card-body">
+            <p class="chapter-card-name">${ch.name}</p>
+            <p class="chapter-card-sub">${t(lang,'chapters_tap')}</p>
+          </div>
+        </button>
+      `).join('')}
+    </div>
+    <button class="add-chapter-btn" id="btn-add-chapter">${t(lang,'chapters_add')}</button>`
+  }
+
+  return `<div class="chapters-inner">
+    ${streakRow}${leaderboardLink}${chaptersTitle}${chaptersContent}
+  </div>
+  ${renderStreakModalInline()}
+  ${renderCoinsModalInline()}`
+}
+
+function renderStreakModalInline() {
+  if (!state.showStreakModal) return ''
+  return renderStreakModal(state.streak, state.lang, 'closeStreakModal')
+}
+function renderCoinsModalInline() {
+  if (!state.showCoinsModal) return ''
+  return renderCoinsModal(state.coins, state.lang, 'closeCoinsModal')
+}
+
+function renderStreakModal(streak, lang, closeId) {
+  const dayLetters = lang==='ar' ? ['ح','س','خ','أ','ث','ث','إ'] : ['S','M','T','W','T','F','S']
+  const today = new Date().getDay()
+  const days = Array.from({length:7},(_,i)=>{
+    const dayIndex=(today-6+i+7)%7
+    const isActive=i>=(7-Math.min(streak,7))
+    const isToday=i===6
+    return {letter:dayLetters[dayIndex],isActive,isToday}
+  })
+  return `<div class="streak-modal-overlay" id="${closeId}-overlay">
+    <div class="streak-modal">
+      <button class="modal-close" id="${closeId}">✕</button>
+      <p class="font-display" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.1em;">${lang==='ar'?'سلسلتك':'Streak'}</p>
+      <img src="/streak-fire.png" alt="streak" style="width:144px;height:auto;${streak===0?'filter:grayscale(1) opacity(0.4)':''}${streak>0?' animation:float 2s ease-in-out infinite':''}" />
+      <div>
+        <p class="font-display" style="font-size:48px;font-weight:800;color:white;">${streak} <span style="color:${streak>0?'#ff2d78':'#6b7280'}">${lang==='ar'?'يوم':'Day'}</span></p>
+        <p class="font-display" style="font-size:24px;font-weight:800;color:rgba(255,255,255,0.8)">${lang==='ar'?'سلسلة!':'Streak!'}</p>
+      </div>
+      <div class="weekly-dots">
+        ${days.map((d,i)=>`<div class="weekly-dot">
+          <div class="weekly-dot-inner" style="background:${d.isActive?'#ff2d78':'rgba(255,255,255,0.1)'};color:${d.isActive?'white':'rgba(255,255,255,0.3)'}">
+            ${d.isActive?'✓':d.letter}
+          </div>
+          <span class="weekly-dot-letter" style="color:${d.isToday?'#ff2d78':'rgba(255,255,255,0.3)'}">${d.letter}</span>
+        </div>`).join('')}
+      </div>
+      <p style="font-size:14px;color:rgba(255,255,255,0.5);">${streak>0?(lang==='ar'?'أكمل اختباراً اليوم للحفاظ على سلسلتك!':'Complete a quiz today to keep your streak going!'):(lang==='ar'?'أكمل اختباراً اليوم لبدء سلسلتك!':'Complete a quiz today to start your streak!')}</p>
+      <button id="${closeId}" class="btn-purple" style="background:#ff2d78;box-shadow:0 4px 0 #c4005a;max-width:100%;">${lang==='ar'?'حسناً! 💪':'Let\'s go! 💪'}</button>
+    </div>
+  </div>`
+}
+
+function renderCoinsModal(coins, lang, closeId) {
+  return `<div class="streak-modal-overlay" id="${closeId}-overlay">
+    <div class="streak-modal coins-modal">
+      <button class="modal-close" id="${closeId}" style="color:white;">✕</button>
+      <p class="font-display" style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,200,0,0.6)">${lang==='ar'?'عملاتك':'Your Coins'}</p>
+      <img src="/coin-flower.png" alt="coins" style="width:160px;height:auto;animation:float 2s ease-in-out infinite" />
+      <div>
+        <p class="font-display" style="font-size:60px;font-weight:800;color:#fbbf24;">${coins}</p>
+        <p class="font-display" style="font-size:20px;font-weight:700;color:rgba(251,191,36,0.6)">${lang==='ar'?'عملة':'coins'}</p>
+      </div>
+      <p style="font-size:14px;color:rgba(255,255,255,0.4)">${lang==='ar'?'اكسب عملات بإكمال الاختبارات وصرفها على مكافآت!':'Earn coins by completing quizzes and spend them on rewards!'}</p>
+      <button id="${closeId}" class="btn-purple" style="background:#fbbf24;color:#78350f;box-shadow:0 4px 0 #d97706;max-width:100%;">${lang==='ar'?'رائع! 🎁':'Awesome! 🎁'}</button>
+    </div>
+  </div>`
+}
+
+function renderStreakModalOverlay() { return renderStreakModal(state.quizStreakCount, state.lang, 'closeQuizStreakModal') }
+function renderCoinsModalOverlay() { return renderCoinsModal(state.coins, state.lang, 'closeQuizCoinsModal') }
+
+// ── CURRENT CHAPTER ───────────────────────────────────────────────────────
+function renderCurrentChapter() {
+  const s = state; const lang = s.lang; const ch = s.chapter
+  const examCount = s.trialUsed ? 1 : 0
+  return `<div class="screen" style="overflow-y:auto;">
+    <div class="current-inner">
+      <button class="back-btn" id="btn-back-chapters">← Back</button>
+      <div class="chapter-header">
+        <div class="chapter-icon-box">${ch.emoji}</div>
+        <div>
+          <p class="chapter-header-title font-display">${ch.name}</p>
+          <p class="chapter-header-sub">${t(lang,'current_exams_saved',examCount)}</p>
+        </div>
+      </div>
+      <div class="action-grid">
+        <button class="action-card action-card-new" id="btn-new-quiz" ${s.trialUsed?'data-trial-used="true"':''}>
+          <div class="action-icon-circle" style="background:rgba(255,255,255,0.2)">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <span class="action-label font-display" style="color:white;">${t(lang,'current_new')}</span>
+        </button>
+        <button class="action-card action-card-revision" disabled>
+          <div class="action-icon-circle" style="background:#ede9fe">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <span class="action-label font-display" style="color:var(--ink)">${t(lang,'current_revision')}</span>
+          <span style="font-size:12px;color:var(--muted)">${t(lang,'current_no_exams')}</span>
+        </button>
+      </div>
+    </div>
+  </div>`
+}
+
+// ── SCAN / HOME ───────────────────────────────────────────────────────────
+function renderScan() {
+  const s = state; const lang = s.lang; const ch = s.chapter
+  return `<div style="height:100dvh;display:flex;flex-direction:column;background:white;">
+    <div class="scan-inner">
+      <button class="back-btn" style="flex-shrink:0;margin-top:48px;margin-bottom:8px;" id="btn-back-chapter">← Back</button>
+      <div style="flex-shrink:0;display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+        <span style="font-size:32px;">${ch?.emoji||'📐'}</span>
+        <h1 class="font-display" style="font-size:24px;font-weight:800;color:var(--ink);">${ch?.name||''}</h1>
+      </div>
+      ${s.scanStatus==='idle' ? renderScanIdle(lang) : ''}
+      ${s.scanStatus==='review' ? renderScanReview(lang) : ''}
+      ${s.scanStatus==='loading' ? renderScanLoading(lang) : ''}
+      ${s.scanStatus==='error' ? renderScanError(lang) : ''}
+    </div>
+    <input type="file" id="file-input" accept="image/*" multiple style="display:none;" />
+  </div>`
+}
+
+function renderScanIdle(lang) {
+  return `<div class="scan-idle">
+    <img src="/nav-profile.png" alt="" style="width:144px;height:auto;animation:float 3s ease-in-out infinite;" />
+    <div style="text-align:center;padding:0 16px;">
+      <p class="font-display" style="font-size:24px;font-weight:800;color:var(--ink);line-height:1.3;">${lang==='ar'?'أعطني صورة وسأحوّلها إلى اختبار ممتع!':'Give me a photo, I\'ll turn it into a fun quiz!'}</p>
+    </div>
+    <button class="camera-btn" id="btn-camera">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+    </button>
+    <p class="scan-hint">${lang==='ar'?'اضغط للتقاط صورة أو اختيار من معرضك':'Tap to take a photo or choose from gallery'}</p>
+  </div>`
+}
+
+function renderScanReview(lang) {
+  const imgs = state.scanImages
+  return `<div style="flex:1;display:flex;flex-direction:column;gap:20px;padding-bottom:40px;">
+    <div class="img-previews">
+      ${imgs.map((img,i)=>`<div class="img-preview-wrap">
+        <img src="${img.preview}" alt="Page ${i+1}" />
+        <button class="img-remove" data-remove="${i}">×</button>
+        <span class="img-num">${i+1}</span>
+      </div>`).join('')}
+      ${imgs.length < 5 ? `<button class="img-add-btn" id="btn-add-more">+</button>` : ''}
+    </div>
+    <p style="font-size:14px;color:var(--muted);">${imgs.length} ${lang==='ar'?'صفحة مضافة':`page${imgs.length>1?'s':''} added`}</p>
+    <button class="generate-btn" id="btn-generate">✨ ${lang==='ar'?'توليد الاختبار':'Generate quiz'}</button>
+    <button class="cancel-btn" id="btn-cancel-scan">${lang==='ar'?'إلغاء':'Cancel'}</button>
+  </div>`
+}
+
+function renderScanLoading(lang) {
+  return `<div class="loading-center">
+    <img src="/nav-profile.png" alt="" style="width:112px;height:auto;animation:float 2s ease-in-out infinite;" />
+    <div>
+      <p class="font-display" style="font-size:20px;font-weight:700;color:var(--ink);">${t(lang,'home_generating')}</p>
+      <p style="font-size:14px;color:var(--muted);margin-top:4px;">${t(lang,'home_reading')}</p>
+    </div>
+    <div class="spinner"></div>
+  </div>`
+}
+
+function renderScanError(lang) {
+  return `<div class="error-center">
+    <span style="font-size:64px;">😅</span>
+    <div>
+      <p class="font-display" style="font-size:20px;font-weight:700;color:var(--ink);">${t(lang,'home_error_title')}</p>
+      <p style="font-size:14px;color:var(--muted);margin-top:8px;">${state.scanError?.message||'Something went wrong'}</p>
+    </div>
+    <button class="btn-purple" id="btn-try-again" style="max-width:280px;">${t(lang,'home_try_again')}</button>
+  </div>`
+}
+
+// ── QUIZ INTRO ────────────────────────────────────────────────────────────
+function renderQuizIntro() {
+  const s = state; const lang = s.lang; const exam = s.exam
+  return `<div class="quiz-intro" style="background:white;">
+    <button class="back-btn" style="position:absolute;top:48px;left:20px;" id="btn-back-scan">← Back</button>
+    <div class="quiz-intro-inner">
+      <img src="/nav-profile.png" alt="" style="width:176px;height:auto;animation:float 2s ease-in-out infinite;" />
+      <div style="text-align:center;display:flex;flex-direction:column;gap:8px;">
+        <h1 class="font-display" style="font-size:30px;font-weight:800;color:var(--ink);line-height:1.2;">
+          ${lang==='ar'?`${t(lang,'quiz_intro_lets_start')} Champ`:`Champ, ${t(lang,'quiz_intro_lets_start')}`}
+        </h1>
+        <p class="font-display" style="font-size:20px;font-weight:700;color:var(--purple);">${exam?.topic||''}</p>
+        <p style="font-size:16px;color:var(--muted);">${t(lang,'quiz_intro_you_can')}</p>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;border-radius:999px;padding:8px 20px;background:#f5f3ff;">
+        <span style="font-size:18px;">📝</span>
+        <span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;color:var(--muted);">${t(lang,'quiz_intro_questions',exam?.questions?.length||3)}</span>
+      </div>
+      <button class="btn-purple" id="btn-start-quiz" style="font-size:20px;padding:20px;">${t(lang,'quiz_intro_start')}</button>
+    </div>
+    <style>@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}</style>
+  </div>`
+}
+
+// ── QUIZ ──────────────────────────────────────────────────────────────────
+function renderQuiz() {
+  const s = state; const lang = s.lang
+  if (s.quizShowStreak) return renderStreakPopup()
+  if (s.quizShowResults) return renderResults()
+
+  const questions = s.exam?.questions || []
+  const q = questions[s.quizIdx]
+  if (!q) return ''
+
+  const total = questions.length
+  const onFire = s.quizConsecutiveCorrect >= 2
+  const progressScale = (s.quizIdx + (s.quizRevealed ? 1 : 0)) / Math.max(total, 1)
+  const answer = currentAnswer()
+  const isCorrect = s.quizRevealed && isAnswerCorrect(q, answer)
+
+  let answersHtml = ''
+  if (q.type === 'mcq') {
+    answersHtml = `<div style="display:flex;flex-direction:column;gap:12px;">
+      ${q.options.map(opt => {
+        let cls = 'mcq-btn'
+        if (s.quizRevealed) {
+          if (opt === q.correct_answer) cls += ' correct'
+          else if (opt === s.quizSelected) cls += ' wrong'
+          else cls += ' faded'
+        } else if (opt === s.quizSelected) cls += ' selected'
+        return `<button class="${cls}" data-mcq="${encodeURIComponent(opt)}" ${s.quizRevealed?'disabled':''}>${opt}</button>`
+      }).join('')}
+    </div>`
+  } else if (q.type === 'true_false') {
+    const opts = getTrueFalseOptions(q.correct_answer)
+    answersHtml = `<div class="tf-grid">
+      ${opts.map(opt => {
+        let cls = 'tf-btn'
+        if (s.quizRevealed) {
+          if (answersMatch(opt, q.correct_answer)) cls += ' correct'
+          else if (opt === s.quizSelected) cls += ' wrong'
+          else cls += ' faded'
+        } else if (opt === s.quizSelected) cls += ' selected'
+        return `<button class="${cls}" data-mcq="${encodeURIComponent(opt)}" ${s.quizRevealed?'disabled':''}>${opt}</button>`
+      }).join('')}
+    </div>`
+  } else if (q.type === 'fill_blank') {
+    const fillCorrect = s.quizRevealed && isAnswerCorrect(q, s.quizTypedValue)
+    answersHtml = `<div style="display:flex;flex-direction:column;gap:8px;">
+      <input type="text" id="fill-input" class="fill-input ${s.quizRevealed?(fillCorrect?'correct':'wrong'):''}" 
+        value="${s.quizTypedValue.replace(/"/g,'&quot;')}" 
+        placeholder="${t(lang,'quiz_fill_placeholder')}"
+        ${s.quizRevealed?'disabled':''} />
+      ${s.quizRevealed && !fillCorrect ? `<p class="correct-answer-hint">${t(lang,'quiz_correct_answer',q.correct_answer)}</p>` : ''}
+    </div>`
+  } else if (q.type === 'visual_count') {
+    const assetUrl = getAssetUrl(q.asset)
+    answersHtml = `<div>
+      <div class="visual-count-row">
+        ${Array.from({length:q.quantity}).map(()=>assetUrl?`<img src="${assetUrl}" alt="${q.asset}" style="width:40px;height:40px;">`:`<span style="font-size:36px;">❓</span>`).join('')}
+      </div>
+      <div class="tf-grid">
+        ${q.options.map(opt => {
+          let cls = 'tf-btn'
+          if (s.quizRevealed) {
+            if (String(opt) === String(q.correct_answer)) cls += ' correct'
+            else if (opt === s.quizSelected) cls += ' wrong'
+            else cls += ' faded'
+          } else if (opt === s.quizSelected) cls += ' selected'
+          return `<button class="${cls}" data-mcq="${opt}" ${s.quizRevealed?'disabled':''}>${opt}</button>`
+        }).join('')}
+      </div>
+    </div>`
+  } else if (q.type === 'text_highlight') {
+    const words = q.text.split(' ')
+    const normTargets = (q.target_words||[]).map(normalize)
+    answersHtml = `<div class="highlight-wrap">
+      ${words.map((word,i)=>{
+        const isSel = s.quizHighlightIdx.includes(i)
+        const isTarget = normTargets.includes(normalize(word))
+        let cls = 'highlight-word'
+        if (s.quizRevealed) {
+          if (isSel && isTarget) cls += ' correct-selected'
+          else if (isSel && !isTarget) cls += ' wrong-selected'
+          else if (!isSel && isTarget) cls += ' missed'
+        } else if (isSel) cls += ' selected'
+        return `<button class="${cls}" data-wordidx="${i}" ${s.quizRevealed?'disabled':''}>${word}</button>`
+      }).join('')}
+    </div>`
+  }
+
+  const explanationHtml = s.quizRevealed && q.explanation
+    ? `<div class="explanation-box">💡 ${q.explanation}</div>` : ''
+
+  const checkDisabled = q.type==='fill_blank' ? s.quizTypedValue.trim()==='' :
+    q.type==='text_highlight' ? s.quizHighlightIdx.length===0 : s.quizSelected===null
+
+  const bottomHtml = !s.quizRevealed
+    ? `<button class="check-btn" id="btn-check" ${checkDisabled?'disabled':''}>${t(lang,'quiz_check')}</button>`
+    : `<div class="feedback-box" style="border-color:${isCorrect?'#86efac':'#fca5a5'};background:${isCorrect?'#f0fdf4':'#fff5f5'}">
+        <div class="feedback-top">
+          <span style="font-size:24px;">${isCorrect?'🎉':'💪'}</span>
+          <p class="feedback-label">${isCorrect?t(lang,'quiz_correct'):t(lang,'quiz_not_quite')}</p>
+        </div>
+        <button class="continue-btn" id="btn-continue"
+          style="background:${isCorrect?'var(--purple)':'#f59e0b'};box-shadow:0 4px 0 ${isCorrect?'var(--purple-dark)':'#d97706'}">
+          ${t(lang,'quiz_continue')}
+        </button>
+      </div>`
+
+  return `<div class="quiz-wrap">
+    ${s.quizShowQuit ? renderQuitPopup() : ''}
+    ${onFire ? renderFireOverlay() : ''}
+    <div class="quiz-inner">
+      <div class="quiz-topbar">
+        <button class="quit-btn" id="btn-quit-quiz">
+          <svg width="40" height="40" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 4l12 12M16 4L4 16"/></svg>
+        </button>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar${onFire?' on-fire':''}" style="transform:scaleX(${progressScale})"></div>
+        </div>
+        <span class="quiz-qnum">${s.quizIdx+1}/${total}</span>
+      </div>
+      <div class="quiz-topic">${exam?.topic||''}</div>
+      <div class="quiz-question">${q.question}</div>
+      <div class="quiz-answers">${answersHtml}${explanationHtml}</div>
+      <div class="quiz-bottom">${bottomHtml}</div>
+    </div>
+    <style>@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}</style>
+  </div>`
+}
+
+function renderQuitPopup() {
+  const lang = state.lang
+  return `<div class="quit-overlay">
+    <div class="quit-sheet">
+      <p class="font-display" style="font-size:18px;font-weight:700;color:var(--ink);text-align:center;line-height:1.4;">${t(lang,'quiz_quit_title')}<br/>${t(lang,'quiz_quit_sub')}</p>
+      <div class="quit-btns">
+        <button class="btn-purple" id="btn-quit-stay" style="max-width:100%;">${t(lang,'quiz_quit_stay')}</button>
+        <button class="btn-ghost" id="btn-quit-leave">${t(lang,'quiz_quit_leave')}</button>
+      </div>
+    </div>
+  </div>`
+}
+
+function renderFireOverlay() {
+  const fires = Array.from({length:20},()=>({left:Math.random()*100,delay:(Math.random()*0.5).toFixed(2),dur:(0.8+Math.random()*0.8).toFixed(2),size:28+Math.random()*32}))
+  const heads = Array.from({length:8},()=>({left:Math.random()*95,delay:(Math.random()*0.6).toFixed(2),dur:(0.9+Math.random()).toFixed(2),size:50+Math.random()*60,rot:((Math.random()-0.5)*60).toFixed(1)}))
+  return `<div class="fire-overlay" key="${state.quizFireKey}">
+    ${fires.map(p=>`<div style="position:absolute;bottom:-80px;left:${p.left}%;font-size:${p.size}px;opacity:0;animation:fire-rise ${p.dur}s ${p.delay}s ease-out both">🔥</div>`).join('')}
+    ${heads.map(p=>`<div style="position:absolute;bottom:-100px;left:${p.left}%;width:${p.size}px;height:${p.size}px;opacity:0;transform:rotate(${p.rot}deg);animation:fire-rise ${p.dur}s ${p.delay}s ease-out both"><img src="/nav-profile.png" alt="" style="width:100%;height:100%;object-fit:contain;"/></div>`).join('')}
+  </div>`
+}
+
+function renderStreakPopup() {
+  const s = state; const lang = s.lang; const streak = s.quizStreakCount
+  const isFirst = streak===1
+  const isMilestone = [3,5,7,10,14,21,30].includes(streak)
+  let headline, sub
+  if (isFirst) { headline=t(lang,'streak_first_headline'); sub=t(lang,'streak_first_sub') }
+  else if (isMilestone) { headline=t(lang,'streak_milestone_headline',streak); sub=t(lang,'streak_milestone_sub') }
+  else { headline=t(lang,'streak_default_headline',streak); sub=t(lang,'streak_default_sub') }
+  const dots = Array.from({length:Math.min(streak,7)})
+  return `<div class="streak-popup">
+    <div class="streak-popup-inner">
+      <img src="/streak-fire.png" alt="" style="width:192px;height:auto;animation:float 2s ease-in-out infinite;" />
+      <div>
+        <h2 class="font-display" style="font-size:36px;font-weight:800;color:white;">${headline}</h2>
+        <p style="font-size:16px;color:rgba(255,255,255,0.5);margin-top:8px;">${sub}</p>
+      </div>
+      <div class="streak-dots">
+        ${dots.map(()=>`<div class="streak-dot">✓</div>`).join('')}
+        ${streak>7?`<span class="font-display" style="font-size:24px;font-weight:800;color:#ff2d78">+${streak-7}</span>`:''}
+      </div>
+      <button class="btn-purple" id="btn-streak-done" style="background:#ff2d78;box-shadow:0 4px 0 #c4005a;max-width:100%;font-size:18px;">${t(lang,'streak_cta')}</button>
+    </div>
+    <style>@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}</style>
+  </div>`
+}
+
+function renderResults() {
+  const s = state; const lang = s.lang
+  const questions = s.exam?.questions || []
+  const answers = s.quizAnswers
+  const correct = questions.filter((q,i)=>isAnswerCorrect(q,answers[i])).length
+  const total = questions.length
+  const pct = Math.round((correct/total)*100)
+
+  let emoji, headlineKey, subKey
+  if (pct===100) { emoji='🏆'; headlineKey='quiz_results_perfect'; subKey='quiz_results_perfect_sub' }
+  else if (pct>=80) { emoji='🎉'; headlineKey='quiz_results_great'; subKey='quiz_results_great_sub' }
+  else if (pct>=60) { emoji='😊'; headlineKey='quiz_results_good'; subKey='quiz_results_good_sub' }
+  else { emoji='💪'; headlineKey='quiz_results_keep'; subKey='quiz_results_keep_sub' }
+
+  const coinsEarned = s.quizCoinsEarned || total * 2
+
+  return `<div class="results-screen">
+    <div class="results-inner">
+      <img src="/nav-profile.png" alt="" style="width:128px;height:auto;animation:float 2s ease-in-out infinite;" />
+      <div style="text-align:center;">
+        <p style="font-size:48px;">${emoji}</p>
+        <h2 class="font-display" style="font-size:30px;font-weight:800;color:var(--ink);margin-top:4px;">${t(lang,headlineKey)}</h2>
+        <p style="font-size:16px;color:var(--muted);margin-top:4px;">${t(lang,subKey)}</p>
+      </div>
+      <div class="score-box" style="background:#1a1200;box-shadow:0 4px 24px rgba(251,191,36,0.2);">
+        <img src="/coin-flower.png" alt="coins" style="width:56px;height:56px;object-fit:contain;animation:float 2s ease-in-out infinite;" />
+        <div>
+          <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(251,191,36,0.6);">Coins earned</p>
+          <p class="font-display" style="font-size:40px;font-weight:800;color:#fbbf24;line-height:1;">+${coinsEarned}</p>
+        </div>
+      </div>
+      <div class="score-box" style="background:#f5f3ff;">
+        <span style="font-size:40px;">🎯</span>
+        <div>
+          <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--purple);">Your score</p>
+          <p class="font-display" style="font-size:36px;font-weight:800;color:var(--purple);line-height:1;">${correct}/${total}</p>
+        </div>
+      </div>
+      <div style="width:100%;border-radius:16px;padding:20px;background:#f5f3ff;border:2px solid #ede9fe;text-align:center;">
+        <p class="font-display" style="font-size:18px;font-weight:800;color:var(--purple);">🎉 You just tried Numio!</p>
+        <p style="font-size:14px;color:var(--muted);margin-top:8px;">Get the full app to scan any lesson, build a streak, and unlock rewards.</p>
+        <a href="https://numiomath.app" target="_blank" style="text-decoration:none;display:block;margin-top:16px;">
+          <button class="btn-purple" style="max-width:100%;">Get Full Numio →</button>
+        </a>
+      </div>
+      <button class="btn-purple" id="btn-results-done" style="background:white;color:var(--purple);border:2px solid #ede9fe;box-shadow:none;">Back to chapters</button>
+    </div>
+    <style>@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}</style>
+  </div>`
+}
+
+// ── CHAPTER MODAL ─────────────────────────────────────────────────────────
+function renderChapterModal() {
+  const lang = state.lang; const s = state
+  return `<div class="modal-overlay" id="modal-overlay">
+    <div class="modal-sheet">
+      <div class="modal-handle"><div></div></div>
+      <div class="modal-body">
+        <h2 class="modal-title">${t(lang,'chapters_modal_title')}</h2>
+        <div>
+          <label class="form-label">${t(lang,'chapters_modal_name_label')}</label>
+          <input type="text" class="form-input" id="chapter-name-input" value="${s.newChapterName.replace(/"/g,'&quot;')}" placeholder="${t(lang,'chapters_modal_name_placeholder')}" />
+        </div>
+        <div>
+          <label class="form-label">${t(lang,'chapters_modal_icon_label')}</label>
+          <div class="emoji-grid">
+            ${EMOJI_OPTIONS.map(e=>`<button class="emoji-btn${s.newChapterEmoji===e?' selected':''}" data-emoji="${e}">${e}</button>`).join('')}
+          </div>
+        </div>
+        <div class="chapter-preview">
+          <span>${s.newChapterEmoji}</span>
+          <span>${s.newChapterName||t(lang,'chapters_modal_name_placeholder')}</span>
+        </div>
+        <button class="btn-purple" id="btn-confirm-chapter" ${!s.newChapterName.trim()?'disabled style="opacity:0.4;cursor:not-allowed;"':''}>${t(lang,'chapters_modal_cta')}</button>
+        <button class="btn-ghost" id="btn-close-modal">${t(lang,'chapters_modal_cancel')}</button>
+      </div>
+    </div>
+  </div>`
+}
+
+// ── TRIAL USED POPUP ──────────────────────────────────────────────────────
+function renderTrialUsed() {
+  const lang = state.lang
+  return `<div class="trial-used-overlay">
+    <div class="trial-used-sheet">
+      <span style="font-size:48px;">🎉</span>
+      <h2 class="font-display" style="font-size:24px;font-weight:800;color:var(--ink);">You've used your free trial!</h2>
+      <p style="font-size:15px;color:var(--muted);max-width:280px;">You already generated your trial quiz. Get the full Numio app to scan unlimited lessons!</p>
+      <a href="https://numiomath.app" target="_blank" style="text-decoration:none;width:100%;">
+        <button class="btn-purple" style="max-width:100%;">Get Full Numio →</button>
+      </a>
+      <button class="btn-ghost" id="btn-dismiss-trial">Maybe later</button>
+    </div>
+  </div>`
+}
+
+// ── ATTACH LISTENERS ──────────────────────────────────────────────────────
+let exam // reference for quiz
+function attachListeners() {
+  const s = state
+
+  // Nav
+  document.querySelectorAll('[data-nav]').forEach(btn => {
+    btn.addEventListener('click', () => handleTabChange(btn.dataset.nav))
+  })
+
+  // Streak/coins modals on chapters
+  const btnStreak = document.getElementById('btn-streak-modal')
+  if (btnStreak) btnStreak.addEventListener('click', () => setState({ showStreakModal: true }))
+  const btnCoins = document.getElementById('btn-coins-modal')
+  if (btnCoins) btnCoins.addEventListener('click', () => setState({ showCoinsModal: true }))
+  const closeStreak = document.getElementById('closeStreakModal')
+  if (closeStreak) closeStreak.addEventListener('click', () => setState({ showStreakModal: false }))
+  const closeCoins = document.getElementById('closeCoinsModal')
+  if (closeCoins) closeCoins.addEventListener('click', () => setState({ showCoinsModal: false }))
+
+  // Chapters
+  const btnAdd = document.getElementById('btn-add-chapter')
+  if (btnAdd) btnAdd.addEventListener('click', () => setState({ showChapterModal: true }))
+  document.querySelectorAll('[data-chapter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ch = s.chapters.find(c => c.id === btn.dataset.chapter)
+      if (ch) setState({ chapter: ch, screen: 'current_chapter', activeTab: 'chapters' })
+    })
+  })
+
+  // Chapter modal
+  const nameInput = document.getElementById('chapter-name-input')
+  if (nameInput) {
+    nameInput.addEventListener('input', e => setState({ newChapterName: e.target.value }))
+    nameInput.focus()
+  }
+  document.querySelectorAll('[data-emoji]').forEach(btn => {
+    btn.addEventListener('click', () => setState({ newChapterEmoji: btn.dataset.emoji }))
+  })
+  const confirmChapter = document.getElementById('btn-confirm-chapter')
+  if (confirmChapter) confirmChapter.addEventListener('click', () => {
+    if (s.newChapterName.trim()) createChapter(s.newChapterName.trim(), s.newChapterEmoji)
+  })
+  const closeModal = document.getElementById('btn-close-modal')
+  if (closeModal) closeModal.addEventListener('click', () => setState({ showChapterModal: false }))
+  const overlay = document.getElementById('modal-overlay')
+  if (overlay) overlay.addEventListener('click', e => { if (e.target === overlay) setState({ showChapterModal: false }) })
+
+  // Current Chapter
+  const backChapters = document.getElementById('btn-back-chapters')
+  if (backChapters) backChapters.addEventListener('click', () => setState({ screen: 'chapters', activeTab: 'chapters' }))
+  const btnNewQuiz = document.getElementById('btn-new-quiz')
+  if (btnNewQuiz) btnNewQuiz.addEventListener('click', () => {
+    if (s.trialUsed) { setState({ trialUsedVisible: true }); return }
+    setState({ screen: 'scan', scanStatus: 'idle', scanImages: [], scanError: null })
+  })
+
+  // Scan
+  const backChapter = document.getElementById('btn-back-chapter')
+  if (backChapter) backChapter.addEventListener('click', () => setState({ screen: 'current_chapter' }))
+  const btnCamera = document.getElementById('btn-camera')
+  const fileInput = document.getElementById('file-input')
+  if (btnCamera && fileInput) {
+    btnCamera.addEventListener('click', () => fileInput.click())
+    fileInput.addEventListener('change', e => {
+      const files = Array.from(e.target.files || [])
+      if (!files.length) return
+      const newImgs = files.map(f => ({ file: f, preview: URL.createObjectURL(f) }))
+      setState({ scanImages: [...s.scanImages, ...newImgs].slice(0,5), scanStatus: 'review' })
+    })
+  }
+  const btnAddMore = document.getElementById('btn-add-more')
+  if (btnAddMore && fileInput) btnAddMore.addEventListener('click', () => fileInput.click())
+  document.querySelectorAll('[data-remove]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = parseInt(btn.dataset.remove)
+      const next = s.scanImages.filter((_,i)=>i!==idx)
+      setState({ scanImages: next, scanStatus: next.length > 0 ? 'review' : 'idle' })
+    })
+  })
+  const btnGenerate = document.getElementById('btn-generate')
+  if (btnGenerate) btnGenerate.addEventListener('click', handleGenerate)
+  const btnCancelScan = document.getElementById('btn-cancel-scan')
+  if (btnCancelScan) btnCancelScan.addEventListener('click', () => setState({ scanImages: [], scanStatus: 'idle' }))
+  const btnTryAgain = document.getElementById('btn-try-again')
+  if (btnTryAgain) btnTryAgain.addEventListener('click', () => setState({ scanImages: [], scanStatus: 'idle', scanError: null }))
+
+  // Quiz Intro
+  const backScan = document.getElementById('btn-back-scan')
+  if (backScan) backScan.addEventListener('click', () => setState({ screen: 'current_chapter' }))
+  const btnStart = document.getElementById('btn-start-quiz')
+  if (btnStart) btnStart.addEventListener('click', () => {
+    resetQuizState()
+    setState({ screen: 'quiz' })
+  })
+
+  // Quiz
+  const btnQuit = document.getElementById('btn-quit-quiz')
+  if (btnQuit) btnQuit.addEventListener('click', () => setState({ quizShowQuit: true }))
+  const btnQuitStay = document.getElementById('btn-quit-stay')
+  if (btnQuitStay) btnQuitStay.addEventListener('click', () => setState({ quizShowQuit: false }))
+  const btnQuitLeave = document.getElementById('btn-quit-leave')
+  if (btnQuitLeave) btnQuitLeave.addEventListener('click', () => {
+    resetQuizState()
+    setState({ screen: 'current_chapter', quizShowQuit: false })
+  })
+
+  // MCQ / TF
+  document.querySelectorAll('[data-mcq]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (s.quizRevealed) return
+      setState({ quizSelected: decodeURIComponent(btn.dataset.mcq) })
+    })
+  })
+  // Fill blank
+  const fillInp = document.getElementById('fill-input')
+  if (fillInp) fillInp.addEventListener('input', e => setState({ quizTypedValue: e.target.value }))
+
+  // Text highlight
+  document.querySelectorAll('[data-wordidx]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (s.quizRevealed) return
+      const i = parseInt(btn.dataset.wordidx)
+      const next = s.quizHighlightIdx.includes(i) ? s.quizHighlightIdx.filter(x=>x!==i) : [...s.quizHighlightIdx, i]
+      setState({ quizHighlightIdx: next })
+    })
+  })
+
+  const btnCheck = document.getElementById('btn-check')
+  if (btnCheck) btnCheck.addEventListener('click', handleCheck)
+  const btnContinue = document.getElementById('btn-continue')
+  if (btnContinue) btnContinue.addEventListener('click', handleContinue)
+
+  // Streak popup (after quiz done)
+  const btnStreakDone = document.getElementById('btn-streak-done')
+  if (btnStreakDone) btnStreakDone.addEventListener('click', () => {
+    setState({ quizShowStreak: false, quizShowResults: true, quizCoinsEarned: (s.exam?.questions?.length||3)*2 })
+  })
+
+  // Results
+  const btnResultsDone = document.getElementById('btn-results-done')
+  if (btnResultsDone) btnResultsDone.addEventListener('click', () => {
+    resetQuizState()
+    setState({ screen: 'current_chapter' })
+  })
+
+  // Trial used dismiss
+  const btnDismissTrial = document.getElementById('btn-dismiss-trial')
+  if (btnDismissTrial) btnDismissTrial.addEventListener('click', () => setState({ trialUsedVisible: false }))
+
+  // Quiz streak/coins modals overlay close
+  const closeQuizStreak = document.getElementById('closeQuizStreakModal')
+  if (closeQuizStreak) closeQuizStreak.addEventListener('click', () => setState({ quizShowStreakModal: false }))
+  const closeQuizCoins = document.getElementById('closeQuizCoinsModal')
+  if (closeQuizCoins) closeQuizCoins.addEventListener('click', () => setState({ quizShowCoinsModal: false }))
+}
+
+// ── BOOT ─────────────────────────────────────────────────────────────────
+init()
+</script>
+</body>
+</html>
