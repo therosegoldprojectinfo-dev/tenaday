@@ -650,8 +650,11 @@ async function handleGenerate() {
     // mark trial used
     const newStreak = state.streak + 1
     const newCoins = state.coins + (exam.questions?.length || 3) * 2
-    setState({ trialUsed: true, streak: newStreak, coins: newCoins, exam, scanStatus: 'idle', scanImages: [] })
-    saveTrialSession({ quiz_used: true, streak: newStreak, coins: newCoins })
+    // Save exam to the chapter so revision works
+    const updatedChapter = { ...state.chapter, examCount: 1, exam }
+    const updatedChapters = state.chapters.map(ch => ch.id === updatedChapter.id ? updatedChapter : ch)
+    setState({ trialUsed: true, streak: newStreak, coins: newCoins, exam, scanStatus: 'idle', scanImages: [], chapter: updatedChapter, chapters: updatedChapters })
+    saveTrialSession({ quiz_used: true, streak: newStreak, coins: newCoins, chapters: updatedChapters })
     go('quiz_intro', { exam })
   } catch (err) {
     setState({ scanStatus: 'error', scanError: err })
@@ -930,7 +933,7 @@ function renderCoinsModalOverlay() { return renderCoinsModal(state.coins, state.
 // ── CURRENT CHAPTER ───────────────────────────────────────────────────────
 function renderCurrentChapter() {
   const s = state; const lang = s.lang; const ch = s.chapter
-  const examCount = s.trialUsed ? 1 : 0
+  const examCount = ch.exam ? 1 : 0
   return `<div class="screen" style="overflow-y:auto;">
     <div class="current-inner">
       <button class="back-btn" id="btn-back-chapters">← Back</button>
@@ -948,12 +951,12 @@ function renderCurrentChapter() {
           </div>
           <span class="action-label font-display" style="color:white;">${t(lang,'current_new')}</span>
         </button>
-        <button class="action-card action-card-revision" disabled>
+        <button class="action-card action-card-revision" id="btn-revision" ${!ch.exam?'disabled style="opacity:0.5;cursor:not-allowed;"':''}>
           <div class="action-icon-circle" style="background:#ede9fe">
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           </div>
           <span class="action-label font-display" style="color:var(--ink)">${t(lang,'current_revision')}</span>
-          <span style="font-size:12px;color:var(--muted)">${t(lang,'current_no_exams')}</span>
+          <span style="font-size:12px;color:var(--muted)">${ch.exam ? (ch.exam.topic||t(lang,'current_revision')) : t(lang,'current_no_exams')}</span>
         </button>
       </div>
     </div>
@@ -1285,7 +1288,7 @@ function renderChapterModal() {
         <h2 class="modal-title">${t(lang,'chapters_modal_title')}</h2>
         <div>
           <label class="form-label">${t(lang,'chapters_modal_name_label')}</label>
-          <input type="text" class="form-input" id="chapter-name-input" value="${s.newChapterName.replace(/"/g,'&quot;')}" placeholder="${t(lang,'chapters_modal_name_placeholder')}" />
+          <input type="text" class="form-input" id="chapter-name-input" dir="ltr" value="${s.newChapterName.replace(/"/g,'&quot;')}" placeholder="${t(lang,'chapters_modal_name_placeholder')}" />
         </div>
         <div>
           <label class="form-label">${t(lang,'chapters_modal_icon_label')}</label>
@@ -1373,6 +1376,12 @@ function attachListeners() {
     if (s.trialUsed) { setState({ trialUsedVisible: true }); return }
     setState({ screen: 'scan', scanStatus: 'idle', scanImages: [], scanError: null })
   })
+  const btnRevision = document.getElementById('btn-revision')
+  if (btnRevision && s.chapter?.exam) {
+    btnRevision.addEventListener('click', () => {
+      setState({ exam: s.chapter.exam, screen: 'quiz_intro' })
+    })
+  }
 
   // Scan
   const backChapter = document.getElementById('btn-back-chapter')
