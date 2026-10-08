@@ -170,6 +170,7 @@
     width: 100%; border-radius: 16px; padding: 12px 16px;
     font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 18px; color: var(--ink);
     border: 2px solid #e5e7eb; background: #fafafa; outline: none; transition: border-color 0.15s;
+    direction: ltr; unicode-bidi: isolate; text-align: left;
   }
   .form-input:focus { border-color: var(--purple); }
   .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
@@ -272,7 +273,7 @@
   .tf-btn.wrong { border-color: #fca5a5; background: #fff5f5; color: #ef4444; }
   .tf-btn.faded { border-color: #f3f4f6; color: #d1d5db; }
 
-  .fill-input { width: 100%; border-radius: 16px; padding: 16px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 20px; color: var(--ink); border: 2px solid #e5e7eb; background: #fafafa; outline: none; transition: border-color 0.15s; }
+  .fill-input { width: 100%; border-radius: 16px; padding: 16px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 20px; color: var(--ink); border: 2px solid #e5e7eb; background: #fafafa; outline: none; transition: border-color 0.15s; direction: ltr; unicode-bidi: isolate; text-align: left; }
   .fill-input:focus { border-color: var(--purple); }
   .fill-input.correct { border-color: #86efac; background: #f0fdf4; }
   .fill-input.wrong { border-color: #fca5a5; background: #fff5f5; }
@@ -572,6 +573,16 @@ function setState(updates) {
 }
 
 // ── SUPABASE AUTH + TRIAL SESSION ────────────────────────────────────────
+const LS_KEY = 'numio_trial_v1'
+
+function saveLocal(data) {
+  try { localStorage.setItem(LS_KEY, JSON.stringify(data)) } catch(e) {}
+}
+
+function loadLocal() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY) || 'null') } catch(e) { return null }
+}
+
 async function init() {
   render() // show spinner
   try {
@@ -583,16 +594,32 @@ async function init() {
     // Check or create trial session (browser fingerprint = anon user id)
     const userId = data.session.user.id
     const { data: existing } = await sb.from('trial_sessions').select('*').eq('anonymous_id', userId).maybeSingle()
+    const local = loadLocal()
     if (existing) {
       state.trialSessionId = existing.id
       state.trialUsed = existing.quiz_used
       state.streak = existing.streak || 0
       state.coins = existing.coins || 0
-      state.chapters = existing.chapters || []
+      // Merge: prefer localStorage chapters (they carry exam objects) over plain DB chapters
+      const dbChapters = existing.chapters || []
+      const localChapters = local?.chapters || []
+      // If localStorage has more data (exam objects), prefer it; otherwise use DB
+      state.chapters = localChapters.length >= dbChapters.length && localChapters.some(c => c.exam)
+        ? localChapters
+        : dbChapters
     } else {
       const { data: created } = await sb.from('trial_sessions').insert({ anonymous_id: userId }).select().single()
       state.trialSessionId = created.id
+      // Restore from localStorage if available (e.g. after browser refresh before Supabase row existed)
+      if (local) {
+        state.trialUsed = local.quiz_used || false
+        state.streak = local.streak || 0
+        state.coins = local.coins || 0
+        state.chapters = local.chapters || []
+      }
     }
+    // Always sync localStorage with current state
+    saveLocal({ quiz_used: state.trialUsed, streak: state.streak, coins: state.coins, chapters: state.chapters })
   } catch (e) {
     console.error('Init error:', e)
   }
@@ -600,6 +627,10 @@ async function init() {
 }
 
 async function saveTrialSession(updates) {
+  // Always write localStorage immediately (instant, survives refresh)
+  const current = loadLocal() || {}
+  saveLocal({ ...current, ...updates })
+  // Then sync to Supabase in background
   if (!state.trialSessionId) return
   await sb.from('trial_sessions').update(updates).eq('id', state.trialSessionId)
 }
@@ -1353,8 +1384,13 @@ function attachListeners() {
   // Chapter modal
   const nameInput = document.getElementById('chapter-name-input')
   if (nameInput) {
+    nameInput.setAttribute('dir', 'ltr')
+    nameInput.style.direction = 'ltr'
     nameInput.addEventListener('input', e => setState({ newChapterName: e.target.value }))
     nameInput.focus()
+    // Move cursor to end (LTR position)
+    const len = nameInput.value.length
+    nameInput.setSelectionRange(len, len)
   }
   document.querySelectorAll('[data-emoji]').forEach(btn => {
     btn.addEventListener('click', () => setState({ newChapterEmoji: btn.dataset.emoji }))
