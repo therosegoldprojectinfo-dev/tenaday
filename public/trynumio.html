@@ -153,14 +153,12 @@
   /* ── MODAL ── */
   .modal-overlay {
     position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.4);
-    display: flex; align-items: flex-end; justify-content: center;
+    display: flex; align-items: center; justify-content: center; padding: 20px;
   }
-  @media (min-width: 768px) { .modal-overlay { align-items: center; } }
   .modal-sheet {
-    width: 100%; max-width: 512px; background: white;
-    border-radius: 24px 24px 0 0; max-height: 90dvh; display: flex; flex-direction: column;
+    width: 100%; max-width: 480px; background: white;
+    border-radius: 24px; max-height: 90dvh; display: flex; flex-direction: column;
   }
-  @media (min-width: 768px) { .modal-sheet { border-radius: 24px; } }
   .modal-handle { flex-shrink: 0; padding: 12px 0 4px; display: flex; justify-content: center; }
   .modal-handle div { width: 40px; height: 4px; border-radius: 999px; background: #e5e7eb; }
   .modal-body { flex: 1; overflow-y: auto; padding: 0 20px 32px; display: flex; flex-direction: column; gap: 20px; }
@@ -228,7 +226,7 @@
   .generate-btn:active { transform: scale(0.97); }
   .cancel-btn { width: 100%; background: none; border: none; cursor: pointer; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 14px; color: var(--muted); padding: 8px; text-align: center; }
 
-  .loading-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding-bottom: 40px; text-align: center; }
+  .loading-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 40px 24px; text-align: center; }
   .spinner { width: 48px; height: 48px; border: 4px solid #f3f4f6; border-top-color: var(--purple); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -753,6 +751,7 @@ function render() {
 
   if (s.screen === 'chapters') mainContent = renderChapters()
   else if (s.screen === 'current_chapter') mainContent = renderCurrentChapter()
+  else if (s.screen === 'revisions') mainContent = renderRevisions()
   else if (s.screen === 'scan') mainContent = renderScan()
   else if (s.screen === 'quiz_intro') mainContent = renderQuizIntro()
   else if (s.screen === 'quiz') mainContent = renderQuiz()
@@ -964,6 +963,36 @@ function renderCoinsModal(coins, lang, closeId) {
 function renderStreakModalOverlay() { return renderStreakModal(state.quizStreakCount, state.lang, 'closeQuizStreakModal') }
 function renderCoinsModalOverlay() { return renderCoinsModal(state.coins, state.lang, 'closeQuizCoinsModal') }
 
+// ── REVISIONS LIST ────────────────────────────────────────────────────────
+function renderRevisions() {
+  const s = state; const lang = s.lang; const ch = s.chapter
+  return `<div class="screen" style="overflow-y:auto;">
+    <div class="current-inner">
+      <button class="back-btn" id="btn-back-chapter-from-revisions">← Back</button>
+      <div class="chapter-header">
+        <div class="chapter-icon-box">${ch.emoji}</div>
+        <div>
+          <p class="chapter-header-title font-display">${ch.name}</p>
+          <p class="chapter-header-sub">Revision</p>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px;">
+        ${ch.exam ? `
+        <button id="btn-start-revision" style="width:100%;background:white;border:none;border-radius:20px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,0.08);cursor:pointer;display:flex;align-items:center;gap:16px;text-align:left;">
+          <div style="width:48px;height:48px;border-radius:14px;background:#ede9fe;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <p class="font-display" style="font-size:16px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ch.exam.topic||'Exam'}</p>
+            <p style="font-size:13px;color:var(--muted);margin-top:2px;">${ch.exam.questions?.length||0} questions</p>
+          </div>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>` : `<p style="text-align:center;color:var(--muted);padding:40px 0;">No exams yet. Generate a quiz first!</p>`}
+      </div>
+    </div>
+  </div>`
+}
+
 // ── CURRENT CHAPTER ───────────────────────────────────────────────────────
 function renderCurrentChapter() {
   const s = state; const lang = s.lang; const ch = s.chapter
@@ -979,19 +1008,23 @@ function renderCurrentChapter() {
         </div>
       </div>
       <div class="action-grid">
-        <button class="action-card action-card-new" id="btn-new-quiz" ${s.trialUsed?'data-trial-used="true"':''}>
-          <div class="action-icon-circle" style="background:rgba(255,255,255,0.2)">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-          </div>
-          <span class="action-label font-display" style="color:white;">${t(lang,'current_new')}</span>
-        </button>
-        <button class="action-card action-card-revision" id="btn-revision" ${!ch.exam?'disabled style="opacity:0.5;cursor:not-allowed;"':''}>
-          <div class="action-icon-circle" style="background:#ede9fe">
-            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-          </div>
-          <span class="action-label font-display" style="color:var(--ink)">${t(lang,'current_revision')}</span>
-          <span style="font-size:12px;color:var(--muted)">${ch.exam ? (ch.exam.topic||t(lang,'current_revision')) : t(lang,'current_no_exams')}</span>
-        </button>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="action-card action-card-new" id="btn-new-quiz" ${s.trialUsed?'data-trial-used="true"':''}>
+            <div class="action-icon-circle" style="background:rgba(255,255,255,0.2)">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </div>
+            <span class="action-label font-display" style="color:white;">${t(lang,'current_new')}</span>
+          </button>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="action-card action-card-revision" id="btn-revision" ${!ch.exam?'disabled style="opacity:0.5;cursor:not-allowed;"':''}>
+            <div class="action-icon-circle" style="background:#ede9fe">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <span class="action-label font-display" style="color:var(--ink)">${t(lang,'current_revision')}</span>
+          </button>
+          ${ch.exam ? `<p style="font-size:12px;color:var(--muted);text-align:center;padding:0 4px;line-height:1.3;">${ch.exam.topic||''}</p>` : `<p style="font-size:12px;color:var(--muted);text-align:center;">${t(lang,'current_no_exams')}</p>`}
+        </div>
       </div>
     </div>
   </div>`
@@ -1000,6 +1033,13 @@ function renderCurrentChapter() {
 // ── SCAN / HOME ───────────────────────────────────────────────────────────
 function renderScan() {
   const s = state; const lang = s.lang; const ch = s.chapter
+  const isFullscreen = s.scanStatus === 'loading' || s.scanStatus === 'error'
+  if (isFullscreen) {
+    return `<div style="height:100dvh;display:flex;flex-direction:column;background:white;">
+      ${s.scanStatus==='loading' ? renderScanLoading(lang) : renderScanError(lang)}
+      <input type="file" id="file-input" accept="image/*" multiple style="display:none;" />
+    </div>`
+  }
   return `<div style="height:100dvh;display:flex;flex-direction:column;background:white;">
     <div class="scan-inner">
       <button class="back-btn" style="flex-shrink:0;margin-top:48px;margin-bottom:8px;" id="btn-back-chapter">← Back</button>
@@ -1009,8 +1049,6 @@ function renderScan() {
       </div>
       ${s.scanStatus==='idle' ? renderScanIdle(lang) : ''}
       ${s.scanStatus==='review' ? renderScanReview(lang) : ''}
-      ${s.scanStatus==='loading' ? renderScanLoading(lang) : ''}
-      ${s.scanStatus==='error' ? renderScanError(lang) : ''}
     </div>
     <input type="file" id="file-input" accept="image/*" multiple style="display:none;" />
   </div>`
@@ -1417,10 +1455,12 @@ function attachListeners() {
   })
   const btnRevision = document.getElementById('btn-revision')
   if (btnRevision && s.chapter?.exam) {
-    btnRevision.addEventListener('click', () => {
-      setState({ exam: s.chapter.exam, screen: 'quiz_intro' })
-    })
+    btnRevision.addEventListener('click', () => setState({ screen: 'revisions' }))
   }
+  const btnBackRevisions = document.getElementById('btn-back-chapter-from-revisions')
+  if (btnBackRevisions) btnBackRevisions.addEventListener('click', () => setState({ screen: 'current_chapter' }))
+  const btnStartRevision = document.getElementById('btn-start-revision')
+  if (btnStartRevision) btnStartRevision.addEventListener('click', () => setState({ exam: s.chapter.exam, screen: 'quiz_intro' }))
 
   // Scan
   const backChapter = document.getElementById('btn-back-chapter')
