@@ -76,6 +76,10 @@ RULES:
 
 QUESTION TYPE RULES:
 - "mcq": 4 options, correct_answer must be exact option text.
+  IMPORTANT — if the question requires listing/ordering items (e.g. "put these in order", "which group contains", "match these"), you MUST:
+  1. Keep the question stem SHORT (e.g. "Put these events in order from oldest to newest:")
+  2. Add an "items" array listing each item clearly (e.g. ["Fall of Rome (476 AD)", "Egyptian Pyramids (2560 BC)", ...])
+  3. Options reference items by number only (e.g. "2, 3, 1, 4"). NEVER pack the full item list into the question string.
 - "true_false": correct_answer in lesson language.
 - "fill_blank": question contains "___", correct_answer is the missing word/phrase.
 - "visual_count": ONLY for counting. "asset" from ${JSON.stringify(OPENMOJI_ASSETS)}, "quantity" 1-12, 4 number options.
