@@ -279,13 +279,17 @@
 
   .visual-count-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; border-radius: 16px; padding: 20px 16px; margin-bottom: 16px; background: #fafafa; border: 2px solid #f3f4f6; }
 
-  .highlight-wrap { display: flex; flex-wrap: wrap; gap: 8px; padding: 8px 4px; }
-  .highlight-word { border-radius: 12px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 18px; padding: 8px 12px; border: 2px solid #e5e7eb; background: #fafafa; color: var(--ink); cursor: pointer; transition: all 0.1s; }
+  .highlight-wrap { line-height: 2.2; padding: 4px 0; }
+  .highlight-word {
+    display: inline; border-radius: 8px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 19px;
+    padding: 3px 6px; margin: 2px 1px; border: none; background: transparent; color: var(--ink);
+    cursor: pointer; transition: background 0.1s, color 0.1s; vertical-align: baseline;
+  }
   .highlight-word:disabled { cursor: not-allowed; }
-  .highlight-word.selected { background: #f5f3ff; color: var(--purple); border-color: #a78bfa; }
-  .highlight-word.correct-selected { background: #f0fdf4; color: #16a34a; border-color: #86efac; }
-  .highlight-word.wrong-selected { background: #fff5f5; color: #ef4444; border-color: #fca5a5; }
-  .highlight-word.missed { background: #fff7ed; color: #d97706; border: 2px dashed #fdba74; }
+  .highlight-word.selected { background: #ede9fe; color: var(--purple); border-radius: 8px; }
+  .highlight-word.correct-selected { background: #dcfce7; color: #16a34a; }
+  .highlight-word.wrong-selected { background: #fee2e2; color: #ef4444; }
+  .highlight-word.missed { background: #fff7ed; color: #d97706; text-decoration: underline dotted #fdba74; }
 
   .explanation-box { margin-top: 16px; border-radius: 16px; padding: 12px 16px; background: #f5f3ff; border: 2px solid #ede9fe; font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--purple); line-height: 1.5; }
 
@@ -1215,7 +1219,7 @@ function renderQuiz() {
           else if (isSel && !isTarget) cls += ' wrong-selected'
           else if (!isSel && isTarget) cls += ' missed'
         } else if (isSel) cls += ' selected'
-        return `<button class="${cls}" data-wordidx="${i}" ${s.quizRevealed?'disabled':''}>${word}</button>`
+        return `<button class="${cls}" data-wordidx="${i}" ${s.quizRevealed?'disabled':''}>${word}</button> `
       }).join('')}
     </div>`
   }
