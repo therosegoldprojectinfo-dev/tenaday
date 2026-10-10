@@ -493,9 +493,11 @@ function isAnswerCorrect(q, answer) {
   if (!q) return false
   if (q.type === 'text_highlight') {
     if (!Array.isArray(answer)) return false
+    const FORGIVEN = new Set(['the','a','an','and','or','but','les','des','le','la','l','un','une','et','ou','de','du','d'])
+    // Strip forgiven filler words (articles, conjunctions) from the answer
+    const meaningfulAnswer = answer.filter(w => !FORGIVEN.has(normalize(w)))
     const words = q.text.split(' ')
     const targets = q.target_words || []
-    // Resolve each target phrase to the actual words as they appear in the sentence
     const expectedWords = targets.flatMap(t => {
       const phraseWords = t.split(' ').filter(Boolean).map(normalize)
       for (let wi = 0; wi <= words.length - phraseWords.length; wi++) {
@@ -504,8 +506,8 @@ function isAnswerCorrect(q, answer) {
       }
       return t.split(' ').filter(Boolean)
     })
-    if (answer.length !== expectedWords.length) return false
-    return wordSetMatches(answer, expectedWords)
+    if (meaningfulAnswer.length !== expectedWords.length) return false
+    return wordSetMatches(meaningfulAnswer, expectedWords)
   }
   return answersMatch(answer, q.correct_answer)
 }
@@ -1241,10 +1243,12 @@ function renderQuiz() {
         const isTarget = allTargetIdx.includes(i)
         const phraseComplete = phraseGroups.some(g => g.includes(i) && g.every(gi => s.quizHighlightIdx.includes(gi)))
         let cls = 'highlight-word'
+        const FORGIVEN = new Set(['the','a','an','and','or','but','les','des','le','la','l','un','une','et','ou','de','du','d'])
         if (s.quizRevealed) {
           if (isTarget && phraseComplete) cls += ' correct-selected'
           else if (isTarget && !phraseComplete) cls += ' missed'
-          else if (isSel && !isTarget) cls += ' wrong-selected'
+          else if (isSel && !isTarget && !FORGIVEN.has(normalize(word))) cls += ' wrong-selected'
+          // forgiven filler words shown as neutral when selected
         } else if (isSel) cls += ' selected'
         return `<button class="${cls}" data-wordidx="${i}" ${s.quizRevealed?'disabled':''}>${word}</button> `
       }).join('')}
