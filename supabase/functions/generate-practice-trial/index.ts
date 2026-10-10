@@ -3,7 +3,7 @@
 //   - No subscription check
 //   - No daily rate limit
 //   - Enforces one quiz per trial_session (quiz_used flag)
-//   - Forces exactly 3 questions (the 3 most important)
+//   - Forces exactly 7 questions (the 7 most important)
 //   - Saves no kid_skills / learner profiles (trial is stateless)
 //   - CORS allows the trial page origin
 
@@ -65,10 +65,10 @@ Extract only what's in the photo. Return ONLY this JSON:
 }
 
 async function generateTrialQuestions(lesson: any) {
-  const system = `You are designing a 3-question trial quiz for a kids' learning app.
+  const system = `You are designing a 7-question trial quiz for a kids' learning app.
 
 RULES:
-- Generate EXACTLY 3 questions — no more, no less.
+- Generate EXACTLY 7 questions — no more, no less.
 - Pick the 3 MOST IMPORTANT things to test from the lesson objectives.
 - Use varied question types from: ${JSON.stringify(ACTIVE_QUESTION_TYPES)}
 - Write everything in the SAME LANGUAGE as the lesson (language: "${lesson.language}").
@@ -91,13 +91,13 @@ Return ONLY this JSON:
   ]
 }`
 
-  const userText = `Lesson objectives:\n${JSON.stringify(lesson.objectives, null, 2)}\n\nGenerate exactly 3 questions. Return only the JSON.`
-  return callClaude(system, [{ type: 'text', text: userText }], 2000)
+  const userText = `Lesson objectives:\n${JSON.stringify(lesson.objectives, null, 2)}\n\nGenerate exactly 7 questions. Return only the JSON.`
+  return callClaude(system, [{ type: 'text', text: userText }], 4000)
 }
 
 function validateQuestions(questions: any[], objectiveIds: string[]) {
   if (!Array.isArray(questions)) return 'No questions array'
-  if (questions.length !== 3) return `Expected 3 questions, got ${questions.length}`
+  if (questions.length !== 7) return `Expected 7 questions, got ${questions.length}`
   for (const q of questions) {
     if (!q.id || !q.type || !q.question || !q.explanation) return `Malformed question: ${q.id}`
     if (!ACTIVE_QUESTION_TYPES.includes(q.type)) return `Bad type: ${q.type}`
@@ -158,7 +158,7 @@ serve(async (req) => {
     const lesson = await analyzeLesson(images)
     const objectiveIds = (lesson.objectives || []).map((o: any) => o.id)
 
-    // Phase 2: generate exactly 3 questions
+    // Phase 2: generate exactly 7 questions
     const phase2 = await generateTrialQuestions(lesson)
     const questions = phase2.questions
 
