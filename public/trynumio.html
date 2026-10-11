@@ -1360,31 +1360,31 @@ function renderResults() {
 
   const coinsEarned = s.quizCoinsEarned || total * 2
 
-  return `<div class="results-screen">
-    <div class="results-inner">
-      <img src="/nav-profile.png" alt="" style="width:128px;height:auto;animation:float 2s ease-in-out infinite;" />
+  return `<div class="results-screen" style="background:#1a1200;justify-content:center;">
+    <style>
+      @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+      @keyframes coinpop{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+    </style>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:24px;width:100%;max-width:360px;">
+      <p style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:rgba(251,191,36,0.6);">YOUR COINS</p>
+      <img src="/coin-flower.png" alt="coins" style="width:140px;height:140px;object-fit:contain;animation:float 2s ease-in-out infinite, coinpop 0.5s ease-out;" />
       <div style="text-align:center;">
-        <p style="font-size:48px;">${emoji}</p>
-        <h2 class="font-display" style="font-size:30px;font-weight:800;color:var(--ink);margin-top:4px;">${t(lang,headlineKey)}</h2>
-        <p style="font-size:16px;color:var(--muted);margin-top:4px;">${t(lang,subKey)}</p>
+        <p class="font-display" style="font-size:72px;font-weight:900;color:#fbbf24;line-height:1;animation:coinpop 0.6s ease-out;">+${coinsEarned}</p>
+        <p style="font-size:18px;color:rgba(251,191,36,0.7);margin-top:4px;">coins</p>
       </div>
-      <div class="score-box" style="background:#1a1200;box-shadow:0 4px 24px rgba(251,191,36,0.2);">
-        <img src="/coin-flower.png" alt="coins" style="width:56px;height:56px;object-fit:contain;animation:float 2s ease-in-out infinite;" />
+      <div style="text-align:center;padding:0 24px;">
+        <p style="font-size:22px;font-weight:800;color:#fbbf24;" class="font-display">Wow! You earned ${coinsEarned} coins 🎉</p>
+        <p style="font-size:15px;color:rgba(251,191,36,0.6);margin-top:8px;">You can buy rewards with these coins!</p>
+      </div>
+      <div style="width:100%;background:rgba(255,255,255,0.08);border-radius:16px;padding:14px 20px;display:flex;align-items:center;gap:12px;">
+        <span style="font-size:28px;">🎯</span>
         <div>
-          <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(251,191,36,0.6);">Coins earned</p>
-          <p class="font-display" style="font-size:40px;font-weight:800;color:#fbbf24;line-height:1;">+${coinsEarned}</p>
+          <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(251,191,36,0.5);">Your score</p>
+          <p class="font-display" style="font-size:24px;font-weight:800;color:#fbbf24;">${correct}/${total}</p>
         </div>
       </div>
-      <div class="score-box" style="background:#f5f3ff;">
-        <span style="font-size:40px;">🎯</span>
-        <div>
-          <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--purple);">Your score</p>
-          <p class="font-display" style="font-size:36px;font-weight:800;color:var(--purple);line-height:1;">${correct}/${total}</p>
-        </div>
-      </div>
-      <button class="btn-purple" id="btn-results-done">← Back to Home</button>
+      <button class="btn-purple" id="btn-results-done" style="width:100%;background:#fbbf24;color:#1a1200;font-weight:800;font-size:18px;border:none;">Awesome! 🎁</button>
     </div>
-    <style>@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}</style>
   </div>`
 }
 
