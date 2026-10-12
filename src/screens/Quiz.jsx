@@ -15,18 +15,9 @@ const FORGIVEN_WORDS = new Set([
   'في','من','إلى','على','عن','مع','هو','هي','هم','هن',
 ])
 
-// ─────────────────────────────────────────────────────────────
-// CLIENT-SIDE QUESTION CLEANER
-// If the AI blobbed items into the question text (e.g.
-// "Sort these. Items: 1) Stone Age, 2) Egypt. Which order?")
-// this strips them out so the question is clean and items array
-// is populated — matching exactly what the HTML reference does.
-// ─────────────────────────────────────────────────────────────
 function cleanQuestion(q) {
   if (!q) return q
-  // Already has items array from edge function — just clean question text
   if (Array.isArray(q.items) && q.items.length > 0) {
-    // Strip any "Items: ..." blob from the question text if present
     const cleaned = q.question
       .replace(/\s*[Ii]tems?:?\s*(\d+[.)]\s*.+?(?=\s+[Ww]hich|\s+[Ss]ort|\s+[Oo]rder|$))/gs, '')
       .replace(/\s*\d+[.)]\s*[^,.\n]+(,\s*\d+[.)]\s*[^,.\n]+)+\.?/g, '')
@@ -34,12 +25,9 @@ function cleanQuestion(q) {
     return { ...q, question: cleaned }
   }
 
-  // No items array — try to parse numbered list out of question text
-  // Matches patterns like: "1) Foo, 2) Bar, 3) Baz" or "1. Foo 2. Bar"
   const itemPattern = /\b1[.)]\s*(.+?)(?=\s*2[.)]\s*)/s
   if (!itemPattern.test(q.question)) return q
 
-  // Extract all numbered items
   const allItems = []
   const itemRe = /\d+[.)]\s*([^0-9]+?)(?=\s*\d+[.)]|$)/g
   let match
@@ -51,7 +39,6 @@ function cleanQuestion(q) {
 
   if (allItems.length < 2) return q
 
-  // Clean the question: remove the items blob, keep the "Which order..." part
   const questionClean = q.question
     .replace(/\b1[.)].+?(?=\s*[Ww]hich|\s*$)/s, '')
     .replace(/\s*[Ii]tems?:?\s*/i, '')
@@ -60,8 +47,6 @@ function cleanQuestion(q) {
 
   return { ...q, question: questionClean, items: allItems }
 }
-
-// ─────────────────────────────────────────────────────────────
 
 function QuitPopup({ visible, onStay, onLeave }) {
   const lang = useLang()
@@ -85,7 +70,6 @@ function QuitPopup({ visible, onStay, onLeave }) {
   )
 }
 
-// ── Fix 9: dark gold coin results screen ─────────────────────
 function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial = false, isReplay = false }) {
   const lang = useLang()
   const correct = questions.filter((q, i) => isAnswerCorrect(q, answers[i])).length
@@ -98,7 +82,6 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial
   else if (pct >= 60) { emoji = '😊'; headlineKey = 'quiz_results_good';    subKey = 'quiz_results_good_sub' }
   else                { emoji = '💪'; headlineKey = 'quiz_results_keep';    subKey = 'quiz_results_keep_sub' }
 
-  // Non-trial with coins → dark gold "Wow!" screen
   if (!isTrial && coinsEarned > 0) {
     return (
       <div style={{ height: '100dvh', background: '#1a1200', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 28px', gap: 0 }}>
@@ -131,7 +114,6 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial
     )
   }
 
-  // Trial / replay / zero-coin fallback
   return (
     <div className="bg-white flex flex-col items-center px-6 py-10 gap-5" style={{ height: '100dvh', overflowY: 'auto' }}>
       <div className="w-full max-w-sm flex flex-col items-center gap-5">
@@ -244,7 +226,6 @@ function MCQCard({ option, selected, revealed, correct, onSelect, big }) {
   )
 }
 
-// ── Fix 4: numbered items list above MCQ options ──────────────
 function ItemsList({ items }) {
   if (!Array.isArray(items) || items.length === 0) return null
   return (
@@ -294,7 +275,6 @@ function VisualCountRow({ asset, quantity }) {
   )
 }
 
-// ── Fix 1+2+3: inline flowing sentence, phrase-level, forgiven ─
 function TextHighlight({ text, selectedPhrases, revealed, targetWords, onTogglePhraseAt }) {
   const tokens = useMemo(() => {
     if (!text) return []
@@ -328,8 +308,6 @@ function TextHighlight({ text, selectedPhrases, revealed, targetWords, onToggleP
   const normSelected = selectedPhrases.map(normalize)
 
   return (
-    // Fix 1: inline flowing sentence — line-height 2.1 so tappable
-    // pills don't overlap when they wrap across lines.
     <div style={{ lineHeight: 2.1, padding: '4px 4px' }}>
       {tokens.map((token, i) => {
         if (token.type === 'space') return <span key={i}>{token.value}</span>
@@ -339,7 +317,6 @@ function TextHighlight({ text, selectedPhrases, revealed, targetWords, onToggleP
         const isTarget = normTargets.includes(normVal)
         const isSelected = normSelected.includes(normVal)
 
-        // Forgiven non-target words: plain text, no button
         if (isForgiven && !isTarget) {
           return (
             <span key={i} style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 19, color: '#1f2937' }}>
@@ -394,7 +371,6 @@ function XIcon() {
   )
 }
 
-// ── Fix 6: fire overlay — key only bumped after correct reveal ─
 function FireModeOverlay({ streakKey, consecutiveCorrect }) {
   const fireCount = Math.min(6 + consecutiveCorrect * 3, 30)
   const headCount = Math.min(2 + consecutiveCorrect * 2, 15)
@@ -421,7 +397,6 @@ function FireModeOverlay({ streakKey, consecutiveCorrect }) {
 export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   const lang = useLang()
 
-  // ── Fix: clean all questions once on mount ─────────────────
   const questions = useMemo(
     () => (exam.questions || []).map(cleanQuestion),
     [exam.questions]
@@ -436,8 +411,8 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   const [showResults,        setShowResults]       = useState(false)
   const [showStreak,         setShowStreak]        = useState(false)
   const [streakCount,        setStreakCount]       = useState(0)
-  // Fix 5: ref for fill_blank so no re-render on every keystroke
   const fillBlankRef         = useRef('')
+  // ── FIX: fillBlankDisplay now tracks typed value so CHECK button re-renders ──
   const [fillBlankDisplay,   setFillBlankDisplay]  = useState('')
   const [selectedPhrases,    setSelectedPhrases]   = useState([])
   const [saving,             setSaving]            = useState(false)
@@ -452,6 +427,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   useEffect(() => {
     questionStartRef.current = Date.now()
     fillBlankRef.current = ''
+    // ── FIX: reset display state too so button disables correctly on new question ──
     setFillBlankDisplay('')
     setSelectedPhrases([])
   }, [idx])
@@ -470,7 +446,6 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   function checkCorrect(answer) { return isAnswerCorrect(q, answer) }
   const isCorrect = revealed && checkCorrect(currentAnswer())
 
-  // Fix 2: toggle phrase string in selectedPhrases
   function togglePhrase(phraseValue) {
     if (revealed) return
     const normVal = normalize(phraseValue)
@@ -478,7 +453,6 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
       const already = prev.some(p => normalize(p) === normVal)
       return already ? prev.filter(p => normalize(p) !== normVal) : [...prev, phraseValue]
     })
-    // Fix 6: do NOT touch fireKey here — only after correct reveal
   }
 
   async function handleContinue() {
@@ -510,7 +484,6 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
     setIdx(i => i + 1); setSelected(null); setRevealed(false)
   }
 
-  // Fix 6: fireKey bumped only here, after correct reveal
   function handleCheck() {
     const answer = currentAnswer()
     const emptyAnswer =
@@ -525,7 +498,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
     if (correct) {
       setConsecutiveCorrect(c => {
         const next = c + 1
-        if (next >= 2) setFireKey(k => k + 1) // ← only here
+        if (next >= 2) setFireKey(k => k + 1)
         return next
       })
     } else { setConsecutiveCorrect(0) }
@@ -577,8 +550,9 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   )
   if (!q) return null
 
+  // ── FIX: check disabled uses fillBlankDisplay (re-renders on keystroke) ──
   const checkDisabled =
-    q.type === 'fill_blank'     ? fillBlankDisplay === '' && fillBlankRef.current.trim() === '' :
+    q.type === 'fill_blank'     ? fillBlankDisplay.trim() === '' :
     q.type === 'text_highlight' ? selectedPhrases.length === 0 :
     selected === null
 
@@ -606,7 +580,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
           <p className="font-body font-bold text-xs tracking-widest uppercase truncate" style={{ color: '#7c3aed' }}>{topic}</p>
         </div>
 
-        {/* Question — always clean, no blobs */}
+        {/* Question */}
         <div className="flex-shrink-0 px-6 pt-4 pb-3" style={{ maxHeight: '30%', overflowY: 'auto' }}>
           <p className="font-display font-bold text-2xl text-ink leading-snug">{q.question}</p>
         </div>
@@ -616,7 +590,6 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
 
           {q.type === 'mcq' && (
             <>
-              {/* Fix 4: items numbered list, clean above options */}
               <ItemsList items={q.items} />
               {q.options.map((option, optIdx) => (
                 <MCQCard
@@ -639,15 +612,21 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
             </div>
           )}
 
-          {/* Fix 5: onChange → ref only, no setState on keystroke */}
           {q.type === 'fill_blank' && (
             <div className="flex flex-col gap-3">
               <input
                 type="text"
                 defaultValue=""
                 ref={el => { if (el && !revealed) el.value = fillBlankRef.current }}
-                onChange={e => { fillBlankRef.current = e.target.value }}
-                onBlur={e => { fillBlankRef.current = e.target.value }}
+                // ── FIX: update both ref AND state so button re-renders ──
+                onChange={e => {
+                  fillBlankRef.current = e.target.value
+                  setFillBlankDisplay(e.target.value)
+                }}
+                onBlur={e => {
+                  fillBlankRef.current = e.target.value
+                  setFillBlankDisplay(e.target.value)
+                }}
                 disabled={revealed}
                 autoFocus
                 placeholder={t(lang, 'quiz_fill_placeholder')}
@@ -676,7 +655,6 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
             </div>
           )}
 
-          {/* Fix 1+2+3: flowing inline sentence, phrase-level, forgiven words */}
           {q.type === 'text_highlight' && (
             <TextHighlight
               text={q.text}
