@@ -8,6 +8,17 @@ import { t } from '../lib/i18n'
 
 const COINS_PER_QUESTION = 2
 
+// Words that are forgiven in text_highlight — tapping them
+// neither counts as a hit nor as a wrong selection.
+const FORGIVEN_WORDS = new Set([
+  'the','a','an','and','or','but','of','in','on','at','to','for',
+  'is','are','was','were','be','been','it','its',
+  // French
+  'le','la','les','un','une','des','et','ou','de','du','en','au','aux',
+  // Arabic connectors / prepositions
+  'في','من','إلى','على','عن','مع','هو','هي','هم','هن',
+])
+
 function CoinIcon({ size = 28 }) {
   return <img src="/coin.png" width={size} height={size} alt="coin" style={{ objectFit: 'contain' }} />
 }
@@ -34,6 +45,7 @@ function QuitPopup({ visible, onStay, onLeave }) {
   )
 }
 
+// ── Fix 9: dark gold coin results screen ─────────────────────
 function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial = false, isReplay = false }) {
   const lang = useLang()
   const correct = questions.filter((q, i) => isAnswerCorrect(q, answers[i])).length
@@ -46,6 +58,33 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial
   else if (pct >= 60)   { emoji = '😊'; headlineKey = 'quiz_results_good';    subKey = 'quiz_results_good_sub' }
   else                  { emoji = '💪'; headlineKey = 'quiz_results_keep';    subKey = 'quiz_results_keep_sub' }
 
+  // Non-trial with coins: show the full dark-gold "Wow!" screen
+  if (!isTrial && coinsEarned > 0) {
+    return (
+      <div style={{ height: '100dvh', background: '#1a1200', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 28px', gap: 0 }}>
+        <div style={{ animation: 'float 2s ease-in-out infinite', marginBottom: 24 }}>
+          <img src="/coin-flower.png" alt="coins" style={{ width: 120, height: 120, objectFit: 'contain' }} />
+        </div>
+        <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 900, fontSize: 36, color: '#fbbf24', textAlign: 'center', lineHeight: 1.15, margin: 0, marginBottom: 10, letterSpacing: '-0.02em' }}>
+          {lang === 'ar' ? `رائع! ربحت ${coinsEarned} عملة` : `Wow! You earned ${coinsEarned} coins`}
+        </p>
+        <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 18, color: 'rgba(251,191,36,0.55)', textAlign: 'center', margin: 0, marginBottom: 48 }}>
+          {correct}/{total} {lang === 'ar' ? 'إجابة صحيحة' : 'correct answers'}
+        </p>
+        <button
+          onClick={onDone}
+          style={{ width: '100%', maxWidth: 360, background: '#fbbf24', border: 'none', borderRadius: 24, padding: '20px 0', fontFamily: "'Baloo 2', sans-serif", fontWeight: 900, fontSize: 22, color: '#1a1200', cursor: 'pointer', boxShadow: '0 5px 0 #b45309', letterSpacing: '-0.01em', transition: 'transform 0.1s', activeTransform: 'scale(0.98)' }}
+          onMouseDown={e => e.currentTarget.style.transform = 'scale(0.97)'}
+          onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
+        >
+          {lang === 'ar' ? 'رائع! 🎁' : 'Awesome! 🎁'}
+        </button>
+        <style>{`@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`}</style>
+      </div>
+    )
+  }
+
+  // Trial / replay / zero-coin fallback: original layout
   return (
     <div className="bg-white flex flex-col items-center px-6 py-10 gap-5" style={{ height: '100dvh', overflowY: 'auto' }}>
       <div className="w-full max-w-sm flex flex-col items-center gap-5">
@@ -64,16 +103,6 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial
             <div>
               <p className="font-body text-xs font-bold uppercase tracking-widest" style={{ color: '#7c3aed' }}>{lang === 'ar' ? 'نتيجتك' : 'Your score'}</p>
               <p className="font-display font-extrabold text-3xl" style={{ color: '#7c3aed' }}>{correct}/{total}</p>
-            </div>
-          </div>
-        ) : coinsEarned > 0 ? (
-          <div className="flex items-center gap-4 rounded-2xl px-6 py-4 w-full" style={{ background: '#1a1200', boxShadow: '0 4px 24px rgba(251,191,36,0.2)' }}>
-            <div style={{ animation: 'float 2s ease-in-out infinite' }}>
-              <img src="/coin-flower.png" alt="coins" className="w-14 h-14 object-contain" />
-            </div>
-            <div>
-              <p className="font-body text-xs font-bold uppercase tracking-widest" style={{ color: 'rgba(251,191,36,0.6)' }}>{t(lang, 'quiz_results_coins')}</p>
-              <p className="font-display font-extrabold text-4xl" style={{ color: '#fbbf24' }}>+{coinsEarned}</p>
             </div>
           </div>
         ) : isReplay ? (
@@ -131,18 +160,20 @@ function answersMatch(a, b) {
   return false
 }
 
-// Set-equality compare (order doesn't matter) for text_highlight answers.
-function wordSetMatches(selectedWords, targetWords) {
-  if (!Array.isArray(selectedWords) || !Array.isArray(targetWords)) return false
-  if (selectedWords.length !== targetWords.length) return false
+// Fix 3: phrase-set equality for text_highlight — forgiven words
+// are excluded from the "must match" set, so tapping "the" never
+// causes a wrong-answer penalty.
+function wordSetMatches(selectedPhrases, targetPhrases) {
+  if (!Array.isArray(selectedPhrases) || !Array.isArray(targetPhrases)) return false
+  // Only require the non-forgiven targets to be selected
+  const required = targetPhrases.filter(w => !FORGIVEN_WORDS.has(normalize(w)))
+  const selected  = selectedPhrases.filter(w => !FORGIVEN_WORDS.has(normalize(w)))
+  if (selected.length !== required.length) return false
   const norm = arr => arr.map(normalize).sort()
-  const a = norm(selectedWords), b = norm(targetWords)
+  const a = norm(selected), b = norm(required)
   return a.every((w, i) => w === b[i])
 }
 
-// Single source of truth for "was this question answered correctly",
-// across every question type — used for scoring, results, and
-// performance logging alike.
 function isAnswerCorrect(q, answer) {
   if (!q) return false
   if (q.type === 'text_highlight') return wordSetMatches(answer, q.target_words)
@@ -172,8 +203,20 @@ function MCQCard({ option, selected, revealed, correct, onSelect, big }) {
   )
 }
 
-// ── visual_count: shows N of an OpenMoji-style asset, then reuses
-// MCQCard for the numeric answer options. ──────────────────────
+// Fix 4: render q.items as a numbered list above the options when present
+function ItemsList({ items }) {
+  if (!Array.isArray(items) || items.length === 0) return null
+  return (
+    <div className="rounded-2xl px-4 py-3 mb-3" style={{ background: '#fafafa', border: '2px solid #f3f4f6' }}>
+      {items.map((item, i) => (
+        <p key={i} className="font-body text-sm text-ink leading-snug py-1" style={{ borderBottom: i < items.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
+          <span className="font-bold" style={{ color: '#7c3aed', marginRight: 8 }}>{i + 1}.</span>{item}
+        </p>
+      ))}
+    </div>
+  )
+}
+
 function VisualCountRow({ asset, quantity }) {
   const src = getAssetPath(asset)
   return (
@@ -187,34 +230,85 @@ function VisualCountRow({ asset, quantity }) {
   )
 }
 
-// ── text_highlight: tap words to select them, compare against
-// q.target_words on check. ──────────────────────────────────────
-function TextHighlight({ text, selectedIdx, revealed, targetWords, onToggle }) {
-  const words = text.split(' ')
+// Fix 1+2+3: text_highlight as flowing inline sentence with
+// phrase-level selection and forgiveness for connector words.
+// Phrases come from q.target_words — consecutive words in the
+// sentence that should be tapped as a single unit are found by
+// scanning for each target phrase as a substring run.
+function TextHighlight({ text, selectedPhrases, revealed, targetWords, onTogglePhraseAt }) {
+  // Build a token list: each token is either a phrase (multiple
+  // consecutive words that appear as a target) or a single word.
+  const tokens = useMemo(() => {
+    if (!text) return []
+    const words = text.split(/(\s+)/) // preserve whitespace as separate tokens
+    const result = []
+    let i = 0
+    while (i < words.length) {
+      if (/^\s+$/.test(words[i])) { result.push({ type: 'space', value: words[i] }); i++; continue }
+      // Try to match a multi-word target phrase starting at i
+      const remainingWords = words.slice(i).filter((_, j, a) => !/^\s+$/.test(a[j] || words[i + j]))
+      let matched = false
+      for (const phrase of (targetWords || [])) {
+        const phraseWords = phrase.split(/\s+/)
+        if (phraseWords.length < 2) continue
+        // check if words[i..] match phrase words consecutively (skipping spaces)
+        const wordTokens = words.slice(i).filter(w => !/^\s+$/.test(w))
+        if (phraseWords.every((pw, pi) => normalize(wordTokens[pi]) === normalize(pw))) {
+          result.push({ type: 'phrase', value: phrase, phraseWords })
+          // advance i past all the words + spaces consumed
+          let consumed = 0, wi = i
+          while (consumed < phraseWords.length && wi < words.length) {
+            if (!/^\s+$/.test(words[wi])) consumed++
+            wi++
+          }
+          // include trailing space if any
+          if (wi < words.length && /^\s+$/.test(words[wi])) wi++
+          i = wi
+          matched = true
+          break
+        }
+      }
+      if (!matched) { result.push({ type: 'word', value: words[i] }); i++ }
+    }
+    return result
+  }, [text, targetWords])
+
   const normTargets = (targetWords || []).map(normalize)
+  const normSelected = selectedPhrases.map(normalize)
 
   return (
-    <div className="flex flex-wrap gap-2 px-1 py-2">
-      {words.map((word, i) => {
-        const isSelected = selectedIdx.includes(i)
-        const isTarget = normTargets.includes(normalize(word))
+    <div style={{ lineHeight: 2.1, padding: '4px 4px' }}>
+      {tokens.map((token, i) => {
+        if (token.type === 'space') return <span key={i}>{token.value}</span>
+
+        const normVal = normalize(token.value)
+        const isForgiven = FORGIVEN_WORDS.has(normVal)
+        const isTarget = normTargets.includes(normVal)
+        const isSelected = normSelected.includes(normVal)
+
+        // Forgiven non-target words render as plain text — no button
+        if (isForgiven && !isTarget) {
+          return <span key={i} className="font-display font-bold text-lg" style={{ color: '#3C3C3C' }}>{token.value} </span>
+        }
+
         let bg = '#fafafa', color = '#3C3C3C', border = '2px solid #e5e7eb'
         if (revealed) {
-          if (isSelected && isTarget)      { bg = '#f0fdf4'; color = '#16a34a'; border = '2px solid #86efac' }
-          else if (isSelected && !isTarget){ bg = '#fff5f5'; color = '#ef4444'; border = '2px solid #fca5a5' }
-          else if (!isSelected && isTarget){ bg = '#fff7ed'; color = '#d97706'; border = '2px dashed #fdba74' }
+          if (isSelected && isTarget)       { bg = '#f0fdf4'; color = '#16a34a'; border = '2px solid #86efac' }
+          else if (isSelected && !isTarget) { bg = '#fff5f5'; color = '#ef4444'; border = '2px solid #fca5a5' }
+          else if (!isSelected && isTarget) { bg = '#fff7ed'; color = '#d97706'; border = '2px dashed #fdba74' }
         } else if (isSelected) {
           bg = '#f5f3ff'; color = '#7c3aed'; border = '2px solid #a78bfa'
         }
+
         return (
           <button
             key={i}
             disabled={revealed}
-            onClick={() => onToggle(i)}
-            className="rounded-xl font-display font-bold text-lg px-3 py-2 transition-all active:scale-95"
-            style={{ background: bg, color, border }}
+            onClick={() => onTogglePhraseAt(token.value)}
+            className="rounded-xl font-display font-bold text-lg px-3 py-1 transition-all active:scale-95"
+            style={{ background: bg, color, border, display: 'inline', margin: '0 2px 4px' }}
           >
-            {word}
+            {token.value}
           </button>
         )
       })}
@@ -230,6 +324,8 @@ function XIcon() {
   )
 }
 
+// Fix 6: FireModeOverlay key is only bumped inside handleCheck
+// after a correct reveal — never on word tap.
 function FireModeOverlay({ streakKey, consecutiveCorrect }) {
   const fireCount = Math.min(6 + consecutiveCorrect * 3, 30)
   const headCount = Math.min(2 + consecutiveCorrect * 2, 15)
@@ -258,25 +354,35 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   const questions = exam.questions || []
   const topic     = exam.topic || 'Quiz'
 
-  const [idx,         setIdx]         = useState(0)
-  const [selected,    setSelected]    = useState(null)
-  const [revealed,    setRevealed]    = useState(false)
-  const [answers,     setAnswers]     = useState([])
-  const [showQuit,    setShowQuit]    = useState(false)
-  const [showResults, setShowResults] = useState(false)
-  const [showStreak,  setShowStreak]  = useState(false)
-  const [streakCount, setStreakCount] = useState(0)
-  const [typedValue,  setTypedValue]  = useState('')
-  const [highlightIdx, setHighlightIdx] = useState([]) // selected word indices for text_highlight
-  const [saving,      setSaving]      = useState(false)
-  const [coinSaveError, setCoinSaveError] = useState(false)
-  const [coinsEarned,   setCoinsEarned]  = useState(0)
-  const [isReplay,      setIsReplay]     = useState(false)
+  const [idx,               setIdx]               = useState(0)
+  const [selected,          setSelected]          = useState(null)
+  const [revealed,          setRevealed]          = useState(false)
+  const [answers,           setAnswers]           = useState([])
+  const [showQuit,          setShowQuit]          = useState(false)
+  const [showResults,       setShowResults]       = useState(false)
+  const [showStreak,        setShowStreak]        = useState(false)
+  const [streakCount,       setStreakCount]       = useState(0)
+  // Fix 5: fill_blank stored in a ref to avoid re-render on every keystroke.
+  // A separate display state forces a single re-render only when needed
+  // (on check/reveal and on question change).
+  const fillBlankRef        = useRef('')
+  const [fillBlankDisplay,  setFillBlankDisplay]  = useState('')
+  // Fix 2: text_highlight stores selected phrase strings, not word indices
+  const [selectedPhrases,   setSelectedPhrases]   = useState([])
+  const [saving,            setSaving]            = useState(false)
+  const [coinSaveError,     setCoinSaveError]     = useState(false)
+  const [coinsEarned,       setCoinsEarned]       = useState(0)
+  const [isReplay,          setIsReplay]          = useState(false)
   const [consecutiveCorrect, setConsecutiveCorrect] = useState(0)
-  const [fireKey, setFireKey] = useState(0)
+  const [fireKey,           setFireKey]           = useState(0)
 
   const questionStartRef = useRef(Date.now())
-  useEffect(() => { questionStartRef.current = Date.now() }, [idx])
+  useEffect(() => {
+    questionStartRef.current = Date.now()
+    fillBlankRef.current = ''
+    setFillBlankDisplay('')
+    setSelectedPhrases([])
+  }, [idx])
 
   const q             = questions[idx]
   const total         = questions.length
@@ -284,17 +390,23 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   const onFire        = consecutiveCorrect >= 2
 
   function currentAnswer() {
-    if (q?.type === 'fill_blank') return typedValue
-    if (q?.type === 'text_highlight') return highlightIdx.map(i => q.text.split(' ')[i])
+    if (q?.type === 'fill_blank')      return fillBlankRef.current
+    if (q?.type === 'text_highlight')  return selectedPhrases
     return selected
   }
 
   function checkCorrect(answer) { return isAnswerCorrect(q, answer) }
   const isCorrect = revealed && checkCorrect(currentAnswer())
 
-  function toggleHighlightWord(i) {
+  // Fix 2: toggle a phrase string in/out of selectedPhrases
+  function togglePhrase(phraseValue) {
     if (revealed) return
-    setHighlightIdx(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i])
+    const normVal = normalize(phraseValue)
+    setSelectedPhrases(prev => {
+      const already = prev.some(p => normalize(p) === normVal)
+      return already ? prev.filter(p => normalize(p) !== normVal) : [...prev, phraseValue]
+    })
+    // Fix 6: do NOT bump fireKey or touch streak on word tap
   }
 
   async function handleContinue() {
@@ -317,22 +429,30 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
       setSaving(false)
       return
     }
-    setIdx(i => i + 1); setSelected(null); setRevealed(false); setTypedValue(''); setHighlightIdx([])
+    setIdx(i => i + 1); setSelected(null); setRevealed(false)
   }
 
+  // Fix 6: fireKey is bumped here — after reveal — not on word tap
   function handleCheck() {
     const answer = currentAnswer()
-    const emptyAnswer = q.type === 'text_highlight' ? highlightIdx.length === 0 : (!answer && answer !== false)
+    const emptyAnswer =
+      q.type === 'text_highlight' ? selectedPhrases.length === 0 :
+      q.type === 'fill_blank'     ? fillBlankRef.current.trim() === '' :
+      (!answer && answer !== false)
     if (emptyAnswer) return
 
     setRevealed(true)
+    // Force fill_blank to re-render once so the revealed colour shows
+    if (q.type === 'fill_blank') setFillBlankDisplay(fillBlankRef.current)
     const correct = isAnswerCorrect(q, answer)
     if (correct) {
-      setConsecutiveCorrect(c => { const next = c + 1; if (next >= 2) setFireKey(k => k + 1); return next })
+      setConsecutiveCorrect(c => {
+        const next = c + 1
+        if (next >= 2) setFireKey(k => k + 1) // ← only here, after correct reveal
+        return next
+      })
     } else { setConsecutiveCorrect(0) }
 
-    // Log performance for adaptation (Phase C reads this next session).
-    // Fire-and-forget — never blocks or breaks the quiz UI.
     if (!isTrial && kidId) {
       const timeSeconds = Math.round((Date.now() - questionStartRef.current) / 1000)
       logQuestionAttempt({ examId: exam.id, kidId, question: q, isCorrect: correct, givenAnswer: answer, timeSeconds })
@@ -371,8 +491,8 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   if (!q) return null
 
   const checkDisabled =
-    q.type === 'fill_blank' ? typedValue.trim() === '' :
-    q.type === 'text_highlight' ? highlightIdx.length === 0 :
+    q.type === 'fill_blank'     ? fillBlankDisplay === '' && fillBlankRef.current.trim() === '' :
+    q.type === 'text_highlight' ? selectedPhrases.length === 0 :
     selected === null
 
   return (
@@ -407,6 +527,8 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
         <div className="px-4 mt-2 flex-1 overflow-y-auto">
           {q.type === 'mcq' && (
             <div className="flex flex-col gap-3">
+              {/* Fix 4: items array renders as numbered list */}
+              <ItemsList items={q.items} />
               {q.options.map((option, optIdx) => (
                 <MCQCard key={`${optIdx}-${option}`} option={option} selected={selected} revealed={revealed} correct={q.correct_answer} onSelect={setSelected} />
               ))}
@@ -419,13 +541,21 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
               ))}
             </div>
           )}
+          {/* Fix 5: onChange writes to ref only — no setState on every keystroke */}
           {q.type === 'fill_blank' && (
             <div className="flex flex-col gap-3">
-              <input type="text" value={typedValue} onChange={e => setTypedValue(e.target.value)} disabled={revealed}
+              <input
+                type="text"
+                defaultValue=""
+                ref={el => { if (el && !revealed) el.value = fillBlankRef.current }}
+                onChange={e => { fillBlankRef.current = e.target.value }}
+                onBlur={e => { fillBlankRef.current = e.target.value }}
+                disabled={revealed}
                 placeholder={t(lang, 'quiz_fill_placeholder')}
                 className="w-full rounded-2xl px-4 py-4 font-display font-bold text-xl text-ink outline-none transition-colors"
-                style={{ border: `2px solid ${revealed ? checkCorrect(typedValue) ? '#86efac' : '#fca5a5' : '#e5e7eb'}`, background: revealed ? checkCorrect(typedValue) ? '#f0fdf4' : '#fff5f5' : '#fafafa' }} />
-              {revealed && !checkCorrect(typedValue) && (
+                style={{ border: `2px solid ${revealed ? checkCorrect(fillBlankRef.current) ? '#86efac' : '#fca5a5' : '#e5e7eb'}`, background: revealed ? checkCorrect(fillBlankRef.current) ? '#f0fdf4' : '#fff5f5' : '#fafafa' }}
+              />
+              {revealed && !checkCorrect(fillBlankRef.current) && (
                 <p className="font-body text-sm font-bold px-1" style={{ color: '#7c3aed' }}>{t(lang, 'quiz_correct_answer', q.correct_answer)}</p>
               )}
             </div>
@@ -440,13 +570,14 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
               </div>
             </div>
           )}
+          {/* Fix 1+2+3: inline flowing sentence, phrase-level, forgiven words */}
           {q.type === 'text_highlight' && (
             <TextHighlight
               text={q.text}
-              selectedIdx={highlightIdx}
+              selectedPhrases={selectedPhrases}
               revealed={revealed}
               targetWords={q.target_words}
-              onToggle={toggleHighlightWord}
+              onTogglePhraseAt={togglePhrase}
             />
           )}
           {revealed && q.explanation && (
