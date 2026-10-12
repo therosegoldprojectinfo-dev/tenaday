@@ -436,6 +436,22 @@
     }
     .slot-btn:hover { background: #e8e8e8; }
     .slot-btn.selected { background: #7B61FF; border-color: #7B61FF; color: #fff; }
+    .slot-btn.past {
+      background: #E8E8E8;
+      border-color: #C0C0C0;
+      color: #A0A0A0;
+      cursor: not-allowed;
+      pointer-events: none;
+      text-decoration: line-through;
+    }
+    .slot-btn.past::after {
+      content: " ✓ Done";
+      font-size: 12px;
+      font-weight: 600;
+      display: block;
+      text-decoration: none;
+      color: #A0A0A0;
+    }
 
     .field-label {
       display: block;
@@ -827,8 +843,40 @@
     ].join("\r\n");
   }
 
+  // Mark past slots grey based on SAST (UTC+2)
+  function markPastSlots() {
+    var nowUTC = Date.now();
+    var saNow = new Date(nowUTC + 2 * 3600 * 1000); // SAST = UTC+2
+    var saHourNow = saNow.getUTCHours();
+    var saMinNow = saNow.getUTCMinutes();
+
+    slots.forEach(function (btn) {
+      var slotHour = parseInt(btn.dataset.sa, 10);
+      // Slot is past if the current SAST hour is >= slot hour
+      // e.g. slot=18 (6pm), current=18:37 → past
+      var isPast = (saHourNow > slotHour) || (saHourNow === slotHour && saMinNow > 0);
+      if (isPast) {
+        btn.classList.add("past");
+        btn.setAttribute("aria-disabled", "true");
+        // If this slot was selected, deselect it
+        if (selected && selected.saHour === slotHour) {
+          selected = null;
+          btn.classList.remove("selected");
+        }
+      } else {
+        btn.classList.remove("past");
+        btn.removeAttribute("aria-disabled");
+      }
+    });
+  }
+
+  markPastSlots();
+  // Re-check every minute so slots grey out in real time
+  setInterval(markPastSlots, 60 * 1000);
+
   slots.forEach(function (btn) {
     btn.addEventListener("click", function () {
+      if (btn.classList.contains("past")) return;
       slots.forEach(function (b) { b.classList.remove("selected"); b.setAttribute("aria-pressed", "false"); });
       btn.classList.add("selected");
       btn.setAttribute("aria-pressed", "true");
