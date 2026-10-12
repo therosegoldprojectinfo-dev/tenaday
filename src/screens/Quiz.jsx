@@ -15,8 +15,14 @@ const FORGIVEN_WORDS = new Set([
   'في','من','إلى','على','عن','مع','هو','هي','هم','هن',
 ])
 
+// Safety net for older quizzes (and the odd bad generation) where the AI packed
+// the list of items into the question string. New quizzes return `items` and
+// `context` as proper fields, so this should be removed once old exams age out.
 function cleanQuestion(q) {
   if (!q) return q
+  // ordering / type_answer always come with clean fields
+  if (q.type === 'ordering' || q.type === 'type_answer') return q
+
   if (Array.isArray(q.items) && q.items.length > 0) {
     const cleaned = q.question
       .replace(/\s*[Ii]tems?:?\s*(\d+[.)]\s*.+?(?=\s+[Ww]hich|\s+[Ss]ort|\s+[Oo]rder|$))/gs, '')
@@ -197,10 +203,36 @@ function wordSetMatches(selectedPhrases, targetPhrases) {
   return a.every((w, i) => w === b[i])
 }
 
+// Ordering uses exact (trimmed) string comparison: items are copied verbatim by the AI,
+// and normalize() could collapse two different items into the same string.
+function orderingMatches(answer, correctOrder) {
+  if (!Array.isArray(answer) || !Array.isArray(correctOrder)) return false
+  if (answer.length !== correctOrder.length) return false
+  return correctOrder.every((c, i) => String(answer[i] ?? '').trim() === String(c).trim())
+}
+
 function isAnswerCorrect(q, answer) {
   if (!q) return false
   if (q.type === 'text_highlight') return wordSetMatches(answer, q.target_words)
-  return answersMatch(answer, q.correct_answer)
+  if (q.type === 'ordering')       return orderingMatches(answer, q.correct_order)
+  // fill_blank / type_answer / mcq / true_false / visual_count: main answer or any accepted alternative
+  const pool = [q.correct_answer, ...(Array.isArray(q.accepted_answers) ? q.accepted_answers : [])]
+  return pool.some(a => answersMatch(answer, a))
+}
+
+// Shuffle the items for an ordering question, guaranteeing the result is NOT already the correct order.
+function shuffleForOrdering(items, correctOrder) {
+  const arr = Array.isArray(items) ? [...items] : []
+  if (arr.length < 2) return arr
+  const isCorrectOrder = a => a.every((x, i) => String(x).trim() === String(correctOrder?.[i] ?? '').trim())
+  for (let attempt = 0; attempt < 8; attempt++) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[arr[i], arr[j]] = [arr[j], arr[i]]
+    }
+    if (!isCorrectOrder(arr)) return arr
+  }
+  return [...arr.slice(1), arr[0]]
 }
 
 function MCQCard({ option, selected, revealed, correct, onSelect, big }) {
@@ -223,6 +255,18 @@ function MCQCard({ option, selected, revealed, correct, onSelect, big }) {
     >
       {option}
     </button>
+  )
+}
+
+// Soft card with the scenario / passage / setup, shown above the question for every type.
+function ContextCard({ text }) {
+  if (typeof text !== 'string' || !text.trim()) return null
+  return (
+    <div style={{ background: '#fafafa', border: '2px solid #f3f4f6', borderRadius: 16, padding: '12px 14px' }}>
+      <p style={{ fontFamily: "'Nunito', sans-serif", fontSize: 15, color: '#374151', lineHeight: 1.5, margin: 0, whiteSpace: 'pre-line' }}>
+        {text}
+      </p>
+    </div>
   )
 }
 
@@ -259,6 +303,116 @@ function ItemsList({ items }) {
         </div>
       ))}
     </div>
+  )
+}
+
+// Tap-to-order: tap an item below to drop it into the next numbered slot,
+// tap a filled slot to send it back. Works on any phone, no drag needed.
+function OrderingBoard({ items, chosen, revealed, correctOrder, onChange }) {
+  const chosenSet = new Set(chosen)
+  const pool = items.map((item, i) => ({ item, i })).filter(({ i }) => !chosenSet.has(i))
+
+  function addItem(i)    { if (!revealed) onChange([...chosen, i]) }
+  function removeItem(i) { if (!revealed) onChange(chosen.filter(c => c !== i)) }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-2">
+        {items.map((_, slot) => {
+          const itemIdx = chosen[slot]
+          const filled  = itemIdx !== undefined
+          const text    = filled ? items[itemIdx] : ''
+
+          let borderColor = '#e5e7eb', bg = '#fafafa', color = '#9ca3af'
+          let badgeBg = '#f3f4f6', badgeColor = '#9ca3af'
+          if (filled && !revealed) {
+            borderColor = '#a78bfa'; bg = '#f5f3ff'; color = '#7c3aed'
+            badgeBg = '#ede9fe'; badgeColor = '#7c3aed'
+          } else if (filled && revealed) {
+            const ok = String(text).trim() === String(correctOrder?.[slot] ?? '').trim()
+            borderColor = ok ? '#86efac' : '#fca5a5'
+            bg          = ok ? '#f0fdf4' : '#fff5f5'
+            color       = ok ? '#16a34a' : '#ef4444'
+            badgeBg     = ok ? '#dcfce7' : '#fee2e2'
+            badgeColor  = color
+          }
+
+          return (
+            <button
+              key={slot}
+              disabled={revealed || !filled}
+              onClick={() => filled && removeItem(itemIdx)}
+              className="w-full select-none transition-all active:scale-[0.98]"
+              style={{
+                display: 'flex', alignItems: 'center', gap: 10,
+                minHeight: 52, padding: '8px 12px', textAlign: 'left',
+                borderRadius: 16, border: `2px ${filled ? 'solid' : 'dashed'} ${borderColor}`,
+                background: bg, color,
+                fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 16, lineHeight: 1.3,
+                cursor: revealed || !filled ? 'default' : 'pointer',
+              }}
+            >
+              <span style={{
+                width: 28, height: 28, borderRadius: 14, flexShrink: 0,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: badgeBg, color: badgeColor, fontSize: 14, fontWeight: 800,
+              }}>{slot + 1}</span>
+              <span>{text}</span>
+            </button>
+          )
+        })}
+      </div>
+
+      {!revealed && pool.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+          {pool.map(({ item, i }) => (
+            <button
+              key={i}
+              onClick={() => addItem(i)}
+              className="select-none transition-all active:scale-95"
+              style={{
+                minHeight: 44, padding: '10px 14px', borderRadius: 14,
+                border: '2px solid #e5e7eb', background: 'white', color: '#3C3C3C',
+                fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 15, lineHeight: 1.3,
+                boxShadow: '0 2px 0 #e5e7eb', cursor: 'pointer',
+              }}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Shared text input for fill_blank and type_answer. Uncontrolled on purpose (same
+// behavior as before): the ref holds the live value, onValue updates display state
+// so the CHECK button re-renders.
+function TextAnswerInput({ inputKey, valueRef, onValue, revealed, isCorrect, placeholder }) {
+  return (
+    <input
+      key={inputKey}
+      type="text"
+      defaultValue=""
+      ref={el => { if (el && !revealed) el.value = valueRef.current }}
+      onChange={e => {
+        valueRef.current = e.target.value
+        onValue(e.target.value)
+      }}
+      onBlur={e => {
+        valueRef.current = e.target.value
+        onValue(e.target.value)
+      }}
+      disabled={revealed}
+      autoFocus
+      placeholder={placeholder}
+      className="w-full rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none transition-colors"
+      style={{
+        border: `2px solid ${revealed ? (isCorrect ? '#86efac' : '#fca5a5') : '#e5e7eb'}`,
+        background: revealed ? (isCorrect ? '#f0fdf4' : '#fff5f5') : '#fafafa',
+      }}
+    />
   )
 }
 
@@ -412,8 +566,11 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   const [showStreak,         setShowStreak]        = useState(false)
   const [streakCount,        setStreakCount]       = useState(0)
   const fillBlankRef         = useRef('')
-  // ── FIX: fillBlankDisplay now tracks typed value so CHECK button re-renders ──
+  // fillBlankDisplay tracks the typed value so the CHECK button re-renders
   const [fillBlankDisplay,   setFillBlankDisplay]  = useState('')
+  const typeAnswerRef        = useRef('')
+  const [typeAnswerDisplay,  setTypeAnswerDisplay] = useState('')
+  const [orderChosen,        setOrderChosen]       = useState([])   // indices into orderItems, in the order tapped
   const [selectedPhrases,    setSelectedPhrases]   = useState([])
   const [saving,             setSaving]            = useState(false)
   const [coinSaveError,      setCoinSaveError]     = useState(false)
@@ -427,8 +584,11 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   useEffect(() => {
     questionStartRef.current = Date.now()
     fillBlankRef.current = ''
-    // ── FIX: reset display state too so button disables correctly on new question ──
+    typeAnswerRef.current = ''
+    // reset display state too so the button disables correctly on a new question
     setFillBlankDisplay('')
+    setTypeAnswerDisplay('')
+    setOrderChosen([])
     setSelectedPhrases([])
   }, [idx])
 
@@ -437,9 +597,17 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   const progressScale = (idx + (revealed ? 1 : 0)) / Math.max(total, 1)
   const onFire        = consecutiveCorrect >= 2
 
+  // Shuffled once per question (q is stable for a given idx)
+  const orderItems = useMemo(
+    () => (q?.type === 'ordering' ? shuffleForOrdering(q.items, q.correct_order) : []),
+    [q]
+  )
+
   function currentAnswer() {
     if (q?.type === 'fill_blank')     return fillBlankRef.current
+    if (q?.type === 'type_answer')    return typeAnswerRef.current
     if (q?.type === 'text_highlight') return selectedPhrases
+    if (q?.type === 'ordering')       return orderChosen.map(i => orderItems[i])
     return selected
   }
 
@@ -489,11 +657,14 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
     const emptyAnswer =
       q.type === 'text_highlight' ? selectedPhrases.length === 0 :
       q.type === 'fill_blank'     ? fillBlankRef.current.trim() === '' :
+      q.type === 'type_answer'    ? typeAnswerRef.current.trim() === '' :
+      q.type === 'ordering'       ? orderChosen.length !== orderItems.length :
       (!answer && answer !== false)
     if (emptyAnswer) return
 
     setRevealed(true)
-    if (q.type === 'fill_blank') setFillBlankDisplay(fillBlankRef.current)
+    if (q.type === 'fill_blank')  setFillBlankDisplay(fillBlankRef.current)
+    if (q.type === 'type_answer') setTypeAnswerDisplay(typeAnswerRef.current)
     const correct = isAnswerCorrect(q, answer)
     if (correct) {
       setConsecutiveCorrect(c => {
@@ -550,10 +721,13 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   )
   if (!q) return null
 
-  // ── FIX: check disabled uses fillBlankDisplay (re-renders on keystroke) ──
+  // CHECK is disabled until the question has an answer.
+  // fill_blank / type_answer use their display state (re-renders on every keystroke).
   const checkDisabled =
     q.type === 'fill_blank'     ? fillBlankDisplay.trim() === '' :
+    q.type === 'type_answer'    ? typeAnswerDisplay.trim() === '' :
     q.type === 'text_highlight' ? selectedPhrases.length === 0 :
+    q.type === 'ordering'       ? orderChosen.length !== orderItems.length :
     selected === null
 
   return (
@@ -580,13 +754,13 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
           <p className="font-body font-bold text-xs tracking-widest uppercase truncate" style={{ color: '#7c3aed' }}>{topic}</p>
         </div>
 
-        {/* Question */}
-        <div className="flex-shrink-0 px-6 pt-4 pb-3" style={{ maxHeight: '30%', overflowY: 'auto' }}>
-          <p className="font-display font-bold text-xl text-ink leading-snug">{q.question}</p>
-        </div>
+        {/* Context + question + answers share one scroll area, so long content
+            never gets clipped by a fixed-height question box */}
+        <div className="flex-1 min-h-0 overflow-y-auto px-4 pt-3 pb-2 flex flex-col gap-3">
 
-        {/* Answers */}
-        <div className="px-4 mt-2 flex-1 overflow-y-auto flex flex-col gap-3">
+          <ContextCard text={q.context} />
+
+          <p className="font-display font-bold text-xl text-ink leading-snug px-2">{q.question}</p>
 
           {q.type === 'mcq' && (
             <>
@@ -614,31 +788,52 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
 
           {q.type === 'fill_blank' && (
             <div className="flex flex-col gap-3">
-              <input
-                type="text"
-                defaultValue=""
-                ref={el => { if (el && !revealed) el.value = fillBlankRef.current }}
-                // ── FIX: update both ref AND state so button re-renders ──
-                onChange={e => {
-                  fillBlankRef.current = e.target.value
-                  setFillBlankDisplay(e.target.value)
-                }}
-                onBlur={e => {
-                  fillBlankRef.current = e.target.value
-                  setFillBlankDisplay(e.target.value)
-                }}
-                disabled={revealed}
-                autoFocus
+              <TextAnswerInput
+                inputKey={`fill-${idx}`}
+                valueRef={fillBlankRef}
+                onValue={setFillBlankDisplay}
+                revealed={revealed}
+                isCorrect={checkCorrect(fillBlankRef.current)}
                 placeholder={t(lang, 'quiz_fill_placeholder')}
-                className="w-full rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none transition-colors"
-                style={{
-                  border: `2px solid ${revealed ? checkCorrect(fillBlankRef.current) ? '#86efac' : '#fca5a5' : '#e5e7eb'}`,
-                  background: revealed ? checkCorrect(fillBlankRef.current) ? '#f0fdf4' : '#fff5f5' : '#fafafa',
-                }}
               />
               {revealed && !checkCorrect(fillBlankRef.current) && (
                 <p className="font-body text-sm font-bold px-1" style={{ color: '#7c3aed' }}>
                   {t(lang, 'quiz_correct_answer', q.correct_answer)}
+                </p>
+              )}
+            </div>
+          )}
+
+          {q.type === 'type_answer' && (
+            <div className="flex flex-col gap-3">
+              <TextAnswerInput
+                inputKey={`type-${idx}`}
+                valueRef={typeAnswerRef}
+                onValue={setTypeAnswerDisplay}
+                revealed={revealed}
+                isCorrect={checkCorrect(typeAnswerRef.current)}
+                placeholder={t(lang, 'quiz_fill_placeholder')}
+              />
+              {revealed && !checkCorrect(typeAnswerRef.current) && (
+                <p className="font-body text-sm font-bold px-1" style={{ color: '#7c3aed' }}>
+                  {t(lang, 'quiz_correct_answer', q.correct_answer)}
+                </p>
+              )}
+            </div>
+          )}
+
+          {q.type === 'ordering' && (
+            <div className="flex flex-col gap-3">
+              <OrderingBoard
+                items={orderItems}
+                chosen={orderChosen}
+                revealed={revealed}
+                correctOrder={q.correct_order}
+                onChange={setOrderChosen}
+              />
+              {revealed && !isCorrect && (
+                <p className="font-body text-sm font-bold px-1" style={{ color: '#7c3aed' }}>
+                  {t(lang, 'quiz_correct_answer', (q.correct_order || []).join(' → '))}
                 </p>
               )}
             </div>
