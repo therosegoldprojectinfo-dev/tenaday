@@ -830,10 +830,10 @@ function renderSidebar() {
 function renderBottomNav() {
   const s = state; const lang = s.lang
   const tabs = [
-    { id: 'chapters', icon: '/nav-chapters.png' },
-    { id: 'rewards',  icon: '/nav-gift.png' },
-    { id: 'parent_zone', icon: '/nav-parent.png' },
-    { id: 'profile',  icon: '/nav-profile.png' },
+    { id: 'chapters', icon: '/nav-chapters.webp' },
+    { id: 'rewards',  icon: '/nav-gift.webp' },
+    { id: 'parent_zone', icon: '/nav-parent.webp' },
+    { id: 'profile',  icon: '/nav-profile.webp' },
   ]
   return `<nav class="bottom-nav">
     ${tabs.map(tab => `
@@ -870,7 +870,7 @@ function renderChapters() {
     </div>
     <div class="streak-cards">
       <button class="streak-card" style="background:${s.streak>0?'#fff0f6':'#f9fafb'};" id="btn-streak-modal">
-        <img src="/streak-fire.png" alt="streak" style="${s.streak===0?'filter:grayscale(1) opacity(0.4)':''}" />
+        <img src="/streak-fire.webp" alt="streak" style="${s.streak===0?'filter:grayscale(1) opacity(0.4)':''}" />
         <div>
           <p class="streak-num" style="color:${s.streak>0?'#ff2d78':'#d1d5db'}">${s.streak}</p>
           <p class="streak-label">${lang==='ar'?'أيام':'day streak'}</p>
@@ -896,7 +896,7 @@ function renderChapters() {
   let chaptersContent
   if (chapters.length === 0) {
     chaptersContent = `<div class="chapters-empty">
-      <img src="/nav-profile.png" alt="" class="float-slow" />
+      <img src="/nav-profile.webp" alt="" class="float-slow" />
       <div>
         <h2>${t(lang,'chapters_empty_title')}</h2>
         <p>${t(lang,'chapters_empty_sub')}</p>
@@ -949,7 +949,7 @@ function renderStreakModal(streak, lang, closeId) {
     <div class="streak-modal">
       <button class="modal-close" id="${closeId}">✕</button>
       <p class="font-display" style="font-size:14px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.1em;">${lang==='ar'?'سلسلتك':'Streak'}</p>
-      <img src="/streak-fire.png" alt="streak" style="width:144px;height:auto;${streak===0?'filter:grayscale(1) opacity(0.4)':''}${streak>0?' animation:float 2s ease-in-out infinite':''}" />
+      <img src="/streak-fire.webp" alt="streak" style="width:144px;height:auto;${streak===0?'filter:grayscale(1) opacity(0.4)':''}${streak>0?' animation:float 2s ease-in-out infinite':''}" />
       <div>
         <p class="font-display" style="font-size:48px;font-weight:800;color:white;">${streak} <span style="color:${streak>0?'#ff2d78':'#6b7280'}">${lang==='ar'?'يوم':'Day'}</span></p>
         <p class="font-display" style="font-size:24px;font-weight:800;color:rgba(255,255,255,0.8)">${lang==='ar'?'سلسلة!':'Streak!'}</p>
@@ -973,7 +973,7 @@ function renderCoinsModal(coins, lang, closeId) {
     <div class="streak-modal coins-modal">
       <button class="modal-close" id="${closeId}" style="color:white;">✕</button>
       <p class="font-display" style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(255,200,0,0.6)">${lang==='ar'?'عملاتك':'Your Coins'}</p>
-      <img src="/coin-flower.png" alt="coins" style="width:160px;height:auto;animation:float 2s ease-in-out infinite" />
+      <img src="/coin-flower.webp" alt="coins" style="width:160px;height:auto;animation:float 2s ease-in-out infinite" />
       <div>
         <p class="font-display" style="font-size:60px;font-weight:800;color:#fbbf24;">${coins}</p>
         <p class="font-display" style="font-size:20px;font-weight:700;color:rgba(251,191,36,0.6)">${lang==='ar'?'عملة':'coins'}</p>
@@ -1080,7 +1080,7 @@ function renderScan() {
 
 function renderScanIdle(lang) {
   return `<div class="scan-idle">
-    <img src="/nav-profile.png" alt="" style="width:144px;height:auto;animation:float 3s ease-in-out infinite;" />
+    <img src="/nav-profile.webp" alt="" style="width:144px;height:auto;animation:float 3s ease-in-out infinite;" />
     <div style="text-align:center;padding:0 16px;">
       <p class="font-display" style="font-size:24px;font-weight:800;color:var(--ink);line-height:1.3;">${lang==='ar'?'أعطني صورة وسأحوّلها إلى اختبار ممتع!':'Give me a photo, I\'ll turn it into a fun quiz!'}</p>
     </div>
@@ -1110,7 +1110,7 @@ function renderScanReview(lang) {
 
 function renderScanLoading(lang) {
   return `<div class="loading-center">
-    <img src="/nav-profile.png" alt="" style="width:112px;height:auto;animation:float 2s ease-in-out infinite;" />
+    <img src="/nav-profile.webp" alt="" style="width:112px;height:auto;animation:float 2s ease-in-out infinite;" />
     <div>
       <p class="font-display" style="font-size:20px;font-weight:700;color:var(--ink);">${t(lang,'home_generating')}</p>
       <p style="font-size:14px;color:var(--muted);margin-top:4px;">${t(lang,'home_reading')}</p>
@@ -1136,7 +1136,7 @@ function renderQuizIntro() {
   return `<div class="quiz-intro" style="background:white;">
     <button class="back-btn" style="position:absolute;top:48px;left:20px;" id="btn-back-scan">← Back</button>
     <div class="quiz-intro-inner">
-      <img src="/nav-profile.png" alt="" style="width:176px;height:auto;animation:float 2s ease-in-out infinite;" />
+      <img src="/nav-profile.webp" alt="" style="width:176px;height:auto;animation:float 2s ease-in-out infinite;" />
       <div style="text-align:center;display:flex;flex-direction:column;gap:8px;">
         <h1 class="font-display" style="font-size:30px;font-weight:800;color:var(--ink);line-height:1.2;">
           ${lang==='ar'?`${t(lang,'quiz_intro_lets_start')} Champ`:`Champ, ${t(lang,'quiz_intro_lets_start')}`}
@@ -1314,7 +1314,7 @@ function renderFireOverlay() {
   const heads = Array.from({length:8},()=>({left:Math.random()*95,delay:(Math.random()*0.6).toFixed(2),dur:(0.9+Math.random()).toFixed(2),size:50+Math.random()*60,rot:((Math.random()-0.5)*60).toFixed(1)}))
   return `<div class="fire-overlay" key="${state.quizFireKey}">
     ${fires.map(p=>`<div style="position:absolute;bottom:-80px;left:${p.left}%;font-size:${p.size}px;opacity:0;animation:fire-rise ${p.dur}s ${p.delay}s ease-out both">🔥</div>`).join('')}
-    ${heads.map(p=>`<div style="position:absolute;bottom:-100px;left:${p.left}%;width:${p.size}px;height:${p.size}px;opacity:0;transform:rotate(${p.rot}deg);animation:fire-rise ${p.dur}s ${p.delay}s ease-out both"><img src="/nav-profile.png" alt="" style="width:100%;height:100%;object-fit:contain;"/></div>`).join('')}
+    ${heads.map(p=>`<div style="position:absolute;bottom:-100px;left:${p.left}%;width:${p.size}px;height:${p.size}px;opacity:0;transform:rotate(${p.rot}deg);animation:fire-rise ${p.dur}s ${p.delay}s ease-out both"><img src="/nav-profile.webp" alt="" style="width:100%;height:100%;object-fit:contain;"/></div>`).join('')}
   </div>`
 }
 
@@ -1367,7 +1367,7 @@ function renderResults() {
     </style>
     <div style="display:flex;flex-direction:column;align-items:center;gap:24px;width:100%;max-width:360px;">
       <p style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.12em;color:rgba(251,191,36,0.6);">YOUR COINS</p>
-      <img src="/coin-flower.png" alt="coins" style="width:140px;height:140px;object-fit:contain;animation:float 2s ease-in-out infinite, coinpop 0.5s ease-out;" />
+      <img src="/coin-flower.webp" alt="coins" style="width:140px;height:140px;object-fit:contain;animation:float 2s ease-in-out infinite, coinpop 0.5s ease-out;" />
       <div style="text-align:center;">
         <p class="font-display" style="font-size:72px;font-weight:900;color:#fbbf24;line-height:1;animation:coinpop 0.6s ease-out;">+${coinsEarned}</p>
         <p style="font-size:18px;color:rgba(251,191,36,0.7);margin-top:4px;">coins</p>
