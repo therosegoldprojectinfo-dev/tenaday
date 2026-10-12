@@ -218,7 +218,7 @@ function MCQCard({ option, selected, revealed, correct, onSelect, big }) {
     <button
       disabled={revealed}
       onClick={() => onSelect(option)}
-      className={`w-full rounded-2xl border-2 font-display font-bold transition-all active:scale-[0.97] select-none ${big ? 'text-3xl h-28 flex items-center justify-center' : 'text-lg px-5 py-4 text-left'}`}
+      className={`w-full rounded-2xl border-2 font-display font-bold transition-all active:scale-[0.97] select-none ${big ? 'text-2xl h-24 flex items-center justify-center' : 'text-base px-4 py-3 text-left'}`}
       style={{ borderColor, background: bgColor, color: textColor, boxShadow: !revealed && !isSelected ? '0 2px 8px rgba(0,0,0,0.05)' : 'none' }}
     >
       {option}
@@ -233,7 +233,7 @@ function ItemsList({ items }) {
       background: '#f8f7ff',
       border: '2px solid #ede9fe',
       borderRadius: 16,
-      padding: '12px 16px',
+      padding: '10px 14px',
       marginBottom: 12,
       display: 'flex',
       flexDirection: 'column',
@@ -244,7 +244,7 @@ function ItemsList({ items }) {
           <span style={{
             fontFamily: "'Baloo 2', sans-serif",
             fontWeight: 800,
-            fontSize: 15,
+            fontSize: 13,
             color: '#7c3aed',
             minWidth: 20,
             lineHeight: 1.4,
@@ -252,7 +252,7 @@ function ItemsList({ items }) {
           }}>{i + 1}.</span>
           <span style={{
             fontFamily: "'Nunito', sans-serif",
-            fontSize: 15,
+            fontSize: 13,
             color: '#1f2937',
             lineHeight: 1.4,
           }}>{item}</span>
@@ -308,7 +308,7 @@ function TextHighlight({ text, selectedPhrases, revealed, targetWords, onToggleP
   const normSelected = selectedPhrases.map(normalize)
 
   return (
-    <div style={{ lineHeight: 2.1, padding: '4px 4px' }}>
+    <div style={{ lineHeight: 2.0, padding: '4px 4px' }}>
       {tokens.map((token, i) => {
         if (token.type === 'space') return <span key={i}>{token.value}</span>
 
@@ -319,7 +319,7 @@ function TextHighlight({ text, selectedPhrases, revealed, targetWords, onToggleP
 
         if (isForgiven && !isTarget) {
           return (
-            <span key={i} style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 19, color: '#1f2937' }}>
+            <span key={i} style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 700, fontSize: 16, color: '#1f2937' }}>
               {token.value}
             </span>
           )
@@ -347,7 +347,7 @@ function TextHighlight({ text, selectedPhrases, revealed, targetWords, onToggleP
               borderRadius: 8,
               fontFamily: "'Baloo 2', sans-serif",
               fontWeight: 700,
-              fontSize: 19,
+              fontSize: 16,
               padding: '3px 6px',
               margin: '2px 1px',
               cursor: revealed ? 'default' : 'pointer',
@@ -582,7 +582,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
 
         {/* Question */}
         <div className="flex-shrink-0 px-6 pt-4 pb-3" style={{ maxHeight: '30%', overflowY: 'auto' }}>
-          <p className="font-display font-bold text-2xl text-ink leading-snug">{q.question}</p>
+          <p className="font-display font-bold text-xl text-ink leading-snug">{q.question}</p>
         </div>
 
         {/* Answers */}
@@ -630,7 +630,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
                 disabled={revealed}
                 autoFocus
                 placeholder={t(lang, 'quiz_fill_placeholder')}
-                className="w-full rounded-2xl px-4 py-4 font-display font-bold text-xl text-ink outline-none transition-colors"
+                className="w-full rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none transition-colors"
                 style={{
                   border: `2px solid ${revealed ? checkCorrect(fillBlankRef.current) ? '#86efac' : '#fca5a5' : '#e5e7eb'}`,
                   background: revealed ? checkCorrect(fillBlankRef.current) ? '#f0fdf4' : '#fff5f5' : '#fafafa',
@@ -667,7 +667,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
 
           {revealed && q.explanation && (
             <div className="rounded-2xl px-4 py-3" style={{ background: '#f5f3ff', border: '2px solid #ede9fe' }}>
-              <p className="font-body text-sm leading-snug" style={{ color: '#7c3aed' }}>💡 {q.explanation}</p>
+              <p className="font-body text-xs leading-snug" style={{ color: '#7c3aed' }}>💡 {q.explanation}</p>
             </div>
           )}
         </div>
@@ -678,7 +678,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
             <button
               disabled={checkDisabled}
               onClick={handleCheck}
-              className="w-full disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all tracking-widest active:scale-95"
+              className="w-full disabled:opacity-40 text-white font-display font-bold text-lg rounded-2xl py-4 transition-all tracking-widest active:scale-95"
               style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}
             >
               {t(lang, 'quiz_check')}
@@ -687,12 +687,12 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
             <div className="rounded-2xl overflow-hidden border-2" style={{ borderColor: isCorrect ? '#86efac' : '#fca5a5', background: isCorrect ? '#f0fdf4' : '#fff5f5' }}>
               <div className="flex items-center gap-3 px-4 py-3">
                 <span className="text-2xl">{isCorrect ? '🎉' : '💪'}</span>
-                <p className="font-display font-bold text-lg text-ink">{isCorrect ? t(lang, 'quiz_correct') : t(lang, 'quiz_not_quite')}</p>
+                <p className="font-display font-bold text-base text-ink">{isCorrect ? t(lang, 'quiz_correct') : t(lang, 'quiz_not_quite')}</p>
               </div>
               <button
                 onClick={handleContinue}
                 disabled={saving}
-                className="w-full py-4 font-display font-bold text-xl tracking-widest text-white active:scale-[0.99] transition-all"
+                className="w-full py-3 font-display font-bold text-lg tracking-widest text-white active:scale-[0.99] transition-all"
                 style={{ background: isCorrect ? '#7c3aed' : '#f59e0b', boxShadow: isCorrect ? '0 4px 0 #5b21b6' : '0 4px 0 #d97706' }}
               >
                 {saving ? t(lang, 'quiz_saving') : t(lang, 'quiz_continue')}
