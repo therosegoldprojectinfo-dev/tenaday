@@ -2,6 +2,7 @@ import { useState, useMemo, useRef, useEffect } from 'react'
 import { completeQuiz, updateStreak } from '../lib/economy'
 import { logQuestionAttempt } from '../lib/performance'
 import { getAssetPath } from '../lib/openmojiAssets'
+import { gradeAnswer } from '../lib/grading'
 import StreakPopup from './StreakPopup'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
@@ -197,9 +198,13 @@ function wordSetMatches(selectedPhrases, targetPhrases) {
   return a.every((w, i) => w === b[i])
 }
 
+// typed answers + choice/reason use the human-like grading in lib/grading.js
 function isAnswerCorrect(q, answer) {
   if (!q) return false
   if (q.type === 'text_highlight') return wordSetMatches(answer, q.target_words)
+  if (q.type === 'fill_blank' || q.type === 'short_answer' || q.type === 'choice_reason') {
+    return gradeAnswer(q, answer).correct
+  }
   return answersMatch(answer, q.correct_answer)
 }
 
@@ -412,8 +417,12 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   const [showStreak,         setShowStreak]        = useState(false)
   const [streakCount,        setStreakCount]       = useState(0)
   const fillBlankRef         = useRef('')
-  // ── FIX: fillBlankDisplay now tracks typed value so CHECK button re-renders ──
+  // fillBlankDisplay tracks the typed value so the CHECK button re-renders
+  // (also used for short_answer, which is typed the same way)
   const [fillBlankDisplay,   setFillBlankDisplay]  = useState('')
+  // choice_reason: the "why" text
+  const reasonRef            = useRef('')
+  const [reasonDisplay,      setReasonDisplay]     = useState('')
   const [selectedPhrases,    setSelectedPhrases]   = useState([])
   const [saving,             setSaving]            = useState(false)
   const [coinSaveError,      setCoinSaveError]     = useState(false)
@@ -427,8 +436,9 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   useEffect(() => {
     questionStartRef.current = Date.now()
     fillBlankRef.current = ''
-    // ── FIX: reset display state too so button disables correctly on new question ──
+    reasonRef.current = ''
     setFillBlankDisplay('')
+    setReasonDisplay('')
     setSelectedPhrases([])
   }, [idx])
 
@@ -437,14 +447,21 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   const progressScale = (idx + (revealed ? 1 : 0)) / Math.max(total, 1)
   const onFire        = consecutiveCorrect >= 2
 
+  const isTyped = q?.type === 'fill_blank' || q?.type === 'short_answer'
+
   function currentAnswer() {
-    if (q?.type === 'fill_blank')     return fillBlankRef.current
-    if (q?.type === 'text_highlight') return selectedPhrases
+    if (isTyped)                       return fillBlankRef.current
+    if (q?.type === 'choice_reason')   return { choice: selected, reason: reasonRef.current }
+    if (q?.type === 'text_highlight')  return selectedPhrases
     return selected
   }
 
   function checkCorrect(answer) { return isAnswerCorrect(q, answer) }
   const isCorrect = revealed && checkCorrect(currentAnswer())
+  const isPartial = revealed && !isCorrect &&
+    (q?.type === 'short_answer' || q?.type === 'choice_reason') &&
+    !!gradeAnswer(q, currentAnswer()).partial
+  const ALMOST = lang === 'ar' ? 'تقريباً!' : lang === 'fr' ? 'Presque !' : 'Almost!'
 
   function togglePhrase(phraseValue) {
     if (revealed) return
@@ -488,12 +505,14 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
     const answer = currentAnswer()
     const emptyAnswer =
       q.type === 'text_highlight' ? selectedPhrases.length === 0 :
-      q.type === 'fill_blank'     ? fillBlankRef.current.trim() === '' :
+      isTyped                     ? fillBlankRef.current.trim() === '' :
+      q.type === 'choice_reason'  ? (!selected || reasonRef.current.trim() === '') :
       (!answer && answer !== false)
     if (emptyAnswer) return
 
     setRevealed(true)
-    if (q.type === 'fill_blank') setFillBlankDisplay(fillBlankRef.current)
+    if (isTyped) setFillBlankDisplay(fillBlankRef.current)
+    if (q.type === 'choice_reason') setReasonDisplay(reasonRef.current)
     const correct = isAnswerCorrect(q, answer)
     if (correct) {
       setConsecutiveCorrect(c => {
@@ -505,7 +524,9 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
 
     if (!isTrial && kidId) {
       const timeSeconds = Math.round((Date.now() - questionStartRef.current) / 1000)
-      logQuestionAttempt({ examId: exam.id, kidId, question: q, isCorrect: correct, givenAnswer: answer, timeSeconds })
+      // keep the logged answer a plain string for choice_reason
+      const givenAnswer = q.type === 'choice_reason' ? `${answer.choice} — ${answer.reason}` : answer
+      logQuestionAttempt({ examId: exam.id, kidId, question: q, isCorrect: correct, givenAnswer, timeSeconds })
     }
   }
 
@@ -550,9 +571,9 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
   )
   if (!q) return null
 
-  // ── FIX: check disabled uses fillBlankDisplay (re-renders on keystroke) ──
   const checkDisabled =
-    q.type === 'fill_blank'     ? fillBlankDisplay.trim() === '' :
+    isTyped                     ? fillBlankDisplay.trim() === '' :
+    q.type === 'choice_reason'  ? (selected === null || reasonDisplay.trim() === '') :
     q.type === 'text_highlight' ? selectedPhrases.length === 0 :
     selected === null
 
@@ -593,7 +614,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
               <ItemsList items={q.items} />
               {q.options.map((option, optIdx) => (
                 <MCQCard
-                  key={`optIdx-{option}`}
+                  key={`${optIdx}-${option}`}
                   option={option}
                   selected={selected}
                   revealed={revealed}
@@ -618,7 +639,6 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
                 type="text"
                 defaultValue=""
                 ref={el => { if (el && !revealed) el.value = fillBlankRef.current }}
-                // ── FIX: update both ref AND state so button re-renders ──
                 onChange={e => {
                   fillBlankRef.current = e.target.value
                   setFillBlankDisplay(e.target.value)
@@ -644,12 +664,84 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
             </div>
           )}
 
+          {/* NEW: short_answer = typed sentence, graded by keywords */}
+          {q.type === 'short_answer' && (
+            <div className="flex flex-col gap-3">
+              <textarea
+                key={`sa-${idx}`}
+                rows={3}
+                defaultValue=""
+                ref={el => { if (el && !revealed) el.value = fillBlankRef.current }}
+                onChange={e => {
+                  fillBlankRef.current = e.target.value
+                  setFillBlankDisplay(e.target.value)
+                }}
+                onBlur={e => {
+                  fillBlankRef.current = e.target.value
+                  setFillBlankDisplay(e.target.value)
+                }}
+                disabled={revealed}
+                autoFocus
+                placeholder={t(lang, 'quiz_fill_placeholder')}
+                className="w-full rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none transition-colors"
+                style={{
+                  resize: 'none',
+                  border: `2px solid ${revealed ? (isCorrect ? '#86efac' : isPartial ? '#fcd34d' : '#fca5a5') : '#e5e7eb'}`,
+                  background: revealed ? (isCorrect ? '#f0fdf4' : isPartial ? '#fffbeb' : '#fff5f5') : '#fafafa',
+                }}
+              />
+              {revealed && !isCorrect && (
+                <p className="font-body text-sm font-bold px-1" style={{ color: '#7c3aed' }}>
+                  {t(lang, 'quiz_correct_answer', q.correct_answer)}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* NEW: choice_reason = pick a choice, then type why */}
+          {q.type === 'choice_reason' && (
+            <div className="flex flex-col gap-3">
+              {q.options.map((option, optIdx) => (
+                <MCQCard
+                  key={`${optIdx}-${option}`}
+                  option={option}
+                  selected={selected}
+                  revealed={revealed}
+                  correct={q.correct_answer}
+                  onSelect={setSelected}
+                />
+              ))}
+              <textarea
+                key={`cr-${idx}`}
+                rows={3}
+                defaultValue=""
+                ref={el => { if (el && !revealed) el.value = reasonRef.current }}
+                onChange={e => {
+                  reasonRef.current = e.target.value
+                  setReasonDisplay(e.target.value)
+                }}
+                onBlur={e => {
+                  reasonRef.current = e.target.value
+                  setReasonDisplay(e.target.value)
+                }}
+                disabled={revealed}
+                placeholder={lang === 'ar' ? 'اكتب السبب…' : lang === 'fr' ? 'Écris pourquoi…' : 'Write why…'}
+                className="w-full rounded-2xl px-4 py-3 font-display font-bold text-base text-ink outline-none transition-colors"
+                style={{
+                  resize: 'none',
+                  border: `2px solid ${revealed ? (isCorrect ? '#86efac' : isPartial ? '#fcd34d' : '#fca5a5') : '#e5e7eb'}`,
+                  background: revealed ? (isCorrect ? '#f0fdf4' : isPartial ? '#fffbeb' : '#fff5f5') : '#fafafa',
+                }}
+              />
+            </div>
+          )}
+
           {q.type === 'visual_count' && (
             <div className="flex flex-col gap-3">
               <VisualCountRow asset={q.asset} quantity={q.quantity} />
               <div className="grid grid-cols-2 gap-3">
                 {q.options.map((option, optIdx) => (
-                  <MCQCard key={`optIdx-{option}`} option={option} selected={selected} revealed={revealed} correct={q.correct_answer} onSelect={setSelected} big />
+                  <MCQCard key={`${optIdx}-${option}`} option={option} selected={selected} revealed={revealed} correct={q.correct_answer} onSelect={setSelected} big />
                 ))}
               </div>
             </div>
@@ -684,10 +776,10 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
               {t(lang, 'quiz_check')}
             </button>
           ) : (
-            <div className="rounded-2xl overflow-hidden border-2" style={{ borderColor: isCorrect ? '#86efac' : '#fca5a5', background: isCorrect ? '#f0fdf4' : '#fff5f5' }}>
+            <div className="rounded-2xl overflow-hidden border-2" style={{ borderColor: isCorrect ? '#86efac' : isPartial ? '#fcd34d' : '#fca5a5', background: isCorrect ? '#f0fdf4' : isPartial ? '#fffbeb' : '#fff5f5' }}>
               <div className="flex items-center gap-3 px-4 py-3">
-                <span className="text-2xl">{isCorrect ? '🎉' : '💪'}</span>
-                <p className="font-display font-bold text-base text-ink">{isCorrect ? t(lang, 'quiz_correct') : t(lang, 'quiz_not_quite')}</p>
+                <span className="text-2xl">{isCorrect ? '🎉' : isPartial ? '🙂' : '💪'}</span>
+                <p className="font-display font-bold text-base text-ink">{isCorrect ? t(lang, 'quiz_correct') : isPartial ? ALMOST : t(lang, 'quiz_not_quite')}</p>
               </div>
               <button
                 onClick={handleContinue}
