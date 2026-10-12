@@ -9,6 +9,36 @@ import { t } from '../lib/i18n'
 
 const COINS_PER_QUESTION = 2
 
+// ── Kid feedback: soft chime (no audio file needed) + short vibration ──
+const SOUND_ON = true   // set to false to mute
+
+let audioCtx
+function feedbackSound(correct) {
+  if (!SOUND_ON) return
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)()
+    const notes = correct ? [523.25, 783.99] : [220]      // happy two-note chime / one soft low note
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator()
+      const gain = audioCtx.createGain()
+      osc.type = 'sine'
+      osc.frequency.value = freq
+      const start = audioCtx.currentTime + i * 0.12
+      gain.gain.setValueAtTime(0.0001, start)
+      gain.gain.exponentialRampToValueAtTime(0.12, start + 0.02)
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.22)
+      osc.connect(gain)
+      gain.connect(audioCtx.destination)
+      osc.start(start)
+      osc.stop(start + 0.25)
+    })
+  } catch { /* sound is optional */ }
+}
+
+function buzz(correct) {
+  try { navigator.vibrate?.(correct ? 25 : [30, 50, 30]) } catch { /* optional */ }
+}
+
 const FORGIVEN_WORDS = new Set([
   'the','a','an','and','or','but','of','in','on','at','to','for',
   'is','are','was','were','be','been','it','its',
@@ -223,8 +253,12 @@ function MCQCard({ option, selected, revealed, correct, onSelect, big }) {
     <button
       disabled={revealed}
       onClick={() => onSelect(option)}
-      className={`w-full rounded-2xl border-2 font-display font-bold transition-all active:scale-[0.97] select-none ${big ? 'text-2xl h-24 flex items-center justify-center' : 'text-base px-4 py-3 text-left'}`}
-      style={{ borderColor, background: bgColor, color: textColor, boxShadow: !revealed && !isSelected ? '0 2px 8px rgba(0,0,0,0.05)' : 'none' }}
+      className={`w-full rounded-2xl border-2 font-display font-bold transition-all active:scale-[0.97] select-none ${big ? 'text-2xl h-24 flex items-center justify-center' : 'text-lg px-5 py-5 text-left flex items-center'}`}
+      style={{
+        borderColor, background: bgColor, color: textColor,
+        boxShadow: !revealed && !isSelected ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
+        animation: revealed && isSelected ? (isCorrect ? 'pop 0.35s ease-out' : 'shake 0.4s ease-in-out') : undefined,
+      }}
     >
       {option}
     </button>
@@ -514,6 +548,8 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
     if (isTyped) setFillBlankDisplay(fillBlankRef.current)
     if (q.type === 'choice_reason') setReasonDisplay(reasonRef.current)
     const correct = isAnswerCorrect(q, answer)
+    feedbackSound(correct)
+    buzz(correct)
     if (correct) {
       setConsecutiveCorrect(c => {
         const next = c + 1
@@ -581,6 +617,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
     <div className="flex items-center justify-center bg-white" style={{ height: '100dvh', overflow: 'hidden' }}>
       <QuitPopup visible={showQuit} onStay={() => setShowQuit(false)} onLeave={onQuit || onDone} />
       {onFire && revealed && <FireModeOverlay streakKey={fireKey} consecutiveCorrect={consecutiveCorrect} />}
+      <style>{`@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}} @keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}`}</style>
 
       <div className="flex flex-col bg-white w-full max-w-sm" style={{ height: '100dvh' }}>
 
@@ -603,7 +640,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
 
         {/* Question */}
         <div className="flex-shrink-0 px-6 pt-4 pb-3" style={{ maxHeight: '30%', overflowY: 'auto' }}>
-          <p className="font-display font-bold text-xl text-ink leading-snug">{q.question}</p>
+          <p className={`font-display font-bold text-ink leading-snug ${q.question.split(/\s+/).length > 14 ? 'text-xl' : 'text-2xl'}`}>{q.question}</p>
         </div>
 
         {/* Answers */}
@@ -652,6 +689,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
                 placeholder={t(lang, 'quiz_fill_placeholder')}
                 className="w-full rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none transition-colors"
                 style={{
+                  animation: revealed && !checkCorrect(fillBlankRef.current) ? 'shake 0.4s ease-in-out' : undefined,
                   border: `2px solid ${revealed ? checkCorrect(fillBlankRef.current) ? '#86efac' : '#fca5a5' : '#e5e7eb'}`,
                   background: revealed ? checkCorrect(fillBlankRef.current) ? '#f0fdf4' : '#fff5f5' : '#fafafa',
                 }}
@@ -757,9 +795,9 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
             />
           )}
 
-          {revealed && q.explanation && (
+          {revealed && !isCorrect && q.explanation && (
             <div className="rounded-2xl px-4 py-3" style={{ background: '#f5f3ff', border: '2px solid #ede9fe' }}>
-              <p className="font-body text-xs leading-snug" style={{ color: '#7c3aed' }}>💡 {q.explanation}</p>
+              <p className="font-body text-sm leading-snug" style={{ color: '#7c3aed' }}>💡 {q.explanation}</p>
             </div>
           )}
         </div>
