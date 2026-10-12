@@ -34,6 +34,9 @@ const KNOWLEDGE_TYPES = [
   'reading', 'production',
 ]
 
+// Fix 7: math symbols that hard-block visual_count generation
+const MATH_SYMBOLS_RE = /[+\-×÷=]|[0-9]\s*[+\-×÷=]|\b(plus|minus|times|divided)\b/i
+
 function jsonResponse(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } })
 }
@@ -46,6 +49,12 @@ async function callClaude(system: string, content: any[], maxTokens = 4000) {
   })
   if (!res.ok) throw new Error(`Claude API error: ${await res.text()}`)
   const data = await res.json()
+
+  // Detect truncation explicitly instead of failing later with a confusing JSON.parse error
+  if (data.stop_reason === 'max_tokens') {
+    throw new Error(`Claude response truncated at max_tokens (${maxTokens})`)
+  }
+
   const text = (data.content || []).filter((b: any) => b.type === 'text').map((b: any) => b.text).join('\n')
   const usage = data.usage || {}
   const clean = text.replace(/^```(?:json)?[^\n]*\n?/i, '').replace(/\n?```\s*$/i, '').trim()
@@ -54,7 +63,6 @@ async function callClaude(system: string, content: any[], maxTokens = 4000) {
 
 // ============================================================
 // PHASE 1 — Lesson analysis → learning objectives
-// (Framework sections 1-3)
 // ============================================================
 async function analyzeLesson(images: { data: string; mediaType: string }[], existingSkills: { skill_key: string; skill_label: string }[]) {
   const system = `You analyze a photo of a child's schoolwork for a practice app (ages 6-12). Follow this process:
@@ -80,12 +88,12 @@ Respond with ONLY this JSON:
 }`
   const content = images.map((img) => ({ type: 'image', source: { type: 'base64', media_type: img.mediaType || 'image/jpeg', data: img.data } }))
   content.push({ type: 'text', text: 'Analyze this lesson and return only the JSON.' })
-  return callClaude(system, content, 2000)
+  return callClaude(system, content, 4000)
 }
 
 // ============================================================
 // PHASE 2 — Framework-driven blueprint + questions
-// (Framework sections 4-19, 22)
+// Fix 8: added items array rule to MCQ prompt
 // ============================================================
 const FRAMEWORK_PROMPT = `You are designing a practice session for a kids' learning app, following the Numio Universal Test Generation Framework.
 
@@ -119,27 +127,30 @@ QUALITY CHECK before including a question — relevance, clear purpose, accuracy
 
 QUESTION TYPES — you may ONLY use these exact values for "type": ${JSON.stringify(ACTIVE_QUESTION_TYPES)}. Pick whichever best serves the practice method — don't force every objective into "mcq".
 - "mcq": "options" (4 strings), "correct_answer" (exact option text).
+  IMPORTANT — if the question requires ordering, listing, or grouping items (e.g. "put these in order", "which group contains X", "match the following"):
+  1. Keep the question stem SHORT (e.g. "Put these events in order from oldest to newest:").
+  2. Add an "items" array listing each item clearly (e.g. ["Fall of Rome (476 AD)", "Egyptian Pyramids (2560 BC)", "Moon Landing (1969)"]).
+  3. Options reference items by number only (e.g. "2, 3, 1" or "Option A: 2, 1, 3"). NEVER pack the full item list into the question string — it makes it unreadable on mobile.
 - "true_false": "correct_answer" in the lesson's language.
 - "fill_blank": "question" contains "___"; "correct_answer" is the missing piece — good for recall/production-lite.
-- "visual_count": ONLY for counting/comparison/small arithmetic skills. "asset" (exactly one of ${JSON.stringify(OPENMOJI_ASSETS)}), "quantity" (1-12), "options" (4 numbers), "correct_answer". If no asset fits, don't use this type.
-- "text_highlight": ONLY for language/grammar/classification skills. "text" (a sentence, lesson's language), "target_words" (array of exact words copied verbatim from "text" to tap) — no options/correct_answer for this type.
+- "visual_count": ONLY for early counting lessons (ages 4-6) where no equations or math operations are present in the lesson. NEVER use if the lesson contains addition, subtraction, multiplication, division, or any math symbols (=, +, -, ×, ÷). "asset" (exactly one of ${JSON.stringify(OPENMOJI_ASSETS)}), "quantity" (1-12), "options" (4 numbers), "correct_answer".
+- "text_highlight": ONLY for language/grammar/classification skills. "text" (a sentence in the lesson's language), "target_words" (array of exact strings copied verbatim from "text" to tap — may be multi-word phrases like "Bronze Age") — no options/correct_answer for this type. The field MUST be named exactly "target_words" — never "highlighted_words", "words_to_highlight", or any other name. Every string in "target_words" must appear verbatim inside "text".
 
 Every question MUST include: id, type, question, explanation, objective_id (must match one of the given objectives' "id"), skill_key (copy from that objective), practice_method (one of: recall, recognition, application, production), purpose (one short sentence: what exactly will the child have practiced), difficulty (1-5).
 
-QUESTION COUNT: decide this yourself, as part of the blueprint — do NOT default to a round number. Base it on how many objectives there are, their importance/complexity, and how much practice each genuinely needs per the framework (section 5). A lesson with 2 tight objectives might need 6-8 questions; a lesson with 5-6 objectives might need 16-20. Hard bounds: minimum 6, maximum 20 questions total.
+LENGTH LIMITS (keep the output compact): "explanation" must be 1-2 sentences maximum. "purpose" must be under 15 words. "blueprint.notes" must be 1-2 sentences.
 
 Respond with ONLY this JSON:
 {
   "topic": "...",
   "blueprint": {
     "objectives_covered": ["obj1", "obj3"],
-    "question_count": 12,
-    "notes": "1-2 sentences on the balance/adaptation decisions made, including why this many questions"
+    "notes": "1-2 sentences on the balance/adaptation decisions made and why"
   },
   "questions": [ { "id": "q1", "type": "mcq", "question": "...", "options": [...], "correct_answer": "...", "explanation": "...", "objective_id": "obj1", "skill_key": "...", "practice_method": "recall", "purpose": "...", "difficulty": 1 } ]
 }`
 
-async function generateBlueprintAndQuestions(lesson: any, skillStats: any[], learnerProfile: any) {
+async function generateBlueprintAndQuestions(lesson: any, skillStats: any[], learnerProfile: any, questionCount: number) {
   const userText = `LANGUAGE: write everything in "${lesson.language || 'the language of the lesson'}".
 
 Lesson objectives for this session:
@@ -151,14 +162,34 @@ ${JSON.stringify(skillStats, null, 2)}
 Learner profile (narrative summary, may be null for a new kid):
 ${JSON.stringify(learnerProfile, null, 2)}
 
-Decide the right number of questions yourself (minimum 6, maximum 20) based on the objectives and performance data. Return only the JSON.`
-  return callClaude(FRAMEWORK_PROMPT, [{ type: 'text', text: userText }], 4500)
+Generate exactly ${questionCount} questions. Return only the JSON.`
+  return callClaude(FRAMEWORK_PROMPT, [{ type: 'text', text: userText }], 12000)
 }
 
-function validateQuestions(questions: any[], objectiveIds: string[]) {
+// Normalize field-name aliases the model sometimes returns instead of
+// the canonical names, so validation never fails on a naming slip.
+function normalizeQuestions(questions: any[]) {
+  for (const q of questions) {
+    if (q.type === 'text_highlight') {
+      // Canonicalize any alias the model might use for target_words
+      if (!q.target_words) {
+        q.target_words =
+          q.highlighted_words  ??
+          q.words_to_highlight ??
+          q.highlight_words    ??
+          q.target             ??
+          q.words              ?? []
+      }
+    }
+  }
+}
+
+// Fix 7: hard validation guard — strips visual_count from any
+// lesson whose page_text contains math operation symbols.
+function validateQuestions(questions: any[], objectiveIds: string[], pageText: string) {
   if (!Array.isArray(questions) || questions.length === 0) return 'No questions returned'
-  if (questions.length < 6) return `Too few questions returned (${questions.length}, minimum 6)`
-  if (questions.length > 20) return `Too many questions returned (${questions.length}, maximum 20)`
+  normalizeQuestions(questions) // heal field-name aliases before checking
+  const lessonHasMath = MATH_SYMBOLS_RE.test(pageText || '')
   for (const q of questions) {
     if (!q.id || !q.type || !q.question || !q.explanation || !q.objective_id || !q.skill_key || !q.practice_method || !q.purpose || !q.difficulty) {
       return `Malformed question (missing required field): ${JSON.stringify(q).slice(0, 200)}`
@@ -170,6 +201,8 @@ function validateQuestions(questions: any[], objectiveIds: string[]) {
     }
     if ((q.type === 'true_false' || q.type === 'fill_blank') && !q.correct_answer) return `${q.type} missing correct_answer: ${q.id}`
     if (q.type === 'visual_count') {
+      // Fix 7: hard block — visual_count is forbidden when lesson has math
+      if (lessonHasMath) return `visual_count forbidden in a lesson containing math symbols: ${q.id}`
       if (!OPENMOJI_ASSETS.includes(q.asset)) return `visual_count unapproved asset "${q.asset}": ${q.id}`
       if (!Number.isInteger(q.quantity) || q.quantity < 1 || q.quantity > 12) return `visual_count bad quantity: ${q.id}`
     }
@@ -183,18 +216,15 @@ function validateQuestions(questions: any[], objectiveIds: string[]) {
 }
 
 // ============================================================
-// Learner profile refresh — small Haiku call, only when there's
-// new attempt data since the last refresh.
+// Learner profile refresh
 // ============================================================
 async function maybeRefreshLearnerProfile(sb: any, kidId: string) {
   const { count: totalAttempts } = await sb.from('question_attempts').select('id', { count: 'exact', head: true }).eq('kid_id', kidId)
   const { data: existing } = await sb.from('kid_learner_profiles').select('*').eq('kid_id', kidId).maybeSingle()
 
   const total = totalAttempts || 0
-  if (existing && total - existing.attempts_at_last_update < 5) {
-    return existing // not enough new data yet — don't spend a call
-  }
-  if (total < 5) return existing || null // too little data for any profile at all
+  if (existing && total - existing.attempts_at_last_update < 5) return existing
+  if (total < 5) return existing || null
 
   const { data: recentWrong } = await sb
     .from('question_attempts')
@@ -214,7 +244,7 @@ Respond with ONLY this JSON:
   "summary": "2-3 sentence narrative combining the above, written for another AI to use when designing the next practice session"
 }`
   const userText = `Per-skill stats:\n${JSON.stringify(skills, null, 2)}\n\nRecent incorrect answers:\n${JSON.stringify(recentWrong, null, 2)}\n\nReturn only the JSON.`
-  const { parsed } = await callClaude(system, [{ type: 'text', text: userText }], 800)
+  const { parsed } = await callClaude(system, [{ type: 'text', text: userText }], 1500)
 
   const row = {
     kid_id: kidId, strengths: parsed.strengths || [], weaknesses: parsed.weaknesses || [],
@@ -284,14 +314,13 @@ serve(async (req) => {
       if (laErr) throw laErr
       lessonAnalysisId = laRow.id
 
-      // Keep skill_label/knowledge_type fresh on kid_skills for any reused keys
       for (const obj of lesson.objectives || []) {
         try {
           await sb.from('kid_skills').upsert(
             { kid_id, skill_key: obj.skill_key, skill_label: obj.description, knowledge_type: obj.knowledge_type },
             { onConflict: 'kid_id,skill_key', ignoreDuplicates: false }
           )
-        } catch (_) { /* best-effort label refresh, never blocks generation */ }
+        } catch (_) { /* best-effort */ }
       }
     } else {
       const { data: parentExam, error: peErr } = await sb.from('exams').select('lesson_analysis_id, topic').eq('id', parent_exam_id).eq('kid_id', kid_id).single()
@@ -302,16 +331,17 @@ serve(async (req) => {
     }
 
     const objectiveIds = (lesson.objectives || []).map((o: any) => o.id)
-    const skillKeys = (lesson.objectives || []).map((o: any) => o.skill_key)
+    const skillKeys    = (lesson.objectives || []).map((o: any) => o.skill_key)
 
     const { data: skillStats } = await sb.from('kid_skills').select('*').eq('kid_id', kid_id).in('skill_key', skillKeys)
     const learnerProfile = await maybeRefreshLearnerProfile(sb, kid_id)
 
-    const phase2 = await generateBlueprintAndQuestions(lesson, skillStats || [], learnerProfile)
+    const phase2 = await generateBlueprintAndQuestions(lesson, skillStats || [], learnerProfile, 15)
     usageTotal.input += phase2.usage.input_tokens || 0
     usageTotal.output += phase2.usage.output_tokens || 0
 
-    const validationError = validateQuestions(phase2.parsed?.questions, objectiveIds)
+    // Fix 7: pass page_text so validateQuestions can hard-block visual_count
+    const validationError = validateQuestions(phase2.parsed?.questions, objectiveIds, lesson.page_text || '')
     if (validationError) {
       console.error('Validation failed:', validationError)
       return jsonResponse({ error: 'Quiz generation failed' }, 500)
@@ -337,7 +367,6 @@ serve(async (req) => {
     }).select('id, topic, page_text, questions').single()
     if (examErr) throw examErr
 
-    // Haiku 4.5 pricing: $1/M in, $5/M out
     try {
       const costUsd = (usageTotal.input * 1 / 1_000_000) + (usageTotal.output * 5 / 1_000_000)
       await sb.from('usage_logs').insert({ user_id: user.id, image_count: mode === 'new' ? images.length : 0, input_tokens: usageTotal.input, output_tokens: usageTotal.output, cost_usd: costUsd })
