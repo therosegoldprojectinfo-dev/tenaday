@@ -169,7 +169,6 @@
       transform: translateX(-50%);
       background: #120F25;
     }
-    /* Title */
     .what-h {
       color: #fff;
       font-size: 32px;
@@ -185,7 +184,6 @@
       text-decoration-thickness: 3px;
       text-underline-offset: 4px;
     }
-    /* Where / How long blocks */
     .what-meta {
       display: flex;
       flex-direction: column;
@@ -211,7 +209,6 @@
       gap: 10px;
     }
     .what-meta-value .emoji { font-size: 24px; }
-    /* What will happen heading */
     .what-happen-h {
       color: #fff;
       font-size: 34px;
@@ -220,7 +217,6 @@
       letter-spacing: -0.02em;
       margin-bottom: 36px;
     }
-    /* Steps */
     .what-steps {
       display: flex;
       flex-direction: column;
@@ -368,7 +364,6 @@
       text-align: left;
     }
 
-    /* "Choose your time" header inside card */
     .choose-time-head {
       display: flex;
       align-items: center;
@@ -387,7 +382,6 @@
       box-shadow: 0 0 0 7px rgba(255, 59, 48, 0.18);
     }
 
-    /* Slot grid */
     .flag-za { width: 1.45em; height: 0.9em; vertical-align: -0.12em; }
     .slot-grid {
       display: grid;
@@ -410,7 +404,6 @@
     .slot-btn:hover { background: #e8e8e8; }
     .slot-btn.selected { background: #7B61FF; border-color: #7B61FF; color: #fff; }
 
-    /* Field labels + inputs */
     .field-label {
       display: block;
       font-size: 15px;
@@ -452,7 +445,6 @@
     }
     .field-error.show { display: block; }
 
-    /* Save button */
     .save-btn {
       display: flex;
       align-items: center;
@@ -501,6 +493,13 @@
     .confirm-detail-row:last-child { border-bottom: none; }
     .confirm-detail-label { flex: 0 0 56px; font-weight: 800; color: #3513A2; }
     .confirm-detail-value { flex: 1; font-weight: 600; color: #0A0A0A; }
+
+    /* WhatsApp green text */
+    .whatsapp-green {
+      color: #25D366;
+      font-weight: 800;
+    }
+
     .confirm-text { font-size: 16px; font-weight: 500; color: #444; line-height: 1.5; margin-bottom: 28px; }
     .calendar-btn {
       display: flex;
@@ -530,12 +529,10 @@
 <body>
 
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-    <!-- Check mark -->
     <symbol id="om-check" viewBox="0 0 80 80">
       <polygon points="4,42.4 16,30.4 28.9,45.3 63.8,8 76,20.2 28.9,67.3"
                fill="#B1CC33" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
     </symbol>
-    <!-- South Africa flag -->
     <symbol id="om-za" viewBox="0 0 64 40">
       <rect x="0" y="0" width="64" height="40" rx="2.5" fill="#000"/>
       <rect x="2" y="2" width="60" height="18" fill="#D22F27"/>
@@ -545,7 +542,6 @@
       <polygon points="2,9 17,20 2,31" fill="#F1B31C"/>
       <polygon points="2,12.5 14,20 2,27.5" fill="#000"/>
     </symbol>
-    <!-- OpenMoji: Unlocked (1F513) -->
     <symbol id="om-unlocked" viewBox="0 0 72 72">
       <path d="M50 34V22C50 13.16 42.84 6 34 6C25.16 6 18 13.16 18 22" fill="none" stroke="#000" stroke-width="5" stroke-linecap="round"/>
       <rect x="10" y="34" width="44" height="32" rx="4" fill="#FCEA2B" stroke="#000" stroke-width="3"/>
@@ -553,7 +549,6 @@
       <circle cx="32" cy="49" r="5" fill="#000" opacity="0.25"/>
       <rect x="29.5" y="51" width="5" height="7" rx="1.5" fill="#000" opacity="0.25"/>
     </symbol>
-    <!-- OpenMoji: Eyes (1F440) -->
     <symbol id="om-eyes" viewBox="0 0 72 72">
       <ellipse cx="20" cy="36" rx="14" ry="20" fill="#fff" stroke="#000" stroke-width="3.5"/>
       <circle cx="20" cy="38" r="8" fill="#C19A65"/>
@@ -564,7 +559,6 @@
       <circle cx="52" cy="38" r="4.5" fill="#000"/>
       <circle cx="54.5" cy="35" r="1.8" fill="#fff"/>
     </symbol>
-    <!-- Question mark bubble (for Ask anything) -->
     <symbol id="om-question" viewBox="0 0 72 72">
       <circle cx="36" cy="36" r="30" fill="#60C3F5" stroke="#000" stroke-width="3"/>
       <text x="36" y="50" font-size="34" font-weight="900" text-anchor="middle" fill="#000" font-family="Arial, sans-serif">?</text>
@@ -621,7 +615,6 @@
       <div class="what-happen-h">What will happen?</div>
 
       <div class="what-steps">
-
         <div class="what-step">
           <div class="what-step-left">
             <div class="what-step-num">1</div>
@@ -632,7 +625,6 @@
             <div class="what-step-sub">Watch Numio turn a real school lesson into practice.</div>
           </div>
         </div>
-
         <div class="what-step">
           <div class="what-step-left">
             <div class="what-step-num">2</div>
@@ -643,7 +635,6 @@
             <div class="what-step-sub">Test Numio yourself with your child's real school lesson.</div>
           </div>
         </div>
-
         <div class="what-step">
           <div class="what-step-left">
             <div class="what-step-num">3</div>
@@ -653,7 +644,6 @@
             <div class="what-step-sub">Decide if Numio can really help your family</div>
           </div>
         </div>
-
       </div>
     </section>
 
@@ -662,13 +652,11 @@
       <h2 class="register-title">Try Numio today<br>for FREE</h2>
 
       <div class="booking-box">
-        <!-- Choose your time header -->
         <div class="choose-time-head">
           <span class="choose-time-dot"></span>
           Choose your time
         </div>
 
-        <!-- Time slots -->
         <div class="slot-grid" id="slot-grid">
           <button type="button" class="slot-btn" data-sa="17" data-label="5:00 PM" aria-pressed="false">5:00 PM</button>
           <button type="button" class="slot-btn" data-sa="18" data-label="6:00 PM" aria-pressed="false">6:00 PM</button>
@@ -678,21 +666,17 @@
         </div>
         <div class="field-error" id="slot-error">Please choose a time slot.</div>
 
-        <!-- Name -->
         <label class="field-label" for="parent-name">What's your name?</label>
         <input class="field-input" type="text" id="parent-name" placeholder="e.g. Ahmed mohsin" autocomplete="name"/>
         <div class="field-error" id="name-error">Please enter your name.</div>
 
-        <!-- WhatsApp number -->
         <label class="field-label" for="parent-phone">WhatsApp number</label>
         <span class="field-sublabel">(We'll only use it to send your meeting link)</span>
         <input class="field-input" type="tel" id="parent-phone" placeholder="e.g. 438-409-9964" autocomplete="tel"/>
         <div class="field-error" id="phone-error">Please enter a valid phone number.</div>
 
-        <!-- CTA -->
         <button type="button" class="save-btn" id="register-btn">Save your spot →</button>
 
-        <!-- Perks inside card -->
         <div class="perks">
           <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>100% Free</span>
           <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg><strong>5 minutes</strong></span>
@@ -708,7 +692,6 @@
     <div class="confirm-inner">
       <img class="confirm-logo" src="/logotousebro.webp" alt="Numio"/>
 
-      <!-- Green badge -->
       <div class="confirm-check-badge">
         <svg viewBox="0 0 80 80" width="80" height="80">
           <circle cx="40" cy="40" r="38" fill="#3DBE5C"/>
@@ -726,15 +709,21 @@
         </div>
         <div class="confirm-detail-row">
           <span class="confirm-detail-label">When</span>
-          <span class="confirm-detail-value" id="confirm-datetime">Wednesday, October 7</span>
+          <span class="confirm-detail-value" id="confirm-datetime">Monday, October 12</span>
         </div>
         <div class="confirm-detail-row">
           <span class="confirm-detail-label">Where</span>
-          <span class="confirm-detail-value">Online via <span class="zoom-word">Zoom</span></span>
+          <span class="confirm-detail-value">
+            <!-- WhatsApp icon inline -->
+            <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:-4px;margin-right:6px;flex-shrink:0">
+              <path d="M34.5 13.4C32.1 11 28.9 9.6 25.5 9.6C18.5 9.6 12.8 15.3 12.8 22.3C12.8 24.6 13.4 26.8 14.6 28.7L12.6 36L20.1 34C21.9 35.1 24 35.7 26.1 35.7H26.2C33.2 35.7 38.9 30 38.9 23C38.8 19.6 37.4 16.4 34.5 13.4ZM25.5 33.4H25.4C23.5 33.4 21.7 32.8 20.1 31.8L19.7 31.6L15.6 32.7L16.7 28.7L16.5 28.3C15.4 26.6 14.8 24.6 14.8 22.5C14.8 16.5 19.7 11.6 25.7 11.6C28.6 11.6 31.3 12.7 33.4 14.8C35.5 16.9 36.6 19.6 36.6 22.5C36.7 28.5 31.8 33.4 25.5 33.4ZM31.8 25.1C31.5 24.95 29.9 24.15 29.6 24.05C29.3 23.95 29.1 23.9 28.9 24.2C28.7 24.5 28.05 25.25 27.9 25.45C27.75 25.65 27.55 25.7 27.25 25.55C26.95 25.4 25.95 25.1 24.75 24.05C23.85 23.25 23.25 22.25 23.1 21.95C22.95 21.65 23.1 21.5 23.25 21.35C23.4 21.2 23.55 21 23.7 20.85C23.85 20.7 23.9 20.6 24 20.4C24.1 20.2 24.05 20.05 23.975 19.9C23.9 19.75 23.3 18.15 23.05 17.55C22.8 16.95 22.55 17.05 22.35 17.05C22.2 17.05 22 17 21.8 17C21.6 17 21.25 17.075 20.95 17.375C20.65 17.675 19.85 18.425 19.85 20.025C19.85 21.625 21 23.175 21.15 23.375C21.3 23.575 23.3 26.625 26.3 28.025C27.05 28.375 27.625 28.575 28.075 28.725C28.825 28.975 29.5 28.925 30.05 28.85C30.65 28.75 31.9 28.075 32.15 27.325C32.4 26.575 32.4 25.95 32.325 25.825C32.25 25.7 32.05 25.625 31.8 25.1Z" fill="#25D366"/>
+            </svg>
+            <span class="whatsapp-green">WhatsApp</span>
+          </span>
         </div>
       </div>
 
-      <p class="confirm-text">We'll send you a <span class="whatsapp-word">WhatsApp</span> message 1 hour before your slot with everything you need to join.</p>
+      <p class="confirm-text">We will send you a message on <span class="whatsapp-green">WhatsApp</span> before the free trial starts.</p>
 
       <button type="button" class="calendar-btn" id="calendar-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
@@ -746,7 +735,7 @@
 
 <script>
 (function () {
-  var EVENT_DATE_OVERRIDE = "2026-10-07";
+  var EVENT_DATE_OVERRIDE = "2026-10-12";
   var LANDING_TITLE = document.title;
   var landing = document.getElementById("landing");
   var confirmPage = document.getElementById("confirmation-page");
@@ -790,7 +779,7 @@
       "DTSTART:" + icsStamp(startUTC),
       "DTEND:" + icsStamp(endUTC),
       "SUMMARY:Numio live Parents Demo",
-      "DESCRIPTION:See if Numio can help your family. We will message you 1 hour before your slot with everything you need to join.",
+      "DESCRIPTION:See if Numio can help your family. We will message you on WhatsApp before the free trial starts.",
       "END:VEVENT", "END:VCALENDAR"
     ].join("\r\n");
   }
