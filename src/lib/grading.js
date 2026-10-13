@@ -26,8 +26,15 @@ const stem = (w) => {
   return w.length > 3 ? w.replace(/[sx]$/, '') : w
 }
 
-const tokens = (s) =>
-  norm(s).split(' ').filter((w) => w && !STOP.has(w)).map(stem)
+// The small words to ignore come from the AI for THIS quiz's language (q.forgiven).
+// Old quizzes without that list fall back to the built-in STOP list.
+function stopSet(list) {
+  if (Array.isArray(list) && list.length) return new Set(list.map((w) => norm(w)).filter(Boolean))
+  return STOP
+}
+
+const tokens = (s, stop = STOP) =>
+  norm(s).split(' ').filter((w) => w && !stop.has(w)).map(stem)
 
 function lev(a, b) {
   const m = a.length, n = b.length
@@ -54,8 +61,10 @@ function sameWord(a, b) {
 }
 
 // fill_blank: 1-3 word answer
-export function gradeFill(input, correct) {
-  const a = tokens(input), b = tokens(correct)
+export function gradeFill(input, correct, forgiven) {
+  const stop = stopSet(forgiven)
+  let a = tokens(input, stop), b = tokens(correct, stop)
+  if (!b.length) { a = tokens(input, new Set()); b = tokens(correct, new Set()) }  // lesson is ABOUT the small words (le/la...): compare them
   if (!a.length || !b.length) return false
   if (a.length === b.length && a.every((w, i) => sameWord(w, b[i]))) return true
   return sameWord(a.join(''), b.join(''))      // "attaquesurprise" = "attaque surprise"
@@ -63,13 +72,14 @@ export function gradeFill(input, correct) {
 
 // short_answer + reason part of choice_reason
 // keywords = [["water","watering"],["sun","light"]], need = min_groups
-export function gradeKeywords(input, keywords, need = 1) {
-  const inTok = tokens(input)
+export function gradeKeywords(input, keywords, need = 1, forgiven) {
+  const stop = stopSet(forgiven)
+  const inTok = tokens(input, stop)
   const inJoined = inTok.join('')
   let hits = 0
   for (const group of keywords || []) {
     const found = group.some((syn) => {
-      const st = tokens(syn)
+      const st = tokens(syn, stop)
       if (!st.length) return false
       for (let i = 0; i + st.length <= inTok.length; i++) {
         if (st.every((w, k) => sameWord(inTok[i + k], w))) return true
@@ -92,16 +102,16 @@ export function gradeAnswer(q, answer) {
       return { score: ok ? 1 : 0, correct: ok }
     }
     case 'fill_blank': {
-      const ok = gradeFill(answer, q.correct_answer)
+      const ok = gradeFill(answer, q.correct_answer, q.forgiven)
       return { score: ok ? 1 : 0, correct: ok }
     }
     case 'short_answer': {
-      const g = gradeKeywords(answer, q.keywords, q.min_groups || 1)
+      const g = gradeKeywords(answer, q.keywords, q.min_groups || 1, q.forgiven)
       return { score: g.score, correct: g.ok, partial: !g.ok && g.hits > 0 }
     }
     case 'choice_reason': {
       const choiceOk = answer?.choice === q.correct_answer
-      const g = gradeKeywords(answer?.reason, q.keywords, q.min_groups || 1)
+      const g = gradeKeywords(answer?.reason, q.keywords, q.min_groups || 1, q.forgiven)
       const score = (choiceOk ? 0.5 : 0) + (g.ok ? 0.5 : 0)
       return { score, correct: score === 1, partial: score > 0 && score < 1, choiceOk, reasonOk: g.ok }
     }
