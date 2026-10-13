@@ -515,7 +515,12 @@ function gstem(w) {
   w = w.replace(/^\u0627\u0644(?=.{2,})/, '')
   return w.length > 3 ? w.replace(/[sx]$/, '') : w
 }
-function gtokens(s) { return gnorm(s).split(' ').filter(w => w && !STOP.has(w)).map(gstem) }
+// small words to ignore: the list the AI gave for THIS quiz's language (q.forgiven), else the built-in fallback
+function stopSet(list) {
+  if (Array.isArray(list) && list.length) return new Set(list.map(w => gnorm(w)).filter(Boolean))
+  return STOP
+}
+function gtokens(s, stop = STOP) { return gnorm(s).split(' ').filter(w => w && !stop.has(w)).map(gstem) }
 function lev(a, b) {
   const m = a.length, n = b.length
   const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)])
@@ -532,8 +537,10 @@ function sameWord(a, b) {
   if (n < 5) return false
   return lev(a, b) <= (n >= 9 ? 2 : 1)
 }
-function gradeFill(input, correct) {
-  const a = gtokens(input), b = gtokens(correct)
+function gradeFill(input, correct, forgiven) {
+  const stop = stopSet(forgiven)
+  let a = gtokens(input, stop), b = gtokens(correct, stop)
+  if (!b.length) { a = gtokens(input, new Set()); b = gtokens(correct, new Set()) }   // lesson is ABOUT the small words (le/la...): compare them
   if (!a.length || !b.length) return false
   if (a.length === b.length && a.every((w, i) => sameWord(w, b[i]))) return true
   return sameWord(a.join(''), b.join(''))                // "attaquesurprise" = "attaque surprise"
@@ -551,7 +558,7 @@ function wordSetMatches(sel, targets) {
 }
 function isAnswerCorrect(q, answer) {
   if (!q) return false
-  if (q.type === 'fill_blank') return gradeFill(answer, q.correct_answer)
+  if (q.type === 'fill_blank') return gradeFill(answer, q.correct_answer, q.forgiven)
   if (q.type === 'text_highlight') {
     if (!Array.isArray(answer)) return false
     const FORGIVEN = new Set(['the','a','an','and','or','but','les','des','le','la','l','un','une','et','ou','de','du','d'])
