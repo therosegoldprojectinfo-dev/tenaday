@@ -8,6 +8,7 @@
     { "source": "/numiopage",   "destination": "/numiopage.html"   },
     { "source": "/checkout",    "destination": "/checkout.html"    },
     { "source": "/registration","destination": "/registration.html"},
+    { "source": "/trynumio",    "destination": "/trynumio.html"    },
     { "source": "/(.*)",        "destination": "/index.html"       }
   ]
 }
