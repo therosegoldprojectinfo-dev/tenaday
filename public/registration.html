@@ -939,7 +939,7 @@
     }).catch(function (e) { console.error("Lead save failed:", e); })
       .finally(function () {
         try {
-          if (window.fbq) fbq("track", "Lead");
+          if (window.fbq) fbq("track", "Prospect");
           if (window.clarity) clarity("event", "reserve_click");
         } catch (e) { console.error("Tracking failed:", e); }
 
