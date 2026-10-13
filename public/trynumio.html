@@ -247,16 +247,20 @@
   .progress-bar.on-fire { background: linear-gradient(90deg, #ff4b4b, #ff9600); }
   .quiz-qnum { font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 14px; color: var(--muted); }
   .quiz-topic { flex-shrink: 0; padding: 8px 20px 4px; font-family: 'Nunito', sans-serif; font-weight: 700; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--purple); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .quiz-question { flex-shrink: 0; padding: 16px 24px 12px; max-height: 30%; overflow-y: auto; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 24px; color: var(--ink); line-height: 1.3; }
+  .quiz-question { flex-shrink: 0; padding: 16px 24px 12px; max-height: 30%; overflow-y: auto; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 26px; color: var(--ink); line-height: 1.3; text-align: start; }
+  .quiz-question.long { font-size: 20px; }
   .quiz-answers { padding: 0 16px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
   .quiz-bottom { flex-shrink: 0; padding: 8px 16px 24px; }
 
+  /* big, impossible-to-miss answer buttons */
   .mcq-btn {
     width: 100%; border-radius: 16px; border: 2px solid #e5e7eb; background: white;
     color: var(--ink); font-family: 'Baloo 2', sans-serif; font-weight: 700;
-    font-size: 18px; padding: 16px 20px; text-align: left; cursor: pointer;
+    font-size: 20px; padding: 20px; min-height: 72px; text-align: start; cursor: pointer;
+    display: flex; align-items: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.1s;
   }
+  .mcq-btn:active:not(:disabled) { transform: scale(0.97); }
   .mcq-btn:disabled { cursor: not-allowed; }
   .mcq-btn.selected { border-color: #a78bfa; background: #f5f3ff; color: var(--purple); }
   .mcq-btn.correct { border-color: #86efac; background: #f0fdf4; color: #16a34a; }
@@ -264,12 +268,19 @@
   .mcq-btn.faded { border-color: #f3f4f6; color: #d1d5db; }
 
   .tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .tf-btn { width: 100%; height: 112px; border-radius: 16px; border: 2px solid #e5e7eb; background: white; color: var(--ink); font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 30px; cursor: pointer; transition: all 0.1s; display: flex; align-items: center; justify-content: center; }
+  .tf-btn { width: 100%; height: 112px; border-radius: 16px; border: 2px solid #e5e7eb; background: white; color: var(--ink); font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 28px; cursor: pointer; transition: all 0.1s; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8px; line-height: 1.1; }
+  .tf-btn:active:not(:disabled) { transform: scale(0.97); }
   .tf-btn:disabled { cursor: not-allowed; }
   .tf-btn.selected { border-color: #a78bfa; background: #f5f3ff; color: var(--purple); }
   .tf-btn.correct { border-color: #86efac; background: #f0fdf4; color: #16a34a; }
   .tf-btn.wrong { border-color: #fca5a5; background: #fff5f5; color: #ef4444; }
   .tf-btn.faded { border-color: #f3f4f6; color: #d1d5db; }
+
+  /* gentle feedback animations (never harsh) */
+  .shake { animation: shake 0.4s ease-in-out; }
+  .pop { animation: pop 0.35s ease-out; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+  @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.04)} 100%{transform:scale(1)} }
 
   .fill-input { width: 100%; border-radius: 16px; padding: 16px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 20px; color: var(--ink); border: 2px solid #e5e7eb; background: #fafafa; outline: none; transition: border-color 0.15s; direction: ltr; unicode-bidi: isolate; text-align: left; }
   .fill-input:focus { border-color: var(--purple); }
@@ -291,7 +302,8 @@
   .highlight-word.wrong-selected { background: #fee2e2; color: #ef4444; }
   .highlight-word.missed { background: #fff7ed; color: #d97706; text-decoration: underline dotted #fdba74; }
 
-  .explanation-box { margin-top: 16px; border-radius: 16px; padding: 12px 16px; background: #f5f3ff; border: 2px solid #ede9fe; font-family: 'Nunito', sans-serif; font-size: 14px; color: var(--purple); line-height: 1.5; }
+  /* one short tip, shown only when the answer is wrong */
+  .explanation-box { margin-top: 16px; border-radius: 16px; padding: 12px 16px; background: #f5f3ff; border: 2px solid #ede9fe; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; color: var(--purple); line-height: 1.4; text-align: start; }
 
   .check-btn { width: 100%; background: var(--purple); box-shadow: 0 4px 0 var(--purple-dark); color: white; border: none; border-radius: 16px; padding: 20px; font-family: 'Baloo 2', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 0.05em; cursor: pointer; transition: transform 0.1s; }
   .check-btn:active { transform: scale(0.97); }
@@ -460,7 +472,7 @@ function t(lang, key, ...args) {
   return v ?? key
 }
 
-// ── NORMALIZE (for answer checking) ──────────────────────────────────────
+// ── NORMALIZE (used by text_highlight + multiple choice) ─────────────────
 function normalize(str) {
   return String(str ?? '').trim().toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -479,6 +491,54 @@ function answersMatch(a, b) {
   if (isLatin(na) && isLatin(nb)) return na.replace(/s$/, '') === nb.replace(/s$/, '')
   return false
 }
+
+// ── HUMAN-LIKE GRADING for typed answers (any language) ──────────────────
+// Forgives hyphens, apostrophes, accents, capitals, plurals, small articles, small typos:
+//   "attaque-surprise" = "attaque surprise" = "attaques surprises" = "attaque surprize"
+const STOP = new Set([
+  'the','a','an','of','to','is','are',
+  'le','la','les','l','un','une','des','de','du','d',
+  'el','los','las','una','der','die','das','il','lo','n','het',
+])
+function gnorm(s) {
+  return String(s ?? '').toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[\u064B-\u0652\u0640]/g, '')
+    .replace(/[\u0622\u0623\u0625]/g, '\u0627')
+    .replace(/\u0629/g, '\u0647').replace(/\u0649/g, '\u064a')
+    .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660))
+    .replace(/[-–—_'’`]/g, ' ')
+    .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+    .replace(/\s+/g, ' ').trim()
+}
+function gstem(w) {
+  w = w.replace(/^\u0627\u0644(?=.{2,})/, '')
+  return w.length > 3 ? w.replace(/[sx]$/, '') : w
+}
+function gtokens(s) { return gnorm(s).split(' ').filter(w => w && !STOP.has(w)).map(gstem) }
+function lev(a, b) {
+  const m = a.length, n = b.length
+  const d = Array.from({ length: m + 1 }, (_, i) => [i, ...Array(n).fill(0)])
+  for (let j = 0; j <= n; j++) d[0][j] = j
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++) {
+    d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1))
+  }
+  return d[m][n]
+}
+function sameWord(a, b) {
+  if (a === b) return true
+  if (/\d/.test(a) || /\d/.test(b)) return false      // numbers must be exact
+  const n = Math.max(a.length, b.length)
+  if (n < 5) return false
+  return lev(a, b) <= (n >= 9 ? 2 : 1)
+}
+function gradeFill(input, correct) {
+  const a = gtokens(input), b = gtokens(correct)
+  if (!a.length || !b.length) return false
+  if (a.length === b.length && a.every((w, i) => sameWord(w, b[i]))) return true
+  return sameWord(a.join(''), b.join(''))                // "attaquesurprise" = "attaque surprise"
+}
+
 function wordSetMatches(sel, targets) {
   if (!Array.isArray(sel) || !Array.isArray(targets)) return false
   // Flatten: target_words may contain multi-word strings like "les oiseaux"
@@ -491,6 +551,7 @@ function wordSetMatches(sel, targets) {
 }
 function isAnswerCorrect(q, answer) {
   if (!q) return false
+  if (q.type === 'fill_blank') return gradeFill(answer, q.correct_answer)
   if (q.type === 'text_highlight') {
     if (!Array.isArray(answer)) return false
     const FORGIVEN = new Set(['the','a','an','and','or','but','les','des','le','la','l','un','une','et','ou','de','du','d'])
@@ -511,11 +572,46 @@ function isAnswerCorrect(q, answer) {
   }
   return answersMatch(answer, q.correct_answer)
 }
-function getTrueFalseOptions(ca) {
-  const a = (ca || '').toLowerCase()
+
+// true/false labels: the edge function sends the two words in the lesson's language
+// (options = [true word, false word]). Old saved exams fall back to the known pairs.
+function getTrueFalseOptions(q) {
+  if (Array.isArray(q.options) && q.options.length === 2) return q.options
+  const a = (q.correct_answer || '').toLowerCase()
   if (a === 'vrai' || a === 'faux') return ['Vrai', 'Faux']
   if (a === 'صحيح' || a === 'خطأ') return ['صحيح', 'خطأ']
+  if (a === 'waar' || a === 'vals') return ['Waar', 'Vals']
+  if (a === 'verdadero' || a === 'falso') return ['Verdadero', 'Falso']
+  if (a === 'wahr' || a === 'falsch') return ['Wahr', 'Falsch']
   return ['True', 'False']
+}
+
+// ── KID FEEDBACK: soft chime (no audio file) + short vibration ───────────
+const SOUND_ON = true   // set to false to mute
+let audioCtx
+function feedbackSound(correct) {
+  if (!SOUND_ON) return
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)()
+    const notes = correct ? [523.25, 783.99] : [220]      // happy two-note chime / one soft low note
+    notes.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator()
+      const gain = audioCtx.createGain()
+      osc.type = 'sine'
+      osc.frequency.value = freq
+      const start = audioCtx.currentTime + i * 0.12
+      gain.gain.setValueAtTime(0.0001, start)
+      gain.gain.exponentialRampToValueAtTime(0.12, start + 0.02)
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.22)
+      osc.connect(gain)
+      gain.connect(audioCtx.destination)
+      osc.start(start)
+      osc.stop(start + 0.25)
+    })
+  } catch (e) { /* sound is optional */ }
+}
+function buzz(correct) {
+  try { if (navigator.vibrate) navigator.vibrate(correct ? 25 : [30, 50, 30]) } catch (e) { /* optional */ }
 }
 
 // ── IMAGE COMPRESSION ────────────────────────────────────────────────────
@@ -732,6 +828,8 @@ function handleCheck() {
   const empty = q?.type === 'text_highlight' ? state.quizHighlightIdx.length === 0 : (!answer && answer !== false)
   if (empty) return
   const correct = isAnswerCorrect(q, answer)
+  feedbackSound(correct)
+  buzz(correct)
   const newConsec = correct ? state.quizConsecutiveCorrect + 1 : 0
   setState({ quizRevealed: true, quizConsecutiveCorrect: newConsec, quizFireKey: correct && newConsec >= 2 ? state.quizFireKey + 1 : state.quizFireKey })
 }
@@ -1141,7 +1239,7 @@ function renderQuizIntro() {
         <h1 class="font-display" style="font-size:30px;font-weight:800;color:var(--ink);line-height:1.2;">
           ${lang==='ar'?`${t(lang,'quiz_intro_lets_start')} Champ`:`Champ, ${t(lang,'quiz_intro_lets_start')}`}
         </h1>
-        <p class="font-display" style="font-size:20px;font-weight:700;color:var(--purple);">${exam?.topic||''}</p>
+        <p class="font-display" dir="auto" style="font-size:20px;font-weight:700;color:var(--purple);">${exam?.topic||''}</p>
         <p style="font-size:16px;color:var(--muted);">${t(lang,'quiz_intro_you_can')}</p>
       </div>
       <div style="display:flex;align-items:center;gap:8px;border-radius:999px;padding:8px 20px;background:#f5f3ff;">
@@ -1170,43 +1268,44 @@ function renderQuiz() {
   const answer = currentAnswer()
   const isCorrect = s.quizRevealed && isAnswerCorrect(q, answer)
 
+  // option button states: green pop on a right tap, gentle shake on a wrong tap
+  const optClass = (base, opt, isRight) => {
+    let cls = base
+    if (s.quizRevealed) {
+      if (isRight) cls += ' correct' + (opt === s.quizSelected ? ' pop' : '')
+      else if (opt === s.quizSelected) cls += ' wrong shake'
+      else cls += ' faded'
+    } else if (opt === s.quizSelected) cls += ' selected'
+    return cls
+  }
+
   let answersHtml = ''
   if (q.type === 'mcq') {
     const itemsHtml = q.items?.length ? `<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;background:#f8f7ff;border-radius:16px;padding:12px 16px;">
-      ${q.items.map((item,i)=>`<div style="display:flex;align-items:flex-start;gap:10px;"><span style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;color:var(--purple);min-width:20px;">${i+1}.</span><span style="font-size:15px;color:var(--ink);line-height:1.4;">${item}</span></div>`).join('')}
+      ${q.items.map((item,i)=>`<div style="display:flex;align-items:flex-start;gap:10px;"><span style="font-family:'Baloo 2',sans-serif;font-weight:800;font-size:15px;color:var(--purple);min-width:20px;">${i+1}.</span><span dir="auto" style="font-size:15px;color:var(--ink);line-height:1.4;">${item}</span></div>`).join('')}
     </div>` : ''
     answersHtml = `${itemsHtml}<div style="display:flex;flex-direction:column;gap:12px;">
       ${q.options.map(opt => {
-        let cls = 'mcq-btn'
-        if (s.quizRevealed) {
-          if (opt === q.correct_answer) cls += ' correct'
-          else if (opt === s.quizSelected) cls += ' wrong'
-          else cls += ' faded'
-        } else if (opt === s.quizSelected) cls += ' selected'
-        return `<button class="${cls}" data-mcq="${encodeURIComponent(opt)}" ${s.quizRevealed?'disabled':''}>${opt}</button>`
+        const cls = optClass('mcq-btn', opt, opt === q.correct_answer)
+        return `<button class="${cls}" dir="auto" data-mcq="${encodeURIComponent(opt)}" ${s.quizRevealed?'disabled':''}>${opt}</button>`
       }).join('')}
     </div>`
   } else if (q.type === 'true_false') {
-    const opts = getTrueFalseOptions(q.correct_answer)
+    const opts = getTrueFalseOptions(q)
     answersHtml = `<div class="tf-grid">
       ${opts.map(opt => {
-        let cls = 'tf-btn'
-        if (s.quizRevealed) {
-          if (answersMatch(opt, q.correct_answer)) cls += ' correct'
-          else if (opt === s.quizSelected) cls += ' wrong'
-          else cls += ' faded'
-        } else if (opt === s.quizSelected) cls += ' selected'
-        return `<button class="${cls}" data-mcq="${encodeURIComponent(opt)}" ${s.quizRevealed?'disabled':''}>${opt}</button>`
+        const cls = optClass('tf-btn', opt, answersMatch(opt, q.correct_answer))
+        return `<button class="${cls}" dir="auto" data-mcq="${encodeURIComponent(opt)}" ${s.quizRevealed?'disabled':''}>${opt}</button>`
       }).join('')}
     </div>`
   } else if (q.type === 'fill_blank') {
     const fillCorrect = s.quizRevealed && isAnswerCorrect(q, s.quizTypedValue)
     answersHtml = `<div style="display:flex;flex-direction:column;gap:8px;">
-      <input type="text" id="fill-input" class="fill-input ${s.quizRevealed?(fillCorrect?'correct':'wrong'):''}" 
+      <input type="text" id="fill-input" class="fill-input ${s.quizRevealed?(fillCorrect?'correct':'wrong shake'):''}" 
         value="${s.quizTypedValue.replace(/"/g,'&quot;')}" 
         placeholder="${t(lang,'quiz_fill_placeholder')}"
-        ${s.quizRevealed?'disabled':''} dir="auto" />
-      ${s.quizRevealed && !fillCorrect ? `<p class="correct-answer-hint">${t(lang,'quiz_correct_answer',q.correct_answer)}</p>` : ''}
+        ${s.quizRevealed?'disabled':''} dir="auto" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" />
+      ${s.quizRevealed && !fillCorrect ? `<p class="correct-answer-hint" dir="auto">${t(lang,'quiz_correct_answer',q.correct_answer)}</p>` : ''}
     </div>`
   } else if (q.type === 'visual_count') {
     const assetUrl = getAssetUrl(q.asset)
@@ -1216,12 +1315,7 @@ function renderQuiz() {
       </div>
       <div class="tf-grid">
         ${q.options.map(opt => {
-          let cls = 'tf-btn'
-          if (s.quizRevealed) {
-            if (String(opt) === String(q.correct_answer)) cls += ' correct'
-            else if (opt === s.quizSelected) cls += ' wrong'
-            else cls += ' faded'
-          } else if (opt === s.quizSelected) cls += ' selected'
+          const cls = optClass('tf-btn', opt, String(opt) === String(q.correct_answer))
           return `<button class="${cls}" data-mcq="${opt}" ${s.quizRevealed?'disabled':''}>${opt}</button>`
         }).join('')}
       </div>
@@ -1255,8 +1349,9 @@ function renderQuiz() {
     </div>`
   }
 
-  const explanationHtml = s.quizRevealed && q.explanation
-    ? `<div class="explanation-box">💡 ${q.explanation}</div>` : ''
+  // one short tip, ONLY when the answer is wrong
+  const explanationHtml = s.quizRevealed && !isCorrect && q.explanation
+    ? `<div class="explanation-box" dir="auto">💡 ${q.explanation}</div>` : ''
 
   const checkDisabled = q.type==='fill_blank' ? s.quizTypedValue.trim()==='' :
     q.type==='text_highlight' ? s.quizHighlightIdx.length===0 : s.quizSelected===null
@@ -1274,6 +1369,8 @@ function renderQuiz() {
         </button>
       </div>`
 
+  const longQ = q.question.trim().split(/\s+/).length > 14 ? ' long' : ''
+
   return `<div class="quiz-wrap">
     ${s.quizShowQuit ? renderQuitPopup() : ''}
     ${onFire && s.quizRevealed ? renderFireOverlay() : ''}
@@ -1287,8 +1384,8 @@ function renderQuiz() {
         </div>
         <span class="quiz-qnum">${s.quizIdx+1}/${total}</span>
       </div>
-      <div class="quiz-topic">${exam?.topic||''}</div>
-      <div class="quiz-question">${q.question}</div>
+      <div class="quiz-topic" dir="auto">${s.exam?.topic||''}</div>
+      <div class="quiz-question${longQ}" dir="auto">${q.question}</div>
       <div class="quiz-answers">${answersHtml}${explanationHtml}</div>
       <div class="quiz-bottom">${bottomHtml}</div>
     </div>
@@ -1431,7 +1528,6 @@ function renderTrialUsed() {
 }
 
 // ── ATTACH LISTENERS ──────────────────────────────────────────────────────
-let exam // reference for quiz
 function attachListeners() {
   const s = state
 
