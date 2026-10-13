@@ -188,13 +188,17 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial
   )
 }
 
-function getTrueFalseOptions(correctAnswer) {
-  const a = (correctAnswer || '').toLowerCase()
+// true/false labels: the edge function sends the two words in the quiz's language
+// (options = [true word, false word]). Old saved quizzes fall back to the known pairs.
+function getTrueFalseOptions(q) {
+  if (Array.isArray(q.options) && q.options.length === 2) return q.options
+  const a = (q.correct_answer || '').toLowerCase()
   if (a === 'vrai' || a === 'faux')         return ['Vrai', 'Faux']
   if (a === 'صحيح' || a === 'خطأ')          return ['صحيح', 'خطأ']
+  if (a === 'waar' || a === 'vals')         return ['Waar', 'Vals']
   if (a === 'verdadero' || a === 'falso')   return ['Verdadero', 'Falso']
   if (a === 'wahr' || a === 'falsch')       return ['Wahr', 'Falsch']
-  if (a === 'vero' || a === 'falso')        return ['Vero', 'Falso']
+  if (a === 'vero')                         return ['Vero', 'Falso']
   return ['True', 'False']
 }
 
@@ -253,9 +257,11 @@ function MCQCard({ option, selected, revealed, correct, onSelect, big }) {
     <button
       disabled={revealed}
       onClick={() => onSelect(option)}
+      dir="auto"
       className={`w-full rounded-2xl border-2 font-display font-bold transition-all active:scale-[0.97] select-none ${big ? 'text-2xl h-24 flex items-center justify-center' : 'text-lg px-5 py-5 text-left flex items-center'}`}
       style={{
         borderColor, background: bgColor, color: textColor,
+        textAlign: big ? 'center' : 'start',
         boxShadow: !revealed && !isSelected ? '0 2px 8px rgba(0,0,0,0.05)' : 'none',
         animation: revealed && isSelected ? (isCorrect ? 'pop 0.35s ease-out' : 'shake 0.4s ease-in-out') : undefined,
       }}
@@ -640,7 +646,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
 
         {/* Question */}
         <div className="flex-shrink-0 px-6 pt-4 pb-3" style={{ maxHeight: '30%', overflowY: 'auto' }}>
-          <p className={`font-display font-bold text-ink leading-snug ${q.question.split(/\s+/).length > 14 ? 'text-xl' : 'text-2xl'}`}>{q.question}</p>
+          <p className={`font-display font-bold text-ink leading-snug ${q.question.split(/\s+/).length > 14 ? 'text-xl' : 'text-2xl'}`} dir="auto">{q.question}</p>
         </div>
 
         {/* Answers */}
@@ -664,7 +670,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
 
           {q.type === 'true_false' && (
             <div className="grid grid-cols-2 gap-3">
-              {getTrueFalseOptions(q.correct_answer).map(option => (
+              {getTrueFalseOptions(q).map(option => (
                 <MCQCard key={option} option={option} selected={selected} revealed={revealed} correct={q.correct_answer} onSelect={setSelected} big />
               ))}
             </div>
