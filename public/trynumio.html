@@ -143,6 +143,16 @@
   }
   .add-chapter-btn:active { transform: scale(0.98); }
 
+  .openmoji-credit {
+    margin-top: 16px;
+    text-align: center;
+    font-family: 'Nunito', sans-serif;
+    font-size: 12px;
+    color: #9ca3af;
+    line-height: 1.5;
+  }
+  .openmoji-credit a { color: #7c3aed; font-weight: 700; text-decoration: none; }
+
   .chapters-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding-top: 40px; gap: 24px; text-align: center; padding-left: 16px; padding-right: 16px; }
   .chapters-empty img { width: 128px; height: auto; animation: float 3s ease-in-out infinite; }
   .chapters-empty h2 { font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 24px; color: var(--ink); }
@@ -1007,7 +1017,8 @@ function renderChapters() {
         <p>${t(lang,'chapters_empty_sub')}</p>
       </div>
       <button class="btn-purple" id="btn-add-chapter">${t(lang,'chapters_empty_cta')}</button>
-    </div>`
+    </div>
+    <p class="openmoji-credit">All emojis designed by <a href="https://openmoji.org" target="_blank" rel="noopener noreferrer">OpenMoji</a> – the open-source emoji and icon project. License: CC BY-SA 4.0</p>`
   } else {
     chaptersContent = `<div class="chapters-grid">
       ${chapters.map((ch, i) => `
@@ -1022,7 +1033,8 @@ function renderChapters() {
         </button>
       `).join('')}
     </div>
-    <button class="add-chapter-btn" id="btn-add-chapter">${t(lang,'chapters_add')}</button>`
+    <button class="add-chapter-btn" id="btn-add-chapter">${t(lang,'chapters_add')}</button>
+    <p class="openmoji-credit">All emojis designed by <a href="https://openmoji.org" target="_blank" rel="noopener noreferrer">OpenMoji</a> – the open-source emoji and icon project. License: CC BY-SA 4.0</p>`
   }
 
   return `<div class="chapters-inner">
