@@ -57,7 +57,7 @@ export default function Profile({ onLogout, onLanguageChange }) {
   }
 
   const activeIndex = kids.findIndex(k => k.id === activeKid?.id)
-  const totalQuizzes = 0 // placeholder — could wire to quiz results later
+  const totalQuizzes = 0
 
   return (
     <div className="bg-white flex flex-col" style={{ height: '100dvh', overflow: 'hidden' }}>
@@ -68,11 +68,10 @@ export default function Profile({ onLogout, onLanguageChange }) {
           {lang === 'ar' ? 'الملف الشخصي' : 'Profile'}
         </h1>
 
-        {/* Hero summary card — like "Hello Anna" */}
+        {/* Hero summary card */}
         {activeKid && (
           <div className="rounded-3xl px-6 py-5 mb-6 relative overflow-hidden"
             style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)', boxShadow: '0 8px 32px rgba(124,58,237,0.25)' }}>
-            {/* Decorative blobs */}
             <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.08)' }} />
             <div style={{ position: 'absolute', bottom: -30, right: 40, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
 
@@ -89,7 +88,6 @@ export default function Profile({ onLogout, onLanguageChange }) {
               </div>
             </div>
 
-            {/* Stats row */}
             <div className="relative flex gap-3 mt-4">
               <div className="flex-1 rounded-2xl px-4 py-3 text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
                 <p className="font-display font-extrabold text-xl text-white">
@@ -140,7 +138,7 @@ export default function Profile({ onLogout, onLanguageChange }) {
           </button>
         </div>
 
-        {/* Numio+ Customization — country/region/grade feeding curriculum alignment */}
+        {/* Numio+ Customization */}
         {activeKid && (
           <>
             <p className="font-body font-bold text-xs text-muted uppercase tracking-widest mb-3">
@@ -185,6 +183,16 @@ export default function Profile({ onLogout, onLanguageChange }) {
           ))}
         </div>
 
+        {/* OpenMoji credit */}
+        <div className="flex items-center justify-center mb-6 px-2">
+          <p className="font-body text-xs text-center" style={{ color: '#9ca3af' }}>
+            {lang === 'ar'
+              ? <>جميع الرموز التعبيرية مصممة بواسطة{' '}<a href="https://openmoji.org" target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 700 }}>OpenMoji</a>{' '}– مشروع الرموز مفتوح المصدر. الترخيص: CC BY-SA 4.0</>
+              : <>All emojis designed by{' '}<a href="https://openmoji.org" target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 700 }}>OpenMoji</a>{' '}– the open-source emoji and icon project. License: CC BY-SA 4.0</>
+            }
+          </p>
+        </div>
+
         {/* Legal links */}
         <div className="flex gap-4 justify-center mb-5">
           <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="font-body text-xs text-muted underline">
@@ -204,7 +212,7 @@ export default function Profile({ onLogout, onLanguageChange }) {
             : '💸 Want a refund? Contact us on WhatsApp'}
         </a>
 
-        {/* Logout — clean card not a button */}
+        {/* Logout */}
         <div onClick={() => setShowLogoutConfirm(true)}
           className="w-full py-4 rounded-2xl font-display font-bold text-base text-center cursor-pointer transition-all active:scale-95"
           style={{ background: '#fff5f5', boxShadow: '0 2px 16px rgba(239,68,68,0.08)', color: '#ef4444' }}>
@@ -213,7 +221,7 @@ export default function Profile({ onLogout, onLanguageChange }) {
 
         {/* WhatsApp support */}
         <a href="https://wa.me/14384102068" target="_blank" rel="noopener noreferrer"
-          className="text-center block"
+          className="text-center block mt-3"
           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, color: '#9ca3af', textDecoration: 'none' }}>
           {lang === 'ar'
             ? <>واجهت مشكلة؟ <span style={{ color: '#7c3aed', fontWeight: 700 }}>تواصل معنا على واتساب</span></>
@@ -295,10 +303,6 @@ function AddKidModal({ lang, onConfirm, onClose }) {
   )
 }
 
-// ── Education Profile modal ─────────────────────────────────────────
-// Step 1: country (with flag emoji). Step 2: region (auto-skipped if
-// country has none). Step 3: grade (real local names per country/region).
-// All 3 saved together so curriculum alignment never runs half-filled.
 function EducationProfileModal({ lang, kid, onConfirm, onClose }) {
   const [step, setStep] = useState(1)
   const [countryName, setCountryName] = useState(kid.country || '')
@@ -312,8 +316,6 @@ function EducationProfileModal({ lang, kid, onConfirm, onClose }) {
 
   const availableRegions = getRegionsForCountry(countryName)
   const hasRegionStep = !!availableRegions
-
-  // Grades are dynamic: depend on country + region (e.g. Quebec vs Ontario)
   const grades = getGradesForCountryRegion(countryCode, region || null)
 
   function handlePickCountry(c) {
