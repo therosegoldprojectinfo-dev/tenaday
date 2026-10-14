@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Join our 10 minutes demo - Never worry about practise ever again. Turn any lesson into practise with just a picture."/>
+  <meta name="description" content="Are you ready to help your child practise for school? Watch this video to see if Numio can really help you."/>
   <title>Numio</title>
 
   <script>
@@ -45,929 +45,190 @@
       margin: 0 auto;
     }
 
-    /* NAV */
+    /* ─── shared page shell ─── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ─── shared nav ─── */
     .nav {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 24px 28px 32px;
+      padding: 20px 24px 8px;
     }
-    .nav-logo { height: 38px; width: auto; }
-    .nav-btn {
-      background: #45E031;
-      color: #000;
-      font-family: 'Inter', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      border: none;
-      border-radius: 50px;
-      padding: 10px 20px;
-      cursor: pointer;
-      white-space: nowrap;
-      letter-spacing: -0.01em;
-    }
+    .nav-logo { height: 34px; width: auto; }
 
-    /* HERO */
-    .hero {
-      padding: 0 28px 36px;
-      text-align: center;
-    }
-    .hero-title {
-      font-size: 36px;
-      font-weight: 900;
-      color: #0A0A0A;
-      line-height: 1.15;
-      letter-spacing: -0.03em;
-      margin-bottom: 20px;
-    }
-    .hero-sub {
-      font-size: 18px;
-      font-weight: 400;
-      color: #333;
-      line-height: 1.5;
-      margin-bottom: 32px;
-    }
-
-    /* PHONE VISUAL */
-    .phone-visual {
+    /* ─── shared video card ─── */
+    .video-wrap {
       width: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 36px;
-    }
-    .phone-left {
-      width: 31%; height: auto; flex-shrink: 0;
-      transform: rotate(-8deg);
-      transform-origin: bottom center;
-    }
-    .phone-arrow {
-      width: 11%; height: auto; flex-shrink: 0;
-      position: relative; top: 10px;
-    }
-    .phone-right {
-      width: 34%; height: auto; flex-shrink: 0;
-      transform: rotate(6deg);
-      transform-origin: bottom center;
-    }
-
-    .cta-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      background: #3DBE5C;
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-size: 20px;
-      font-weight: 800;
-      border: none;
-      border-radius: 50px;
-      padding: 22px 20px;
-      cursor: pointer;
-      letter-spacing: -0.01em;
-      white-space: nowrap;
-      box-shadow: 0 5px 0 #27a348;
-      margin-bottom: 20px;
-      transition: filter 0.15s, transform 0.1s;
-    }
-    .cta-btn:hover  { filter: brightness(1.06); }
-    .cta-btn:active { transform: scale(0.98); box-shadow: none; }
-
-    .perks {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px 22px;
-    }
-    .perk {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      color: #0A0A0A;
-      font-size: 16px;
-      font-weight: 500;
-      line-height: 1.2;
-    }
-    .om-check { width: 20px; height: 20px; flex-shrink: 0; }
-
-    /* DETAILS SECTION — dark navy block */
-    .what {
-      position: relative;
-      isolation: isolate;
-      background: #120F25;
-      padding: 60px 28px 72px;
-      text-align: left;
-    }
-    .what::before {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      top: 0; bottom: 0;
-      left: 50%;
-      width: 100vw;
-      transform: translateX(-50%);
-      background: #120F25;
-    }
-    .what-h {
-      color: #fff;
-      font-size: 32px;
-      font-weight: 800;
-      line-height: 1.2;
-      letter-spacing: -0.01em;
-      margin-bottom: 36px;
-      text-align: center;
-    }
-    .what-h .underline-magenta {
-      text-decoration: underline;
-      text-decoration-color: #F200FF;
-      text-decoration-thickness: 3px;
-      text-underline-offset: 4px;
-    }
-    .what-meta {
-      display: flex;
-      flex-direction: column;
-      gap: 36px;
-      margin-bottom: 48px;
-    }
-    .what-meta-item {}
-    .what-meta-label {
-      color: #fff;
-      font-size: 34px;
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-    }
-    .what-meta-value {
-      color: #fff;
-      font-size: 20px;
-      font-weight: 500;
-      line-height: 1.4;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .what-meta-value .emoji { font-size: 24px; }
-    /* With who block */
-    .what-withwho {
-      margin-bottom: 48px;
-    }
-    .what-withwho-content {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .what-withwho-avatar {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      background: #fff;
-      flex-shrink: 0;
-      object-fit: cover;
-      display: block;
-    }
-    .what-withwho-text {
-      display: flex;
-      flex-direction: column;
-    }
-    .what-withwho-name {
-      color: #fff;
-      font-size: 22px;
-      font-weight: 800;
-      line-height: 1.2;
-    }
-    .what-withwho-role {
-      color: rgba(255,255,255,0.65);
-      font-size: 16px;
-      font-weight: 400;
-      line-height: 1.4;
-    }
-
-    .what-happen-h {
-      color: #fff;
-      font-size: 34px;
-      font-weight: 800;
-      line-height: 1.1;
-      letter-spacing: -0.02em;
-      margin-bottom: 36px;
-    }
-    .what-steps {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-    .what-step {
-      display: flex;
-      align-items: flex-start;
-      gap: 20px;
-    }
-    .what-step-left {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex-shrink: 0;
-      gap: 0;
-    }
-    .what-step-num {
-      width: 54px;
-      height: 54px;
-      border-radius: 50%;
-      background: #1EFF00;
-      color: #000;
-      font-size: 28px;
-      font-weight: 900;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-family: 'Inter', sans-serif;
-    }
-    .what-step-arrow {
-      color: #fff;
-      font-size: 22px;
-      line-height: 1;
-      padding: 10px 0;
-      text-align: center;
-    }
-    .what-step-text {
-      padding-top: 8px;
-    }
-    .what-step-title {
-      color: #fff;
-      font-size: 23px;
-      font-weight: 800;
-      line-height: 1.2;
-      margin-bottom: 6px;
-    }
-    .what-step-sub {
-      color: rgba(255,255,255,0.75);
-      font-size: 17px;
-      font-weight: 400;
-      line-height: 1.5;
-      margin-bottom: 4px;
-    }
-
-    /* READY SECTION */
-    .ready {
-      padding: 56px 28px 0;
-      text-align: center;
-    }
-    .ready-h {
-      font-size: 30px;
-      font-weight: 800;
-      line-height: 1.22;
-      letter-spacing: -0.02em;
-      margin-bottom: 12px;
-    }
-    .ready-sub {
-      font-size: 19px;
-      font-weight: 400;
-      color: #444;
-      line-height: 1.35;
-      margin-bottom: 40px;
-    }
-
-    /* EVENT INFO BOX */
-    .event-section { padding: 0 28px 28px; }
-    .event-details {
-      display: flex;
-      flex-direction: column;
-      border: 2px solid #E0D8FF;
-      border-radius: 24px;
-      overflow: hidden;
-      text-align: left;
-    }
-    .event-detail-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 20px 24px;
-      border-bottom: 1.5px solid #E0D8FF;
-    }
-    .event-detail-row:last-child { border-bottom: none; }
-    .event-detail-icon {
-      width: 40px; height: 40px;
-      background: #f3f0ff;
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .event-detail-icon svg {
-      width: 20px; height: 20px;
-      stroke: #3513A2; fill: none;
-      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
-    }
-    .event-detail-label { font-size: 17px; font-weight: 700; color: #0A0A0A; }
-
-    /* REGISTRATION SECTION — purple bg wrap */
-    .register-section {
-      position: relative;
-      isolation: isolate;
-      background: #661AE9;
-      padding: 44px 24px 60px;
-      text-align: center;
-    }
-    .register-section::before {
-      content: "";
-      position: absolute;
-      z-index: -1;
-      top: 0; bottom: 0;
-      left: 50%;
-      width: 100vw;
-      transform: translateX(-50%);
-      background: #661AE9;
-    }
-    .register-title {
-      color: #fff;
-      font-size: 32px;
-      font-weight: 800;
-      line-height: 1.2;
-      letter-spacing: -0.02em;
+      padding: 0 24px;
       margin-bottom: 28px;
+    }
+    .video-inner {
+      position: relative;
+      width: 100%;
+      padding-bottom: 177.78%; /* 9:16 portrait */
+      border-radius: 20px;
+      overflow: hidden;
+      background: #e8e8e8;
+      border: 1.5px solid #d0d0d0;
+    }
+    .video-inner iframe,
+    .video-inner video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+    .play-overlay svg { opacity: 0.3; }
+
+    /* ─── page body padding ─── */
+    .page-body {
+      padding: 28px 24px 48px;
       text-align: center;
     }
 
-    /* White card */
-    .booking-box {
-      background: #fff;
-      border: 3px solid #000;
-      border-radius: 40px;
-      padding: 28px 22px 24px;
-      text-align: left;
-    }
-
-    .choose-time-head {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      font-size: 20px;
-      font-weight: 800;
+    /* ─── titles ─── */
+    .page-title {
+      font-size: 34px;
+      font-weight: 900;
       color: #0A0A0A;
-      margin-bottom: 20px;
-      line-height: 1.2;
+      line-height: 1.13;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
     }
-    .choose-time-dot {
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      background: #FF3B30;
-      flex-shrink: 0;
-      box-shadow: 0 0 0 7px rgba(255, 59, 48, 0.18);
-    }
-
-    .flag-za { width: 1.45em; height: 0.9em; vertical-align: -0.12em; }
-    .slot-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 24px;
-    }
-    .slot-btn {
-      font-family: 'Inter', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: #0A0A0A;
-      background: #F3F3F3;
-      border: 2px solid #000;
-      border-radius: 16px;
-      padding: 10px 8px;
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-    .slot-btn:hover { background: #e8e8e8; }
-    .slot-btn.selected { background: #7B61FF; border-color: #7B61FF; color: #fff; }
-    .slot-btn.past {
-      background: #E8E8E8;
-      border-color: #C0C0C0;
-      color: #A0A0A0;
-      cursor: not-allowed;
-      pointer-events: none;
-      text-decoration: line-through;
-    }
-    .slot-btn.past::after {
-      content: " ✓ Done";
-      font-size: 12px;
-      font-weight: 600;
-      display: block;
-      text-decoration: none;
-      color: #A0A0A0;
-    }
-
-    .field-label {
-      display: block;
-      font-size: 15px;
-      font-weight: 700;
-      color: #0A0A0A;
-      line-height: 1.4;
-      margin-bottom: 8px;
-    }
-    .field-sublabel {
-      display: block;
-      font-size: 13px;
-      font-weight: 400;
-      color: #666;
-      margin-bottom: 8px;
-      margin-top: -4px;
-    }
-    .field-input {
-      width: 100%;
-      font-family: 'Inter', sans-serif;
-      font-size: 16px;
-      font-weight: 400;
-      color: #0A0A0A;
-      background: #F3F3F3;
-      border: 2px solid #000;
-      border-radius: 19px;
-      padding: 13px 16px;
-      margin-bottom: 18px;
-      outline: none;
-    }
-    .field-input::placeholder { color: #aaa; }
-    .field-input:focus { border-color: #661AE9; background: #fff; }
-    .field-error {
-      display: none;
-      font-size: 13px;
-      font-weight: 600;
-      color: #e53e3e;
-      line-height: 1.4;
-      margin: -12px 0 14px;
-    }
-    .field-error.show { display: block; }
-
-    .save-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      background: #20DD16;
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-size: 20px;
-      font-weight: 800;
-      border: none;
-      border-radius: 50px;
-      padding: 16px 24px;
-      cursor: pointer;
-      letter-spacing: -0.01em;
-      margin-bottom: 18px;
-      transition: filter 0.15s, transform 0.1s;
-    }
-    .save-btn:hover  { filter: brightness(1.06); }
-    .save-btn:active { transform: scale(0.98); }
-    .save-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    /* CONFIRMATION PAGE */
-    .confirm-page { display: none; }
-    .confirm-page.show { display: block; }
-    .confirm-inner { padding: 24px 28px 72px; text-align: center; }
-    .confirm-logo { height: 38px; width: auto; display: block; margin: 0 auto 56px; }
-    .confirm-check-badge { display: flex; justify-content: center; margin-bottom: 20px; }
-    .confirm-title { font-size: 28px; font-weight: 800; line-height: 1.22; letter-spacing: -0.02em; margin-bottom: 28px; }
-    .confirm-section {
-      border: 2px solid #E0D8FF;
-      background: #F9F7FF;
-      border-radius: 24px;
-      padding: 8px 20px;
-      margin-bottom: 24px;
-      text-align: left;
-    }
-    .confirm-detail-row {
-      display: flex;
-      gap: 16px;
-      padding: 14px 0;
-      border-bottom: 1.5px solid #E0D8FF;
-      font-size: 16px;
-      line-height: 1.4;
-    }
-    .confirm-detail-row:last-child { border-bottom: none; }
-    .confirm-detail-label { flex: 0 0 56px; font-weight: 800; color: #3513A2; }
-    .confirm-detail-value { flex: 1; font-weight: 600; color: #0A0A0A; }
-
-    /* WhatsApp green text */
-    .whatsapp-green {
-      color: #25D366;
-      font-weight: 800;
-    }
-
-    .confirm-text { font-size: 16px; font-weight: 500; color: #444; line-height: 1.5; margin-bottom: 28px; }
-    .calendar-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      background: #3DBE5C;
-      color: #fff;
-      font-family: 'Inter', sans-serif;
+    .page-sub {
       font-size: 17px;
+      font-weight: 400;
+      color: #3a3a3a;
+      line-height: 1.5;
+      margin-bottom: 28px;
+    }
+
+    /* ─── green pill CTA ─── */
+    .green-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      background: #3BEA1A;
+      color: #000;
+      font-family: 'Inter', sans-serif;
+      font-size: 19px;
       font-weight: 800;
       border: none;
       border-radius: 50px;
-      padding: 20px 20px;
+      padding: 20px 24px;
       cursor: pointer;
       letter-spacing: -0.01em;
-      box-shadow: 0 5px 0 #27a348;
-      margin-bottom: 20px;
+      text-decoration: none;
+      margin-bottom: 16px;
       transition: filter 0.15s, transform 0.1s;
     }
-    .calendar-btn:hover  { filter: brightness(1.06); }
-    .calendar-btn:active { transform: scale(0.98); box-shadow: none; }
-    .calendar-note { font-size: 13px; font-weight: 500; color: #999; line-height: 1.5; }
+    .green-btn:hover  { filter: brightness(1.06); }
+    .green-btn:active { transform: scale(0.98); }
+
+    /* ─── trust line ─── */
+    .trust {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      font-size: 15px;
+      font-weight: 500;
+      color: #555;
+    }
+    .trust::before {
+      content: "•";
+      font-size: 18px;
+      line-height: 1;
+      color: #555;
+    }
   </style>
 </head>
 <body>
 
-  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-    <symbol id="om-check" viewBox="0 0 80 80">
-      <polygon points="4,42.4 16,30.4 28.9,45.3 63.8,8 76,20.2 28.9,67.3"
-               fill="#B1CC33" stroke="#000" stroke-width="4" stroke-linejoin="round"/>
-    </symbol>
-    <symbol id="om-za" viewBox="0 0 64 40">
-      <rect x="0" y="0" width="64" height="40" rx="2.5" fill="#000"/>
-      <rect x="2" y="2" width="60" height="18" fill="#D22F27"/>
-      <rect x="2" y="20" width="60" height="18" fill="#1E50A0"/>
-      <polygon points="2,2 5,2 22,12.9 62,12.9 62,27.1 22,27.1 5,38 2,38" fill="#FFFFFF"/>
-      <polygon points="2,4 22,15 62,15 62,25 22,25 2,36" fill="#5C9E31"/>
-      <polygon points="2,9 17,20 2,31" fill="#F1B31C"/>
-      <polygon points="2,12.5 14,20 2,27.5" fill="#000"/>
-    </symbol>
-    <symbol id="om-unlocked" viewBox="0 0 72 72">
-      <path d="M50 34V22C50 13.16 42.84 6 34 6C25.16 6 18 13.16 18 22" fill="none" stroke="#000" stroke-width="5" stroke-linecap="round"/>
-      <rect x="10" y="34" width="44" height="32" rx="4" fill="#FCEA2B" stroke="#000" stroke-width="3"/>
-      <polygon points="54,47 54,66 35,66" fill="#F1B31C" opacity="0.7"/>
-      <circle cx="32" cy="49" r="5" fill="#000" opacity="0.25"/>
-      <rect x="29.5" y="51" width="5" height="7" rx="1.5" fill="#000" opacity="0.25"/>
-    </symbol>
-    <symbol id="om-eyes" viewBox="0 0 72 72">
-      <ellipse cx="20" cy="36" rx="14" ry="20" fill="#fff" stroke="#000" stroke-width="3.5"/>
-      <circle cx="20" cy="38" r="8" fill="#C19A65"/>
-      <circle cx="20" cy="38" r="4.5" fill="#000"/>
-      <circle cx="22.5" cy="35" r="1.8" fill="#fff"/>
-      <ellipse cx="52" cy="36" rx="14" ry="20" fill="#fff" stroke="#000" stroke-width="3.5"/>
-      <circle cx="52" cy="38" r="8" fill="#C19A65"/>
-      <circle cx="52" cy="38" r="4.5" fill="#000"/>
-      <circle cx="54.5" cy="35" r="1.8" fill="#fff"/>
-    </symbol>
-    <symbol id="om-question" viewBox="0 0 72 72">
-      <circle cx="36" cy="36" r="30" fill="#60C3F5" stroke="#000" stroke-width="3"/>
-      <text x="36" y="50" font-size="34" font-weight="900" text-anchor="middle" fill="#000" font-family="Arial, sans-serif">?</text>
-    </symbol>
-  </svg>
-
-  <!-- LANDING PAGE -->
-  <div id="landing">
-
-    <!-- NAV -->
+  <!-- ══════════════════════════════════
+       PAGE 1 — Hook video
+  ══════════════════════════════════ -->
+  <div id="page1" class="page active">
     <nav class="nav">
       <img class="nav-logo" src="/logotousebro.webp" alt="Numio"/>
     </nav>
+    <div class="page-body">
+      <h1 class="page-title">Are you ready to help your child practise for school?</h1>
+      <p class="page-sub">Watch this video to see if Numio can really help you 😊</p>
+    </div>
 
-    <!-- 1. HERO -->
-    <section class="hero">
-      <h1 class="hero-title">Never worry about school practice again!</h1>
-      <p class="hero-sub">Your child can now take a pic of any lesson and start practising in just 15 seconds.</p>
-
-      <div class="phone-visual">
-        <img class="phone-left"  src="/phonestouse.png"        alt="Take a pic of their lesson"/>
-        <img class="phone-arrow" src="/tousebro%20(2).webp"   alt=""/>
-        <img class="phone-right" src="/phonestouse%20(1).png" alt="Get a quiz instantly"/>
-      </div>
-
-      <button class="cta-btn" type="button" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">Try Numio today →</button>
-      <div class="perks">
-        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>100% Free</span>
-        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg><strong>5 minutes</strong></span>
-        <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>No commitment</span>
-      </div>
-    </section>
-
-    <!-- 2. DETAILS SECTION — dark navy block -->
-    <section class="what">
-      <h2 class="what-h"><span class="underline-magenta">Details</span> about the live free trial:</h2>
-
-      <div class="what-meta">
-        <div class="what-meta-item">
-          <div class="what-meta-label">Where?</div>
-          <div class="what-meta-value">
-            <svg width="26" height="26" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0">
-              <path d="M34.5 13.4C32.1 11 28.9 9.6 25.5 9.6C18.5 9.6 12.8 15.3 12.8 22.3C12.8 24.6 13.4 26.8 14.6 28.7L12.6 36L20.1 34C21.9 35.1 24 35.7 26.1 35.7H26.2C33.2 35.7 38.9 30 38.9 23C38.8 19.6 37.4 16.4 34.5 13.4ZM25.5 33.4H25.4C23.5 33.4 21.7 32.8 20.1 31.8L19.7 31.6L15.6 32.7L16.7 28.7L16.5 28.3C15.4 26.6 14.8 24.6 14.8 22.5C14.8 16.5 19.7 11.6 25.7 11.6C28.6 11.6 31.3 12.7 33.4 14.8C35.5 16.9 36.6 19.6 36.6 22.5C36.7 28.5 31.8 33.4 25.5 33.4ZM31.8 25.1C31.5 24.95 29.9 24.15 29.6 24.05C29.3 23.95 29.1 23.9 28.9 24.2C28.7 24.5 28.05 25.25 27.9 25.45C27.75 25.65 27.55 25.7 27.25 25.55C26.95 25.4 25.95 25.1 24.75 24.05C23.85 23.25 23.25 22.25 23.1 21.95C22.95 21.65 23.1 21.5 23.25 21.35C23.4 21.2 23.55 21 23.7 20.85C23.85 20.7 23.9 20.6 24 20.4C24.1 20.2 24.05 20.05 23.975 19.9C23.9 19.75 23.3 18.15 23.05 17.55C22.8 16.95 22.55 17.05 22.35 17.05C22.2 17.05 22 17 21.8 17C21.6 17 21.25 17.075 20.95 17.375C20.65 17.675 19.85 18.425 19.85 20.025C19.85 21.625 21 23.175 21.15 23.375C21.3 23.575 23.3 26.625 26.3 28.025C27.05 28.375 27.625 28.575 28.075 28.725C28.825 28.975 29.5 28.925 30.05 28.85C30.65 28.75 31.9 28.075 32.15 27.325C32.4 26.575 32.4 25.95 32.325 25.825C32.25 25.7 32.05 25.625 31.8 25.1Z" fill="#25D366"/>
-            </svg>
-            On a WhatsApp call
-          </div>
-        </div>
-        <div class="what-meta-item">
-          <div class="what-meta-label">With who?</div>
-          <div class="what-withwho-content">
-            <img class="what-withwho-avatar" src="/ismail.webp" alt="Ismail"/>
-            <div class="what-withwho-text">
-              <span class="what-withwho-name">With me!</span>
-              <span class="what-withwho-role">(Numio founder)</span>
-            </div>
-          </div>
-        </div>
-        <div class="what-meta-item">
-          <div class="what-meta-label">How long?</div>
-          <div class="what-meta-value"><span class="emoji">⏱️</span> It's about 5 minutes max</div>
+    <div class="video-wrap">
+      <div class="video-inner">
+        <!-- Replace with your video 1 embed URL -->
+        <!-- <iframe src="YOUR_VIDEO_1_URL" allow="autoplay; fullscreen" allowfullscreen></iframe> -->
+        <div class="play-overlay">
+          <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+            <circle cx="36" cy="36" r="36" fill="#000"/>
+            <polygon points="28,20 56,36 28,52" fill="#fff"/>
+          </svg>
         </div>
       </div>
+    </div>
 
-      <div class="what-happen-h">What will happen?</div>
-
-      <div class="what-steps">
-        <div class="what-step">
-          <div class="what-step-left">
-            <div class="what-step-num">1</div>
-            <div class="what-step-arrow">↓</div>
-          </div>
-          <div class="what-step-text">
-            <div class="what-step-title">See Numio</div>
-            <div class="what-step-sub">Watch Numio turn a real school lesson into practice.</div>
-          </div>
-        </div>
-        <div class="what-step">
-          <div class="what-step-left">
-            <div class="what-step-num">2</div>
-            <div class="what-step-arrow">↓</div>
-          </div>
-          <div class="what-step-text">
-            <div class="what-step-title">Try it</div>
-            <div class="what-step-sub">Test Numio yourself with your child's real school lesson.</div>
-          </div>
-        </div>
-        <div class="what-step">
-          <div class="what-step-left">
-            <div class="what-step-num">3</div>
-          </div>
-          <div class="what-step-text">
-            <div class="what-step-title">Decide</div>
-            <div class="what-step-sub">Decide if Numio can really help your family</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. REGISTRATION FORM — purple section -->
-    <section class="register-section" id="register">
-      <h2 class="register-title">Try Numio today<br>for FREE</h2>
-
-      <div class="booking-box">
-        <div class="choose-time-head">
-          <span class="choose-time-dot"></span>
-          Choose your time
-        </div>
-
-        <div class="slot-grid" id="slot-grid">
-          <button type="button" class="slot-btn" data-sa="17" data-label="5:00 PM" aria-pressed="false">5:00 PM</button>
-          <button type="button" class="slot-btn" data-sa="18" data-label="6:00 PM" aria-pressed="false">6:00 PM</button>
-          <button type="button" class="slot-btn" data-sa="19" data-label="7:00 PM" aria-pressed="false">7:00 PM</button>
-          <button type="button" class="slot-btn" data-sa="20" data-label="8:00 PM" aria-pressed="false">8:00 PM</button>
-          <button type="button" class="slot-btn" data-sa="21" data-label="9:00 PM" aria-pressed="false">9:00 PM</button>
-        </div>
-        <div class="field-error" id="slot-error">Please choose a time slot.</div>
-
-        <label class="field-label" for="parent-name">What's your name?</label>
-        <input class="field-input" type="text" id="parent-name" placeholder="e.g. Thabo Nkosi" autocomplete="name"/>
-        <div class="field-error" id="name-error">Please enter your name.</div>
-
-        <label class="field-label" for="parent-phone">WhatsApp number</label>
-        <span class="field-sublabel">(We'll only use it to send your meeting link)</span>
-        <input class="field-input" type="tel" id="parent-phone" placeholder="e.g. 071 234 5678" autocomplete="tel"/>
-        <div class="field-error" id="phone-error">Please enter a valid phone number.</div>
-
-        <button type="button" class="save-btn" id="register-btn">Save your spot →</button>
-
-        <div class="perks">
-          <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>100% Free</span>
-          <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg><strong>5 minutes</strong></span>
-          <span class="perk"><svg class="om-check" aria-hidden="true"><use href="#om-check"/></svg>No commitment</span>
-        </div>
-      </div>
-    </section>
-
+    <div class="page-body" style="padding-top:0">
+      <button class="green-btn" id="cta1">
+        Yes, show me the solution →
+      </button>
+      <p class="trust">No email or phone Number</p>
+    </div>
   </div>
 
-  <!-- CONFIRMATION PAGE -->
-  <div class="confirm-page" id="confirmation-page">
-    <div class="confirm-inner">
-      <img class="confirm-logo" src="/logotousebro.webp" alt="Numio"/>
-
-      <div class="confirm-check-badge">
-        <svg viewBox="0 0 80 80" width="80" height="80">
-          <circle cx="40" cy="40" r="38" fill="#3DBE5C"/>
-          <polyline points="22,40 35,53 58,28" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-
-      <h1 class="confirm-title">Your spot is confirmed</h1>
-
-      <!-- What / When / Where card -->
-      <div class="confirm-section">
-        <div class="confirm-detail-row">
-          <span class="confirm-detail-label">What</span>
-          <span class="confirm-detail-value">Test Numio live with your child's lesson</span>
-        </div>
-        <div class="confirm-detail-row">
-          <span class="confirm-detail-label">When</span>
-          <span class="confirm-detail-value" id="confirm-datetime">Tuesday, October 13</span>
-        </div>
-        <div class="confirm-detail-row">
-          <span class="confirm-detail-label">Where</span>
-          <span class="confirm-detail-value">
-            <!-- WhatsApp icon inline -->
-            <svg width="20" height="20" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:-4px;margin-right:6px;flex-shrink:0">
-              <path d="M34.5 13.4C32.1 11 28.9 9.6 25.5 9.6C18.5 9.6 12.8 15.3 12.8 22.3C12.8 24.6 13.4 26.8 14.6 28.7L12.6 36L20.1 34C21.9 35.1 24 35.7 26.1 35.7H26.2C33.2 35.7 38.9 30 38.9 23C38.8 19.6 37.4 16.4 34.5 13.4ZM25.5 33.4H25.4C23.5 33.4 21.7 32.8 20.1 31.8L19.7 31.6L15.6 32.7L16.7 28.7L16.5 28.3C15.4 26.6 14.8 24.6 14.8 22.5C14.8 16.5 19.7 11.6 25.7 11.6C28.6 11.6 31.3 12.7 33.4 14.8C35.5 16.9 36.6 19.6 36.6 22.5C36.7 28.5 31.8 33.4 25.5 33.4ZM31.8 25.1C31.5 24.95 29.9 24.15 29.6 24.05C29.3 23.95 29.1 23.9 28.9 24.2C28.7 24.5 28.05 25.25 27.9 25.45C27.75 25.65 27.55 25.7 27.25 25.55C26.95 25.4 25.95 25.1 24.75 24.05C23.85 23.25 23.25 22.25 23.1 21.95C22.95 21.65 23.1 21.5 23.25 21.35C23.4 21.2 23.55 21 23.7 20.85C23.85 20.7 23.9 20.6 24 20.4C24.1 20.2 24.05 20.05 23.975 19.9C23.9 19.75 23.3 18.15 23.05 17.55C22.8 16.95 22.55 17.05 22.35 17.05C22.2 17.05 22 17 21.8 17C21.6 17 21.25 17.075 20.95 17.375C20.65 17.675 19.85 18.425 19.85 20.025C19.85 21.625 21 23.175 21.15 23.375C21.3 23.575 23.3 26.625 26.3 28.025C27.05 28.375 27.625 28.575 28.075 28.725C28.825 28.975 29.5 28.925 30.05 28.85C30.65 28.75 31.9 28.075 32.15 27.325C32.4 26.575 32.4 25.95 32.325 25.825C32.25 25.7 32.05 25.625 31.8 25.1Z" fill="#25D366"/>
-            </svg>
-            <span class="whatsapp-green">WhatsApp</span>
-          </span>
+  <!-- ══════════════════════════════════
+       PAGE 2 — Solution video + Stripe
+  ══════════════════════════════════ -->
+  <div id="page2" class="page">
+    <div class="video-wrap" style="padding-top:24px">
+      <div class="video-inner">
+        <!-- Replace with your video 2 embed URL -->
+        <!-- <iframe src="YOUR_VIDEO_2_URL" allow="autoplay; fullscreen" allowfullscreen></iframe> -->
+        <div class="play-overlay">
+          <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+            <circle cx="36" cy="36" r="36" fill="#000"/>
+            <polygon points="28,20 56,36 28,52" fill="#fff"/>
+          </svg>
         </div>
       </div>
+    </div>
 
-      <p class="confirm-text">We will send you a message on <span class="whatsapp-green">WhatsApp</span> before the free trial starts.</p>
-
-      <button type="button" class="calendar-btn" id="calendar-btn">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        Save to Calendar
-      </button>
-      <p class="calendar-note">We'll never share your info. See you there!</p>
+    <div class="page-body" style="padding-top:0">
+      <a class="green-btn" href="https://buy.stripe.com/fZu14n0nT1gz3vU7rz1ZS03" id="stripe-btn">
+        Get Lifetime Access for $5 →
+      </a>
+      <p class="trust">One-time payment · No subscription</p>
     </div>
   </div>
 
 <script>
 (function () {
-  var EVENT_DATE_OVERRIDE = "2026-10-14";
-  var LANDING_TITLE = document.title;
-  var landing = document.getElementById("landing");
-  var confirmPage = document.getElementById("confirmation-page");
-  var slots = document.querySelectorAll(".slot-btn");
-  var selected = null;
-  var chosen = null;
+  var page1 = document.getElementById("page1");
+  var page2 = document.getElementById("page2");
 
-  function pad(n) { return String(n).padStart(2, "0"); }
-
-  function eventDate() {
-    if (EVENT_DATE_OVERRIDE) return EVENT_DATE_OVERRIDE;
-    var sa = new Date(Date.now() + 2 * 3600 * 1000);
-    var t = new Date(Date.UTC(sa.getUTCFullYear(), sa.getUTCMonth(), sa.getUTCDate() + 1));
-    return t.getUTCFullYear() + "-" + pad(t.getUTCMonth() + 1) + "-" + pad(t.getUTCDate());
-  }
-
-  function prettyDate(iso) {
-    var p = iso.split("-");
-    return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])).toLocaleDateString("en-US", {
-      weekday: "long", month: "long", day: "numeric", timeZone: "UTC"
-    });
-  }
-
-  function slotToUTCDate(iso, saHour) {
-    var p = iso.split("-");
-    return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], saHour - 2, 0, 0));
-  }
-
-  function icsStamp(d) {
-    return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + "T" +
-      pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + "00Z";
-  }
-
-  function buildICS(startUTC) {
-    var endUTC = new Date(startUTC.getTime() + 10 * 60000);
-    return [
-      "BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Numio//Live Demo//EN",
-      "BEGIN:VEVENT",
-      "UID:" + Date.now() + "@numiomath.app",
-      "DTSTAMP:" + icsStamp(new Date()),
-      "DTSTART:" + icsStamp(startUTC),
-      "DTEND:" + icsStamp(endUTC),
-      "SUMMARY:Numio live Parents Demo",
-      "DESCRIPTION:See if Numio can help your family. We will message you on WhatsApp before the free trial starts.",
-      "END:VEVENT", "END:VCALENDAR"
-    ].join("\r\n");
-  }
-
-  // Mark past slots grey based on SAST (UTC+2)
-  function markPastSlots() {
-    var nowUTC = Date.now();
-    var saNow = new Date(nowUTC + 2 * 3600 * 1000); // SAST = UTC+2
-    var saHourNow = saNow.getUTCHours();
-    var saMinNow = saNow.getUTCMinutes();
-
-    slots.forEach(function (btn) {
-      var slotHour = parseInt(btn.dataset.sa, 10);
-      // Slot is past if the current SAST hour is >= slot hour
-      // e.g. slot=18 (6pm), current=18:37 → past
-      var isPast = (saHourNow > slotHour) || (saHourNow === slotHour && saMinNow > 0);
-      if (isPast) {
-        btn.classList.add("past");
-        btn.setAttribute("aria-disabled", "true");
-        // If this slot was selected, deselect it
-        if (selected && selected.saHour === slotHour) {
-          selected = null;
-          btn.classList.remove("selected");
-        }
-      } else {
-        btn.classList.remove("past");
-        btn.removeAttribute("aria-disabled");
-      }
-    });
-  }
-
-  markPastSlots();
-  // Re-check every minute so slots grey out in real time
-  setInterval(markPastSlots, 60 * 1000);
-
-  slots.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      if (btn.classList.contains("past")) return;
-      slots.forEach(function (b) { b.classList.remove("selected"); b.setAttribute("aria-pressed", "false"); });
-      btn.classList.add("selected");
-      btn.setAttribute("aria-pressed", "true");
-      selected = { saHour: parseInt(btn.dataset.sa, 10), label: btn.dataset.label };
-      hideError("slot-error");
-    });
-  });
-
-  function showError(id) { document.getElementById(id).classList.add("show"); }
-  function hideError(id) { document.getElementById(id).classList.remove("show"); }
-  function isValidPhone(v) { return v.replace(/[^\d]/g, "").length >= 9; }
-
-  function showView(confirmed) {
-    landing.style.display = confirmed ? "none" : "";
-    confirmPage.classList.toggle("show", confirmed);
-    document.title = confirmed ? "You're in! – Numio" : LANDING_TITLE;
+  document.getElementById("cta1").addEventListener("click", function () {
+    page1.classList.remove("active");
+    page2.classList.add("active");
     window.scrollTo(0, 0);
-  }
-
-  window.addEventListener("popstate", function (e) {
-    showView(!!(e.state && e.state.numio === "confirmed"));
+    try { if (window.fbq) fbq("track", "ViewContent"); } catch(e) {}
+    try { if (window.clarity) clarity("event", "hook_cta_click"); } catch(e) {}
   });
 
-  if (location.hash === "#confirmed") {
-    history.replaceState(null, "", location.pathname + location.search);
-  }
-
-  document.getElementById("register-btn").addEventListener("click", function () {
-    var name = document.getElementById("parent-name").value.trim();
-    var phone = document.getElementById("parent-phone").value.trim();
-    var ok = true;
-
-    if (!selected) { showError("slot-error"); ok = false; } else { hideError("slot-error"); }
-    if (!name) { showError("name-error"); ok = false; } else { hideError("name-error"); }
-    if (!isValidPhone(phone)) { showError("phone-error"); ok = false; } else { hideError("phone-error"); }
-    if (!ok) return;
-
-    var btn = this;
-    btn.disabled = true;
-    btn.textContent = "Saving your spot…";
-
-    var date = eventDate();
-    chosen = { saHour: selected.saHour, label: selected.label, date: date };
-
-    fetch("https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/register-event-lead", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0",
-      },
-      body: JSON.stringify({
-        name: name,
-        phone: phone,
-        slot_label: selected.label,
-        event_date: date,
-        timezone: "SAST (South Africa)",
-      }),
-    }).catch(function (e) { console.error("Lead save failed:", e); })
-      .finally(function () {
-        try {
-          if (window.fbq) fbq("track", "Prospect");
-          if (window.clarity) clarity("event", "reserve_click");
-        } catch (e) { console.error("Tracking failed:", e); }
-
-        var whenEl = document.getElementById("confirm-datetime");
-        if (whenEl) {
-          whenEl.textContent = prettyDate(date) + " · " + chosen.label + " (South Africa time)";
-        }
-
-        history.pushState({ numio: "confirmed" }, "", "#confirmed");
-        showView(true);
-
-        btn.disabled = false;
-        btn.textContent = "Start live FREE trial →";
-      });
-  });
-
-  document.getElementById("calendar-btn").addEventListener("click", function () {
-    var c = chosen || { saHour: 19, date: eventDate() };
-    var ics = buildICS(slotToUTCDate(c.date, c.saHour));
-    var blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = "numio-live-demo.ics";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  document.getElementById("stripe-btn").addEventListener("click", function () {
+    try { if (window.fbq) fbq("track", "InitiateCheckout"); } catch(e) {}
+    try { if (window.clarity) clarity("event", "stripe_cta_click"); } catch(e) {}
   });
 })();
 </script>
