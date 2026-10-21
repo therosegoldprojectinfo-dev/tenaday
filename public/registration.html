@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Are you ready to help your child practise for school? Watch this video to see if Numio can really help you."/>
+  <meta name="description" content="Create practise for your child with just a picture. Watch this 1 minute video before creating your account."/>
   <title>Numio</title>
 
   <!-- Meta Pixel Code -->
@@ -37,34 +37,61 @@
       background: #fff;
       color: #0A0A0A;
       overflow-x: hidden;
+    }
+
+    .content-wrap {
       max-width: 480px;
       margin: 0 auto;
     }
 
-    /* ─── shared page shell ─── */
-    .page { display: none; }
-    .page.active { display: block; }
-
-    /* ─── shared nav ─── */
-    .nav {
-      padding: 20px 24px 8px;
+    /* ─── Red top banner ─── */
+    .top-banner {
+      background: #FF3A3A;
+      color: #fff;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 20px;
+      letter-spacing: -0.01em;
     }
-    .nav-logo { height: 34px; width: auto; }
 
-    /* ─── shared video card ─── */
+    /* ─── Page body ─── */
+    .page-body {
+      padding: 28px 24px 0;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: #0A0A0A;
+      line-height: 1.13;
+      letter-spacing: -0.03em;
+      margin-bottom: 14px;
+    }
+
+    .page-sub {
+      font-size: 16px;
+      font-weight: 400;
+      color: #3a3a3a;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    /* ─── Video card ─── */
     .video-wrap {
       width: 100%;
       padding: 0 24px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
     .video-inner {
       position: relative;
       width: 100%;
-      padding-bottom: 177.78%; /* 9:16 portrait */
-      border-radius: 20px;
+      padding-bottom: 140%; /* portrait ratio matching mockup */
+      border-radius: 24px;
       overflow: hidden;
-      background: #e8e8e8;
-      border: 1.5px solid #d0d0d0;
+      background: #D9D9D9;
+      border: 5px solid #03B30F;
     }
     .video-inner iframe,
     .video-inner video {
@@ -82,146 +109,102 @@
       justify-content: center;
       pointer-events: none;
     }
-    .play-overlay svg { opacity: 0.3; }
+    .play-overlay svg { opacity: 0.25; }
 
-    /* ─── page body padding ─── */
-    .page-body {
-      padding: 28px 24px 48px;
+    /* ─── CTA section ─── */
+    .cta-section {
+      padding: 0 24px 48px;
       text-align: center;
     }
 
-    /* ─── titles ─── */
-    .page-title {
-      font-size: 34px;
-      font-weight: 900;
-      color: #0A0A0A;
-      line-height: 1.13;
-      letter-spacing: -0.03em;
-      margin-bottom: 14px;
-    }
-    .page-sub {
-      font-size: 17px;
-      font-weight: 400;
-      color: #3a3a3a;
-      line-height: 1.5;
-      margin-bottom: 28px;
-    }
-
-    /* ─── green pill CTA ─── */
     .green-btn {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       width: 100%;
-      background: #3BEA1A;
+      background: #20DD16;
       color: #000;
       font-family: 'Inter', sans-serif;
-      font-size: 19px;
+      font-size: 18px;
       font-weight: 800;
       border: none;
-      border-radius: 50px;
+      border-radius: 33px;
       padding: 20px 24px;
       cursor: pointer;
       letter-spacing: -0.01em;
       text-decoration: none;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       transition: filter 0.15s, transform 0.1s;
     }
     .green-btn:hover  { filter: brightness(1.06); }
     .green-btn:active { transform: scale(0.98); }
 
-    /* ─── trust line ─── */
-    .trust {
+    /* ─── Bullet trust signals ─── */
+    .trust-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .trust-list li {
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 7px;
       font-size: 15px;
       font-weight: 500;
-      color: #555;
+      color: #444;
+      margin-bottom: 6px;
     }
-    .trust::before {
+    .trust-list li::before {
       content: "•";
       font-size: 18px;
       line-height: 1;
-      color: #555;
+      color: #444;
     }
   </style>
 </head>
 <body>
 
-  <!-- ══════════════════════════════════
-       PAGE 1 — Hook video
-  ══════════════════════════════════ -->
-  <div id="page1" class="page active">
-    <nav class="nav">
-      <img class="nav-logo" src="/logotousebro.webp" alt="Numio"/>
-    </nav>
-    <div class="page-body">
-      <h1 class="page-title">Are you ready to help your child practise for school?</h1>
-      <p class="page-sub">Watch this video to see if Numio can really help you 😊</p>
-    </div>
+  <!-- Red top banner -->
+  <div class="top-banner">Never worry about school practise again</div>
 
-    <div class="video-wrap">
-      <div class="video-inner">
-        <!-- Replace with your video 1 embed URL -->
-        <!-- <iframe src="YOUR_VIDEO_1_URL" allow="autoplay; fullscreen" allowfullscreen></iframe> -->
-        <div class="play-overlay">
-          <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
-            <circle cx="36" cy="36" r="36" fill="#000"/>
-            <polygon points="28,20 56,36 28,52" fill="#fff"/>
-          </svg>
-        </div>
+  <div class="content-wrap">
+
+  <!-- Title + subtitle -->
+  <div class="page-body">
+    <h1 class="page-title">Create practise for your child with just a picture</h1>
+    <p class="page-sub">Watch this 1 minute video before creating your account</p>
+  </div>
+
+  <!-- Video -->
+  <div class="video-wrap">
+    <div class="video-inner">
+      <!-- Replace with your video embed URL -->
+      <!-- <iframe src="YOUR_VIDEO_URL" allow="autoplay; fullscreen" allowfullscreen></iframe> -->
+      <div class="play-overlay">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
+          <circle cx="36" cy="36" r="36" fill="#000"/>
+          <polygon points="28,20 56,36 28,52" fill="#fff"/>
+        </svg>
       </div>
-    </div>
-
-    <div class="page-body" style="padding-top:0">
-      <button class="green-btn" id="cta1">
-        Yes, show me the solution →
-      </button>
-      <p class="trust">No email or phone Number</p>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
-       PAGE 2 — Solution video + Stripe
-  ══════════════════════════════════ -->
-  <div id="page2" class="page">
-    <div class="video-wrap" style="padding-top:24px">
-      <div class="video-inner">
-        <!-- Replace with your video 2 embed URL -->
-        <!-- <iframe src="YOUR_VIDEO_2_URL" allow="autoplay; fullscreen" allowfullscreen></iframe> -->
-        <div class="play-overlay">
-          <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
-            <circle cx="36" cy="36" r="36" fill="#000"/>
-            <polygon points="28,20 56,36 28,52" fill="#fff"/>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <div class="page-body" style="padding-top:0">
-      <a class="green-btn" href="https://buy.stripe.com/fZu14n0nT1gz3vU7rz1ZS03" id="stripe-btn">
-        Get Lifetime Access for $5 →
-      </a>
-      <p class="trust">One-time payment · No subscription</p>
-    </div>
+  <!-- CTA -->
+  <div class="cta-section">
+    <a class="green-btn" href="https://buy.stripe.com/fZu14n0nT1gz3vU7rz1ZS03" id="stripe-btn">
+      Yes, i want to try it →
+    </a>
+    <ul class="trust-list">
+      <li>Get instant access now</li>
+      <li>No risk for 365 days</li>
+    </ul>
   </div>
+  </div><!-- end content-wrap -->
 
 <script>
 (function () {
-  var page1 = document.getElementById("page1");
-  var page2 = document.getElementById("page2");
-
-  document.getElementById("cta1").addEventListener("click", function () {
-    page1.classList.remove("active");
-    page2.classList.add("active");
-    window.scrollTo(0, 0);
-    try { if (window.fbq) fbq("track", "ViewContent"); } catch(e) {}
-    try { if (window.clarity) clarity("event", "hook_cta_click"); } catch(e) {}
-  });
-
   document.getElementById("stripe-btn").addEventListener("click", function () {
     try { fbq("track", "InitiateCheckout"); } catch(e) {}
   });
