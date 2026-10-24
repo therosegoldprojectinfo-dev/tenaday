@@ -59,6 +59,18 @@
       position: relative;
     }
 
+    /* BYE screen */
+    .bye-screen {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--ink);
+      letter-spacing: -0.03em;
+    }
+
     /* PROGRESS */
     .progress-wrap { padding: 20px 24px 0; flex-shrink: 0; }
     .progress-track { height: 6px; border-radius: 999px; background: #EBEBEB; overflow: hidden; }
@@ -73,34 +85,37 @@
     /* ── LANDING ── */
     .landing-logo { margin-bottom: 20px; }
     .landing-logo img { height: 34px; width: auto; object-fit: contain; }
-    .landing-body { margin-top: 32px; }
 
-    /* Phone duo — mimics the screenshot exactly */
+    /* More breathing room between logo and phones */
+    .landing-body { margin-top: 48px; }
+
+    /* Phone duo */
     .phone-wrap {
       width: 100%;
       display: flex;
-      align-items: flex-end;   /* align bottoms so they visually "meet" */
+      align-items: flex-end;
       justify-content: center;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
       gap: 0;
       overflow: visible;
-      min-height: 220px;
+      min-height: 240px;
+      position: relative;
     }
 
-    /* Left phone: tilted left, overlapping toward center */
+    /* Left phone: tilted left, lower */
     .phone-wrap img.phone-left {
       width: 42%;
       max-width: 180px;
       height: auto;
       object-fit: contain;
-      transform: rotate(-12deg) translateX(10px) translateY(12px);
+      transform: rotate(-12deg) translateX(12px) translateY(20px);
       transform-origin: bottom center;
       flex-shrink: 0;
       position: relative;
       z-index: 1;
     }
 
-    /* Arrow between phones */
+    /* Arrow: pushed higher between the two phones */
     .phone-wrap img.arrow-img {
       width: 10%;
       max-width: 40px;
@@ -109,16 +124,16 @@
       flex-shrink: 0;
       position: relative;
       z-index: 2;
-      margin-bottom: 40px; /* float it up a bit between the phones */
+      margin-bottom: 90px;
     }
 
-    /* Right phone: tilted right, slightly raised */
+    /* Right phone: tilted right, higher than left */
     .phone-wrap img.phone-right {
       width: 42%;
       max-width: 180px;
       height: auto;
       object-fit: contain;
-      transform: rotate(8deg) translateX(-10px) translateY(-14px);
+      transform: rotate(8deg) translateX(-12px) translateY(-30px);
       transform-origin: bottom center;
       flex-shrink: 0;
       position: relative;
@@ -135,7 +150,7 @@
       text-align: center;
     }
 
-    /* ── QUESTION (matches screenshot) ── */
+    /* ── QUESTION ── */
     .question-text {
       font-size: 22px;
       font-weight: 800;
@@ -241,6 +256,7 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const STRIPE_URL    = 'https://buy.stripe.com/fZu14n0nT1gz3vU7rz1ZS03'
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
 
+// ── SESSION ───────────────────────────────────────────────────────────────
 function getSessionId() {
   let id = sessionStorage.getItem('numio_sid')
   if (!id) {
@@ -258,9 +274,24 @@ async function trackStep(step, answer) {
   catch(e) { /* non-blocking */ }
 }
 
+// ── BYE CHECK — runs before anything else ────────────────────────────────
+// If they ever clicked "No" on any question, they see Bye. forever.
+if (sessionStorage.getItem('numio_bye') === '1') {
+  document.getElementById('card').innerHTML = '<div class="bye-screen">Bye.</div>'
+  // Stop the rest of the script
+  throw new Error('bye')
+}
+
 // ── FLOW ──────────────────────────────────────────────────────────────────
-const SCREENS = ['landing','q1','q2','q3','solution','offer']
 const TOTAL_Q = 3
+
+// "No" option texts — any of these triggers the bye screen
+const NO_OPTIONS = new Set([
+  'No, thanks',
+  'No, we always have enough.',
+  'No.',
+  'No, thanks.',
+])
 
 const QUESTIONS = [
   { screen:'q1', step:1, stepsLeft:4, text:'Would you like your child to get more practice with their school lessons?',              options:['Yes, for sure!','No, thanks'] },
@@ -276,6 +307,13 @@ function goTo(screen) {
   selectedOption = null
   currentScreen  = screen
   render()
+}
+
+function showBye() {
+  sessionStorage.setItem('numio_bye', '1')
+  document.getElementById('progress-wrap').style.display = 'none'
+  document.getElementById('screen-content').innerHTML = '<div class="bye-screen">Bye.</div>'
+  document.getElementById('bottom-area').innerHTML = ''
 }
 
 // ── RENDER ────────────────────────────────────────────────────────────────
@@ -432,6 +470,18 @@ function attachListeners() {
   if (btnContinue) {
     btnContinue.addEventListener('click', async () => {
       if (!selectedOption) return
+
+      // ── "No" answer → dead end ──
+      if (NO_OPTIONS.has(selectedOption)) {
+        if (currentScreen === 'solution') {
+          await trackStep(5, selectedOption)
+        } else {
+          const q = QUESTIONS.find(x => x.screen === currentScreen)
+          if (q) await trackStep(q.step, selectedOption)
+        }
+        showBye()
+        return
+      }
 
       if (currentScreen === 'solution') {
         await trackStep(5, selectedOption)
