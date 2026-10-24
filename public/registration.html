@@ -80,32 +80,19 @@
 
     .phone-wrap {
       width: 100%;
-      background: var(--purple-light);
-      border-radius: 20px;
-      height: 210px;
+      background: transparent;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 28px;
-      overflow: hidden;
+      margin-bottom: 20px;
       position: relative;
     }
     .phone-wrap img.phone-img {
-      height: 185px;
-      width: auto;
+      width: 100%;
+      max-width: 340px;
+      height: auto;
       object-fit: contain;
-      position: relative;
-      z-index: 1;
-    }
-    .phone-wrap img.arrow-img {
-      position: absolute;
-      right: 28px;
-      top: 50%;
-      transform: translateY(-60%);
-      height: 60px;
-      width: auto;
-      object-fit: contain;
-      z-index: 2;
+      display: block;
     }
 
     .landing-title {
@@ -293,9 +280,7 @@ function htmlLanding() {
       <img src="./logotousebro.webp" alt="Numio"/>
     </div>
     <div class="phone-wrap">
-      <img class="phone-img" src="./phonestouse.png" alt="Numio app"
-        onerror="this.src='public/phonestouse (1).png'"/>
-      <img class="arrow-img" src="./arrowpicturetouse.png" alt=""/>
+      <img class="phone-img" src="./phonestouse (1).png" alt="Numio app"/>
     </div>
     <h1 class="landing-title">Infinite practise for your child in 15 seconds</h1>
   `
