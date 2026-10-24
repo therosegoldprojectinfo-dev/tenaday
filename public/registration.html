@@ -70,7 +70,7 @@
     .progress-fill { height: 100%; border-radius: 999px; background: var(--purple); transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
 
     /* SCREEN */
-    .screen { flex: 1; display: flex; flex-direction: column; padding: 28px 24px 16px; }
+    .screen { flex: 1; display: flex; flex-direction: column; padding: 28px 24px 16px; justify-content: flex-start; }
     .screen-anim { animation: slideIn 0.28s cubic-bezier(0.4,0,0.2,1); }
     @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
 
@@ -84,21 +84,31 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0;
       margin-bottom: 20px;
       position: relative;
     }
-    .phone-wrap img.phone-img {
-      width: 42%;
+    .phone-wrap img.phone-left {
+      width: 44%;
       height: auto;
       object-fit: contain;
       display: block;
+      transform: rotate(-8deg) translateY(8px);
+      transform-origin: bottom center;
     }
     .phone-wrap img.arrow-img {
-      width: 16%;
+      width: 14%;
       height: auto;
       object-fit: contain;
       flex-shrink: 0;
+      margin: 0 -4px;
+    }
+    .phone-wrap img.phone-right {
+      width: 44%;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      transform: rotate(6deg) translateY(-8px);
+      transform-origin: bottom center;
     }
 
     .landing-title {
@@ -108,6 +118,7 @@
       line-height: 1.18;
       letter-spacing: -0.03em;
       margin-bottom: 0;
+      flex: 1;
     }
 
     /* QUESTION */
@@ -286,9 +297,9 @@ function htmlLanding() {
       <img src="./logotousebro.webp" alt="Numio"/>
     </div>
     <div class="phone-wrap">
-      <img class="phone-img" src="./phonestouse.png" alt="Camera"/>
+      <img class="phone-left" src="./phonestouse.png" alt="Camera"/>
       <img class="arrow-img" src="./arrowpicturetouse.png" alt=""/>
-      <img class="phone-img" src="./phonestouse (1).png" alt="App"/>
+      <img class="phone-right" src="./phonestouse (1).png" alt="App"/>
     </div>
     <h1 class="landing-title">Infinite practise for your child in 15 seconds</h1>
   `
