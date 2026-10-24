@@ -65,10 +65,13 @@
       align-items: center;
       justify-content: center;
       min-height: 100dvh;
-      font-size: 32px;
+      font-size: 24px;
       font-weight: 900;
       color: var(--ink);
       letter-spacing: -0.03em;
+      text-align: center;
+      padding: 40px 32px;
+      line-height: 1.4;
     }
 
     /* PROGRESS */
@@ -277,7 +280,7 @@ async function trackStep(step, answer) {
 // ── BYE CHECK — runs before anything else ────────────────────────────────
 // If they ever clicked "No" on any question, they see Bye. forever.
 if (sessionStorage.getItem('numio_bye') === '1') {
-  document.getElementById('card').innerHTML = '<div class="bye-screen">Bye.</div>'
+  document.getElementById('card').innerHTML = '<div class="bye-screen">Sorry but Numio is not for you. Have a good day! 👋</div>'
   // Stop the rest of the script
   throw new Error('bye')
 }
@@ -312,7 +315,7 @@ function goTo(screen) {
 function showBye() {
   sessionStorage.setItem('numio_bye', '1')
   document.getElementById('progress-wrap').style.display = 'none'
-  document.getElementById('screen-content').innerHTML = '<div class="bye-screen">Bye.</div>'
+  document.getElementById('screen-content').innerHTML = '<div class="bye-screen">Sorry but Numio is not for you. Have a good day! 👋</div>'
   document.getElementById('bottom-area').innerHTML = ''
 }
 
