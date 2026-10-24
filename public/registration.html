@@ -37,7 +37,7 @@
       --purple-light: #F0ECFF;
       --ink: #0D0D0D;
       --muted: #888;
-      --border: #E8E8E8;
+      --border: #E0E0E0;
     }
 
     body {
@@ -62,84 +62,113 @@
     .progress-fill { height: 100%; border-radius: 999px; background: var(--purple); transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
 
     /* SCREEN */
-    .screen { flex: 1; display: flex; flex-direction: column; padding: 28px 24px 16px; justify-content: flex-start; }
+    .screen { display: flex; flex-direction: column; padding: 28px 24px 16px; }
+    .screen.grow { flex: 1; }
     .screen-anim { animation: slideIn 0.28s cubic-bezier(0.4,0,0.2,1); }
     @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
 
-    /* LANDING */
-    .landing-logo { margin-bottom: 24px; }
+    /* ── LANDING ── */
+    .landing-logo { margin-bottom: 20px; }
     .landing-logo img { height: 34px; width: auto; object-fit: contain; }
 
+    /* Phone duo — mimics the screenshot exactly */
     .phone-wrap {
       width: 100%;
-      background: transparent;
       display: flex;
-      align-items: center;
+      align-items: flex-end;   /* align bottoms so they visually "meet" */
       justify-content: center;
       margin-bottom: 20px;
-      position: relative;
+      gap: 0;
+      overflow: visible;
+      min-height: 220px;
     }
+
+    /* Left phone: tilted left, overlapping toward center */
     .phone-wrap img.phone-left {
-      width: 44%;
+      width: 42%;
+      max-width: 180px;
       height: auto;
       object-fit: contain;
-      display: block;
-      transform: rotate(-8deg) translateY(8px);
+      transform: rotate(-12deg) translateX(10px) translateY(12px);
       transform-origin: bottom center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
     }
+
+    /* Arrow between phones */
     .phone-wrap img.arrow-img {
-      width: 14%;
+      width: 10%;
+      max-width: 40px;
       height: auto;
       object-fit: contain;
       flex-shrink: 0;
-      margin: 0 -4px;
+      position: relative;
+      z-index: 2;
+      margin-bottom: 40px; /* float it up a bit between the phones */
     }
+
+    /* Right phone: tilted right, slightly raised */
     .phone-wrap img.phone-right {
-      width: 44%;
+      width: 42%;
+      max-width: 180px;
       height: auto;
       object-fit: contain;
-      display: block;
-      transform: rotate(6deg) translateY(-8px);
+      transform: rotate(8deg) translateX(-10px) translateY(-14px);
       transform-origin: bottom center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
     }
 
     .landing-title {
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 900;
       color: var(--ink);
       line-height: 1.18;
       letter-spacing: -0.03em;
       margin-bottom: 0;
-      flex: 1;
+      text-align: center;
     }
 
-    /* QUESTION */
+    /* ── QUESTION (matches screenshot) ── */
     .question-text {
-      font-size: 21px;
+      font-size: 22px;
       font-weight: 800;
       color: var(--ink);
       line-height: 1.32;
       letter-spacing: -0.02em;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
-    .options-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
     .option-btn {
       width: 100%;
-      padding: 17px 20px;
-      border-radius: 14px;
-      border: 2px solid var(--border);
+      padding: 20px 20px;
+      border-radius: 16px;
+      border: 1.5px solid var(--border);
       background: #fff;
       font-family: 'Inter', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
+      font-size: 16px;
+      font-weight: 700;
       color: var(--ink);
       text-align: left;
       cursor: pointer;
       transition: border-color 0.15s, background 0.15s;
       -webkit-tap-highlight-color: transparent;
     }
+
     .option-btn:hover { border-color: #bbb; }
-    .option-btn.selected { border-color: #3B82F6; background: #EFF6FF; color: #1D4ED8; }
+    .option-btn.selected {
+      border-color: var(--purple);
+      background: var(--purple-light);
+      color: var(--purple);
+    }
 
     /* SOLUTION */
     .solution-title { font-size: 21px; font-weight: 800; color: var(--ink); line-height: 1.3; letter-spacing: -0.02em; margin-bottom: 18px; }
@@ -163,12 +192,19 @@
     }
 
     /* BOTTOM */
-    .bottom-area { flex-shrink: 0; padding: 16px 24px 36px; display: flex; flex-direction: column; gap: 10px; }
+    .bottom-area {
+      flex-shrink: 0;
+      padding: 16px 24px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
     .cta-btn {
       display: flex; align-items: center; justify-content: center; gap: 8px;
       width: 100%; background: var(--purple); color: #fff;
       font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 800;
-      border: none; border-radius: 100px; padding: 19px 24px;
+      border: none; border-radius: 100px; padding: 20px 24px;
       cursor: pointer; letter-spacing: -0.01em; text-decoration: none;
       transition: background 0.15s, transform 0.1s;
       -webkit-tap-highlight-color: transparent;
@@ -177,7 +213,7 @@
     .cta-btn:active { transform: scale(0.98); }
     .cta-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    .step-counter { text-align: center; font-size: 13px; font-weight: 600; color: var(--muted); }
+    .step-counter { text-align: center; font-size: 14px; font-weight: 600; color: var(--muted); }
 
     .trust-row { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; }
     .trust-item { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: #444; }
@@ -219,10 +255,8 @@ async function trackStep(step, answer) {
 }
 
 // ── FLOW ──────────────────────────────────────────────────────────────────
-// Screens: landing → q1 → q2 → q3 → q4 → solution → offer
-// Steps left shown:  –     4    3    2    1     1       –
-const SCREENS = ['landing','q1','q2','q3','q4','solution','offer']
-const TOTAL_Q = 3 // 3 real questions before solution
+const SCREENS = ['landing','q1','q2','q3','solution','offer']
+const TOTAL_Q = 3
 
 const QUESTIONS = [
   { screen:'q1', step:1, stepsLeft:4, text:'Would you like your child to get more practice with their school lessons?',              options:['Yes, for sure!','No, thanks'] },
@@ -247,7 +281,6 @@ function render() {
   const content      = document.getElementById('screen-content')
   const bottom       = document.getElementById('bottom-area')
 
-  // Restart animation
   content.classList.remove('screen-anim')
   void content.offsetWidth
   content.classList.add('screen-anim')
@@ -257,9 +290,9 @@ function render() {
     content.innerHTML = htmlLanding()
     bottom.innerHTML  = htmlLandingBottom()
 
-  } else if (['q1','q2','q3','q4'].includes(currentScreen)) {
+  } else if (['q1','q2','q3'].includes(currentScreen)) {
     const q = QUESTIONS.find(x => x.screen === currentScreen)
-    const pct = (q.step / (TOTAL_Q + 2)) * 100  // +2 for solution+offer
+    const pct = (q.step / (TOTAL_Q + 2)) * 100
     progressWrap.style.display = 'block'
     fill.style.width = pct + '%'
     content.innerHTML = htmlQuestion(q)
@@ -293,7 +326,7 @@ function htmlLanding() {
       <img class="arrow-img" src="./arrowpicturetouse.png" alt=""/>
       <img class="phone-right" src="./phonestouse (1).png" alt="App"/>
     </div>
-    <h1 class="landing-title">Infinite practise for your child in 15 seconds</h1>
+    <h1 class="landing-title">Infinite practise for<br>your child in 15 seconds</h1>
   `
 }
 
@@ -369,7 +402,6 @@ function htmlOfferBottom() {
 // ── LISTENERS ─────────────────────────────────────────────────────────────
 function attachListeners() {
 
-  // Landing
   const btnStart = document.getElementById('btn-start')
   if (btnStart) {
     btnStart.addEventListener('click', async () => {
@@ -378,22 +410,18 @@ function attachListeners() {
     })
   }
 
-  // Option buttons (works for question screens AND solution screen)
   document.querySelectorAll('.option-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const opt = decodeURIComponent(btn.dataset.opt)
       selectedOption = opt
-      // Re-render just the options (no full re-render to keep animation clean)
       document.querySelectorAll('.option-btn').forEach(b => {
         b.classList.toggle('selected', decodeURIComponent(b.dataset.opt) === opt)
       })
-      // Enable continue button
       const cont = document.getElementById('btn-continue')
       if (cont) cont.disabled = false
     })
   })
 
-  // Continue button
   const btnContinue = document.getElementById('btn-continue')
   if (btnContinue) {
     btnContinue.addEventListener('click', async () => {
@@ -414,7 +442,6 @@ function attachListeners() {
     })
   }
 
-  // Stripe button
   const btnStripe = document.getElementById('btn-stripe')
   if (btnStripe) {
     btnStripe.addEventListener('click', () => {
