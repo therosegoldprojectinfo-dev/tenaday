@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Create practise for your child with just a picture. Watch this 1 minute video before creating your account."/>
-  <title>Numio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="description" content="Infinite practise for your child in 15 seconds."/>
+  <title>Numio – Get Started</title>
 
-  <!-- Meta Pixel Code -->
+  <!-- Meta Pixel -->
   <script>
   !function(f,b,e,v,n,t,s)
   {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -14,202 +14,422 @@
   if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
   n.queue=[];t=b.createElement(e);t.async=!0;
   t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  s.parentNode.insertBefore(t,s)}(window,document,'script',
   'https://connect.facebook.net/en_US/fbevents.js');
   fbq('init', '1028944262871292');
   fbq('track', 'PageView');
   </script>
   <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"
-  /></noscript>
-  <!-- End Meta Pixel Code -->
+  src="https://www.facebook.com/tr?id=1028944262871292&ev=PageView&noscript=1"/></noscript>
 
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
-  <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/></noscript>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
+
+    :root {
+      --purple: #4F20E8;
+      --purple-dark: #3910C5;
+      --purple-light: #F0ECFF;
+      --ink: #0D0D0D;
+      --muted: #888;
+      --border: #E8E8E8;
+    }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f5f5;
+      color: var(--ink);
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
       background: #fff;
-      color: #0A0A0A;
-      overflow-x: hidden;
-    }
-
-    .content-wrap {
-      max-width: 480px;
-      margin: 0 auto;
-    }
-
-    /* ─── Red top banner ─── */
-    .top-banner {
-      background: #FF3A3A;
-      color: #fff;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 700;
-      padding: 12px 20px;
-      letter-spacing: -0.01em;
-    }
-
-    /* ─── Page body ─── */
-    .page-body {
-      padding: 28px 24px 0;
-      text-align: center;
-    }
-
-    .page-title {
-      font-size: 32px;
-      font-weight: 900;
-      color: #0A0A0A;
-      line-height: 1.13;
-      letter-spacing: -0.03em;
-      margin-bottom: 14px;
-    }
-
-    .page-sub {
-      font-size: 16px;
-      font-weight: 400;
-      color: #3a3a3a;
-      line-height: 1.5;
-      margin-bottom: 24px;
-    }
-
-    /* ─── Video card ─── */
-    .video-wrap {
       width: 100%;
-      padding: 0 24px;
-      margin-bottom: 24px;
-    }
-    .video-inner {
+      max-width: 420px;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
       position: relative;
+    }
+    @media (min-width: 480px) {
+      .card { min-height: auto; border-radius: 24px; box-shadow: 0 8px 48px rgba(0,0,0,0.10); margin: 24px 0; }
+      body { align-items: flex-start; padding: 24px 16px; }
+    }
+
+    /* PROGRESS */
+    .progress-wrap { padding: 20px 24px 0; flex-shrink: 0; }
+    .progress-track { height: 6px; border-radius: 999px; background: #EBEBEB; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 999px; background: var(--purple); transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
+
+    /* SCREEN */
+    .screen { flex: 1; display: flex; flex-direction: column; padding: 28px 24px 16px; }
+    .screen-anim { animation: slideIn 0.28s cubic-bezier(0.4,0,0.2,1); }
+    @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:translateX(0); } }
+
+    /* LANDING */
+    .landing-logo { margin-bottom: 24px; }
+    .landing-logo img { height: 34px; width: auto; object-fit: contain; }
+
+    .phone-wrap {
       width: 100%;
-      padding-bottom: 140%; /* portrait ratio matching mockup */
-      border-radius: 24px;
+      background: var(--purple-light);
+      border-radius: 20px;
+      height: 210px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
       overflow: hidden;
-      background: #D9D9D9;
-      border: 5px solid #03B30F;
+      position: relative;
     }
-    .video-inner iframe,
-    .video-inner video {
+    .phone-wrap img.phone-img {
+      height: 185px;
+      width: auto;
+      object-fit: contain;
+      position: relative;
+      z-index: 1;
+    }
+    .phone-wrap img.arrow-img {
       position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    .play-overlay {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      pointer-events: none;
-    }
-    .play-overlay svg { opacity: 0.25; }
-
-    /* ─── CTA section ─── */
-    .cta-section {
-      padding: 0 24px 48px;
-      text-align: center;
+      right: 28px;
+      top: 50%;
+      transform: translateY(-60%);
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+      z-index: 2;
     }
 
-    .green-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      width: 100%;
-      background: #20DD16;
-      color: #000;
-      font-family: 'Inter', sans-serif;
-      font-size: 18px;
+    .landing-title {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--ink);
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      margin-bottom: 0;
+    }
+
+    /* QUESTION */
+    .question-text {
+      font-size: 21px;
       font-weight: 800;
-      border: none;
-      border-radius: 33px;
-      padding: 20px 24px;
-      cursor: pointer;
-      letter-spacing: -0.01em;
-      text-decoration: none;
-      margin-bottom: 14px;
-      transition: filter 0.15s, transform 0.1s;
+      color: var(--ink);
+      line-height: 1.32;
+      letter-spacing: -0.02em;
+      margin-bottom: 24px;
     }
-    .green-btn:hover  { filter: brightness(1.06); }
-    .green-btn:active { transform: scale(0.98); }
-
-    /* ─── Bullet trust signals ─── */
-    .trust-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .trust-list li {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 7px;
+    .options-list { display: flex; flex-direction: column; gap: 12px; }
+    .option-btn {
+      width: 100%;
+      padding: 17px 20px;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      background: #fff;
+      font-family: 'Inter', sans-serif;
       font-size: 15px;
-      font-weight: 500;
-      color: #444;
-      margin-bottom: 6px;
+      font-weight: 600;
+      color: var(--ink);
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
-    .trust-list li::before {
-      content: "•";
-      font-size: 18px;
-      line-height: 1;
-      color: #444;
+    .option-btn:hover { border-color: #bbb; }
+    .option-btn.selected { border-color: #3B82F6; background: #EFF6FF; color: #1D4ED8; }
+
+    /* SOLUTION */
+    .solution-title { font-size: 21px; font-weight: 800; color: var(--ink); line-height: 1.3; letter-spacing: -0.02em; margin-bottom: 18px; }
+    .video-placeholder {
+      width: 100%; aspect-ratio: 16/9;
+      border-radius: 14px; background: #E2E2E2;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 22px;
     }
+    .play-icon { width: 52px; height: 52px; background: rgba(0,0,0,0.18); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .play-icon::after { content: ''; display: block; width: 0; height: 0; border-top: 10px solid transparent; border-bottom: 10px solid transparent; border-left: 16px solid rgba(0,0,0,0.45); margin-left: 4px; }
+
+    .sub-question { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 14px; }
+
+    /* OFFER */
+    .offer-title { font-size: 24px; font-weight: 900; color: var(--ink); letter-spacing: -0.03em; margin-bottom: 5px; }
+    .offer-sub { font-size: 15px; color: var(--muted); margin-bottom: 18px; font-weight: 500; }
+    .video-placeholder-portrait {
+      width: 100%; aspect-ratio: 9/16; max-height: 320px;
+      border-radius: 14px; background: #E2E2E2;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 0;
+    }
+
+    /* BOTTOM */
+    .bottom-area { flex-shrink: 0; padding: 16px 24px 36px; display: flex; flex-direction: column; gap: 10px; }
+    .cta-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; background: var(--purple); color: #fff;
+      font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 800;
+      border: none; border-radius: 100px; padding: 19px 24px;
+      cursor: pointer; letter-spacing: -0.01em; text-decoration: none;
+      transition: background 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .cta-btn:hover { background: var(--purple-dark); }
+    .cta-btn:active { transform: scale(0.98); }
+    .cta-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .step-counter { text-align: center; font-size: 13px; font-weight: 600; color: var(--muted); }
+
+    .trust-row { display: flex; align-items: center; justify-content: center; gap: 18px; flex-wrap: wrap; }
+    .trust-item { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: #444; }
+    .check-icon { width: 16px; height: 16px; background: #22c55e; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .check-icon::after { content: '✓'; font-size: 10px; color: #fff; font-weight: 800; }
   </style>
 </head>
 <body>
-
-  <!-- Red top banner -->
-  <div class="top-banner">Never worry about school practise again</div>
-
-  <div class="content-wrap">
-
-  <!-- Title + subtitle -->
-  <div class="page-body">
-    <h1 class="page-title">Create practise for your child with just a picture</h1>
-    <p class="page-sub">Watch this 1 minute video before creating your account</p>
+<div class="card" id="card">
+  <div class="progress-wrap" id="progress-wrap" style="display:none;">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
-
-  <!-- Video -->
-  <div class="video-wrap">
-    <div class="video-inner">
-      <!-- Replace with your video embed URL -->
-      <!-- <iframe src="YOUR_VIDEO_URL" allow="autoplay; fullscreen" allowfullscreen></iframe> -->
-      <div class="play-overlay">
-        <svg width="72" height="72" viewBox="0 0 72 72" fill="none">
-          <circle cx="36" cy="36" r="36" fill="#000"/>
-          <polygon points="28,20 56,36 28,52" fill="#fff"/>
-        </svg>
-      </div>
-    </div>
-  </div>
-
-  <!-- CTA -->
-  <div class="cta-section">
-    <a class="green-btn" href="https://buy.stripe.com/fZu14n0nT1gz3vU7rz1ZS03" id="stripe-btn">
-      Yes, i want to try it →
-    </a>
-    <ul class="trust-list">
-      <li>Get instant access now</li>
-      <li>No risk for 365 days</li>
-    </ul>
-  </div>
-  </div><!-- end content-wrap -->
+  <div class="screen screen-anim" id="screen-content"></div>
+  <div class="bottom-area" id="bottom-area"></div>
+</div>
 
 <script>
-(function () {
-  document.getElementById("stripe-btn").addEventListener("click", function () {
-    try { fbq("track", "InitiateCheckout"); } catch(e) {}
-  });
-})();
-</script>
+// ── SUPABASE ──────────────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://lyedpfhzrvyaskmzhyhl.supabase.co'
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0'
+const STRIPE_URL    = 'https://buy.stripe.com/fZu14n0nT1gz3vU7rz1ZS03'
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON)
 
+function getSessionId() {
+  let id = sessionStorage.getItem('numio_sid')
+  if (!id) {
+    id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+      ? crypto.randomUUID()
+      : Math.random().toString(36).slice(2) + Date.now()
+    sessionStorage.setItem('numio_sid', id)
+  }
+  return id
+}
+const SESSION_ID = getSessionId()
+
+async function trackStep(step, answer) {
+  try { await sb.from('quiz_responses').insert({ session_id: SESSION_ID, step, answer: answer || null }) }
+  catch(e) { /* non-blocking */ }
+}
+
+// ── FLOW ──────────────────────────────────────────────────────────────────
+// Screens: landing → q1 → q2 → q3 → q4 → solution → offer
+// Steps left shown:  –     4    3    2    1     1       –
+const SCREENS = ['landing','q1','q2','q3','q4','solution','offer']
+const TOTAL_Q = 3 // 3 real questions before solution
+
+const QUESTIONS = [
+  { screen:'q1', step:1, stepsLeft:4, text:'Would you like your child to get more practice with their school lessons?',              options:['Yes, for sure!','No, thanks'] },
+  { screen:'q2', step:2, stepsLeft:3, text:'Do you sometimes struggle to find enough practice exercises for your child\'s school lessons?', options:['Yes, that\'s a problem.','No, we always have enough.'] },
+  { screen:'q3', step:3, stepsLeft:2, text:'Would you prefer not to spend money on practice books or create exercises yourself?',       options:['Yes, that would help!','No.'] },
+]
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let selectedOption = null
+let currentScreen  = 'landing'
+
+function goTo(screen) {
+  selectedOption = null
+  currentScreen  = screen
+  render()
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────
+function render() {
+  const progressWrap = document.getElementById('progress-wrap')
+  const fill         = document.getElementById('progress-fill')
+  const content      = document.getElementById('screen-content')
+  const bottom       = document.getElementById('bottom-area')
+
+  // Restart animation
+  content.classList.remove('screen-anim')
+  void content.offsetWidth
+  content.classList.add('screen-anim')
+
+  if (currentScreen === 'landing') {
+    progressWrap.style.display = 'none'
+    content.innerHTML = htmlLanding()
+    bottom.innerHTML  = htmlLandingBottom()
+
+  } else if (['q1','q2','q3','q4'].includes(currentScreen)) {
+    const q = QUESTIONS.find(x => x.screen === currentScreen)
+    const pct = (q.step / (TOTAL_Q + 2)) * 100  // +2 for solution+offer
+    progressWrap.style.display = 'block'
+    fill.style.width = pct + '%'
+    content.innerHTML = htmlQuestion(q)
+    bottom.innerHTML  = htmlQuestionBottom(q.stepsLeft)
+
+  } else if (currentScreen === 'solution') {
+    progressWrap.style.display = 'block'
+    fill.style.width = ((TOTAL_Q + 1) / (TOTAL_Q + 2) * 100) + '%'
+    content.innerHTML = htmlSolution()
+    bottom.innerHTML  = htmlSolutionBottom()
+
+  } else if (currentScreen === 'offer') {
+    progressWrap.style.display = 'block'
+    fill.style.width = '100%'
+    content.innerHTML = htmlOffer()
+    bottom.innerHTML  = htmlOfferBottom()
+  }
+
+  attachListeners()
+}
+
+// ── HTML TEMPLATES ────────────────────────────────────────────────────────
+
+function htmlLanding() {
+  return `
+    <div class="landing-logo">
+      <img src="public/logotousebro.webp" alt="Numio"/>
+    </div>
+    <div class="phone-wrap">
+      <img class="phone-img" src="public/phonestouse.png" alt="Numio app"
+        onerror="this.src='public/phonestouse (1).png'"/>
+      <img class="arrow-img" src="public/arrowpicturetouse.png" alt=""/>
+    </div>
+    <h1 class="landing-title">Infinite practise for your child in 15 seconds</h1>
+  `
+}
+
+function htmlLandingBottom() {
+  return `
+    <button class="cta-btn" id="btn-start">Get started →</button>
+    <p class="step-counter">Less than 2 minutes to complete</p>
+  `
+}
+
+function htmlQuestion(q) {
+  return `
+    <p class="question-text">${q.text}</p>
+    <div class="options-list">
+      ${q.options.map(opt => `
+        <button class="option-btn${selectedOption === opt ? ' selected' : ''}" data-opt="${encodeURIComponent(opt)}">
+          ${opt}
+        </button>
+      `).join('')}
+    </div>
+  `
+}
+
+function htmlQuestionBottom(stepsLeft) {
+  const disabled = selectedOption === null ? 'disabled' : ''
+  return `
+    <button class="cta-btn" id="btn-continue" ${disabled}>Continue →</button>
+    <p class="step-counter">${stepsLeft} step${stepsLeft !== 1 ? 's' : ''} left</p>
+  `
+}
+
+function htmlSolution() {
+  return `
+    <h2 class="solution-title">Great, so here's an easier and faster solution:</h2>
+    <div class="video-placeholder"><div class="play-icon"></div></div>
+    <p class="sub-question">Do you think this could help you?</p>
+    <div class="options-list">
+      ${['Yes, that would help!','No, thanks.'].map(opt => `
+        <button class="option-btn${selectedOption === opt ? ' selected' : ''}" data-opt="${encodeURIComponent(opt)}">
+          ${opt}
+        </button>
+      `).join('')}
+    </div>
+  `
+}
+
+function htmlSolutionBottom() {
+  const disabled = selectedOption === null ? 'disabled' : ''
+  return `
+    <button class="cta-btn" id="btn-continue" ${disabled}>Continue →</button>
+    <p class="step-counter">1 step left</p>
+  `
+}
+
+function htmlOffer() {
+  return `
+    <h2 class="offer-title">Your offer is ready!</h2>
+    <p class="offer-sub">Watch this video to decide:</p>
+    <div class="video-placeholder-portrait"><div class="play-icon"></div></div>
+  `
+}
+
+function htmlOfferBottom() {
+  return `
+    <a class="cta-btn" href="${STRIPE_URL}" id="btn-stripe">Get started →</a>
+    <div class="trust-row">
+      <span class="trust-item"><span class="check-icon"></span> Get instant access</span>
+      <span class="trust-item"><span class="check-icon"></span> No risk for 365 days</span>
+    </div>
+  `
+}
+
+// ── LISTENERS ─────────────────────────────────────────────────────────────
+function attachListeners() {
+
+  // Landing
+  const btnStart = document.getElementById('btn-start')
+  if (btnStart) {
+    btnStart.addEventListener('click', async () => {
+      await trackStep(0, 'landing_started')
+      goTo('q1')
+    })
+  }
+
+  // Option buttons (works for question screens AND solution screen)
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const opt = decodeURIComponent(btn.dataset.opt)
+      selectedOption = opt
+      // Re-render just the options (no full re-render to keep animation clean)
+      document.querySelectorAll('.option-btn').forEach(b => {
+        b.classList.toggle('selected', decodeURIComponent(b.dataset.opt) === opt)
+      })
+      // Enable continue button
+      const cont = document.getElementById('btn-continue')
+      if (cont) cont.disabled = false
+    })
+  })
+
+  // Continue button
+  const btnContinue = document.getElementById('btn-continue')
+  if (btnContinue) {
+    btnContinue.addEventListener('click', async () => {
+      if (!selectedOption) return
+
+      if (currentScreen === 'solution') {
+        await trackStep(5, selectedOption)
+        goTo('offer')
+        return
+      }
+
+      const q = QUESTIONS.find(x => x.screen === currentScreen)
+      if (!q) return
+      await trackStep(q.step, selectedOption)
+
+      const nextMap = { q1:'q2', q2:'q3', q3:'solution' }
+      goTo(nextMap[currentScreen])
+    })
+  }
+
+  // Stripe button
+  const btnStripe = document.getElementById('btn-stripe')
+  if (btnStripe) {
+    btnStripe.addEventListener('click', () => {
+      try { fbq('track', 'InitiateCheckout') } catch(e) {}
+      trackStep(6, 'stripe_clicked')
+    })
+  }
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────
+render()
+</script>
 </body>
 </html>
