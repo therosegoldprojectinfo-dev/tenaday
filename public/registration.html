@@ -76,7 +76,8 @@
 
     /* PROGRESS */
     .progress-wrap { padding: 20px 24px 0; flex-shrink: 0; }
-    .progress-track { height: 6px; border-radius: 999px; background: #EBEBEB; overflow: hidden; }
+    .progress-steps-label { text-align: center; font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+    .progress-track { height: 20px; border-radius: 999px; background: #EBEBEB; overflow: hidden; }
     .progress-fill { height: 100%; border-radius: 999px; background: var(--purple); transition: width 0.4s cubic-bezier(0.4,0,0.2,1); }
 
     /* SCREEN */
@@ -246,6 +247,7 @@
 <body>
 <div class="card" id="card">
   <div class="progress-wrap" id="progress-wrap" style="display:none;">
+    <div class="progress-steps-label" id="progress-steps-label"></div>
     <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
   </div>
   <div class="screen screen-anim" id="screen-content"></div>
@@ -288,18 +290,10 @@ if (sessionStorage.getItem('numio_bye') === '1') {
 // ── FLOW ──────────────────────────────────────────────────────────────────
 const TOTAL_Q = 3
 
-// "No" option texts — any of these triggers the bye screen
-const NO_OPTIONS = new Set([
-  'No, thanks',
-  'No, we always have enough.',
-  'No.',
-  'No, thanks.',
-])
-
 const QUESTIONS = [
-  { screen:'q1', step:1, stepsLeft:4, text:'Would you like your child to get more practice with their school lessons?',              options:['Yes, for sure!','No, thanks'] },
-  { screen:'q2', step:2, stepsLeft:3, text:'Do you sometimes struggle to find enough practice exercises for your child\'s school lessons?', options:['Yes, that\'s a problem.','No, we always have enough.'] },
-  { screen:'q3', step:3, stepsLeft:2, text:'Would you prefer not to spend money on practice books or create exercises yourself?',       options:['Yes, that would help!','No.'] },
+  { screen:'q1', step:1, stepsLeft:4, text:'What kind of practice does your child need right now?', options:['School lessons revision','Simple daily practise','Test and exam preparation'] },
+  { screen:'q2', step:2, stepsLeft:3, text:'What is the biggest problem when your child practices at home?', options:['Not enough practise','Not motivated to practise','Practise don\'t match their schools'] },
+  { screen:'q3', step:3, stepsLeft:2, text:'What would save you the most stress right now?', options:['Not buying other books','Not creating questions myself','Both, I want fast and cheap practice'] },
 ]
 
 // ── STATE ─────────────────────────────────────────────────────────────────
@@ -339,18 +333,21 @@ function render() {
     const q = QUESTIONS.find(x => x.screen === currentScreen)
     const pct = (q.step / (TOTAL_Q + 2)) * 100
     progressWrap.style.display = 'block'
+    document.getElementById('progress-steps-label').textContent = q.stepsLeft + ' steps left'
     fill.style.width = pct + '%'
     content.innerHTML = htmlQuestion(q)
-    bottom.innerHTML  = htmlQuestionBottom(q.stepsLeft)
+    bottom.innerHTML  = ''
 
   } else if (currentScreen === 'solution') {
     progressWrap.style.display = 'block'
+    document.getElementById('progress-steps-label').textContent = '1 step left'
     fill.style.width = ((TOTAL_Q + 1) / (TOTAL_Q + 2) * 100) + '%'
     content.innerHTML = htmlSolution()
     bottom.innerHTML  = htmlSolutionBottom()
 
   } else if (currentScreen === 'offer') {
     progressWrap.style.display = 'block'
+    document.getElementById('progress-steps-label').textContent = ''
     fill.style.width = '100%'
     content.innerHTML = htmlOffer()
     bottom.innerHTML  = htmlOfferBottom()
@@ -421,11 +418,7 @@ function htmlSolution() {
 }
 
 function htmlSolutionBottom() {
-  const disabled = selectedOption === null ? 'disabled' : ''
-  return `
-    <button class="cta-btn" id="btn-continue" ${disabled}>Continue →</button>
-    <p class="step-counter">1 step left</p>
-  `
+  return ''
 }
 
 function htmlOffer() {
@@ -458,46 +451,39 @@ function attachListeners() {
   }
 
   document.querySelectorAll('.option-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const opt = decodeURIComponent(btn.dataset.opt)
       selectedOption = opt
+
+      // Flash selected state briefly before navigating
       document.querySelectorAll('.option-btn').forEach(b => {
         b.classList.toggle('selected', decodeURIComponent(b.dataset.opt) === opt)
       })
-      const cont = document.getElementById('btn-continue')
-      if (cont) cont.disabled = false
-    })
-  })
 
-  const btnContinue = document.getElementById('btn-continue')
-  if (btnContinue) {
-    btnContinue.addEventListener('click', async () => {
-      if (!selectedOption) return
-
-      // ── "No" answer → dead end ──
-      if (NO_OPTIONS.has(selectedOption)) {
-        if (currentScreen === 'solution') {
-          await trackStep(5, selectedOption)
-        } else {
-          const q = QUESTIONS.find(x => x.screen === currentScreen)
-          if (q) await trackStep(q.step, selectedOption)
-        }
-        showBye()
-        return
-      }
+      // Small delay so user sees the selection before moving on
+      await new Promise(r => setTimeout(r, 180))
 
       if (currentScreen === 'solution') {
-        await trackStep(5, selectedOption)
+        await trackStep(5, opt)
         goTo('offer')
         return
       }
 
       const q = QUESTIONS.find(x => x.screen === currentScreen)
-      if (!q) return
-      await trackStep(q.step, selectedOption)
+      if (q) await trackStep(q.step, opt)
 
       const nextMap = { q1:'q2', q2:'q3', q3:'solution' }
-      goTo(nextMap[currentScreen])
+      if (nextMap[currentScreen]) goTo(nextMap[currentScreen])
+    })
+  })
+
+  // Continue button still used on solution screen
+  const btnContinue = document.getElementById('btn-continue')
+  if (btnContinue) {
+    btnContinue.addEventListener('click', async () => {
+      if (!selectedOption) return
+      await trackStep(5, selectedOption)
+      goTo('offer')
     })
   }
 
