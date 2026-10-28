@@ -225,8 +225,29 @@
     .sub-question { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 14px; }
 
     /* OFFER */
+    .offer-banner {
+      background: #E8232A;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 900;
+      text-align: center;
+      padding: 14px 20px;
+      letter-spacing: 0.02em;
+      line-height: 1.4;
+      text-transform: uppercase;
+      margin: -28px -24px 20px -24px;
+    }
     .offer-title { font-size: 24px; font-weight: 900; color: var(--ink); letter-spacing: -0.03em; margin-bottom: 5px; }
     .offer-sub { font-size: 15px; color: var(--muted); margin-bottom: 18px; font-weight: 500; }
+
+    /* Confetti canvas */
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
 
     .vsl-wrap {
       width: 75%;
@@ -292,6 +313,7 @@
   </style>
 </head>
 <body>
+<canvas id="confetti-canvas"></canvas>
 <div class="card" id="card">
   <div class="progress-wrap" id="progress-wrap" style="display:none;">
     <div class="progress-steps-label" id="progress-steps-label"></div>
@@ -393,11 +415,10 @@ function render() {
     bottom.innerHTML  = htmlSolutionBottom()
 
   } else if (currentScreen === 'offer') {
-    progressWrap.style.display = 'block'
-    document.getElementById('progress-steps-label').textContent = ''
-    fill.style.width = '100%'
+    progressWrap.style.display = 'none'
     content.innerHTML = htmlOffer()
     bottom.innerHTML  = htmlOfferBottom()
+    setTimeout(launchConfetti, 100)
   }
 
   attachListeners()
@@ -475,6 +496,7 @@ function htmlSolutionBottom() {
 
 function htmlOffer() {
   return `
+    <div class="offer-banner">⚠️ Don't leave without watching this video 👇</div>
     <h2 class="offer-title">Your offer is ready!</h2>
     <p class="offer-sub">Watch this video to decide:</p>
     <div class="vsl-wrap">
@@ -575,6 +597,62 @@ function attachListeners() {
       trackStep(6, 'stripe_clicked')
     })
   }
+}
+
+// ── CONFETTI ──────────────────────────────────────────────────────────────
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas')
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  canvas.width  = window.innerWidth
+  canvas.height = window.innerHeight
+
+  const colors = ['#4F20E8','#BEB1EA','#E8232A','#FFD700','#22c55e','#fff']
+  const pieces = Array.from({ length: 120 }, () => ({
+    x: Math.random() * canvas.width,
+    y: Math.random() * -canvas.height,
+    w: 8 + Math.random() * 8,
+    h: 4 + Math.random() * 4,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    rotation: Math.random() * Math.PI * 2,
+    rotSpeed: (Math.random() - 0.5) * 0.2,
+    vx: (Math.random() - 0.5) * 3,
+    vy: 3 + Math.random() * 4,
+    alpha: 1,
+  }))
+
+  let frame
+  const startTime = Date.now()
+
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    const elapsed = Date.now() - startTime
+    const done = pieces.every(p => p.y > canvas.height + 20)
+
+    if (done || elapsed > 4000) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      cancelAnimationFrame(frame)
+      return
+    }
+
+    pieces.forEach(p => {
+      p.x += p.vx
+      p.y += p.vy
+      p.rotation += p.rotSpeed
+      if (elapsed > 2500) p.alpha = Math.max(0, p.alpha - 0.02)
+
+      ctx.save()
+      ctx.globalAlpha = p.alpha
+      ctx.translate(p.x, p.y)
+      ctx.rotate(p.rotation)
+      ctx.fillStyle = p.color
+      ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h)
+      ctx.restore()
+    })
+
+    frame = requestAnimationFrame(draw)
+  }
+  draw()
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────
