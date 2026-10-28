@@ -220,6 +220,7 @@
       overflow: hidden;
       width: 100%;
       background: #000;
+      position: relative;
     }
     .vsl-border video {
       width: 100%;
@@ -227,22 +228,17 @@
       aspect-ratio: 9/16;
       max-height: 55vh;
       object-fit: cover;
-      border-radius: 17px;
     }
-    /* Timeline bar sits just below the video border */
+    /* Timeline bar sits inside the border at the very bottom */
     .vsl-timeline {
-      margin-top: 10px;
       width: 100%;
-      height: 5px;
-      border-radius: 999px;
-      background: #EBEBEB;
-      overflow: hidden;
+      height: 8px;
+      background: rgba(255,255,255,0.25);
     }
     .vsl-timeline-fill {
       height: 100%;
       width: 0%;
-      border-radius: 999px;
-      background: var(--purple);
+      background: #BEB1EA;
       transition: width 0.5s linear;
     }
 
@@ -460,9 +456,9 @@ function htmlOffer() {
     <div class="vsl-wrap">
       <div class="vsl-border">
         <video id="vsl-video" src="./VSL_compressed.mp4" playsinline controls autoplay></video>
-      </div>
-      <div class="vsl-timeline">
-        <div class="vsl-timeline-fill" id="vsl-fill"></div>
+        <div class="vsl-timeline">
+          <div class="vsl-timeline-fill" id="vsl-fill"></div>
+        </div>
       </div>
     </div>
   `
