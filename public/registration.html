@@ -208,10 +208,40 @@
     /* OFFER */
     .offer-title { font-size: 24px; font-weight: 900; color: var(--ink); letter-spacing: -0.03em; margin-bottom: 5px; }
     .offer-sub { font-size: 15px; color: var(--muted); margin-bottom: 18px; font-weight: 500; }
-    .video-placeholder-portrait {
-      width: 100%; aspect-ratio: 9/16; max-height: 320px;
-      border-radius: 14px; background: #E2E2E2;
-      display: flex; align-items: center; justify-content: center; margin-bottom: 0;
+
+    .vsl-wrap {
+      width: 100%;
+      position: relative;
+    }
+    .vsl-border {
+      border: 7px solid #BEB1EA;
+      border-radius: 24px;
+      overflow: hidden;
+      width: 100%;
+      background: #000;
+    }
+    .vsl-border video {
+      width: 100%;
+      display: block;
+      aspect-ratio: 9/16;
+      object-fit: cover;
+      border-radius: 17px;
+    }
+    /* Timeline bar sits just below the video border */
+    .vsl-timeline {
+      margin-top: 10px;
+      width: 100%;
+      height: 5px;
+      border-radius: 999px;
+      background: #EBEBEB;
+      overflow: hidden;
+    }
+    .vsl-timeline-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: var(--purple);
+      transition: width 0.5s linear;
     }
 
     /* BOTTOM */
@@ -425,7 +455,14 @@ function htmlOffer() {
   return `
     <h2 class="offer-title">Your offer is ready!</h2>
     <p class="offer-sub">Watch this video to decide:</p>
-    <div class="video-placeholder-portrait"><div class="play-icon"></div></div>
+    <div class="vsl-wrap">
+      <div class="vsl-border">
+        <video id="vsl-video" src="./public/VSL_compressed.mp4" playsinline controls autoplay></video>
+      </div>
+      <div class="vsl-timeline">
+        <div class="vsl-timeline-fill" id="vsl-fill"></div>
+      </div>
+    </div>
   `
 }
 
@@ -484,6 +521,17 @@ function attachListeners() {
       if (!selectedOption) return
       await trackStep(5, selectedOption)
       goTo('offer')
+    })
+  }
+
+  const vslVideo = document.getElementById('vsl-video')
+  if (vslVideo) {
+    vslVideo.addEventListener('timeupdate', () => {
+      const fill = document.getElementById('vsl-fill')
+      if (!fill) return
+      const duration = vslVideo.duration || 88
+      const pct = Math.min((vslVideo.currentTime / duration) * 100, 100)
+      fill.style.width = pct + '%'
     })
   }
 
