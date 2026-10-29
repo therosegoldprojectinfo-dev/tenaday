@@ -26,8 +26,8 @@
   fbq('init', '1028944262871292');
   fbq('track', 'PageView');
   fbq('track', 'InitiateCheckout', {
-    value: 5.00,
-    currency: 'USD',
+    value: 60.00,
+    currency: 'ZAR',
     num_items: 1,
     content_name: 'Numio Lifetime Access',
   });
@@ -263,15 +263,15 @@
       <span class="order-header-chevron" id="chevron">▼</span>
     </div>
     <div class="order-header-right">
-      <span class="order-header-old">$10.00</span>
-      <span class="order-header-new">$5.00</span>
+      <span class="order-header-old">R120</span>
+      <span class="order-header-new">R60</span>
     </div>
   </div>
   <div class="order-header-details" id="order-details">
     <div style="background:#f7f5ff; border-radius:12px; padding:12px 16px; font-size:13px; color:var(--grey); border:1.5px solid var(--border); margin-bottom:8px;">
       <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
         <span style="font-weight:600; color:var(--black);">Numio Lifetime Access</span>
-        <span style="font-weight:700; color:var(--purple);">$5.00</span>
+        <span style="font-weight:700; color:var(--purple);">R60</span>
       </div>
       <div style="font-size:12px;">Unlimited practice · No ads · One-time payment</div>
     </div>
@@ -279,7 +279,7 @@
 
   <!-- COUNTDOWN -->
   <div class="countdown-box">
-    <div class="countdown-label">🔥 <strong>Save $5 Today!</strong></div>
+    <div class="countdown-label">🔥 <strong>Save R60 Today!</strong></div>
     <div class="countdown-sublabel">Your offer expires in</div>
     <div class="countdown-timer"><span id="c-h">00</span> : <span id="c-m">00</span> : <span id="c-s">00</span></div>
   </div>
@@ -331,14 +331,14 @@
           <div class="total-card-sub">One-time payment · yours forever</div>
         </div>
         <div class="total-card-price">
-          <span class="total-card-old">$10.00</span>
-          <span class="total-card-new">$5.00</span>
+          <span class="total-card-old">R120</span>
+          <span class="total-card-new">R60</span>
         </div>
       </div>
       <hr class="total-card-divider"/>
       <div class="total-card-row">
         <span class="total-card-label">Total due now</span>
-        <span class="total-card-amount">USD $5.00</span>
+        <span class="total-card-amount">ZAR R60</span>
       </div>
     </div>
   </div>
@@ -412,7 +412,7 @@
 
   // ── Countdown — fixed deadline: midnight Sep 18 2026 ──
   (function() {
-    var _end = new Date('2026-09-18T00:00:00').getTime();
+    var _end = new Date('2026-10-31T23:59:59+02:00').getTime();
     function tick() {
       var d = Math.max(0, _end - Date.now());
       document.getElementById('c-h').textContent = String(Math.floor(d / 3600000)).padStart(2,'0');
