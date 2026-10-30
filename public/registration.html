@@ -88,6 +88,7 @@
       overflow: hidden;
       width: 100%;
       background: #000;
+      position: relative;
     }
 
     .vsl-border video {
@@ -96,6 +97,20 @@
       aspect-ratio: 9/16;
       max-height: 55vh;
       object-fit: cover;
+    }
+
+    .vsl-duration {
+      position: absolute;
+      bottom: 16px;
+      right: 10px;
+      background: rgba(0,0,0,0.75);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 7px;
+      border-radius: 6px;
+      pointer-events: none;
+      letter-spacing: 0.02em;
     }
 
     .vsl-timeline {
@@ -190,6 +205,7 @@
   <div class="vsl-wrap">
     <div class="vsl-border">
       <video id="vsl-video" src="./VSL_fr_compressed.mp4" playsinline controls autoplay muted></video>
+      <div class="vsl-duration">1:08</div>
       <div class="vsl-timeline">
         <div class="vsl-timeline-fill" id="vsl-fill"></div>
       </div>
