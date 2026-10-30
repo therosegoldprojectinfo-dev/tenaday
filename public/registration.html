@@ -175,7 +175,7 @@
 
   <div class="vsl-wrap">
     <div class="vsl-border">
-      <video id="vsl-video" src="./VSL_fr_compressed.mp4" playsinline controls autoplay></video>
+      <video id="vsl-video" src="./VSL_fr_compressed.mp4" playsinline controls autoplay muted></video>
       <div class="vsl-timeline">
         <div class="vsl-timeline-fill" id="vsl-fill"></div>
       </div>
@@ -198,6 +198,15 @@
   let unlocked = false
 
   const video   = document.getElementById('vsl-video')
+
+  // Unmute on first user interaction anywhere on page
+  function unmuteOnce() {
+    video.muted = false
+    document.removeEventListener('touchstart', unmuteOnce)
+    document.removeEventListener('click', unmuteOnce)
+  }
+  document.addEventListener('touchstart', unmuteOnce, { once: true })
+  document.addEventListener('click', unmuteOnce, { once: true })
   const fill    = document.getElementById('vsl-fill')
   const btn     = document.getElementById('btn-cta')
   const warning = document.getElementById('watch-warning')
