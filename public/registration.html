@@ -176,13 +176,7 @@
       gap: 12px;
     }
 
-    .watch-warning {
-      text-align: center;
-      font-size: 14px;
-      font-weight: 700;
-      color: #FF4649;
-      min-height: 20px;
-    }
+
 
     /* Yellow gradient button like screenshot */
     .cta-btn {
@@ -227,6 +221,16 @@
       cursor: not-allowed;
       filter: grayscale(0.4);
     }
+    @keyframes vibrate {
+      0%,100% { transform: translateX(0); }
+      15% { transform: translateX(-6px); }
+      30% { transform: translateX(6px); }
+      45% { transform: translateX(-5px); }
+      60% { transform: translateX(5px); }
+      75% { transform: translateX(-3px); }
+      90% { transform: translateX(3px); }
+    }
+    .cta-btn.vibrating { animation: vibrate 0.4s ease; }
 
     #confetti-canvas {
       position: fixed;
@@ -273,9 +277,8 @@
 
 
   <div class="bottom">
-    <div class="watch-warning" id="watch-warning"></div>
     <button class="cta-btn locked" id="btn-cta">
-      Yes, I want better grades for my child for $1
+      🔒 Watch Video to Unlock
     </button>
     <div class="trust-row">
       <span class="trust-item"><span class="check-icon"></span> Get instant access</span>
@@ -288,10 +291,9 @@
   const UNLOCK_AT = 45
   let unlocked = false
 
-  const video   = document.getElementById('vsl-video')
-  const fill    = document.getElementById('vsl-fill')
-  const btn     = document.getElementById('btn-cta')
-  const warning = document.getElementById('watch-warning')
+  const video = document.getElementById('vsl-video')
+  const fill  = document.getElementById('vsl-fill')
+  const btn   = document.getElementById('btn-cta')
 
   // Unmute on first tap
   function unmuteOnce() {
@@ -317,20 +319,22 @@
     if (!unlocked && video.currentTime >= UNLOCK_AT) {
       unlocked = true
       btn.classList.remove('locked')
-      warning.textContent = ''
+      btn.textContent = 'Yes, I want better grades for my child for $1'
       launchConfetti()
     }
   })
 
   btn.addEventListener('click', () => {
     if (!unlocked) {
-      warning.textContent = '👆 Watch the video first!'
-      setTimeout(() => { warning.textContent = '' }, 2500)
+      // Vibrate the button
+      btn.classList.remove('vibrating')
+      void btn.offsetWidth // reflow to restart animation
+      btn.classList.add('vibrating')
+      btn.addEventListener('animationend', () => btn.classList.remove('vibrating'), { once: true })
       video.scrollIntoView({ behavior: 'smooth', block: 'center' })
       if (video.paused) video.play()
       return
     }
-    try { fbq('track', 'InitiateCheckout') } catch(e) {}
     window.location.href = 'https://numiomath.app/checkout'
   })
 
