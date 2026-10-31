@@ -11,7 +11,6 @@
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
   <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/></noscript>
 
-  <!-- Stripe loads async so it doesn't block page render -->
   <script src="https://js.stripe.com/v3/" async></script>
 
   <script>
@@ -250,12 +249,10 @@
 <main>
 <div class="page">
 
-  <!-- LOGO -->
   <div class="header">
     <img src="/logotousebro.webp" alt="Numio" style="height:40px; width:auto; display:block; object-fit:contain;" width="280" height="70"/>
   </div>
 
-  <!-- ORDER SUMMARY -->
   <div class="order-header" onclick="toggleOrderDetails()">
     <div class="order-header-left">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
@@ -277,24 +274,20 @@
     </div>
   </div>
 
-  <!-- COUNTDOWN -->
   <div class="countdown-box">
     <div class="countdown-label">🔥 <strong>Save $4 Today!</strong></div>
     <div class="countdown-sublabel">Your offer expires in</div>
     <div class="countdown-timer"><span id="c-h">00</span> : <span id="c-m">00</span> : <span id="c-s">00</span></div>
   </div>
 
-  <!-- HERO IMAGE -->
   <img src="/imagesellingincheckout.webp" alt="Numio app" loading="lazy" width="400" height="280" style="width:100%; max-height:280px; object-fit:cover; border-radius:20px; margin:16px 0 0; display:block;"/>
 
-  <!-- GUARANTEE COPY -->
   <div class="guarantee-copy">
     <p>🛡️ You're protected for 365 days.</p>
     <p>If your child's grades don't improve,</p>
     <p>we'll give you 100% of your money back.</p>
   </div>
 
-  <!-- BENEFITS -->
   <div style="padding-top:20px; padding-bottom:20px;">
     <ul class="benefits">
       <li>
@@ -316,13 +309,10 @@
     </ul>
   </div>
 
-  <!-- PAYMENT SECTION -->
   <div class="payment-section">
     <p class="section-label">Payment</p>
-
     <div id="element-skeleton">Loading payment options…</div>
     <div id="payment-element" style="display:none;"></div>
-
     <div class="total-card">
       <div class="total-card-product">
         <img src="/numioultimateimage.webp" alt="Numio" class="total-card-img" width="52" height="52"/>
@@ -381,24 +371,17 @@
   async function initStripe() {
     try {
       const stripe = Stripe(STRIPE_PK);
-
       const res = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
       });
-
       const data = await res.json();
       if (!res.ok || !data.clientSecret) throw new Error(data.error || 'Failed to init payment');
-
-      const checkout = await stripe.initEmbeddedCheckout({
-        clientSecret: data.clientSecret,
-      });
-
+      const checkout = await stripe.initEmbeddedCheckout({ clientSecret: data.clientSecret });
       document.getElementById('element-skeleton').style.display = 'none';
       document.getElementById('payment-element').style.display = 'block';
       checkout.mount('#payment-element');
-
     } catch (err) {
       console.error('Stripe init error:', err);
       document.getElementById('element-skeleton').textContent = 'Could not load payment form. Please refresh.';
@@ -410,9 +393,9 @@
     document.getElementById('chevron').classList.toggle('open');
   }
 
-  // ── Countdown — fixed deadline: midnight Sep 18 2026 ──
+  // Countdown — ends first minute of 2026-11-02 (midnight)
   (function() {
-    var _end = new Date('2026-10-31T23:59:59+02:00').getTime();
+    var _end = new Date('2026-11-02T00:01:00+00:00').getTime();
     function tick() {
       var d = Math.max(0, _end - Date.now());
       document.getElementById('c-h').textContent = String(Math.floor(d / 3600000)).padStart(2,'0');
