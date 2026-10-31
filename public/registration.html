@@ -171,7 +171,6 @@
 
     /* CTA */
     .bottom {
-      margin-top: auto;
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -262,9 +261,9 @@
 
   <div class="vsl-wrap">
     <div class="vsl-border">
-      <video id="vsl-video" src="./VSL_fr_compressed.mp4" playsinline controls autoplay muted></video>
+      <video id="vsl-video" src="./VSL_fr_3_compressed.mp4" playsinline controls autoplay muted></video>
       <div class="vsl-badge">New App!</div>
-      <div class="vsl-duration" id="vsl-duration">0:00 / 1:08</div>
+      <div class="vsl-duration" id="vsl-duration">0:00 / 1:18</div>
       <div class="vsl-timeline">
         <div class="vsl-timeline-fill" id="vsl-fill"></div>
       </div>
@@ -310,10 +309,10 @@
   }
 
   video.addEventListener('timeupdate', () => {
-    const duration = video.duration || 68
+    const duration = video.duration || 78
     fill.style.width = Math.min((video.currentTime / duration) * 100, 100) + '%'
     const badge = document.getElementById('vsl-duration')
-    if (badge) badge.textContent = fmt(video.currentTime) + ' / 1:08'
+    if (badge) badge.textContent = fmt(video.currentTime) + ' / 1:18'
 
     if (!unlocked && video.currentTime >= UNLOCK_AT) {
       unlocked = true
