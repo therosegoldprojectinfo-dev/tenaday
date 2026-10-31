@@ -56,29 +56,45 @@
       padding: 40px 24px 44px;
     }
 
+    /* RED TOP BANNER */
+    .top-banner {
+      background: #FF4649;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 900;
+      text-align: center;
+      padding: 16px 20px;
+      letter-spacing: 0.01em;
+      line-height: 1.3;
+      text-transform: uppercase;
+      margin: -40px -24px 28px -24px;
+    }
+
     h1 {
-      font-size: 36px;
+      font-size: 32px;
       font-weight: 900;
       line-height: 1.15;
       letter-spacing: -0.03em;
       color: var(--ink);
       text-align: center;
-      margin-bottom: 14px;
+      margin-bottom: 6px;
     }
 
+    h1 .red { color: #FF4649; }
+
     .sub {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 600;
       color: var(--ink);
       text-align: center;
       line-height: 1.4;
-      margin-bottom: 28px;
+      margin-bottom: 20px;
     }
 
-    /* Video */
+    /* VIDEO */
     .vsl-wrap {
       width: 94%;
-      margin: 0 auto 32px;
+      margin: 0 auto 20px;
       position: relative;
     }
 
@@ -95,10 +111,30 @@
       width: 100%;
       display: block;
       aspect-ratio: 9/16;
-      max-height: 55vh;
+      max-height: 52vh;
       object-fit: cover;
     }
 
+    /* NEW APP badge — top left */
+    .vsl-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.22);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 6px;
+      pointer-events: none;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.35);
+    }
+
+    /* Duration badge — bottom right */
     .vsl-duration {
       position: absolute;
       bottom: 16px;
@@ -126,6 +162,13 @@
       transition: width 0.5s linear;
     }
 
+    /* CHALLENGE IMAGE */
+    .challenge-img {
+      width: 80%;
+      margin: 0 auto 20px;
+      display: block;
+    }
+
     /* CTA */
     .bottom {
       margin-top: auto;
@@ -134,30 +177,53 @@
       gap: 12px;
     }
 
-    .cta-btn {
-      display: flex; align-items: center; justify-content: center;
-      width: 100%; background: var(--purple); color: #fff;
-      font-family: 'Inter', sans-serif; font-size: 17px; font-weight: 800;
-      border: none; border-radius: 100px; padding: 20px 24px;
-      cursor: pointer; letter-spacing: -0.01em; text-decoration: none;
-      transition: background 0.15s, transform 0.1s;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .cta-btn:hover:not(.locked) { background: var(--purple-dark); }
-    .cta-btn:active:not(.locked) { transform: scale(0.98); }
-    .cta-btn.locked {
-      opacity: 0.45;
-      cursor: not-allowed;
-      filter: grayscale(0.3);
-    }
-
     .watch-warning {
       text-align: center;
       font-size: 14px;
       font-weight: 700;
-      color: #E8232A;
+      color: #FF4649;
       min-height: 20px;
-      transition: opacity 0.2s;
+    }
+
+    /* Yellow gradient button like screenshot */
+    .cta-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      width: 100%;
+      background: linear-gradient(180deg, #FFE234 0%, #F5C400 100%);
+      color: #1a0a00;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 900;
+      border: none;
+      border-radius: 100px;
+      padding: 18px 24px;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: filter 0.15s, transform 0.1s;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 4px 0 #C49A00, 0 6px 16px rgba(245,196,0,0.35);
+      white-space: nowrap;
+    }
+    .cta-btn .btn-sub {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      opacity: 0.8;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .cta-btn:hover:not(.locked) { filter: brightness(1.05); }
+    .cta-btn:active:not(.locked) { transform: scale(0.98); }
+    .cta-btn.locked {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: grayscale(0.4);
     }
 
     #confetti-canvas {
@@ -181,30 +247,20 @@
       display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
     .check-icon::after { content: '✓'; font-size: 10px; color: #fff; font-weight: 800; }
-
-    .top-banner {
-      background: #FF0000;
-      color: #fff;
-      font-size: 17px;
-      font-weight: 900;
-      text-align: center;
-      padding: 16px 20px;
-      letter-spacing: 0.01em;
-      line-height: 1.3;
-      text-transform: uppercase;
-      margin: -40px -24px 28px -24px;
-    }
   </style>
 </head>
 <body>
+<canvas id="confetti-canvas"></canvas>
 <div class="card">
   <div class="top-banner">Wait! This is the last step before you help your child at school</div>
-  <h1>Help your child with school while you relax.</h1>
-  <p class="sub">This new app turns any lesson into practise in 15 seconds 👇</p>
+
+  <h1>Help your child with school while you relax<br><span class="red">for the next 365 days!</span></h1>
+  <p class="sub">Never worry about school again, this new app turns any lesson into practise in 15 seconds 👇</p>
 
   <div class="vsl-wrap">
     <div class="vsl-border">
       <video id="vsl-video" src="./VSL_fr_compressed.mp4" playsinline controls autoplay muted></video>
+      <div class="vsl-badge">New App!</div>
       <div class="vsl-duration" id="vsl-duration">0:00 / 1:08</div>
       <div class="vsl-timeline">
         <div class="vsl-timeline-fill" id="vsl-fill"></div>
@@ -212,10 +268,13 @@
     </div>
   </div>
 
-  <canvas id="confetti-canvas"></canvas>
+  <img class="challenge-img" src="./Défi scolaire 365 jours avec dossier et tests.webp" alt="365 Days Challenge"/>
+
   <div class="bottom">
     <div class="watch-warning" id="watch-warning"></div>
-    <button class="cta-btn locked" id="btn-cta">Get unlimited access for $1 →</button>
+    <button class="cta-btn locked" id="btn-cta">
+      Yes, I want better grades for my child for $1
+    </button>
     <div class="trust-row">
       <span class="trust-item"><span class="check-icon"></span> Get instant access</span>
       <span class="trust-item"><span class="check-icon"></span> No risk for 365 days</span>
@@ -224,12 +283,15 @@
 </div>
 
 <script>
-  const UNLOCK_AT = 45 // seconds
+  const UNLOCK_AT = 45
   let unlocked = false
 
   const video   = document.getElementById('vsl-video')
+  const fill    = document.getElementById('vsl-fill')
+  const btn     = document.getElementById('btn-cta')
+  const warning = document.getElementById('watch-warning')
 
-  // Unmute on first user interaction anywhere on page
+  // Unmute on first tap
   function unmuteOnce() {
     video.muted = false
     document.removeEventListener('touchstart', unmuteOnce)
@@ -237,11 +299,7 @@
   }
   document.addEventListener('touchstart', unmuteOnce, { once: true })
   document.addEventListener('click', unmuteOnce, { once: true })
-  const fill    = document.getElementById('vsl-fill')
-  const btn     = document.getElementById('btn-cta')
-  const warning = document.getElementById('watch-warning')
 
-  // Timeline progress
   function fmt(s) {
     const m = Math.floor(s / 60)
     const sec = Math.floor(s % 60)
@@ -254,7 +312,6 @@
     const badge = document.getElementById('vsl-duration')
     if (badge) badge.textContent = fmt(video.currentTime) + ' / 1:08'
 
-    // Unlock at 45s
     if (!unlocked && video.currentTime >= UNLOCK_AT) {
       unlocked = true
       btn.classList.remove('locked')
@@ -263,13 +320,10 @@
     }
   })
 
-  // Block click if locked
-  btn.addEventListener('click', (e) => {
+  btn.addEventListener('click', () => {
     if (!unlocked) {
-      e.preventDefault()
       warning.textContent = '👆 Watch the video first!'
       setTimeout(() => { warning.textContent = '' }, 2500)
-      // Scroll video into view and make sure it's playing
       video.scrollIntoView({ behavior: 'smooth', block: 'center' })
       if (video.paused) video.play()
       return
@@ -278,15 +332,13 @@
     window.location.href = 'https://numiomath.app/checkout'
   })
 
-  // Confetti burst
   function launchConfetti() {
     const canvas = document.getElementById('confetti-canvas')
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     canvas.width  = window.innerWidth
     canvas.height = window.innerHeight
-
-    const colors = ['#4F20E8','#BEB1EA','#FFD700','#22c55e','#fff','#E8232A']
+    const colors = ['#4F20E8','#BEB1EA','#FFD700','#22c55e','#fff','#FF4649']
     const pieces = Array.from({ length: 80 }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * -200,
@@ -299,7 +351,6 @@
       vy: 3 + Math.random() * 4,
       alpha: 1,
     }))
-
     let frame
     const startTime = Date.now()
     function draw() {
