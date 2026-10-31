@@ -56,20 +56,6 @@
       padding: 40px 24px 44px;
     }
 
-    /* RED TOP BANNER */
-    .top-banner {
-      background: #FF4649;
-      color: #fff;
-      font-size: 17px;
-      font-weight: 900;
-      text-align: center;
-      padding: 16px 20px;
-      letter-spacing: 0.01em;
-      line-height: 1.3;
-      text-transform: uppercase;
-      margin: -40px -24px 28px -24px;
-    }
-
     h1 {
       font-size: 32px;
       font-weight: 900;
@@ -94,7 +80,7 @@
     /* VIDEO */
     .vsl-wrap {
       width: 94%;
-      margin: 0 auto 20px;
+      margin: 0 auto 12px;
       position: relative;
     }
 
@@ -113,6 +99,69 @@
       aspect-ratio: 9/16;
       max-height: 52vh;
       object-fit: cover;
+    }
+
+    /* Play overlay */
+    .play-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.35);
+      cursor: pointer;
+      border-radius: 17px;
+      transition: background 0.2s;
+    }
+    .play-overlay:hover { background: rgba(0,0,0,0.45); }
+    .play-overlay.hidden { display: none; }
+
+    .play-circle {
+      width: 72px;
+      height: 72px;
+      background: rgba(255,255,255,0.92);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+    }
+    .play-circle svg {
+      width: 32px;
+      height: 32px;
+      margin-left: 4px;
+      fill: #4F20E8;
+    }
+
+    /* Tap to watch label */
+    .tap-label {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #555;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .tap-label .play-icon-small {
+      width: 22px;
+      height: 22px;
+      background: #4F20E8;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .tap-label .play-icon-small svg {
+      width: 10px;
+      height: 10px;
+      fill: #fff;
+      margin-left: 2px;
     }
 
     /* NEW APP badge — top left */
@@ -162,13 +211,6 @@
       transition: width 0.5s linear;
     }
 
-    /* CHALLENGE IMAGE */
-    .challenge-img {
-      width: 80%;
-      margin: 0 auto 20px;
-      display: block;
-    }
-
     /* CTA */
     .bottom {
       display: flex;
@@ -176,9 +218,6 @@
       gap: 12px;
     }
 
-
-
-    /* Yellow gradient button like screenshot */
     .cta-btn {
       display: flex;
       flex-direction: column;
@@ -259,23 +298,34 @@
 <body>
 <canvas id="confetti-canvas"></canvas>
 <div class="card">
-  <div class="top-banner">Wait! This is the last step before you help your child at school</div>
 
   <h1>Help your child with school while you relax<br><span class="red">for the next 365 days!</span></h1>
   <p class="sub">Never worry about school again, this new app turns any lesson into practise in 15 seconds 👇</p>
 
   <div class="vsl-wrap">
     <div class="vsl-border">
-      <video id="vsl-video" src="./VSL_fr_3_compressed.mp4" playsinline controls autoplay muted></video>
+      <video id="vsl-video" src="./VSL_fr_3_compressed.mp4" playsinline></video>
       <div class="vsl-badge">New App!</div>
       <div class="vsl-duration" id="vsl-duration">0:00 / 1:18</div>
       <div class="vsl-timeline">
         <div class="vsl-timeline-fill" id="vsl-fill"></div>
       </div>
+      <!-- Play overlay -->
+      <div class="play-overlay" id="play-overlay">
+        <div class="play-circle">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
     </div>
   </div>
 
-
+  <!-- Tap to watch label -->
+  <div class="tap-label">
+    <span class="play-icon-small">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
+    </span>
+    Tap to watch
+  </div>
 
   <div class="bottom">
     <button class="cta-btn locked" id="btn-cta">
@@ -291,22 +341,31 @@
 <script>
   const UNLOCK_AT = 45
   let unlocked = false
+  let started = false
 
   const video = document.getElementById('vsl-video')
   const fill  = document.getElementById('vsl-fill')
   const btn   = document.getElementById('btn-cta')
+  const overlay = document.getElementById('play-overlay')
 
-  video.playbackRate = 1.25
-  video.addEventListener('loadedmetadata', () => { video.playbackRate = 1.25 })
-
-  // Unmute on first tap
-  function unmuteOnce() {
+  function startVideo() {
+    if (started) return
+    started = true
+    overlay.classList.add('hidden')
     video.muted = false
-    document.removeEventListener('touchstart', unmuteOnce)
-    document.removeEventListener('click', unmuteOnce)
+    video.playbackRate = 1.25
+    video.play()
   }
-  document.addEventListener('touchstart', unmuteOnce, { once: true })
-  document.addEventListener('click', unmuteOnce, { once: true })
+
+  overlay.addEventListener('click', startVideo)
+  overlay.addEventListener('touchend', function(e) {
+    e.preventDefault()
+    startVideo()
+  })
+
+  video.addEventListener('loadedmetadata', () => {
+    if (started) video.playbackRate = 1.25
+  })
 
   function fmt(s) {
     const m = Math.floor(s / 60)
@@ -330,13 +389,16 @@
 
   btn.addEventListener('click', () => {
     if (!unlocked) {
-      // Vibrate the button
       btn.classList.remove('vibrating')
-      void btn.offsetWidth // reflow to restart animation
+      void btn.offsetWidth
       btn.classList.add('vibrating')
       btn.addEventListener('animationend', () => btn.classList.remove('vibrating'), { once: true })
       video.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      if (video.paused) video.play()
+      if (!started) {
+        startVideo()
+      } else if (video.paused) {
+        video.play()
+      }
       return
     }
     window.location.href = 'https://numiomath.app/checkout'
