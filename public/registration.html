@@ -296,6 +296,9 @@
   const fill  = document.getElementById('vsl-fill')
   const btn   = document.getElementById('btn-cta')
 
+  video.playbackRate = 1.25
+  video.addEventListener('loadedmetadata', () => { video.playbackRate = 1.25 })
+
   // Unmute on first tap
   function unmuteOnce() {
     video.muted = false
