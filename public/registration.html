@@ -205,7 +205,7 @@
   <div class="vsl-wrap">
     <div class="vsl-border">
       <video id="vsl-video" src="./VSL_fr_compressed.mp4" playsinline controls autoplay muted></video>
-      <div class="vsl-duration">1:08</div>
+      <div class="vsl-duration" id="vsl-duration">0:00 / 1:08</div>
       <div class="vsl-timeline">
         <div class="vsl-timeline-fill" id="vsl-fill"></div>
       </div>
@@ -242,9 +242,17 @@
   const warning = document.getElementById('watch-warning')
 
   // Timeline progress
+  function fmt(s) {
+    const m = Math.floor(s / 60)
+    const sec = Math.floor(s % 60)
+    return m + ':' + String(sec).padStart(2, '0')
+  }
+
   video.addEventListener('timeupdate', () => {
-    const duration = video.duration || 88
+    const duration = video.duration || 68
     fill.style.width = Math.min((video.currentTime / duration) * 100, 100) + '%'
+    const badge = document.getElementById('vsl-duration')
+    if (badge) badge.textContent = fmt(video.currentTime) + ' / 1:08'
 
     // Unlock at 45s
     if (!unlocked && video.currentTime >= UNLOCK_AT) {
