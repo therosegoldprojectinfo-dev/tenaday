@@ -239,6 +239,33 @@
       font-weight: 500;
     }
     .stripe-note a { color: #aaa; }
+
+    /* ─── CAROUSEL ─── */
+    .carousel-wrap { margin: 16px 0 20px; }
+    #carousel-outer {
+      position: relative; border-radius: 23px; overflow: hidden;
+      width: 100%; aspect-ratio: 1/1; background: #5B3FD9;
+    }
+    .c-slide { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; }
+    .c-slide.active { display: flex; }
+    .c-slide img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .c-slide video { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .c-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 36px; height: 36px; border-radius: 50%;
+      background: rgba(255,255,255,0.85); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 18px; z-index: 5;
+    }
+    .c-arrow.prev { left: 10px; }
+    .c-arrow.next { right: 10px; }
+    #carousel-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+    .c-dot {
+      width: 44px; height: 44px; border-radius: 8px; overflow: hidden;
+      cursor: pointer; border: 2px solid transparent; flex-shrink: 0; opacity: 0.5;
+    }
+    .c-dot.active { border-color: #3513A2; opacity: 1; }
+    .c-dot img { width: 100%; height: 100%; object-fit: cover; display: block; }
   </style>
 </head>
 <body>
@@ -277,7 +304,49 @@
     <div class="countdown-timer"><span id="c-h">00</span> : <span id="c-m">00</span> : <span id="c-s">00</span></div>
   </div>
 
-  <img src="/imagesellingincheckout.webp" alt="Numio app" loading="lazy" width="400" height="280" style="width:100%; max-height:280px; object-fit:cover; border-radius:20px; margin:16px 0 0; display:block;"/>
+  <div class="carousel-wrap">
+    <div id="carousel-outer">
+      <div class="c-slide active" id="slide-0" style="background:#000; position:relative;">
+        <video id="carousel-video" loop muted playsinline preload="metadata" poster="/videofirstframetouse.webp" style="width:100%;height:100%;object-fit:contain;display:block;">
+          <source src="/carouselvideo.mp4" type="video/mp4"/>
+        </video>
+        <div id="video-tap-overlay" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;" onclick="playCarouselVideo()">
+          <div style="width:60px;height:60px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.3);margin-bottom:10px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="#3513A2"><polygon points="5 3 19 12 5 21"/></svg>
+          </div>
+          <div style="background:rgba(0,0,0,0.55);color:#fff;font-size:13px;font-weight:700;padding:6px 14px;border-radius:50px;backdrop-filter:blur(4px);">▶ Tap to watch</div>
+        </div>
+      </div>
+      <div class="c-slide" id="slide-1">
+        <img src="/carouselimages__3_.webp" alt="4 reasons to try Numio" loading="lazy"/>
+      </div>
+      <div class="c-slide" id="slide-2">
+        <img src="/carouselimages__2_.webp" alt="How to use Numio" loading="lazy"/>
+      </div>
+      <div class="c-slide" id="slide-3">
+        <img src="/carouselimages__1_.webp" alt="Practise their exact lessons" loading="lazy"/>
+      </div>
+      <div class="c-slide" id="slide-4">
+        <img src="/carouselimages__4_.webp" alt="Why is Numio the best option" loading="lazy"/>
+      </div>
+      <div class="c-slide" id="slide-5">
+        <img src="/carouselimages__5_.webp" alt="Money back guarantee" loading="lazy"/>
+      </div>
+      <button class="c-arrow prev" onclick="carouselMove(-1)">‹</button>
+      <button class="c-arrow next" onclick="carouselMove(1)">›</button>
+    </div>
+    <div id="carousel-dots">
+      <div class="c-dot active" onclick="carouselGo(0)" style="position:relative;">
+        <img src="/carouselvideo-thumb.webp" style="background:#5B3FD9;object-fit:contain;"/>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.3);"><span style="font-size:12px;color:#fff;">▶</span></div>
+      </div>
+      <div class="c-dot" onclick="carouselGo(1)"><img src="/carouselimages__3_.webp" loading="lazy"/></div>
+      <div class="c-dot" onclick="carouselGo(2)"><img src="/carouselimages__2_.webp" loading="lazy"/></div>
+      <div class="c-dot" onclick="carouselGo(3)"><img src="/carouselimages__1_.webp" loading="lazy"/></div>
+      <div class="c-dot" onclick="carouselGo(4)"><img src="/carouselimages__4_.webp" loading="lazy"/></div>
+      <div class="c-dot" onclick="carouselGo(5)"><img src="/carouselimages__5_.webp" loading="lazy"/></div>
+    </div>
+  </div>
 
   <div class="guarantee-copy">
     <p>🛡️ You're protected for 365 days.</p>
@@ -404,6 +473,41 @@
   })();
 
   waitForStripe(initStripe);
+
+  // ── CAROUSEL ──
+  function playCarouselVideo() {
+    const overlay = document.getElementById('video-tap-overlay');
+    const video = document.getElementById('carousel-video');
+    if (overlay) overlay.style.display = 'none';
+    if (video) { video.muted = false; video.play().catch(() => { video.muted = true; video.play(); }); }
+  }
+
+  let cIndex = 0;
+  const cTotal = 6;
+  function carouselRender() {
+    document.querySelectorAll('.c-slide').forEach((slide, i) => {
+      slide.classList.toggle('active', i === cIndex);
+      const vid = slide.querySelector('video');
+      if (vid) { i === cIndex ? vid.play().catch(()=>{}) : vid.pause(); }
+    });
+    document.querySelectorAll('.c-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === cIndex);
+    });
+  }
+  function carouselMove(dir) { cIndex = (cIndex + dir + cTotal) % cTotal; carouselRender(); }
+  function carouselGo(i) { cIndex = i; carouselRender(); }
+
+  // Swipe support
+  (function() {
+    let startX = 0;
+    const outer = document.getElementById('carousel-outer');
+    if (!outer) return;
+    outer.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+    outer.addEventListener('touchend', e => {
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) carouselMove(diff > 0 ? 1 : -1);
+    }, { passive: true });
+  })();
 </script>
 
 </body>
