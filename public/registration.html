@@ -89,7 +89,7 @@
       border-radius: 24px;
       overflow: hidden;
       width: 100%;
-      background: #000;
+      background: #111;
       position: relative;
     }
 
@@ -108,12 +108,10 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.25);
+      background: transparent;
       cursor: pointer;
       border-radius: 17px;
-      transition: background 0.2s;
     }
-    .play-overlay:hover { background: rgba(0,0,0,0.35); }
     .play-overlay.hidden { display: none; }
 
     /* WATCH NOW pill button */
@@ -292,7 +290,7 @@
 
   <div class="vsl-wrap">
     <div class="vsl-border">
-      <video id="vsl-video" src="./VSL_fr_3_compressed.mp4" playsinline></video>
+      <video id="vsl-video" src="./VSL_fr_3_compressed.mp4" playsinline preload="metadata"></video>
       <div class="vsl-badge">New App!</div>
       <div class="vsl-duration" id="vsl-duration">0:00 / 1:18</div>
       <div class="vsl-timeline">
@@ -336,6 +334,7 @@
     started = true
     overlay.classList.add('hidden')
     video.muted = false
+    video.currentTime = 0
     video.playbackRate = 1.25
     video.play()
   }
@@ -347,7 +346,11 @@
   })
 
   video.addEventListener('loadedmetadata', () => {
-    if (started) video.playbackRate = 1.25
+    if (!started) {
+      video.currentTime = 0.01 // seek to first frame to show thumbnail
+    } else {
+      video.playbackRate = 1.25
+    }
   })
 
   function fmt(s) {
