@@ -338,6 +338,76 @@
   const btn   = document.getElementById('btn-cta')
   const overlay = document.getElementById('play-overlay')
 
+  // ── Supabase tracking ──────────────────────────────────────────
+  const SUPA_URL = 'https://lyedpfhzrvyaskmzhyhl.supabase.co'
+  const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5ZWRwZmh6cnZ5YXNrbXpoeWhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3MzA0NDUsImV4cCI6MjEwMDMwNjQ0NX0.RUWNNJ67V-uDJTflaFGjW0xoNnExzZ0_tIvd6VmZ2q0'
+
+  const sessionId = Math.random().toString(36).slice(2) + Date.now().toString(36)
+  let supaRowId = null
+  let lastSyncedTime = 0
+  let syncInterval = null
+
+  async function supaFetch(path, method, body) {
+    try {
+      await fetch(SUPA_URL + path, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPA_KEY,
+          'Authorization': 'Bearer ' + SUPA_KEY,
+          'Prefer': method === 'POST' ? 'return=representation' : ''
+        },
+        body: JSON.stringify(body)
+      }).then(async r => {
+        if (method === 'POST' && !supaRowId) {
+          const data = await r.json()
+          if (data && data[0]) supaRowId = data[0].id
+        }
+      })
+    } catch(e) {}
+  }
+
+  function startTracking() {
+    // Insert initial row
+    supaFetch('/rest/v1/video_sessions', 'POST', {
+      session_id: sessionId,
+      watch_time: 0,
+      completed: false,
+      user_agent: navigator.userAgent
+    })
+
+    // Sync every 5 seconds while playing
+    syncInterval = setInterval(() => {
+      const current = Math.floor(video.currentTime)
+      if (!video.paused && current !== lastSyncedTime) {
+        lastSyncedTime = current
+        if (supaRowId) {
+          supaFetch('/rest/v1/video_sessions?id=eq.' + supaRowId, 'PATCH', {
+            watch_time: current,
+            completed: unlocked,
+            updated_at: new Date().toISOString()
+          })
+        }
+      }
+    }, 5000)
+  }
+
+  // Final sync on page leave
+  window.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && supaRowId) {
+      const current = Math.floor(video.currentTime)
+      navigator.sendBeacon(
+        SUPA_URL + '/rest/v1/video_sessions?id=eq.' + supaRowId,
+        new Blob([JSON.stringify({
+          watch_time: current,
+          completed: unlocked,
+          updated_at: new Date().toISOString()
+        })], { type: 'application/json' })
+      )
+    }
+  })
+  // ───────────────────────────────────────────────────────────────
+
   function startVideo() {
     if (started) return
     started = true
@@ -346,6 +416,7 @@
     video.currentTime = 0
     video.playbackRate = 1.25
     video.play()
+    startTracking()
   }
 
   overlay.addEventListener('click', startVideo)
