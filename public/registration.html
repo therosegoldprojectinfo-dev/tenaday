@@ -108,60 +108,48 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.35);
+      background: rgba(0,0,0,0.25);
       cursor: pointer;
       border-radius: 17px;
       transition: background 0.2s;
     }
-    .play-overlay:hover { background: rgba(0,0,0,0.45); }
+    .play-overlay:hover { background: rgba(0,0,0,0.35); }
     .play-overlay.hidden { display: none; }
 
-    .play-circle {
-      width: 72px;
-      height: 72px;
-      background: rgba(255,255,255,0.92);
-      border-radius: 50%;
+    /* WATCH NOW pill button */
+    .watch-btn {
       display: flex;
       align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+      gap: 12px;
+      background: #FF4649;
+      border-radius: 100px;
+      padding: 10px 24px 10px 10px;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.4);
+      cursor: pointer;
     }
-    .play-circle svg {
-      width: 32px;
-      height: 32px;
-      margin-left: 4px;
-      fill: #4F20E8;
-    }
-
-    /* Tap to watch label */
-    .tap-label {
-      text-align: center;
-      font-size: 14px;
-      font-weight: 700;
-      color: #555;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .tap-label .play-icon-small {
-      width: 22px;
-      height: 22px;
-      background: #4F20E8;
+    .watch-btn-circle {
+      width: 52px;
+      height: 52px;
+      background: #fff;
       border-radius: 50%;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
-    .tap-label .play-icon-small svg {
-      width: 10px;
-      height: 10px;
-      fill: #fff;
-      margin-left: 2px;
+    .watch-btn-circle svg {
+      width: 22px;
+      height: 22px;
+      fill: #FF4649;
+      margin-left: 3px;
+    }
+    .watch-btn-text {
+      color: #fff;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      white-space: nowrap;
     }
 
     /* NEW APP badge — top left */
@@ -312,19 +300,14 @@
       </div>
       <!-- Play overlay -->
       <div class="play-overlay" id="play-overlay">
-        <div class="play-circle">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
+        <div class="watch-btn">
+          <div class="watch-btn-circle">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+          <span class="watch-btn-text">Watch Now</span>
         </div>
       </div>
     </div>
-  </div>
-
-  <!-- Tap to watch label -->
-  <div class="tap-label">
-    <span class="play-icon-small">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5v14l11-7z"/></svg>
-    </span>
-    Tap to watch
   </div>
 
   <div class="bottom">
