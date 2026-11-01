@@ -275,6 +275,19 @@
       z-index: 999;
     }
 
+    .unlock-countdown {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #888;
+      letter-spacing: 0.02em;
+      margin-top: -4px;
+      transition: color 0.3s;
+      display: none;
+    }
+    .unlock-countdown.visible { display: block; }
+    .unlock-countdown.hidden { display: none !important; }
+
     .trust-row {
       display: flex; align-items: center; justify-content: center;
       gap: 18px; flex-wrap: wrap;
@@ -321,6 +334,9 @@
     <button class="cta-btn locked" id="btn-cta">
       🔒 Watch Video to Unlock
     </button>
+    <div class="unlock-countdown" id="unlock-countdown">
+      🔓 Unlocks in <span id="unlock-timer">45</span>s
+    </div>
     <div class="trust-row">
       <span class="trust-item"><span class="check-icon"></span> Get instant access</span>
       <span class="trust-item"><span class="check-icon"></span> No risk for 365 days</span>
@@ -417,6 +433,7 @@
     video.playbackRate = 1.25
     video.play()
     startTracking()
+    unlockCountdown.classList.add('visible')
   }
 
   overlay.addEventListener('click', startVideo)
@@ -439,17 +456,32 @@
     return m + ':' + String(sec).padStart(2, '0')
   }
 
+  const unlockCountdown = document.getElementById('unlock-countdown')
+  const unlockTimer = document.getElementById('unlock-timer')
+
   video.addEventListener('timeupdate', () => {
     const duration = video.duration || 78
     fill.style.width = Math.min((video.currentTime / duration) * 100, 100) + '%'
     const badge = document.getElementById('vsl-duration')
     if (badge) badge.textContent = fmt(video.currentTime) + ' / 1:18'
 
-    if (!unlocked && video.currentTime >= UNLOCK_AT) {
-      unlocked = true
-      btn.classList.remove('locked')
-      btn.textContent = 'Yes, I want better grades for my child for $1'
-      launchConfetti()
+    if (!unlocked) {
+      const remaining = Math.max(0, Math.ceil(UNLOCK_AT - video.currentTime))
+      unlockTimer.textContent = remaining
+
+      // pulse red as it gets close
+      if (remaining <= 10) {
+        unlockCountdown.style.color = '#FF4649'
+        unlockCountdown.style.fontWeight = '900'
+      }
+
+      if (video.currentTime >= UNLOCK_AT) {
+        unlocked = true
+        btn.classList.remove('locked')
+        btn.innerHTML = '🎉 Yes, I want better grades for my child for $1'
+        unlockCountdown.classList.add('hidden')
+        launchConfetti()
+      }
     }
   })
 
