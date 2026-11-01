@@ -363,29 +363,40 @@
   let lastSyncedTime = 0
   let syncInterval = null
 
-  async function supaFetch(path, method, body) {
+  const SUPA_HEADERS = {
+    'Content-Type': 'application/json',
+    'apikey': SUPA_KEY,
+    'Authorization': 'Bearer ' + SUPA_KEY,
+    'Prefer': 'return=representation'
+  }
+
+  async function supaInsert(body) {
     try {
-      await fetch(SUPA_URL + path, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPA_KEY,
-          'Authorization': 'Bearer ' + SUPA_KEY,
-          'Prefer': method === 'POST' ? 'return=representation' : ''
-        },
+      const r = await fetch(SUPA_URL + '/rest/v1/video_sessions', {
+        method: 'POST',
+        headers: SUPA_HEADERS,
         body: JSON.stringify(body)
-      }).then(async r => {
-        if (method === 'POST' && !supaRowId) {
-          const data = await r.json()
-          if (data && data[0]) supaRowId = data[0].id
-        }
       })
-    } catch(e) {}
+      const data = await r.json()
+      console.log('[Supabase] insert:', r.status, data)
+      if (data && data[0] && data[0].id) supaRowId = data[0].id
+    } catch(e) { console.error('[Supabase] insert error:', e) }
+  }
+
+  async function supaUpdate(body) {
+    if (!supaRowId) return
+    try {
+      const r = await fetch(SUPA_URL + '/rest/v1/video_sessions?id=eq.' + supaRowId, {
+        method: 'PATCH',
+        headers: { ...SUPA_HEADERS, 'Prefer': '' },
+        body: JSON.stringify(body)
+      })
+      console.log('[Supabase] update:', r.status)
+    } catch(e) { console.error('[Supabase] update error:', e) }
   }
 
   function startTracking() {
-    // Insert initial row
-    supaFetch('/rest/v1/video_sessions', 'POST', {
+    supaInsert({
       session_id: sessionId,
       watch_time: 0,
       completed: false,
@@ -395,15 +406,13 @@
     // Sync every 5 seconds while playing
     syncInterval = setInterval(() => {
       const current = Math.floor(video.currentTime)
-      if (!video.paused && current !== lastSyncedTime) {
+      if (!video.paused && current !== lastSyncedTime && supaRowId) {
         lastSyncedTime = current
-        if (supaRowId) {
-          supaFetch('/rest/v1/video_sessions?id=eq.' + supaRowId, 'PATCH', {
-            watch_time: current,
-            completed: unlocked,
-            updated_at: new Date().toISOString()
-          })
-        }
+        supaUpdate({
+          watch_time: current,
+          completed: unlocked,
+          updated_at: new Date().toISOString()
+        })
       }
     }, 5000)
   }
@@ -411,15 +420,11 @@
   // Final sync on page leave
   window.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden' && supaRowId) {
-      const current = Math.floor(video.currentTime)
-      navigator.sendBeacon(
-        SUPA_URL + '/rest/v1/video_sessions?id=eq.' + supaRowId,
-        new Blob([JSON.stringify({
-          watch_time: current,
-          completed: unlocked,
-          updated_at: new Date().toISOString()
-        })], { type: 'application/json' })
-      )
+      supaUpdate({
+        watch_time: Math.floor(video.currentTime),
+        completed: unlocked,
+        updated_at: new Date().toISOString()
+      })
     }
   })
   // ───────────────────────────────────────────────────────────────
