@@ -461,7 +461,7 @@
 
   // Countdown — ends first minute of 2026-11-11 (midnight UTC)
   (function() {
-    var _end = new Date('2026-11-11T00:01:00+00:00').getTime();
+    var _end = new Date('2026-11-12T00:01:00+00:00').getTime();
     function tick() {
       var d = Math.max(0, _end - Date.now());
       document.getElementById('c-h').textContent = String(Math.floor(d / 3600000)).padStart(2,'0');
