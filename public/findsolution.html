@@ -11,15 +11,17 @@ html, body {
   min-height: 100%;
   font-family: 'Fredoka', sans-serif;
   overflow-x: hidden;
+  background: #ffffff;
 }
 
-.screen { display: none; }
-.screen.active { display: block; }
+/* screens — only .active shown, others truly hidden */
+.screen { display: none !important; }
+.screen.active { display: block !important; }
 
 /* ===================== LANDING ===================== */
 #s-landing {
   min-height: 100vh;
-  background: linear-gradient(180deg, #F2F5FD 0%, #DBD0FB 50%, #A387FF 100%);
+  background: #ffffff;
 }
 .landing-wrap {
   max-width: 430px;
@@ -41,23 +43,43 @@ html, body {
   margin-bottom: 20px;
 }
 
-/* mascot sits in normal flow, then card comes after with negative top margin */
-.mascot-area {
+/* hero: image overlaps top of card */
+.hero {
   position: relative;
-  width: 100%;
-  z-index: 2; /* above the card */
+}
+
+/* the card is in normal flow */
+.bottom-card {
+  background: #F1ECFF;
+  border: 2px solid #AC90FF;
+  border-radius: 13px;
+  padding: 20px 20px 24px;
+  text-align: center;
+  /* card starts partway through the image */
+  margin-top: -60px;
+  padding-top: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* image sits above card using absolute, overflows the card top */
+.mascot-wrap {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+  /* push image down so only the bottom ~60px overlaps the card */
+  margin-bottom: -60px;
 }
 .edu-badge {
   display: inline-block;
-  background: rgba(255,255,255,0.75);
-  border: 1px solid rgba(255,255,255,0.9);
+  background: rgba(255,255,255,0.8);
+  border: 1px solid rgba(180,160,255,0.5);
   border-radius: 100px;
   padding: 4px 14px;
   font-family: 'Fredoka', sans-serif;
   font-weight: 300;
   font-size: 11px;
   color: #555;
-  backdrop-filter: blur(4px);
   margin-bottom: 8px;
 }
 .mascot-img {
@@ -66,28 +88,15 @@ html, body {
   display: block;
   margin: 0 auto;
   object-fit: contain;
-  position: relative;
-  z-index: 2;
 }
 
-/* card is BELOW in DOM but visually behind mascot */
-.bottom-card {
-  background: #F1ECFF;
-  border: 2px solid #AC90FF;
-  border-radius: 13px;
-  padding: 28px 20px 24px;
-  text-align: center;
-  margin-top: -80px;      /* pulls card UP under the mascot */
-  padding-top: 96px;      /* pushes text DOWN so it clears the mascot overlap */
-  position: relative;
-  z-index: 1;             /* behind mascot */
-}
 .card-title {
   font-family: 'Fredoka One', cursive;
   font-size: 20px;
   color: #6B2FD9;
   line-height: 1.35;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  margin-top: 50px; /* clear the overlapping image bottom */
 }
 .btn-find {
   display: block;
@@ -115,7 +124,7 @@ html, body {
 /* ===================== DIAGNOSTIC ===================== */
 #s-diag {
   min-height: 100vh;
-  background: linear-gradient(180deg, #F2F5FD 0%, #E8E0FB 100%);
+  background: #ffffff;
 }
 .diag-wrap {
   max-width: 430px;
@@ -166,7 +175,7 @@ html, body {
 }
 .choices { display: flex; flex-direction: column; gap: 12px; }
 .choice {
-  background: #fff;
+  background: #fafafa;
   border: 1.5px solid #D8CCFA;
   border-radius: 13px;
   padding: 16px 18px;
@@ -187,7 +196,7 @@ html, body {
   font-family: 'Fredoka', sans-serif;
   font-size: 16px;
   color: #2d1a6e;
-  background: #fff;
+  background: #fafafa;
   outline: none;
   transition: border-color .15s;
   margin-bottom: 10px;
@@ -214,11 +223,14 @@ html, body {
 /* ===================== LOADER ===================== */
 #s-loader {
   min-height: 100vh;
-  background: linear-gradient(180deg, #F2F5FD 0%, #DBD0FB 50%, #A387FF 100%);
-  display: flex;
+  background: #ffffff;
+  display: flex !important;
   align-items: center;
   justify-content: center;
 }
+#s-loader.screen { display: none !important; }
+#s-loader.screen.active { display: flex !important; }
+
 .loader-box { text-align: center; }
 .spinner {
   width: 54px; height: 54px;
@@ -238,7 +250,7 @@ html, body {
 /* ===================== RESULTS ===================== */
 #s-results {
   min-height: 100vh;
-  background: linear-gradient(180deg, #F2F5FD 0%, #E8E0FB 100%);
+  background: #ffffff;
 }
 .results-wrap {
   max-width: 430px;
@@ -321,7 +333,7 @@ html, body {
 /* ===================== OFFER ===================== */
 #s-offer {
   min-height: 100vh;
-  background: linear-gradient(180deg, #F2F5FD 0%, #E8E0FB 100%);
+  background: #ffffff;
 }
 .offer-wrap {
   max-width: 430px;
@@ -436,21 +448,21 @@ html, body {
 <!-- ===================== LANDING ===================== -->
 <div id="s-landing" class="screen active">
   <div class="landing-wrap">
-
     <p class="greet-line" id="greet-txt">Good morning</p>
     <p class="greet-name">Welcome to Numio 👋</p>
 
-    <!-- mascot: z-index 2, sits on top -->
-    <div class="mascot-area">
-      <span class="edu-badge">Education specialist</span>
-      <img class="mascot-img" src="numodoctor.webp" alt="Numio mascot" />
-    </div>
-
-    <!-- card: z-index 1, pulled up under mascot via negative margin-top -->
-    <div class="bottom-card">
-      <p class="card-title">Please take this short diagnostic to find the perfect solution for your child</p>
-      <button class="btn-find" id="btn-start">Find Solution for My child</button>
-      <p class="card-sub">Super fast &amp; Guarantee to find solution</p>
+    <div class="hero">
+      <!-- image on top -->
+      <div class="mascot-wrap">
+        <span class="edu-badge">Education specialist</span>
+        <img class="mascot-img" src="numodoctor.webp" alt="Numio mascot" />
+      </div>
+      <!-- card behind/below, image bottom overlaps it -->
+      <div class="bottom-card">
+        <p class="card-title">Please take this short diagnostic to find the perfect solution for your child</p>
+        <button class="btn-find" id="btn-start">Find Solution for My child</button>
+        <p class="card-sub">Super fast &amp; Guarantee to find solution</p>
+      </div>
     </div>
 
   </div>
@@ -524,11 +536,22 @@ html, body {
 
 <script>
 (function () {
+  /* greeting */
   var h = new Date().getHours();
   document.getElementById('greet-txt').textContent =
     h >= 5 && h < 12 ? 'Good morning' :
     h >= 12 && h < 18 ? 'Good afternoon' : 'Good evening';
 
+  /* show/hide screens */
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(function (s) {
+      s.classList.remove('active');
+    });
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  /* questions */
   var QS = [
     { tag: 'Academic situation', text: 'How old is your child, and what grade are they currently in?', type: 'inputs', inputs: ['Age (e.g. 10)', 'Grade (e.g. Grade 5)'] },
     { tag: 'Areas needing attention', text: 'Are there subjects your child finds difficult, or do they need practice across several subjects?', type: 'choices', choices: ['One or two specific subjects', 'Several subjects at once', 'Not sure yet'] },
@@ -539,24 +562,23 @@ html, body {
 
   var step = 0;
 
-  function show(id) {
-    document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('active'); });
-    document.getElementById(id).classList.add('active');
-    window.scrollTo(0, 0);
-  }
-
   function renderQ() {
     var q = QS[step];
     var total = QS.length;
     var left = total - step;
     document.getElementById('prog-fill').style.width = (step / total * 100) + '%';
     document.getElementById('steps-left-txt').textContent = left + (left === 1 ? ' step left' : ' steps left');
+
     var area = document.getElementById('q-area');
     var btnNext = document.getElementById('btn-next');
     btnNext.disabled = true;
+
     var html = '<p class="q-tag">' + q.tag + '</p><h2 class="q-title">' + q.text + '</h2>';
+
     if (q.type === 'inputs') {
-      html += q.inputs.map(function (pl) { return '<input class="diag-input" placeholder="' + pl + '" />'; }).join('');
+      html += q.inputs.map(function (pl) {
+        return '<input class="diag-input" placeholder="' + pl + '" />';
+      }).join('');
       area.innerHTML = html;
       var inputs = area.querySelectorAll('.diag-input');
       inputs.forEach(function (inp) {
@@ -565,7 +587,9 @@ html, body {
         });
       });
     } else {
-      html += '<div class="choices">' + q.choices.map(function (c) { return '<button class="choice">' + c + '</button>'; }).join('') + '</div>';
+      html += '<div class="choices">' + q.choices.map(function (c) {
+        return '<button class="choice">' + c + '</button>';
+      }).join('') + '</div>';
       area.innerHTML = html;
       area.querySelectorAll('.choice').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -582,7 +606,9 @@ html, body {
     if (step >= QS.length) {
       show('s-loader');
       setTimeout(function () { show('s-results'); }, 3000);
-    } else { renderQ(); }
+    } else {
+      renderQ();
+    }
   }
 
   function startCountdown() {
@@ -598,9 +624,18 @@ html, body {
     tick();
   }
 
-  document.getElementById('btn-start').addEventListener('click', function () { step = 0; renderQ(); show('s-diag'); });
+  document.getElementById('btn-start').addEventListener('click', function () {
+    step = 0;
+    renderQ();
+    show('s-diag');
+  });
+
   document.getElementById('btn-next').addEventListener('click', nextStep);
-  document.getElementById('btn-to-offer').addEventListener('click', function () { show('s-offer'); startCountdown(); });
+
+  document.getElementById('btn-to-offer').addEventListener('click', function () {
+    show('s-offer');
+    startCountdown();
+  });
 }());
 </script>
 </body>
