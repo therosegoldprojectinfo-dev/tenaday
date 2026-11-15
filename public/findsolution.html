@@ -13,13 +13,10 @@ html, body {
   overflow-x: hidden;
 }
 
-/* screens */
 .screen { display: none; }
 .screen.active { display: block; }
 
-/* =====================
-   LANDING
-   ===================== */
+/* ===================== LANDING ===================== */
 #s-landing {
   min-height: 100vh;
   background: linear-gradient(180deg, #F2F5FD 0%, #DBD0FB 50%, #A387FF 100%);
@@ -30,7 +27,6 @@ html, body {
   padding: 36px 24px 48px;
 }
 
-/* greeting */
 .greet-line {
   font-family: 'Fredoka', sans-serif;
   font-weight: 300;
@@ -42,23 +38,17 @@ html, body {
   font-family: 'Fredoka One', cursive;
   font-size: 22px;
   color: #1a1a2e;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
-/* mascot area */
+/* mascot sits in normal flow, then card comes after with negative top margin */
 .mascot-area {
   position: relative;
   width: 100%;
-  min-height: 260px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  margin-bottom: 0;
+  z-index: 2; /* above the card */
 }
 .edu-badge {
-  position: absolute;
-  top: 10px;
-  left: 0;
+  display: inline-block;
   background: rgba(255,255,255,0.75);
   border: 1px solid rgba(255,255,255,0.9);
   border-radius: 100px;
@@ -68,23 +58,29 @@ html, body {
   font-size: 11px;
   color: #555;
   backdrop-filter: blur(4px);
+  margin-bottom: 8px;
 }
 .mascot-img {
   width: 100%;
-  max-width: 320px;
+  max-width: 340px;
   display: block;
   margin: 0 auto;
   object-fit: contain;
+  position: relative;
+  z-index: 2;
 }
 
-/* bottom card */
+/* card is BELOW in DOM but visually behind mascot */
 .bottom-card {
   background: #F1ECFF;
   border: 2px solid #AC90FF;
   border-radius: 13px;
   padding: 28px 20px 24px;
   text-align: center;
-  margin-top: -8px;
+  margin-top: -80px;      /* pulls card UP under the mascot */
+  padding-top: 96px;      /* pushes text DOWN so it clears the mascot overlap */
+  position: relative;
+  z-index: 1;             /* behind mascot */
 }
 .card-title {
   font-family: 'Fredoka One', cursive;
@@ -92,7 +88,6 @@ html, body {
   color: #6B2FD9;
   line-height: 1.35;
   margin-bottom: 24px;
-  text-align: center;
 }
 .btn-find {
   display: block;
@@ -115,12 +110,9 @@ html, body {
   font-weight: 600;
   font-size: 13px;
   color: #6B2FD9;
-  text-align: center;
 }
 
-/* =====================
-   DIAGNOSTIC
-   ===================== */
+/* ===================== DIAGNOSTIC ===================== */
 #s-diag {
   min-height: 100vh;
   background: linear-gradient(180deg, #F2F5FD 0%, #E8E0FB 100%);
@@ -172,11 +164,7 @@ html, body {
   line-height: 1.3;
   margin-bottom: 28px;
 }
-.choices {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
+.choices { display: flex; flex-direction: column; gap: 12px; }
 .choice {
   background: #fff;
   border: 1.5px solid #D8CCFA;
@@ -190,10 +178,7 @@ html, body {
   cursor: pointer;
   transition: border-color .15s, background .15s;
 }
-.choice:hover, .choice.on {
-  border-color: #A387FF;
-  background: #F1ECFF;
-}
+.choice:hover, .choice.on { border-color: #A387FF; background: #F1ECFF; }
 .diag-input {
   width: 100%;
   padding: 15px 16px;
@@ -226,9 +211,7 @@ html, body {
 .btn-next:hover { background: #8B6FE8; transform: translateY(-1px); }
 .btn-next:disabled { opacity: .4; cursor: not-allowed; transform: none; }
 
-/* =====================
-   LOADER
-   ===================== */
+/* ===================== LOADER ===================== */
 #s-loader {
   min-height: 100vh;
   background: linear-gradient(180deg, #F2F5FD 0%, #DBD0FB 50%, #A387FF 100%);
@@ -252,9 +235,7 @@ html, body {
   color: #2d1a6e;
 }
 
-/* =====================
-   RESULTS
-   ===================== */
+/* ===================== RESULTS ===================== */
 #s-results {
   min-height: 100vh;
   background: linear-gradient(180deg, #F2F5FD 0%, #E8E0FB 100%);
@@ -337,9 +318,7 @@ html, body {
 }
 .btn-access:hover { background: #8B6FE8; transform: translateY(-1px); }
 
-/* =====================
-   OFFER
-   ===================== */
+/* ===================== OFFER ===================== */
 #s-offer {
   min-height: 100vh;
   background: linear-gradient(180deg, #F2F5FD 0%, #E8E0FB 100%);
@@ -461,11 +440,13 @@ html, body {
     <p class="greet-line" id="greet-txt">Good morning</p>
     <p class="greet-name">Welcome to Numio 👋</p>
 
+    <!-- mascot: z-index 2, sits on top -->
     <div class="mascot-area">
       <span class="edu-badge">Education specialist</span>
       <img class="mascot-img" src="numodoctor.webp" alt="Numio mascot" />
     </div>
 
+    <!-- card: z-index 1, pulled up under mascot via negative margin-top -->
     <div class="bottom-card">
       <p class="card-title">Please take this short diagnostic to find the perfect solution for your child</p>
       <button class="btn-find" id="btn-start">Find Solution for My child</button>
@@ -507,22 +488,10 @@ html, body {
     <div class="how-box">
       <h3>How Numio can help</h3>
       <ul class="how-list">
-        <li>
-          <span class="check"><svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          Turns their actual school lesson into a 20-question quiz
-        </li>
-        <li>
-          <span class="check"><svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          Makes practice available in approximately 15 seconds
-        </li>
-        <li>
-          <span class="check"><svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          Lets them generate new quizzes whenever they need more practice
-        </li>
-        <li>
-          <span class="check"><svg viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-          Requires only a photo of the lesson to get started
-        </li>
+        <li><span class="check"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Turns their actual school lesson into a 20-question quiz</li>
+        <li><span class="check"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Makes practice available in approximately 15 seconds</li>
+        <li><span class="check"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Lets them generate new quizzes whenever they need more practice</li>
+        <li><span class="check"><svg viewBox="0 0 10 10" fill="none"><path d="M1.5 5l2.5 2.5 4.5-4.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Requires only a photo of the lesson to get started</li>
       </ul>
     </div>
     <button class="btn-access" id="btn-to-offer">Access Numio now</button>
@@ -555,44 +524,17 @@ html, body {
 
 <script>
 (function () {
-  /* greeting */
   var h = new Date().getHours();
   document.getElementById('greet-txt').textContent =
     h >= 5 && h < 12 ? 'Good morning' :
     h >= 12 && h < 18 ? 'Good afternoon' : 'Good evening';
 
-  /* questions */
   var QS = [
-    {
-      tag: 'Academic situation',
-      text: 'How old is your child, and what grade are they currently in?',
-      type: 'inputs',
-      inputs: ['Age (e.g. 10)', 'Grade (e.g. Grade 5)']
-    },
-    {
-      tag: 'Areas needing attention',
-      text: 'Are there subjects your child finds difficult, or do they need practice across several subjects?',
-      type: 'choices',
-      choices: ['One or two specific subjects', 'Several subjects at once', 'Not sure yet']
-    },
-    {
-      tag: 'Exam preparation',
-      text: 'When an exam is coming up, how does your child usually prepare?',
-      type: 'choices',
-      choices: ['Reads the lesson again', 'Reviews their notes', 'Does exercises from a textbook', 'Takes practice tests or quizzes']
-    },
-    {
-      tag: 'Practice frequency',
-      text: 'Does your child get enough opportunity to practise, or is staying consistent difficult?',
-      type: 'choices',
-      choices: ['They practise regularly', 'Sometimes, but not consistently', 'Finding good exercises is hard', 'Making time for it is the challenge']
-    },
-    {
-      tag: "Parent's difficulty",
-      text: 'As a parent, what is the hardest part of helping your child prepare for exams?',
-      type: 'choices',
-      choices: ['Finding relevant exercises', 'Knowing if they truly understand', 'Correcting their work', 'I do not have enough time to help']
-    }
+    { tag: 'Academic situation', text: 'How old is your child, and what grade are they currently in?', type: 'inputs', inputs: ['Age (e.g. 10)', 'Grade (e.g. Grade 5)'] },
+    { tag: 'Areas needing attention', text: 'Are there subjects your child finds difficult, or do they need practice across several subjects?', type: 'choices', choices: ['One or two specific subjects', 'Several subjects at once', 'Not sure yet'] },
+    { tag: 'Exam preparation', text: 'When an exam is coming up, how does your child usually prepare?', type: 'choices', choices: ['Reads the lesson again', 'Reviews their notes', 'Does exercises from a textbook', 'Takes practice tests or quizzes'] },
+    { tag: 'Practice frequency', text: 'Does your child get enough opportunity to practise, or is staying consistent difficult?', type: 'choices', choices: ['They practise regularly', 'Sometimes, but not consistently', 'Finding good exercises is hard', 'Making time for it is the challenge'] },
+    { tag: "Parent's difficulty", text: 'As a parent, what is the hardest part of helping your child prepare for exams?', type: 'choices', choices: ['Finding relevant exercises', 'Knowing if they truly understand', 'Correcting their work', 'I do not have enough time to help'] }
   ];
 
   var step = 0;
@@ -609,29 +551,21 @@ html, body {
     var left = total - step;
     document.getElementById('prog-fill').style.width = (step / total * 100) + '%';
     document.getElementById('steps-left-txt').textContent = left + (left === 1 ? ' step left' : ' steps left');
-
     var area = document.getElementById('q-area');
     var btnNext = document.getElementById('btn-next');
     btnNext.disabled = true;
-
     var html = '<p class="q-tag">' + q.tag + '</p><h2 class="q-title">' + q.text + '</h2>';
-
     if (q.type === 'inputs') {
-      html += q.inputs.map(function (pl) {
-        return '<input class="diag-input" placeholder="' + pl + '" />';
-      }).join('');
+      html += q.inputs.map(function (pl) { return '<input class="diag-input" placeholder="' + pl + '" />'; }).join('');
       area.innerHTML = html;
       var inputs = area.querySelectorAll('.diag-input');
       inputs.forEach(function (inp) {
         inp.addEventListener('input', function () {
-          var all = Array.from(inputs).every(function (i) { return i.value.trim() !== ''; });
-          btnNext.disabled = !all;
+          btnNext.disabled = !Array.from(inputs).every(function (i) { return i.value.trim() !== ''; });
         });
       });
     } else {
-      html += '<div class="choices">' + q.choices.map(function (c) {
-        return '<button class="choice" data-val="' + c + '">' + c + '</button>';
-      }).join('') + '</div>';
+      html += '<div class="choices">' + q.choices.map(function (c) { return '<button class="choice">' + c + '</button>'; }).join('') + '</div>';
       area.innerHTML = html;
       area.querySelectorAll('.choice').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -648,9 +582,7 @@ html, body {
     if (step >= QS.length) {
       show('s-loader');
       setTimeout(function () { show('s-results'); }, 3000);
-    } else {
-      renderQ();
-    }
+    } else { renderQ(); }
   }
 
   function startCountdown() {
@@ -658,8 +590,7 @@ html, body {
     var el = document.getElementById('countdown');
     function tick() {
       if (secs < 0) { el.textContent = '0:00'; return; }
-      var m = Math.floor(secs / 60);
-      var s = secs % 60;
+      var m = Math.floor(secs / 60), s = secs % 60;
       el.textContent = m + ':' + (s < 10 ? '0' : '') + s;
       secs--;
       setTimeout(tick, 1000);
@@ -667,18 +598,9 @@ html, body {
     tick();
   }
 
-  document.getElementById('btn-start').addEventListener('click', function () {
-    step = 0;
-    renderQ();
-    show('s-diag');
-  });
-
+  document.getElementById('btn-start').addEventListener('click', function () { step = 0; renderQ(); show('s-diag'); });
   document.getElementById('btn-next').addEventListener('click', nextStep);
-
-  document.getElementById('btn-to-offer').addEventListener('click', function () {
-    show('s-offer');
-    startCountdown();
-  });
+  document.getElementById('btn-to-offer').addEventListener('click', function () { show('s-offer'); startCountdown(); });
 }());
 </script>
 </body>
