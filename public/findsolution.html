@@ -14,15 +14,13 @@ html, body {
   background: #ffffff;
 }
 
-/* screens — only .active shown, others truly hidden */
 .screen { display: none !important; }
 .screen.active { display: block !important; }
+#s-loader.screen.active { display: flex !important; }
 
 /* ===================== LANDING ===================== */
-#s-landing {
-  min-height: 100vh;
-  background: #ffffff;
-}
+#s-landing { min-height: 100vh; background: #fff; }
+
 .landing-wrap {
   max-width: 430px;
   margin: 0 auto;
@@ -40,35 +38,18 @@ html, body {
   font-family: 'Fredoka One', cursive;
   font-size: 22px;
   color: #1a1a2e;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
-/* hero: image overlaps top of card */
+/* hero container: stacking context */
 .hero {
   position: relative;
 }
 
-/* the card is in normal flow */
-.bottom-card {
-  background: #F1ECFF;
-  border: 2px solid #AC90FF;
-  border-radius: 13px;
-  padding: 20px 20px 24px;
-  text-align: center;
-  /* card starts partway through the image */
-  margin-top: -60px;
-  padding-top: 20px;
-  position: relative;
-  z-index: 1;
-}
-
-/* image sits above card using absolute, overflows the card top */
+/* IMAGE — in normal flow, z-index 1 (behind card) */
 .mascot-wrap {
   position: relative;
-  z-index: 2;
-  pointer-events: none;
-  /* push image down so only the bottom ~60px overlaps the card */
-  margin-bottom: -60px;
+  z-index: 1;
 }
 .edu-badge {
   display: inline-block;
@@ -90,13 +71,24 @@ html, body {
   object-fit: contain;
 }
 
+/* CARD — pulled up with negative margin so it overlaps the image bottom */
+.bottom-card {
+  background: #F1ECFF;
+  border: 2px solid #AC90FF;
+  border-radius: 13px;
+  padding: 24px 20px 24px;
+  text-align: center;
+  margin-top: -120px;   /* how much the card climbs over the image */
+  position: relative;
+  z-index: 2;           /* card is IN FRONT of the image */
+}
+
 .card-title {
   font-family: 'Fredoka One', cursive;
   font-size: 20px;
   color: #6B2FD9;
   line-height: 1.35;
   margin-bottom: 20px;
-  margin-top: 50px; /* clear the overlapping image bottom */
 }
 .btn-find {
   display: block;
@@ -122,10 +114,7 @@ html, body {
 }
 
 /* ===================== DIAGNOSTIC ===================== */
-#s-diag {
-  min-height: 100vh;
-  background: #ffffff;
-}
+#s-diag { min-height: 100vh; background: #fff; }
 .diag-wrap {
   max-width: 430px;
   margin: 0 auto;
@@ -138,8 +127,7 @@ html, body {
   margin-bottom: 36px;
 }
 .prog-track {
-  flex: 1;
-  height: 8px;
+  flex: 1; height: 8px;
   background: #D8CCFA;
   border-radius: 100px;
   overflow: hidden;
@@ -223,14 +211,10 @@ html, body {
 /* ===================== LOADER ===================== */
 #s-loader {
   min-height: 100vh;
-  background: #ffffff;
-  display: flex !important;
+  background: #fff;
   align-items: center;
   justify-content: center;
 }
-#s-loader.screen { display: none !important; }
-#s-loader.screen.active { display: flex !important; }
-
 .loader-box { text-align: center; }
 .spinner {
   width: 54px; height: 54px;
@@ -248,10 +232,7 @@ html, body {
 }
 
 /* ===================== RESULTS ===================== */
-#s-results {
-  min-height: 100vh;
-  background: #ffffff;
-}
+#s-results { min-height: 100vh; background: #fff; }
 .results-wrap {
   max-width: 430px;
   margin: 0 auto;
@@ -308,15 +289,12 @@ html, body {
   width: 20px; min-width: 20px; height: 20px;
   background: #7c3aed;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex; align-items: center; justify-content: center;
   margin-top: 1px;
 }
 .check svg { width: 10px; height: 10px; }
 .btn-access {
-  display: block;
-  width: 100%;
+  display: block; width: 100%;
   background: #A387FF;
   border: 2px solid #673FE8;
   border-radius: 188px;
@@ -331,10 +309,7 @@ html, body {
 .btn-access:hover { background: #8B6FE8; transform: translateY(-1px); }
 
 /* ===================== OFFER ===================== */
-#s-offer {
-  min-height: 100vh;
-  background: #ffffff;
-}
+#s-offer { min-height: 100vh; background: #fff; }
 .offer-wrap {
   max-width: 430px;
   margin: 0 auto;
@@ -342,8 +317,7 @@ html, body {
 }
 .offer-eyebrow {
   font-family: 'Fredoka', sans-serif;
-  font-weight: 600;
-  font-size: 11px;
+  font-weight: 600; font-size: 11px;
   color: #9B6DFF;
   letter-spacing: .07em;
   text-transform: uppercase;
@@ -351,9 +325,7 @@ html, body {
 }
 .offer-title {
   font-family: 'Fredoka One', cursive;
-  font-size: 24px;
-  color: #2d1a6e;
-  margin-bottom: 20px;
+  font-size: 24px; color: #2d1a6e; margin-bottom: 20px;
 }
 .price-card {
   background: #F1ECFF;
@@ -365,81 +337,56 @@ html, body {
 }
 .price-label {
   font-family: 'Fredoka', sans-serif;
-  font-weight: 600;
-  font-size: 12px;
+  font-weight: 600; font-size: 12px;
   color: #9B6DFF;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  margin-bottom: 10px;
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px;
 }
 .price-old {
   font-family: 'Fredoka One', cursive;
-  font-size: 18px;
-  color: #b0a0d0;
-  text-decoration: line-through;
-  margin-bottom: 2px;
+  font-size: 18px; color: #b0a0d0;
+  text-decoration: line-through; margin-bottom: 2px;
 }
 .price-new {
   font-family: 'Fredoka One', cursive;
-  font-size: 60px;
-  color: #7c3aed;
-  line-height: 1;
-  margin-bottom: 8px;
+  font-size: 60px; color: #7c3aed;
+  line-height: 1; margin-bottom: 8px;
 }
 .price-note {
   font-family: 'Fredoka', sans-serif;
-  font-size: 13px;
-  color: #6b6b8e;
-  line-height: 1.5;
+  font-size: 13px; color: #6b6b8e; line-height: 1.5;
 }
 .timer-bar {
   background: #fef3c7;
   border: 1px solid #fcd34d;
   border-radius: 13px;
   padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  display: flex; align-items: center; gap: 10px;
   margin-bottom: 20px;
 }
 .timer-icon { font-size: 20px; }
 .timer-label {
   font-family: 'Fredoka', sans-serif;
-  font-weight: 600;
-  font-size: 13px;
-  color: #92400e;
+  font-weight: 600; font-size: 13px; color: #92400e;
 }
 .timer-count {
   font-family: 'Fredoka One', cursive;
-  font-size: 22px;
-  color: #b45309;
-  margin-left: auto;
+  font-size: 22px; color: #b45309; margin-left: auto;
 }
 .btn-wa {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  display: flex; align-items: center; justify-content: center; gap: 10px;
   width: 100%;
-  background: #25d366;
-  border: none;
-  border-radius: 188px;
-  padding: 17px;
+  background: #25d366; border: none;
+  border-radius: 188px; padding: 17px;
   font-family: 'Fredoka One', cursive;
-  font-size: 17px;
-  color: #fff;
-  cursor: pointer;
-  transition: background .15s;
-  text-decoration: none;
-  margin-bottom: 12px;
+  font-size: 17px; color: #fff;
+  cursor: pointer; transition: background .15s;
+  text-decoration: none; margin-bottom: 12px;
 }
 .btn-wa:hover { background: #1aad53; }
 .offer-fine {
   text-align: center;
   font-family: 'Fredoka', sans-serif;
-  font-size: 12px;
-  color: #9B6DFF;
-  line-height: 1.5;
+  font-size: 12px; color: #9B6DFF; line-height: 1.5;
 }
 </style>
 </head>
@@ -452,12 +399,13 @@ html, body {
     <p class="greet-name">Welcome to Numio 👋</p>
 
     <div class="hero">
-      <!-- image on top -->
+      <!-- IMAGE: z-index 1, in normal flow -->
       <div class="mascot-wrap">
         <span class="edu-badge">Education specialist</span>
         <img class="mascot-img" src="numodoctor.webp" alt="Numio mascot" />
       </div>
-      <!-- card behind/below, image bottom overlaps it -->
+
+      <!-- CARD: z-index 2, margin-top negative = climbs over image bottom -->
       <div class="bottom-card">
         <p class="card-title">Please take this short diagnostic to find the perfect solution for your child</p>
         <button class="btn-find" id="btn-start">Find Solution for My child</button>
@@ -542,7 +490,7 @@ html, body {
     h >= 5 && h < 12 ? 'Good morning' :
     h >= 12 && h < 18 ? 'Good afternoon' : 'Good evening';
 
-  /* show/hide screens */
+  /* show screen */
   function show(id) {
     document.querySelectorAll('.screen').forEach(function (s) {
       s.classList.remove('active');
@@ -625,16 +573,11 @@ html, body {
   }
 
   document.getElementById('btn-start').addEventListener('click', function () {
-    step = 0;
-    renderQ();
-    show('s-diag');
+    step = 0; renderQ(); show('s-diag');
   });
-
   document.getElementById('btn-next').addEventListener('click', nextStep);
-
   document.getElementById('btn-to-offer').addEventListener('click', function () {
-    show('s-offer');
-    startCountdown();
+    show('s-offer'); startCountdown();
   });
 }());
 </script>
