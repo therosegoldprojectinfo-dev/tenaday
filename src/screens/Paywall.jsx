@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 const WHATSAPP = 'https://wa.me/14384102068'
-const LANDING  = '/productpage.html'
+const LANDING  = 'https://buy.stripe.com/fZufZh2w12kDd6u6nv1ZS06'
 
 const S = {
   wrap: {
