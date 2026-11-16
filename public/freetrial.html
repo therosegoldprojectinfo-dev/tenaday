@@ -386,12 +386,15 @@
           throw new Error('Account setup failed. Please try again.')
         }
 
-        // Step 3: Set parent PIN
+        // Step 3: Mark account as activated
+        try { await sb.rpc('set_profile_activated') } catch (_) {}
+
+        // Step 4: Set parent PIN
         try {
           await sb.rpc('set_parent_pin', { p_pin_hash: pinHash })
         } catch (_) { /* already set, fine */ }
 
-        // Step 4: Create kid
+        // Step 5: Create kid
         const { data: kidData, error: kidErr } = await sb.rpc('create_kid_for_family', { p_name: kidName })
         if (kidErr) throw new Error("Almost there! Couldn't set up your child's profile. Please try again.")
 
