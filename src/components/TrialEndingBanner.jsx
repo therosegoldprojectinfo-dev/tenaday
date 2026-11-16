@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 
 const STORAGE_KEY = 'numio_trial_banner_dismissed'
-const LANDING     = '/productpage.html'
+const LANDING     = 'https://buy.stripe.com/fZufZh2w12kDd6u6nv1ZS06'
 
 export default function TrialEndingBanner({ trialDaysLeft }) {
   const [visible, setVisible] = useState(false)
@@ -52,7 +52,7 @@ export default function TrialEndingBanner({ trialDaysLeft }) {
 
         <p style={{ fontSize: 15, color: '#6b7280', lineHeight: 1.6, marginBottom: 28, maxWidth: 280, margin: '0 auto 28px' }}>
           Hope your child has been loving Numio 🎉<br />
-          Get full access so the learning never stops.
+          Get full access tomorrow so the learning never stops.
         </p>
 
         <a href={LANDING} style={{
@@ -63,17 +63,8 @@ export default function TrialEndingBanner({ trialDaysLeft }) {
           fontWeight: 800, fontSize: 18,
           boxShadow: '0 4px 0 #5b21b6',
         }}>
-          Get full access →
+          I will renew tomorrow →
         </a>
-
-        <button onClick={dismiss} style={{
-          background: 'none', border: 'none',
-          color: '#9ca3af', fontSize: 14, fontWeight: 600,
-          cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif",
-          padding: '8px 0',
-        }}>
-          Maybe later
-        </button>
       </div>
 
       <style>{`
