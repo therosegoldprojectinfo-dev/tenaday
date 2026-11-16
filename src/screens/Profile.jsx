@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useLang } from '../lib/LangContext'
 import { useKid } from '../lib/KidContext'
-import { createKid, getKids, updateKidEducationProfile } from '../lib/kids'
-import { COUNTRIES, getRegionsForCountry, getGradesForCountryRegion, getFlagEmoji } from '../lib/regions'
+import { createKid, getKids } from '../lib/kids'
 
 const AVATARS = ['🪐', '🌍', '🌙', '⭐', '🌟', '☀️', '🌎', '🌏', '🌑', '💫']
 const ACCENT_COLORS = ['#ede9fe', '#fce7f3', '#dbeafe', '#dcfce7', '#ffedd5']
@@ -13,7 +12,6 @@ export default function Profile({ onLogout, onLanguageChange }) {
   const { activeKid, kids, setActiveKid, setKids } = useKid()
   const [showAddKid, setShowAddKid] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
-  const [showEducationModal, setShowEducationModal] = useState(false)
   const [langSaving, setLangSaving] = useState(false)
   const [username, setUsername] = useState('')
 
@@ -47,13 +45,6 @@ export default function Profile({ onLogout, onLanguageChange }) {
       onLanguageChange?.(newLang)
     } catch (e) { console.error(e) }
     finally { setLangSaving(false) }
-  }
-
-  async function handleSaveEducationProfile({ country, region, grade }) {
-    const updated = await updateKidEducationProfile(activeKid.id, { country, region, grade })
-    setKids(prev => prev.map(k => k.id === updated.id ? updated : k))
-    setActiveKid(updated)
-    setShowEducationModal(false)
   }
 
   const activeIndex = kids.findIndex(k => k.id === activeKid?.id)
@@ -138,32 +129,7 @@ export default function Profile({ onLogout, onLanguageChange }) {
           </button>
         </div>
 
-        {/* Numio+ Customization */}
-        {activeKid && (
-          <>
-            <p className="font-body font-bold text-xs text-muted uppercase tracking-widest mb-3">
-              {lang === 'ar' ? 'نوميو+ التخصيص' : 'Numio+ Customization'}
-            </p>
-            <button onClick={() => setShowEducationModal(true)}
-              className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-left transition-all active:scale-95 mb-6"
-              style={{ background: 'white', boxShadow: '0 2px 16px rgba(0,0,0,0.06)', border: '1.5px solid transparent' }}>
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0" style={{ background: '#ede9fe' }}>
-                🎓
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-display font-bold text-base" style={{ color: '#1a1a2e' }}>
-                  {lang === 'ar' ? 'الدولة، المنطقة، والصف' : 'Country, region & grade'}
-                </p>
-                <p className="font-body text-xs text-muted mt-0.5 truncate">
-                  {activeKid.country
-                    ? [activeKid.country, activeKid.region, activeKid.grade].filter(Boolean).join(' · ')
-                    : (lang === 'ar' ? 'لم يتم الضبط بعد — اضغط للإضافة' : 'Not set yet — tap to add')}
-                </p>
-              </div>
-              <span className="font-bold text-lg flex-shrink-0 text-muted">›</span>
-            </button>
-          </>
-        )}
+
 
         {/* Language */}
         <p className="font-body font-bold text-xs text-muted uppercase tracking-widest mb-3">
@@ -232,15 +198,6 @@ export default function Profile({ onLogout, onLanguageChange }) {
 
       {showAddKid && <AddKidModal lang={lang} onConfirm={handleAddKid} onClose={() => setShowAddKid(false)} />}
 
-      {showEducationModal && activeKid && (
-        <EducationProfileModal
-          lang={lang}
-          kid={activeKid}
-          onConfirm={handleSaveEducationProfile}
-          onClose={() => setShowEducationModal(false)}
-        />
-      )}
-
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4">
@@ -296,132 +253,6 @@ function AddKidModal({ lang, onConfirm, onClose }) {
           {saving ? '...' : lang === 'ar' ? 'إضافة ←' : 'Add kid →'}
         </button>
         <button onClick={onClose} className="w-full text-muted font-body font-bold text-sm py-3 text-center mt-1">
-          {lang === 'ar' ? 'إلغاء' : 'Cancel'}
-        </button>
-      </div>
-    </div>
-  )
-}
-
-function EducationProfileModal({ lang, kid, onConfirm, onClose }) {
-  const [step, setStep] = useState(1)
-  const [countryName, setCountryName] = useState(kid.country || '')
-  const [countryCode, setCountryCode] = useState(
-    () => COUNTRIES.find(c => c.name === kid.country)?.code || ''
-  )
-  const [region, setRegion] = useState(kid.region || '')
-  const [grade, setGrade] = useState(kid.grade || '')
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
-
-  const availableRegions = getRegionsForCountry(countryName)
-  const hasRegionStep = !!availableRegions
-  const grades = getGradesForCountryRegion(countryCode, region || null)
-
-  function handlePickCountry(c) {
-    setCountryName(c.name)
-    setCountryCode(c.code)
-    if (c.name !== kid.country) setRegion('')
-    setStep(getRegionsForCountry(c.name) ? 2 : 3)
-  }
-
-  function handlePickRegion(r) {
-    setRegion(r)
-    setStep(3)
-  }
-
-  async function handlePickGrade(g) {
-    setGrade(g)
-    setSaving(true); setError('')
-    try {
-      await onConfirm({ country: countryName, region: hasRegionStep ? region : null, grade: g })
-    } catch {
-      setError(lang === 'ar' ? 'حدث خطأ ما.' : 'Something went wrong.')
-      setSaving(false)
-    }
-  }
-
-  function handleBack() {
-    if (step === 3 && hasRegionStep) setStep(2)
-    else if (step === 3 || step === 2) setStep(1)
-  }
-
-  const titles = {
-    1: lang === 'ar' ? 'في أي دولة يدرس طفلك؟' : 'What country does your child study in?',
-    2: lang === 'ar' ? 'أي منطقة أو مقاطعة؟' : 'Which province/state/region?',
-    3: lang === 'ar' ? 'في أي صف دراسي؟' : 'What grade is your child in?',
-  }
-
-  const totalSteps = hasRegionStep ? 3 : 2
-  const displayStep = step === 3 ? totalSteps : step
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="w-full bg-white rounded-t-3xl px-5 pb-8 pt-4" style={{ maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
-        <div className="flex justify-center mb-4 flex-shrink-0"><div className="w-10 h-1 rounded-full bg-gray-200" /></div>
-
-        <div className="flex items-center justify-between mb-4 flex-shrink-0">
-          {step > 1
-            ? <button onClick={handleBack} className="font-body font-bold text-sm text-muted active:opacity-60">
-                {lang === 'ar' ? '→ رجوع' : '← Back'}
-              </button>
-            : <span />}
-          <span className="font-body text-xs text-muted">{displayStep}/{totalSteps}</span>
-        </div>
-
-        <h2 className="font-display font-extrabold text-xl text-ink text-center mb-5 flex-shrink-0">
-          {titles[step]}
-        </h2>
-
-        {error && <p className="font-body text-sm text-red-500 font-bold text-center mb-3 flex-shrink-0">{error}</p>}
-
-        <div className="overflow-y-auto flex flex-col gap-2" style={{ flex: 1 }}>
-          {step === 1 && COUNTRIES.map(c => {
-            const flag = getFlagEmoji(c.code)
-            const isSelected = countryName === c.name
-            return (
-              <button key={c.code} onClick={() => handlePickCountry(c)}
-                disabled={saving}
-                className="w-full text-left px-4 py-3 rounded-2xl font-body font-bold text-base transition-all active:scale-95 disabled:opacity-40 flex items-center gap-3"
-                style={{
-                  background: isSelected ? '#f5f3ff' : '#fafafa',
-                  color: isSelected ? '#7c3aed' : '#1a1a2e',
-                  border: isSelected ? '1.5px solid #c4b5fd' : '1.5px solid transparent',
-                }}>
-                <span style={{ fontSize: '1.4rem', lineHeight: 1, flexShrink: 0 }}>{flag}</span>
-                <span>{c.name}</span>
-              </button>
-            )
-          })}
-
-          {step === 2 && availableRegions?.map(r => (
-            <button key={r} onClick={() => handlePickRegion(r)}
-              disabled={saving}
-              className="w-full text-left px-4 py-3 rounded-2xl font-body font-bold text-base transition-all active:scale-95 disabled:opacity-40"
-              style={{
-                background: region === r ? '#f5f3ff' : '#fafafa',
-                color: region === r ? '#7c3aed' : '#1a1a2e',
-                border: region === r ? '1.5px solid #c4b5fd' : '1.5px solid transparent',
-              }}>
-              {r}
-            </button>
-          ))}
-
-          {step === 3 && grades.map(g => (
-            <button key={g} onClick={() => handlePickGrade(g)}
-              disabled={saving}
-              className="w-full text-left px-4 py-3 rounded-2xl font-body font-bold text-base transition-all active:scale-95 disabled:opacity-40"
-              style={{
-                background: grade === g ? '#f5f3ff' : '#fafafa',
-                color: grade === g ? '#7c3aed' : '#1a1a2e',
-                border: grade === g ? '1.5px solid #c4b5fd' : '1.5px solid transparent',
-              }}>
-              {saving && grade === g ? '...' : g}
-            </button>
-          ))}
-        </div>
-
-        <button onClick={onClose} disabled={saving} className="w-full text-muted font-body font-bold text-sm py-3 text-center mt-2 flex-shrink-0">
           {lang === 'ar' ? 'إلغاء' : 'Cancel'}
         </button>
       </div>
