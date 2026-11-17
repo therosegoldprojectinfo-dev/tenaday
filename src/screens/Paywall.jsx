@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-const WHATSAPP      = 'https://wa.me/14384102068'
-const HARDCODED_URL = 'https://buy.stripe.com/fZufZh2w12kDd6u6nv1ZS06'
-const EDGE_FN       = 'https://lyedpfhzrvyaskmzhyhl.supabase.co/functions/v1/create-checkout-session'
+const WHATSAPP = 'https://wa.me/14384102068'
+const LANDING  = 'https://buy.stripe.com/fZufZh2w12kDd6u6nv1ZS06'
 
 const S = {
   wrap: {
@@ -33,10 +32,6 @@ const S = {
     borderRadius: 18, padding: '18px 0', marginBottom: 16,
     fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800,
     fontSize: 19, boxShadow: '0 4px 0 #5b21b6', boxSizing: 'border-box',
-    border: 'none', cursor: 'pointer',
-  },
-  ctaDisabled: {
-    opacity: 0.6, cursor: 'not-allowed',
   },
   wa: {
     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -50,14 +45,10 @@ const S = {
 
 export default function Paywall() {
   const [wasTrial, setWasTrial] = useState(false)
-  const [userId,   setUserId]   = useState(null)
-  const [loading,  setLoading]  = useState(false)
-  const [error,    setError]    = useState('')
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
-      setUserId(user.id)
       supabase
         .from('profiles')
         .select('trial_started_at, stripe_customer_id')
@@ -70,73 +61,34 @@ export default function Paywall() {
     })
   }, [])
 
-  async function handlePay() {
-    setError('')
-
-    // Trial user + signed in → dynamic checkout with their user ID in metadata
-    if (wasTrial && userId) {
-      setLoading(true)
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        const res  = await fetch(EDGE_FN, {
-          method:  'POST',
-          headers: {
-            'Content-Type':  'application/json',
-            'Authorization': `Bearer ${session?.access_token}`,
-          },
-          body: JSON.stringify({ supabase_user_id: userId }),
-        })
-        const json = await res.json()
-        if (json.error) throw new Error(json.error)
-        // Edge fn returns a hosted checkout URL for trial users
-        window.location.href = json.url
-      } catch (e) {
-        console.error('Checkout error:', e)
-        setError('Something went wrong. Please try again or contact support.')
-        setLoading(false)
-      }
-      return
-    }
-
-    // Non-trial user → hardcoded link as before
-    window.location.href = HARDCODED_URL
-  }
-
   return (
     <div style={S.wrap}>
       <img src="/nav-profile.png" alt="Numio" style={S.mascot} />
 
-      {wasTrial ? (
-        <>
-          <div style={S.badge}>🎉 Your free trial has ended</div>
-          <h2 style={S.h2}>Hope you enjoyed Numio!</h2>
-          <p style={S.p}>
-            Your 7-day free trial is over. Get full access to keep generating
-            quizzes and tracking your child's progress.
-          </p>
-        </>
-      ) : (
-        <>
-          <h2 style={S.h2}>Your subscription has ended</h2>
-          <p style={S.p}>
-            Renew your Numio subscription to continue generating quizzes
-            and tracking your child's progress.
-          </p>
-        </>
-      )}
+      {wasTrial
+        ? (
+          <>
+            <div style={S.badge}>🎉 Your free trial has ended</div>
+            <h2 style={S.h2}>Hope you enjoyed Numio!</h2>
+            <p style={S.p}>
+              Your 7-day free trial is over. Get full access to keep generating
+              quizzes and tracking your child's progress.
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 style={S.h2}>Your subscription has ended</h2>
+            <p style={S.p}>
+              Renew your Numio subscription to continue generating quizzes
+              and tracking your child's progress.
+            </p>
+          </>
+        )
+      }
 
-      {error && (
-        <p style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontSize: 14, fontWeight: 700, color: '#dc2626', marginBottom: 16, maxWidth: 300 }}>
-          {error}
-        </p>
-      )}
-
-      <button
-        onClick={handlePay}
-        disabled={loading}
-        style={{ ...S.cta, ...(loading ? S.ctaDisabled : {}) }}>
-        {loading ? 'Preparing checkout…' : (wasTrial ? 'Get full access →' : 'Renew Numio →')}
-      </button>
+      <a href={LANDING} style={S.cta}>
+        {wasTrial ? 'Get full access →' : 'Renew Numio →'}
+      </a>
 
       <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" style={S.wa}>
         💬 Contact support
