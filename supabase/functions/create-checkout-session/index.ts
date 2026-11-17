@@ -15,15 +15,32 @@ serve(async (req) => {
   }
 
   try {
+    const body             = await req.json().catch(() => ({}))
+    const supabaseUserId   = body?.supabase_user_id || null
+
+    // If called with a user ID (trial upgrade flow) → hosted checkout, auto-links via webhook
+    // If called without (embedded payment element flow) → return client_secret as before
+    const isTrialUpgrade = !!supabaseUserId
+
     const params = new URLSearchParams({
       'line_items[0][price]':               'price_1UGKk6F3Ob4o24uqDWQw2mCB',
       'line_items[0][quantity]':            '1',
       'mode':                               'payment',
-      'ui_mode':                            'embedded',
       'automatic_payment_methods[enabled]': 'true',
-      'return_url':                         'https://numiomath.app/success?session_id={CHECKOUT_SESSION_ID}',
       'metadata[product]':                  'numio_lifetime',
     })
+
+    if (isTrialUpgrade) {
+      // Hosted checkout — user lands back at /?subscribed=true, no PostPaymentSetup needed
+      params.set('ui_mode',    'hosted')
+      params.set('success_url', 'https://numiomath.app/?subscribed=true')
+      params.set('cancel_url',  'https://numiomath.app/')
+      params.set('metadata[supabase_user_id]', supabaseUserId)
+    } else {
+      // Embedded checkout — existing flow for new users
+      params.set('ui_mode',    'embedded')
+      params.set('return_url', 'https://numiomath.app/success?session_id={CHECKOUT_SESSION_ID}')
+    }
 
     const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
@@ -41,11 +58,19 @@ serve(async (req) => {
       throw new Error(session.error?.message || 'Failed to create session')
     }
 
-    // Return client_secret — this is what the frontend Payment Element needs
-    return new Response(
-      JSON.stringify({ clientSecret: session.client_secret }),
-      { status: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-    )
+    if (isTrialUpgrade) {
+      // Return the hosted checkout URL — Paywall will redirect to it
+      return new Response(
+        JSON.stringify({ url: session.url }),
+        { status: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+      )
+    } else {
+      // Return client_secret for the embedded Payment Element
+      return new Response(
+        JSON.stringify({ clientSecret: session.client_secret }),
+        { status: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
+      )
+    }
 
   } catch (err) {
     console.error('Edge Function error:', err)
