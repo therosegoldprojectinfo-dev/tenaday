@@ -155,7 +155,7 @@ export default function Rewards({ kidId, onNavigateToParentZone }) {
           {/* Curved "Tu as récolté / X pièces" title */}
           <div className="w-full text-center mt-3" style={{ lineHeight: 1.1 }}>
             <p className="font-display font-bold text-ink" style={{ fontSize: 18 }}>Tu as récolté</p>
-            <svg viewBox="0 0 300 60" width="100%" height="54" style={{ overflow: 'visible', marginTop: -4 }}>
+            <svg viewBox="0 0 300 60" width="100%" height="54" style={{ overflow: 'visible', marginTop: 6 }}>
               <defs>
                 <path id="coinsCurve" d="M 10,45 Q 150,10 290,45" />
               </defs>
