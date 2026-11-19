@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { getExamsForChapter } from '../lib/chapters'
 import { useLang } from '../lib/LangContext'
 
@@ -8,6 +8,14 @@ export default function CurrentChapter({ chapter, onNew, onRevision, onSelectExa
   const lang = useLang()
   const [exams, setExams]     = useState([])
   const [loading, setLoading] = useState(true)
+  const fileInputRef = useRef(null)
+  const [inputKey, setInputKey] = useState(0)
+
+  function handleFilesPicked(e) {
+    const files = Array.from(e.target.files || [])
+    setInputKey(k => k + 1)
+    if (files.length) onNew(chapter, files)
+  }
 
   useEffect(() => { if (chapter?.id) loadExams() }, [chapter?.id])
 
@@ -61,7 +69,7 @@ export default function CurrentChapter({ chapter, onNew, onRevision, onSelectExa
 
         {/* Prendre une photo */}
         <button
-          onClick={() => onNew(chapter)}
+          onClick={() => fileInputRef.current?.click()}
           className="flex-shrink-0 w-full flex items-center justify-center gap-3 rounded-full active:scale-95 transition-all mb-8"
           style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', padding: '16px 20px' }}
         >
@@ -112,6 +120,16 @@ export default function CurrentChapter({ chapter, onNew, onRevision, onSelectExa
           )}
         </div>
       </div>
+
+      <input
+        key={`pick-${inputKey}`}
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={handleFilesPicked}
+      />
 
       <style>{`.no-scrollbar{scrollbar-width:none}.no-scrollbar::-webkit-scrollbar{display:none}`}</style>
     </div>
