@@ -110,24 +110,20 @@ function StreakPopupModal({ streak, lang, onClose, accountCreatedAt }) {
           className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center z-10"
           style={{ background: 'rgba(0,0,0,0.08)', color: '#333' }}>✕</button>
 
-        {/* Header — fixed inside modal */}
-        <div className="flex-shrink-0 text-center pt-6 pb-4 px-5">
-          <p className="font-display font-bold text-ink text-lg leading-tight">Garde ta</p>
-          <p className="font-display font-extrabold text-ink leading-tight" style={{ fontSize: 32 }}>
-            Série de {streak} jour{streak > 1 ? 's' : ''}
-          </p>
-        </div>
-
-        {/* Streak info card */}
-        <div className="flex-shrink-0 mx-5 mb-4">
-          <div className="flex items-center gap-3 rounded-2xl px-4 py-3"
-            style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-            <img src="/firebro.gif" alt="fire" style={{ width: 36, height: 36, objectFit: 'contain' }} />
-            <div>
-              <p className="font-display font-extrabold text-base text-ink">Compléter un Quiz</p>
-              <p className="font-body text-xs" style={{ color: '#888' }}>pour continuer ta série</p>
-            </div>
+        {/* Header — centered gif + text + button */}
+        <div className="flex-shrink-0 flex flex-col items-center text-center pt-10 pb-5 px-5 gap-3">
+          <img src="/firebro.gif" alt="fire" style={{ width: 90, height: 90, objectFit: 'contain' }} />
+          <div>
+            <p className="font-display font-extrabold text-ink" style={{ fontSize: 26 }}>Compléter un Quiz</p>
+            <p className="font-body text-sm mt-1" style={{ color: '#888' }}>pour continuer ta série</p>
           </div>
+          <button
+            onClick={onClose}
+            className="w-full py-4 rounded-2xl font-display font-bold text-base text-ink transition-all active:scale-95 mt-1"
+            style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+          >
+            Débuter un Quiz !
+          </button>
         </div>
 
         {/* Scrollable calendar area */}
