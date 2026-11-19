@@ -9,11 +9,6 @@ const EMOJI_OPTIONS = [
   '🧪','🌊','🦁','🎯','🧩','🌸','⚽','🎸','🍎','🚀',
 ]
 
-const CARD_ACCENTS = [
-  '#ede9fe', '#fce7f3', '#dbeafe', '#fef9c3',
-  '#dcfce7', '#ffedd5', '#ccfbf1', '#fee2e2',
-]
-
 function CalendarMonth({ year, month, streakDaysSet, today }) {
   const colHeaders = ['Di','Lu','Ma','Me','Je','Ve','Sa']
   const firstDay   = new Date(year, month, 1).getDay()
@@ -285,31 +280,36 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
             />
           </div>
 
-          {/* Add subject bar */}
-          <button
-            onClick={() => setShowModal(true)}
-            className="w-full flex items-center gap-3 rounded-full mb-5 active:scale-95 transition-all"
-            style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb', padding: '14px 20px' }}
-          >
-            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ background: '#1a1a2e', color: 'white', fontSize: 18, fontWeight: 'bold' }}>+</div>
-            <span className="font-body font-bold text-base" style={{ color: '#6b7280' }}>Je veux rajouter un Sujet</span>
-          </button>
+          {/* Add subject row — separate + button and input bar */}
+          <div className="flex items-center gap-3 mb-6">
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center active:scale-95 transition-all"
+              style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', fontSize: 22, color: '#1a1a2e', fontWeight: 'bold' }}
+            >+</button>
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex-1 text-left rounded-full active:scale-95 transition-all"
+              style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', padding: '13px 20px' }}
+            >
+              <span className="font-body text-base" style={{ color: '#9ca3af' }}>Je veux rajouter un Sujet</span>
+            </button>
+          </div>
 
           {/* Section title */}
-          <div className="mb-4">
-            <h1 className="font-display font-extrabold text-2xl text-ink">Mes Sujets</h1>
+          <div className="mb-3">
+            <h2 className="font-display font-bold text-lg text-ink">Mes Sujets</h2>
           </div>
 
           {chapters.length === 0 ? (
             <EmptyState lang={lang} onAdd={() => setShowModal(true)} />
           ) : (
-            <div className="flex flex-col gap-3">
-              {chapters.map((chapter) => (
+            <div className="grid grid-cols-2 gap-4">
+              {chapters.map((chapter, index) => (
                 <ChapterCard
                   key={chapter.id}
                   chapter={chapter}
-                  lang={lang}
+                  index={index}
                   onClick={() => onSelectChapter(chapter)}
                 />
               ))}
@@ -325,29 +325,35 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
   )
 }
 
-function ChapterCard({ chapter, lang, onClick }) {
+const CARD_ACCENTS = [
+  '#ede9fe', '#fce7f3', '#dbeafe', '#fef9c3',
+  '#dcfce7', '#ffedd5', '#ccfbf1', '#fee2e2',
+]
+
+function ChapterCard({ chapter, index, onClick }) {
+  const accent = CARD_ACCENTS[index % CARD_ACCENTS.length]
   return (
     <div
       className="w-full rounded-3xl bg-white overflow-hidden"
       style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
     >
-      <div className="flex items-center gap-4 px-4 pt-4 pb-3">
-        {/* Emoji avatar — like the fish */}
-        <div className="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center"
-          style={{ background: '#f5f3ff', fontSize: 36 }}>
-          {chapter.emoji}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="font-display font-extrabold text-base text-ink truncate">{chapter.name}</p>
-          <p className="font-body text-sm mt-0.5" style={{ color: '#9ca3af' }}>
-            {chapter.quiz_count ?? 0} quiz terminés
-          </p>
-        </div>
+      {/* Colored top with big emoji */}
+      <div
+        className="flex items-center justify-center"
+        style={{ background: accent, height: 110, borderRadius: '24px 24px 0 0' }}
+      >
+        <span style={{ fontSize: 58, lineHeight: 1 }}>{chapter.emoji}</span>
       </div>
-      <div className="px-4 pb-4">
+
+      {/* Bottom content */}
+      <div className="px-4 pt-3 pb-4">
+        <p className="font-display font-extrabold text-base text-ink truncate mb-0.5">{chapter.name}</p>
+        <p className="font-body text-xs mb-3" style={{ color: '#9ca3af' }}>
+          {chapter.quiz_count ?? 0} quiz terminés
+        </p>
         <button
           onClick={onClick}
-          className="w-full py-3 rounded-2xl font-display font-bold text-base text-ink transition-all active:scale-95"
+          className="w-full py-2.5 rounded-full font-display font-bold text-sm text-ink transition-all active:scale-95"
           style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb' }}
         >
           🚀 Débuter un quiz !
