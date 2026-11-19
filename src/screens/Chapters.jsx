@@ -285,20 +285,20 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
             <button
               onClick={() => setShowModal(true)}
               className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center active:scale-95 transition-all"
-              style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', fontSize: 22, color: '#1a1a2e', fontWeight: 'bold' }}
+              style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', fontSize: 24, color: '#1a1a2e', fontWeight: '300', lineHeight: 1 }}
             >+</button>
             <button
               onClick={() => setShowModal(true)}
               className="flex-1 text-left rounded-full active:scale-95 transition-all"
               style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', padding: '13px 20px' }}
             >
-              <span className="font-body text-base" style={{ color: '#9ca3af' }}>Je veux rajouter un Sujet</span>
+              <span className="font-body text-base" style={{ color: '#9ca3af' }}>Je veux rajouter une Matière</span>
             </button>
           </div>
 
           {/* Section title */}
           <div className="mb-3">
-            <h2 className="font-display font-bold text-lg text-ink">Mes Sujets</h2>
+            <h2 className="font-display font-bold text-lg text-ink">Mes Matières</h2>
           </div>
 
           {chapters.length === 0 ? (
