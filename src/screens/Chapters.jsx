@@ -15,63 +15,136 @@ const CARD_ACCENTS = [
 ]
 
 function StreakPopupModal({ streak, lang, onClose }) {
-  const dayLetters = lang === 'ar'
-    ? ['ح','س','خ','أ','ث','ث','إ']
-    : ['S','M','T','W','T','F','S']
-  const today = new Date().getDay()
-  const days = Array.from({ length: 7 }, (_, i) => {
-    const dayIndex = (today - 6 + i + 7) % 7
-    const isActive = i >= (7 - Math.min(streak, 7))
-    const isToday  = i === 6
-    return { letter: dayLetters[dayIndex], isActive, isToday }
-  })
+  const today = new Date()
+  const currentYear  = today.getFullYear()
+  const currentMonth = today.getMonth()
+  const currentDay   = today.getDate()
+
+  // Build a grid of days for the current month
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay() // 0=Sun
+  const daysInMonth     = new Date(currentYear, currentMonth + 1, 0).getDate()
+
+  // Which days in this month have streak? 
+  // We know the streak count — mark the last `streak` days up to and including today
+  const streakDays = new Set()
+  for (let i = 0; i < streak; i++) {
+    const d = new Date(currentYear, currentMonth, currentDay - i)
+    if (d.getMonth() === currentMonth) streakDays.add(d.getDate())
+  }
+
+  const monthName = today.toLocaleString(lang === 'ar' ? 'ar' : lang === 'fr' ? 'fr' : 'fr', { month: 'long' })
+
+  const colHeaders = lang === 'ar'
+    ? ['ح','إ','ث','ث','أ','خ','س']
+    : ['Di','Lu','Ma','Me','Je','Ve','Sa']
+
+  // Build calendar cells (pad start)
+  const cells = []
+  for (let i = 0; i < firstDayOfMonth; i++) cells.push(null)
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+
+  const title    = lang === 'ar' ? `حافظ على سلسلتك لمدة ${streak} أيام` : `Garde ta série de ${streak} jour${streak > 1 ? 's' : ''}`
+  const subtitle = lang === 'ar' ? 'إبقِ سلسلتك مشتعلة!' : ''
+  const ctaLabel = lang === 'ar' ? `حافظ على سلسلتك لمدة ${streak} أيام 🎮` : `🎮 Garde ta série de ${streak} jour${streak > 1 ? 's' : ''}`
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-6"
-      style={{ background: 'rgba(10,10,20,0.85)' }}
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="w-full max-w-sm rounded-3xl flex flex-col items-center gap-6 py-10 px-6 text-center relative"
-        style={{ background: '#1a1a2e' }}>
-        <button onClick={onClose} className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.1)', color: 'white' }}>✕</button>
-        <p className="font-display font-bold text-sm text-white/50 uppercase tracking-widest">
-          {lang === 'ar' ? 'سلسلتك' : 'Streak'}
-        </p>
-        <img src="/streak-fire.png" alt="streak" className="w-36 h-auto"
-          style={{ filter: streak === 0 ? 'grayscale(1) opacity(0.4)' : 'none', animation: streak > 0 ? 'float 2s ease-in-out infinite' : 'none' }} />
-        <div>
-          <p className="font-display font-extrabold text-5xl text-white">
-            {streak} <span style={{ color: streak > 0 ? '#ff2d78' : '#6b7280' }}>{lang === 'ar' ? 'يوم' : 'Day'}</span>
-          </p>
-          <p className="font-display font-extrabold text-2xl text-white/80 mt-1">
-            {lang === 'ar' ? 'سلسلة!' : 'Streak!'}
+    <div
+      className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center"
+      style={{ background: 'rgba(10,10,20,0.6)' }}
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div
+        className="w-full md:max-w-sm rounded-t-3xl md:rounded-3xl flex flex-col px-5 pt-6 pb-8 relative"
+        style={{ background: '#F6F5F7' }}
+      >
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.08)', color: '#333' }}
+        >✕</button>
+
+        {/* Header */}
+        <div className="text-center mb-4 mt-2">
+          <p className="font-display font-bold text-ink text-lg leading-tight">Garde ta</p>
+          <p className="font-display font-extrabold text-ink leading-tight" style={{ fontSize: 32 }}>
+            Série de {streak} jour{streak > 1 ? 's' : ''}
           </p>
         </div>
-        <div className="flex gap-2">
-          {days.map((d, i) => (
-            <div key={i} className="flex flex-col items-center gap-1.5">
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center font-display font-bold text-sm"
-                style={{ background: d.isActive ? '#ff2d78' : 'rgba(255,255,255,0.1)', color: d.isActive ? 'white' : 'rgba(255,255,255,0.3)' }}>
-                {d.isActive ? '✓' : d.letter}
-              </div>
-              <span className="font-body text-xs" style={{ color: d.isToday ? '#ff2d78' : 'rgba(255,255,255,0.3)' }}>
-                {d.letter}
-              </span>
-            </div>
-          ))}
+
+        {/* Streak pill */}
+        <div
+          className="flex items-center gap-3 rounded-2xl px-4 py-3 mb-4"
+          style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+        >
+          <img src="/firebro.gif" alt="fire" style={{ width: 36, height: 36, objectFit: 'contain' }} />
+          <div>
+            <p className="font-display font-extrabold text-base text-ink">
+              {streak} question{streak > 1 ? 's' : ''}
+            </p>
+            <p className="font-body text-xs" style={{ color: '#888' }}>pour continuer ta série</p>
+          </div>
         </div>
-        <p className="font-body text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-          {streak > 0
-            ? (lang === 'ar' ? 'أكمل اختباراً اليوم للحفاظ على سلسلتك!' : 'Complete a quiz today to keep your streak going!')
-            : (lang === 'ar' ? 'أكمل اختباراً اليوم لبدء سلسلتك!' : 'Complete a quiz today to start your streak!')}
-        </p>
-        <button onClick={onClose}
-          className="w-full py-4 rounded-2xl font-display font-bold text-lg text-white transition-all active:scale-95"
-          style={{ background: '#ff2d78', boxShadow: '0 4px 0 #c4005a' }}>
-          {lang === 'ar' ? 'حسناً! 💪' : "Let's go! 💪"}
+
+        {/* Calendar */}
+        <div className="rounded-2xl overflow-hidden" style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          {/* Col headers */}
+          <div className="grid grid-cols-7 px-2 pt-3 pb-1">
+            {colHeaders.map((h, i) => (
+              <div key={i} className="text-center font-body font-bold text-xs" style={{ color: '#aaa' }}>{h}</div>
+            ))}
+          </div>
+          {/* Month label */}
+          <div className="px-4 pb-1">
+            <span className="font-display font-bold text-sm text-ink capitalize">{monthName}</span>
+          </div>
+          {/* Day grid */}
+          <div className="grid grid-cols-7 gap-y-1 px-2 pb-3">
+            {cells.map((day, i) => {
+              if (!day) return <div key={i} />
+              const isStreak  = streakDays.has(day)
+              const isToday   = day === currentDay
+              return (
+                <div key={i} className="flex items-center justify-center" style={{ height: 42 }}>
+                  {isStreak ? (
+                    <div className="flex flex-col items-center gap-0" style={{ position: 'relative' }}>
+                      <img src="/streak-fire.png" alt="🔥" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+                      {isToday && (
+                        <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#ff2d78', marginTop: 1 }} />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-0.5">
+                      <div
+                        className="w-9 h-9 rounded-full flex items-center justify-center font-display font-bold text-sm"
+                        style={{
+                          background: isToday ? 'rgba(255,45,120,0.08)' : 'transparent',
+                          color: isToday ? '#ff2d78' : '#bbb',
+                          border: isToday ? '1.5px solid #ff2d78' : 'none',
+                        }}
+                      >
+                        {day}
+                      </div>
+                      {isToday && (
+                        <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#ff2d78' }} />
+                      )}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* CTA */}
+        <button
+          onClick={onClose}
+          className="mt-5 w-full py-4 rounded-2xl font-display font-bold text-base text-white transition-all active:scale-95"
+          style={{ background: '#1a1a2e', boxShadow: '0 4px 0 #000' }}
+        >
+          {ctaLabel}
         </button>
       </div>
-      <style>{`@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`}</style>
     </div>
   )
 }
@@ -125,7 +198,7 @@ function TopStatsBar({ streak, coinBalance, lang }) {
         <button
           onClick={() => setShowCoins(true)}
           className="flex items-center gap-2 rounded-full px-4 py-2 transition-all active:scale-95"
-          style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb' }}
+          style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb' }}
         >
           <img src="/coin-flower.png" alt="coins" style={{ width: 28, height: 28, objectFit: 'contain' }} />
           <span className="font-display font-extrabold text-base text-amber-500">{coinBalance ?? 0}</span>
@@ -135,9 +208,9 @@ function TopStatsBar({ streak, coinBalance, lang }) {
         <button
           onClick={() => setShowStreak(true)}
           className="flex items-center gap-2 rounded-full px-4 py-2 transition-all active:scale-95"
-          style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb' }}
+          style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb' }}
         >
-          <img src="/streak-fire.png" alt="streak" style={{ width: 28, height: 28, objectFit: 'contain', filter: streak === 0 ? 'grayscale(1) opacity(0.4)' : 'none' }} />
+          <img src="/firebro.gif" alt="streak" style={{ width: 28, height: 28, objectFit: 'contain', filter: streak === 0 ? 'grayscale(1) opacity(0.4)' : 'none' }} />
           <span className="font-display font-extrabold text-base" style={{ color: streak > 0 ? '#ff2d78' : '#9ca3af' }}>{streak}</span>
         </button>
       </div>
