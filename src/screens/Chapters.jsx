@@ -354,9 +354,9 @@ function ChapterCard({ chapter, index, onClick }) {
         <button
           onClick={onClick}
           className="w-full py-2.5 rounded-full font-display font-bold text-sm text-ink transition-all active:scale-95"
-          style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb' }}
+          style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb', fontSize: 12 }}
         >
-          🚀 Débuter un quiz !
+          Débuter un quiz !
         </button>
       </div>
     </div>
