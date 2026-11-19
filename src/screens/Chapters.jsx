@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getChapters, createChapter } from '../lib/chapters'
+import { getChapters, createChapter, deleteChapter, updateChapter } from '../lib/chapters'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
 
@@ -230,9 +230,10 @@ function TopStatsBar({ streak, coinBalance, lang }) {
 
 export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid, onLeaderboard }) {
   const lang = useLang()
-  const [chapters, setChapters]   = useState([])
-  const [loading, setLoading]     = useState(true)
-  const [showModal, setShowModal] = useState(false)
+  const [chapters, setChapters]         = useState([])
+  const [loading, setLoading]           = useState(true)
+  const [showModal, setShowModal]       = useState(false)
+  const [emojiTarget, setEmojiTarget]   = useState(null)  // chapter to change emoji for
 
   useEffect(() => {
     if (kidId) loadChapters()
@@ -257,6 +258,25 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
       setShowModal(false)
     } catch (err) {
       console.error('Failed to create chapter:', err)
+    }
+  }
+
+  async function handleDelete(chapter) {
+    try {
+      await deleteChapter(chapter.id)
+      setChapters(prev => prev.filter(c => c.id !== chapter.id))
+    } catch (err) {
+      console.error('Failed to delete chapter:', err)
+    }
+  }
+
+  async function handleChangeEmoji(chapter, newEmoji) {
+    try {
+      await updateChapter(chapter.id, { emoji: newEmoji })
+      setChapters(prev => prev.map(c => c.id === chapter.id ? { ...c, emoji: newEmoji } : c))
+      setEmojiTarget(null)
+    } catch (err) {
+      console.error('Failed to update emoji:', err)
     }
   }
 
@@ -315,6 +335,8 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
                   chapter={chapter}
                   index={index}
                   onClick={() => onSelectChapter(chapter)}
+                  onDelete={handleDelete}
+                  onChangeEmoji={ch => setEmojiTarget(ch)}
                 />
               ))}
             </div>
@@ -325,6 +347,14 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
       {showModal && (
         <ChapterModal lang={lang} onConfirm={handleCreate} onClose={() => setShowModal(false)} />
       )}
+
+      {emojiTarget && (
+        <EmojiPickerModal
+          chapter={emojiTarget}
+          onConfirm={newEmoji => handleChangeEmoji(emojiTarget, newEmoji)}
+          onClose={() => setEmojiTarget(null)}
+        />
+      )}
     </div>
   )
 }
@@ -334,19 +364,74 @@ const CARD_ACCENTS = [
   '#dcfce7', '#ffedd5', '#ccfbf1', '#fee2e2',
 ]
 
-function ChapterCard({ chapter, index, onClick }) {
+function ChapterCard({ chapter, index, onClick, onDelete, onChangeEmoji }) {
   const accent = CARD_ACCENTS[index % CARD_ACCENTS.length]
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
     <div
       className="w-full rounded-3xl bg-white overflow-hidden"
-      style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
+      style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)', position: 'relative' }}
     >
       {/* Colored top with big emoji */}
       <div
         className="flex items-center justify-center"
-        style={{ background: accent, height: 110, borderRadius: '24px 24px 0 0' }}
+        style={{ background: accent, height: 110, borderRadius: '24px 24px 0 0', position: 'relative' }}
       >
         <span style={{ fontSize: 58, lineHeight: 1 }}>{chapter.emoji}</span>
+
+        {/* Three-dot button */}
+        <button
+          onClick={e => { e.stopPropagation(); setMenuOpen(v => !v) }}
+          className="flex items-center justify-center active:scale-95 transition-all"
+          style={{
+            position: 'absolute', top: 10, right: 10,
+            width: 28, height: 28, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.75)', border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <circle cx="7" cy="2.5" r="1.3" fill="#1a1a2e"/>
+            <circle cx="7" cy="7"   r="1.3" fill="#1a1a2e"/>
+            <circle cx="7" cy="11.5" r="1.3" fill="#1a1a2e"/>
+          </svg>
+        </button>
+
+        {/* Dropdown menu */}
+        {menuOpen && (
+          <>
+            {/* backdrop to close */}
+            <div
+              style={{ position: 'fixed', inset: 0, zIndex: 40 }}
+              onClick={e => { e.stopPropagation(); setMenuOpen(false) }}
+            />
+            <div
+              style={{
+                position: 'absolute', top: 42, right: 10, zIndex: 50,
+                background: 'white', borderRadius: 14,
+                boxShadow: '0 8px 24px rgba(0,0,0,0.14)',
+                minWidth: 170, overflow: 'hidden',
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              <button
+                onClick={() => { setMenuOpen(false); onChangeEmoji(chapter) }}
+                className="w-full text-left flex items-center gap-2 font-body font-bold text-sm text-ink transition-all active:scale-95"
+                style={{ padding: '12px 16px', borderBottom: '1px solid #f3f4f6' }}
+              >
+                <span style={{ fontSize: 16 }}>🎨</span> Changer d'émojie
+              </button>
+              <button
+                onClick={() => { setMenuOpen(false); onDelete(chapter) }}
+                className="w-full text-left flex items-center gap-2 font-body font-bold text-sm transition-all active:scale-95"
+                style={{ padding: '12px 16px', color: '#ef4444' }}
+              >
+                <span style={{ fontSize: 16 }}>🗑️</span> Supprimer matière
+              </button>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Bottom content */}
@@ -362,6 +447,45 @@ function ChapterCard({ chapter, index, onClick }) {
         >
           Débuter un quiz !
         </button>
+      </div>
+    </div>
+  )
+}
+
+function EmojiPickerModal({ chapter, onConfirm, onClose }) {
+  const [selected, setSelected] = useState(chapter.emoji)
+  return (
+    <div className="fixed inset-0 z-50 bg-black/40 flex items-end md:items-center md:justify-center"
+      onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="w-full md:max-w-lg md:rounded-3xl bg-white rounded-t-3xl flex flex-col" style={{ maxHeight: '70dvh' }}>
+        <div className="flex-shrink-0 pt-3 pb-1 flex justify-center">
+          <div className="w-10 h-1 rounded-full bg-gray-200" />
+        </div>
+        <div className="flex-1 overflow-y-auto px-5 pb-8 flex flex-col gap-5">
+          <h2 className="font-display font-extrabold text-xl text-ink text-center pt-2">
+            Changer d'émojie
+          </h2>
+          <div className="flex justify-center">
+            <span style={{ fontSize: 52 }}>{selected}</span>
+          </div>
+          <div className="grid grid-cols-6 md:grid-cols-8 gap-2">
+            {EMOJI_OPTIONS.map(e => (
+              <button key={e} onClick={() => setSelected(e)}
+                className="h-11 w-full rounded-xl text-xl flex items-center justify-center border-2 transition-all"
+                style={{ borderColor: selected === e ? '#7c3aed' : '#f3f4f6', background: selected === e ? '#f5f3ff' : '#f9fafb' }}>
+                {e}
+              </button>
+            ))}
+          </div>
+          <button onClick={() => onConfirm(selected)}
+            className="w-full text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95"
+            style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}>
+            Confirmer
+          </button>
+          <button onClick={onClose} className="w-full text-muted font-body font-bold text-sm py-2 text-center">
+            Annuler
+          </button>
+        </div>
       </div>
     </div>
   )
