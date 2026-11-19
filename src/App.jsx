@@ -242,7 +242,8 @@ export default function App() {
               <CurrentChapter
                 chapter={chapter}
                 kidId={activeKid?.id}
-                onNew={c => go({ screen: 'scan', chapter: c, exam: null })}
+                onNew={(c, files) => go({ screen: 'scan', chapter: c, exam: null, scanFiles: files })}
+                onSelectExam={e => go({ screen: 'quiz_intro', exam: e })}
                 onRevision={(c, exams) => go({ screen: 'revision', chapter: c, revisionExams: exams })}
                 onBack={() => go({ screen: 'chapters' })}
               />
@@ -251,6 +252,7 @@ export default function App() {
             {screen === 'scan' && (
               <Home
                 chapter={chapter}
+                initialFiles={nav.scanFiles}
                 kidId={activeKid?.id}
                 onExamReady={freshExam => go({ screen: 'quiz_intro', exam: freshExam })}
                 onBack={() => go({ screen: 'current_chapter' })}
