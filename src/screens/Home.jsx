@@ -41,66 +41,55 @@ function getErrorMessage(err, lang) {
 export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles }) {
   const lang = useLang()
   const cameraInputRef = useRef(null)
-  const MAX_IMAGES = 5
   const MAX_SIZE_MB = 10
 
-  function validateFiles(files, existingCount) {
-    if (existingCount + files.length > MAX_IMAGES) {
-      return new Error(lang === 'ar' ? `الحد الأقصى ${MAX_IMAGES} صور` : `Max ${MAX_IMAGES} images allowed`)
-    }
-    const tooBig = files.find(f => f.size > MAX_SIZE_MB * 1024 * 1024)
-    if (tooBig) {
-      return new Error(lang === 'ar' ? `حجم الصورة كبير جداً (الحد ${MAX_SIZE_MB}MB)` : `Image too large (max ${MAX_SIZE_MB}MB each)`)
+  function validateFile(file) {
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      return new Error(lang === 'ar' ? `حجم الصورة كبير جداً (الحد ${MAX_SIZE_MB}MB)` : `Image too large (max ${MAX_SIZE_MB}MB)`)
     }
     return null
   }
 
-  // Photos picked on the subject page arrive here as initialFiles,
-  // so we open straight on the "Generate quiz" (review) screen.
-  const startFiles = Array.isArray(initialFiles) ? initialFiles : []
-  const startError = startFiles.length ? validateFiles(startFiles, 0) : null
+  // The photo picked on the subject page arrives as initialFiles.
+  // Only ONE photo is allowed, so we keep the first file only.
+  const startFile  = Array.isArray(initialFiles) ? initialFiles[0] : null
+  const startError = startFile ? validateFile(startFile) : null
 
-  const [status, setStatus]   = useState(startError ? 'error' : startFiles.length ? 'review' : 'idle')
-  const [error, setError]     = useState(startError)
-  const [images, setImages]   = useState(() =>
-    startError ? [] : startFiles.map(file => ({ file, preview: URL.createObjectURL(file) }))
+  const [status, setStatus] = useState(startError ? 'error' : startFile ? 'review' : 'idle')
+  const [error, setError]   = useState(startError)
+  const [image, setImage]   = useState(() =>
+    startFile && !startError ? { file: startFile, preview: URL.createObjectURL(startFile) } : null
   )
   const [inputKey, setInputKey] = useState(0)
 
-  async function handleGallerySelected(e) {
-    const files = Array.from(e.target.files || [])
-    if (!files.length) return
-
-    const problem = validateFiles(files, images.length)
+  // "Reprendre la photo" — replaces the current photo
+  function handleRetake(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const problem = validateFile(file)
     if (problem) {
       setError(problem)
       setStatus('error')
       return
     }
-    const newImages = files.map(file => ({ file, preview: URL.createObjectURL(file) }))
-    setImages(prev => [...prev, ...newImages])
+    if (image?.preview) URL.revokeObjectURL(image.preview)
+    setImage({ file, preview: URL.createObjectURL(file) })
     setStatus('review')
-  }
-
-  function removeImage(index) {
-    const next = images.filter((_, i) => i !== index)
-    if (next.length === 0) { onBack(); return }
-    setImages(next)
   }
 
   function handleReset() {
     setError(null)
-    setImages([])
+    setImage(null)
     setInputKey(k => k + 1)
     onBack()
   }
 
   async function handleGenerate() {
-    if (!images.length) return
+    if (!image) return
     setStatus('loading')
     setError(null)
     try {
-      const compressed = await Promise.all(images.map(img => compressImage(img.file)))
+      const compressed = [await compressImage(image.file)]
       // generatePractice runs the full 4-phase pipeline server-side
       // (lesson analysis → curriculum alignment → practice plan →
       // questions) and already inserts the exam row — no separate
@@ -135,47 +124,45 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
 
         {/* IDLE — temporarily removed: picker opens automatically on mount */}
 
-        {/* REVIEW — images added, ready to generate */}
-        {status === 'review' && (
-          <div className="flex-1 flex flex-col gap-5 pb-10">
-            {/* Image previews */}
-            <div className="flex flex-wrap gap-3">
-              {images.map((img, i) => (
-                <div key={i} className="relative rounded-2xl overflow-hidden border-2 border-gray-100" style={{ width: 90, height: 90 }}>
-                  <img src={img.preview} alt={`Page ${i + 1}`} className="w-full h-full object-cover" />
-                  <button
-                    onClick={() => removeImage(i)}
-                    className="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full text-xs flex items-center justify-center font-bold"
-                  >×</button>
-                  <div className="absolute bottom-1 left-1 bg-black/50 text-white text-xs font-bold rounded px-1">{i + 1}</div>
-                </div>
-              ))}
-
-              {/* Add more */}
-              {images.length < MAX_IMAGES && (
-                <button
-                  onClick={() => { setInputKey(k => k + 1); setTimeout(() => cameraInputRef.current?.click(), 10) }}
-                  className="rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center text-muted text-2xl transition-all active:bg-gray-50"
-                  style={{ width: 90, height: 90 }}
-                >+</button>
-              )}
+        {/* REVIEW — one photo, ready to generate */}
+        {status === 'review' && image && (
+          <div className="flex-1 flex flex-col items-center gap-5 pb-10">
+            {/* Photo, big and centered */}
+            <div
+              className="w-full flex items-center justify-center overflow-hidden"
+              style={{ borderRadius: 28, background: '#f9fafb', border: '1.5px solid #eef0f3', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
+            >
+              <img
+                src={image.preview}
+                alt="Photo"
+                style={{ width: '100%', maxHeight: '52dvh', objectFit: 'contain' }}
+              />
             </div>
 
-            <p className="font-body text-sm text-muted">
-              {images.length} {lang === 'ar' ? 'صفحة مضافة' : `page${images.length > 1 ? 's' : ''} added`}
-            </p>
-
-            {/* Generate button */}
+            {/* Générer le quiz */}
             <button
               onClick={handleGenerate}
-              className="w-full text-white font-display font-bold text-lg rounded-2xl py-5 transition-all active:scale-95"
+              className="w-full flex items-center justify-center gap-2.5 text-white font-display font-bold text-lg rounded-2xl py-5 transition-all active:scale-95"
               style={{ background: '#7c3aed', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}
             >
-              {lang === 'ar' ? '✨ توليد الاختبار' : '✨ Generate quiz'}
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
+                <path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z" />
+                <path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z" />
+              </svg>
+              Générer le quiz
             </button>
 
-            <button onClick={handleReset} className="w-full text-muted font-body font-bold text-sm py-2 text-center">
-              {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+            {/* Reprendre la photo */}
+            <button
+              onClick={() => { setInputKey(k => k + 1); setTimeout(() => cameraInputRef.current?.click(), 10) }}
+              className="w-full flex items-center justify-center gap-2.5 font-display font-bold text-base text-ink rounded-2xl py-4 transition-all active:scale-95"
+              style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a2e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+              Reprendre la photo
             </button>
           </div>
         )}
@@ -225,9 +212,8 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
         ref={cameraInputRef}
         type="file"
         accept="image/*"
-        multiple
         className="hidden"
-        onChange={handleGallerySelected}
+        onChange={handleRetake}
       />
 
       <style>{`@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`}</style>
