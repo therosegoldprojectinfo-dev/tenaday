@@ -149,33 +149,33 @@ function StreakPopupModal({ streak, lang, onClose, accountCreatedAt }) {
 function CoinsPopupModal({ coinBalance, lang, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-6"
-      style={{ background: 'rgba(10,10,20,0.85)' }}
+      style={{ background: 'rgba(10,10,20,0.6)' }}
       onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div className="w-full max-w-sm rounded-3xl flex flex-col items-center gap-6 py-10 px-6 text-center relative"
-        style={{ background: '#1a1200' }}>
+      <div className="w-full max-w-sm rounded-3xl flex flex-col items-center gap-5 py-10 px-6 text-center relative"
+        style={{ background: 'white' }}>
         <button onClick={onClose} className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.1)', color: 'white' }}>✕</button>
-        <p className="font-display font-bold text-sm uppercase tracking-widest" style={{ color: 'rgba(255,200,0,0.6)' }}>
-          {lang === 'ar' ? 'عملاتك' : 'Your Coins'}
+          style={{ background: 'rgba(0,0,0,0.08)', color: '#333' }}>✕</button>
+        <p className="font-display font-bold text-sm uppercase tracking-widest" style={{ color: '#d97706' }}>
+          {lang === 'ar' ? 'عملاتك' : 'Tes Pièces'}
         </p>
         <div style={{ animation: 'float 2s ease-in-out infinite' }}>
           <img src="/coin-flower.png" alt="coins" className="w-40 h-auto" />
         </div>
         <div>
-          <p className="font-display font-extrabold text-6xl" style={{ color: '#fbbf24' }}>{coinBalance ?? 0}</p>
-          <p className="font-display font-bold text-xl mt-1" style={{ color: 'rgba(251,191,36,0.6)' }}>
-            {lang === 'ar' ? 'عملة' : 'coins'}
+          <p className="font-display font-extrabold text-6xl" style={{ color: '#f59e0b' }}>{coinBalance ?? 0}</p>
+          <p className="font-display font-bold text-xl mt-1" style={{ color: '#d97706' }}>
+            {lang === 'ar' ? 'عملة' : 'pièces'}
           </p>
         </div>
-        <p className="font-body text-sm" style={{ color: 'rgba(255,255,255,0.4)' }}>
+        <p className="font-body text-sm" style={{ color: '#9ca3af' }}>
           {lang === 'ar'
             ? 'اكسب عملات بإكمال الاختبارات وصرفها على مكافآت!'
-            : 'Earn coins by completing quizzes and spend them on rewards!'}
+            : 'Gagne des pièces en complétant des quiz et dépense-les sur des récompenses !'}
         </p>
         <button onClick={onClose}
           className="w-full py-4 rounded-2xl font-display font-bold text-lg transition-all active:scale-95"
           style={{ background: '#fbbf24', color: '#78350f', boxShadow: '0 4px 0 #d97706' }}>
-          {lang === 'ar' ? 'رائع! 🎁' : 'Awesome! 🎁'}
+          {lang === 'ar' ? 'رائع! 🎁' : 'Super ! 🎁'}
         </button>
       </div>
       <style>{`@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`}</style>
