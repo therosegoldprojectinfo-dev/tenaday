@@ -285,8 +285,12 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
             <button
               onClick={() => setShowModal(true)}
               className="flex-shrink-0 w-11 h-11 rounded-full flex items-center justify-center active:scale-95 transition-all"
-              style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', fontSize: 24, color: '#1a1a2e', fontWeight: '300', lineHeight: 1 }}
-            >+</button>
+              style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+            >
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 2V16M2 9H16" stroke="#1a1a2e" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </button>
             <button
               onClick={() => setShowModal(true)}
               className="flex-1 text-left rounded-full active:scale-95 transition-all"
