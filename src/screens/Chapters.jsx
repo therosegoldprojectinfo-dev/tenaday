@@ -126,27 +126,7 @@ function StreakPopupModal({ streak, lang, onClose, accountCreatedAt }) {
           </button>
         </div>
 
-        {/* Scrollable calendar area */}
-        <div className="flex-1 overflow-y-auto px-5 pb-2" style={{ minHeight: 0 }}>
-          {months.slice().reverse().map(({ year, month }) => (
-            <CalendarMonth
-              key={`${year}-${month}`}
-              year={year}
-              month={month}
-              streakDaysSet={streakDaysSet}
-              today={today}
-            />
-          ))}
-        </div>
 
-        {/* CTA */}
-        <div className="flex-shrink-0 px-5 py-5">
-          <button onClick={onClose}
-            className="w-full py-4 rounded-2xl font-display font-bold text-base text-white transition-all active:scale-95"
-            style={{ background: '#1a1a2e', boxShadow: '0 4px 0 #000' }}>
-            {ctaLabel}
-          </button>
-        </div>
       </div>
     </div>
   )
