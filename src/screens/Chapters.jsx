@@ -197,21 +197,21 @@ function TopStatsBar({ streak, coinBalance, lang }) {
         {/* Coins pill */}
         <button
           onClick={() => setShowCoins(true)}
-          className="flex items-center gap-2 rounded-full px-4 py-2 transition-all active:scale-95"
-          style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb' }}
+          className="flex items-center gap-2 rounded-full transition-all active:scale-95"
+          style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb', padding: '10px 20px' }}
         >
-          <img src="/coin-flower.png" alt="coins" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-          <span className="font-display font-extrabold text-base text-amber-500">{coinBalance ?? 0}</span>
+          <img src="/coin-flower.png" alt="coins" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+          <span className="font-display font-extrabold text-lg text-amber-500">{coinBalance ?? 0}</span>
         </button>
 
         {/* Streak pill */}
         <button
           onClick={() => setShowStreak(true)}
-          className="flex items-center gap-2 rounded-full px-4 py-2 transition-all active:scale-95"
-          style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb' }}
+          className="flex items-center gap-2 rounded-full transition-all active:scale-95"
+          style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb', padding: '10px 20px' }}
         >
-          <img src="/firebro.gif" alt="streak" style={{ width: 28, height: 28, objectFit: 'contain', filter: streak === 0 ? 'grayscale(1) opacity(0.4)' : 'none' }} />
-          <span className="font-display font-extrabold text-base" style={{ color: streak > 0 ? '#ff2d78' : '#9ca3af' }}>{streak}</span>
+          <img src="/firebro.gif" alt="streak" style={{ width: 32, height: 32, objectFit: 'contain', filter: streak === 0 ? 'grayscale(1) opacity(0.4)' : 'none' }} />
+          <span className="font-display font-extrabold text-lg" style={{ color: streak > 0 ? '#ff2d78' : '#9ca3af' }}>{streak}</span>
         </button>
       </div>
 
