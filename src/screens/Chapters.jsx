@@ -185,12 +185,12 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
   if (loading) return <LoadingScreen />
 
   return (
-    <div className="flex flex-col" style={{ height: '100dvh', background: '#eeecf4' }}>
+    <div className="flex flex-col" style={{ height: '100dvh', background: '#F8F9FA' }}>
 
       {/* Top stats bar — small streak + coins top right */}
       <TopStatsBar streak={streak} coinBalance={activeKid?.coin_balance} lang={lang} />
 
-      <div className="flex-1 overflow-y-auto px-5 pb-10" style={{ background: '#eeecf4' }}>
+      <div className="flex-1 overflow-y-auto px-5 pb-10" style={{ background: '#F8F9FA' }}>
         <div className="max-w-2xl mx-auto">
 
           {/* GIF mascot */}
