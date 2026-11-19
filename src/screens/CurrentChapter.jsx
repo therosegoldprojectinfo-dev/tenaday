@@ -12,9 +12,9 @@ export default function CurrentChapter({ chapter, onNew, onRevision, onSelectExa
   const [inputKey, setInputKey] = useState(0)
 
   function handleFilesPicked(e) {
-    const files = Array.from(e.target.files || [])
+    const file = e.target.files?.[0]
     setInputKey(k => k + 1)
-    if (files.length) onNew(chapter, files)
+    if (file) onNew(chapter, [file])
   }
 
   useEffect(() => { if (chapter?.id) loadExams() }, [chapter?.id])
@@ -126,7 +126,6 @@ export default function CurrentChapter({ chapter, onNew, onRevision, onSelectExa
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        multiple
         className="hidden"
         onChange={handleFilesPicked}
       />
