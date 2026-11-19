@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { generatePractice } from '../lib/generatePractice'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
@@ -38,37 +38,42 @@ function getErrorMessage(err, lang) {
   return lang === 'ar' ? 'حدث خطأ ما. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'
 }
 
-export default function Home({ chapter, onExamReady, onBack, kidId }) {
+export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles }) {
   const lang = useLang()
   const cameraInputRef = useRef(null)
-  const [status, setStatus]   = useState('idle')
-  const [error, setError]     = useState(null)
-  const [images, setImages]   = useState([])
-  const [inputKey, setInputKey] = useState(0)
-
   const MAX_IMAGES = 5
   const MAX_SIZE_MB = 10
 
-  // Open the camera / gallery as soon as this screen shows, so the
-  // "Prendre une photo" tap goes straight to the picker.
-  // If the browser blocks it, the idle screen below stays as a fallback.
-  useEffect(() => {
-    const id = setTimeout(() => cameraInputRef.current?.click(), 50)
-    return () => clearTimeout(id)
-  }, [])
+  function validateFiles(files, existingCount) {
+    if (existingCount + files.length > MAX_IMAGES) {
+      return new Error(lang === 'ar' ? `الحد الأقصى ${MAX_IMAGES} صور` : `Max ${MAX_IMAGES} images allowed`)
+    }
+    const tooBig = files.find(f => f.size > MAX_SIZE_MB * 1024 * 1024)
+    if (tooBig) {
+      return new Error(lang === 'ar' ? `حجم الصورة كبير جداً (الحد ${MAX_SIZE_MB}MB)` : `Image too large (max ${MAX_SIZE_MB}MB each)`)
+    }
+    return null
+  }
+
+  // Photos picked on the subject page arrive here as initialFiles,
+  // so we open straight on the "Generate quiz" (review) screen.
+  const startFiles = Array.isArray(initialFiles) ? initialFiles : []
+  const startError = startFiles.length ? validateFiles(startFiles, 0) : null
+
+  const [status, setStatus]   = useState(startError ? 'error' : startFiles.length ? 'review' : 'idle')
+  const [error, setError]     = useState(startError)
+  const [images, setImages]   = useState(() =>
+    startError ? [] : startFiles.map(file => ({ file, preview: URL.createObjectURL(file) }))
+  )
+  const [inputKey, setInputKey] = useState(0)
 
   async function handleGallerySelected(e) {
     const files = Array.from(e.target.files || [])
     if (!files.length) return
 
-    if (images.length + files.length > MAX_IMAGES) {
-      setError(new Error(lang === 'ar' ? `الحد الأقصى ${MAX_IMAGES} صور` : `Max ${MAX_IMAGES} images allowed`))
-      setStatus('error')
-      return
-    }
-    const tooBig = files.find(f => f.size > MAX_SIZE_MB * 1024 * 1024)
-    if (tooBig) {
-      setError(new Error(lang === 'ar' ? `حجم الصورة كبير جداً (الحد ${MAX_SIZE_MB}MB)` : `Image too large (max ${MAX_SIZE_MB}MB each)`))
+    const problem = validateFiles(files, images.length)
+    if (problem) {
+      setError(problem)
       setStatus('error')
       return
     }
@@ -78,18 +83,16 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
   }
 
   function removeImage(index) {
-    setImages(prev => {
-      const next = prev.filter((_, i) => i !== index)
-      if (next.length === 0) setStatus('idle')
-      return next
-    })
+    const next = images.filter((_, i) => i !== index)
+    if (next.length === 0) { onBack(); return }
+    setImages(next)
   }
 
   function handleReset() {
-    setStatus('idle')
     setError(null)
     setImages([])
     setInputKey(k => k + 1)
+    onBack()
   }
 
   async function handleGenerate() {
@@ -225,7 +228,6 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
         multiple
         className="hidden"
         onChange={handleGallerySelected}
-        onCancel={() => { if (images.length === 0) onBack() }}
       />
 
       <style>{`@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`}</style>
