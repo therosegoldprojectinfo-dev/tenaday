@@ -185,12 +185,12 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
   if (loading) return <LoadingScreen />
 
   return (
-    <div className="bg-white flex flex-col" style={{ height: '100dvh' }}>
+    <div className="flex flex-col" style={{ height: '100dvh', background: '#eeecf4' }}>
 
       {/* Top stats bar — small streak + coins top right */}
       <TopStatsBar streak={streak} coinBalance={activeKid?.coin_balance} lang={lang} />
 
-      <div className="flex-1 overflow-y-auto px-5 pb-10">
+      <div className="flex-1 overflow-y-auto px-5 pb-10" style={{ background: '#eeecf4' }}>
         <div className="max-w-2xl mx-auto">
 
           {/* GIF mascot */}
@@ -198,7 +198,7 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
             <img
               src="/gifbro.gif"
               alt="Numio"
-              style={{ width: 140, height: 'auto' }}
+              style={{ width: '100%', maxWidth: 360, height: 'auto' }}
             />
           </div>
 
