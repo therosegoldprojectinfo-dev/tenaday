@@ -285,10 +285,23 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
   return (
     <div className="flex flex-col" style={{ height: '100dvh', background: '#ffffff' }}>
 
-      {/* Top stats bar — small streak + coins top right */}
-      <TopStatsBar streak={streak} coinBalance={activeKid?.coin_balance} lang={lang} />
-
       <div className="flex-1 overflow-y-auto px-5 pb-10" style={{ background: '#ffffff' }}>
+
+      {/* Top stats bar — sticky with frosted glass */}
+      <div style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 30,
+        marginLeft: '-20px',
+        marginRight: '-20px',
+        paddingLeft: '20px',
+        paddingRight: '20px',
+        background: 'rgba(255,255,255,0.72)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}>
+        <TopStatsBar streak={streak} coinBalance={activeKid?.coin_balance} lang={lang} />
+      </div>
         <div className="max-w-2xl mx-auto">
 
           {/* GIF mascot */}
@@ -342,7 +355,7 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
             </div>
           )}
         </div>
-      </div>
+      </div>  {/* end scroll wrapper */}
 
       {showModal && (
         <ChapterModal lang={lang} onConfirm={handleCreate} onClose={() => setShowModal(false)} />
@@ -355,7 +368,7 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
           onClose={() => setEmojiTarget(null)}
         />
       )}
-    </div>
+    </div>  {/* end outer flex */}
   )
 }
 
