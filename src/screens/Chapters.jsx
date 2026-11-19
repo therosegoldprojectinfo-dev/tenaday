@@ -112,7 +112,21 @@ function StreakPopupModal({ streak, lang, onClose, accountCreatedAt }) {
 
         {/* Header — centered gif + text + button */}
         <div className="flex-shrink-0 flex flex-col items-center text-center pt-10 pb-5 px-5 gap-3">
-          <img src="/firebro.gif" alt="fire" style={{ width: 90, height: 90, objectFit: 'contain' }} />
+          {/* Curved "Garde ta / Série de X jours" title */}
+          <div className="w-full" style={{ lineHeight: 1.1 }}>
+            <p className="font-display font-bold text-ink" style={{ fontSize: 18 }}>Garde ta</p>
+            <svg viewBox="0 0 300 60" width="100%" height="54" style={{ overflow: 'visible', marginTop: -4 }}>
+              <defs>
+                <path id="curve" d="M 10,45 Q 150,10 290,45" />
+              </defs>
+              <text fontFamily="inherit" fontWeight="800" fontSize="32" fill="#1a1a2e">
+                <textPath href="#curve" startOffset="50%" textAnchor="middle">
+                  Série de {streak} jour{streak > 1 ? 's' : ''}
+                </textPath>
+              </text>
+            </svg>
+          </div>
+          <img src="/firebro.gif" alt="fire" style={{ width: 120, height: 120, objectFit: 'contain' }} />
           <div>
             <p className="font-display font-extrabold text-ink" style={{ fontSize: 26 }}>Compléter un Quiz</p>
             <p className="font-body text-sm mt-1" style={{ color: '#888' }}>pour continuer ta série</p>
