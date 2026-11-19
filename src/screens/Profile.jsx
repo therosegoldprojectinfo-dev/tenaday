@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { useLang } from '../lib/LangContext'
 import { useKid } from '../lib/KidContext'
 import { createKid, getKids } from '../lib/kids'
 
 const AVATARS = ['🪐', '🌍', '🌙', '⭐', '🌟', '☀️', '🌎', '🌏', '🌑', '💫']
-const ACCENT_COLORS = ['#ede9fe', '#fce7f3', '#dbeafe', '#dcfce7', '#ffedd5']
 
-export default function Profile({ onLogout, onLanguageChange }) {
-  const lang = useLang()
+const CARD = { background: 'white', border: '1.5px solid #eef0f3', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }
+const PILL = { background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }
+
+export default function Profile({ onLogout }) {
   const { activeKid, kids, setActiveKid, setKids } = useKid()
   const [showAddKid, setShowAddKid] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
-  const [langSaving, setLangSaving] = useState(false)
   const [username, setUsername] = useState('')
 
   useEffect(() => {
@@ -36,182 +35,140 @@ export default function Profile({ onLogout, onLanguageChange }) {
     setShowAddKid(false)
   }
 
-  async function handleLanguageChange(newLang) {
-    if (newLang === lang || langSaving) return
-    setLangSaving(true)
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) await supabase.from('profiles').update({ language: newLang }).eq('id', user.id)
-      onLanguageChange?.(newLang)
-    } catch (e) { console.error(e) }
-    finally { setLangSaving(false) }
-  }
-
-  const activeIndex = kids.findIndex(k => k.id === activeKid?.id)
-  const totalQuizzes = 0
+  const activeIndex = Math.max(0, kids.findIndex(k => k.id === activeKid?.id))
+  const activeCoins = (kids.find(k => k.id === activeKid?.id) || activeKid)?.coin_balance || 0
 
   return (
     <div className="bg-white flex flex-col" style={{ height: '100dvh', overflow: 'hidden' }}>
-      <div className="flex-1 overflow-y-auto px-5 pt-12 pb-10 max-w-lg mx-auto w-full">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-5 pt-12 pb-10 max-w-lg mx-auto w-full">
 
-        {/* Page title */}
-        <h1 className="font-display font-extrabold text-3xl text-ink mb-6">
-          {lang === 'ar' ? 'الملف الشخصي' : 'Profile'}
-        </h1>
+        {/* Titre */}
+        <h1 className="font-display font-extrabold text-2xl text-ink mb-5">Profil</h1>
 
-        {/* Hero summary card */}
+        {/* Carte résumé */}
         {activeKid && (
-          <div className="rounded-3xl px-6 py-5 mb-6 relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)', boxShadow: '0 8px 32px rgba(124,58,237,0.25)' }}>
-            <div style={{ position: 'absolute', top: -20, right: -20, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.08)' }} />
-            <div style={{ position: 'absolute', bottom: -30, right: 40, width: 80, height: 80, borderRadius: '50%', background: 'rgba(255,255,255,0.06)' }} />
-
-            <div className="relative flex items-center gap-4">
-              <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0"
-                style={{ background: 'rgba(255,255,255,0.2)' }}>
-                {AVATARS[activeIndex % AVATARS.length]}
-              </div>
-              <div>
-                <p className="font-body text-sm text-white/70">
-                  {lang === 'ar' ? 'مرحباً،' : 'Hello,'}
-                </p>
-                <p className="font-display font-extrabold text-2xl text-white">{activeKid.name}</p>
+          <div className="mb-8" style={{ ...CARD, borderRadius: 28, padding: 18 }}>
+            <div className="flex items-center gap-4">
+              <IconTile size={64}><span style={{ fontSize: 32 }}>{AVATARS[activeIndex % AVATARS.length]}</span></IconTile>
+              <div className="min-w-0">
+                <p className="font-body text-sm" style={{ color: '#9ca3af' }}>Bonjour,</p>
+                <p className="font-display font-extrabold text-2xl text-ink truncate">{activeKid.name}</p>
               </div>
             </div>
 
-            <div className="relative flex gap-3 mt-4">
-              <div className="flex-1 rounded-2xl px-4 py-3 text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                <p className="font-display font-extrabold text-xl text-white">
-                  {(kids.find(k => k.id === activeKid.id) || activeKid).coin_balance || 0}
-                </p>
-                <p className="font-body text-xs text-white/70 mt-0.5">{lang === 'ar' ? 'نقاط' : 'Points'}</p>
+            <div className="flex gap-3 mt-4">
+              <div className="flex-1 text-center" style={{ background: '#f9fafb', border: '1.5px solid #eef0f3', borderRadius: 20, padding: '12px 8px' }}>
+                <div className="flex items-center justify-center gap-1.5">
+                  <img src="/coin-flower.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} />
+                  <p className="font-display font-extrabold text-xl" style={{ color: '#f59e0b' }}>{activeCoins}</p>
+                </div>
+                <p className="font-body text-xs mt-0.5" style={{ color: '#9ca3af' }}>Pièces</p>
               </div>
-              <div className="flex-1 rounded-2xl px-4 py-3 text-center" style={{ background: 'rgba(255,255,255,0.15)' }}>
-                <p className="font-display font-extrabold text-xl text-white">{kids.length}</p>
-                <p className="font-body text-xs text-white/70 mt-0.5">{lang === 'ar' ? 'أطفال' : 'Kids'}</p>
+              <div className="flex-1 text-center" style={{ background: '#f9fafb', border: '1.5px solid #eef0f3', borderRadius: 20, padding: '12px 8px' }}>
+                <p className="font-display font-extrabold text-xl text-ink">{kids.length}</p>
+                <p className="font-body text-xs mt-0.5" style={{ color: '#9ca3af' }}>Enfant{kids.length > 1 ? 's' : ''}</p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Kids section */}
-        <p className="font-body font-bold text-xs text-muted uppercase tracking-widest mb-3">
-          {lang === 'ar' ? 'الأطفال في هذا الحساب' : 'Kids on this account'}
-        </p>
-        <div className="flex flex-col gap-3 mb-6">
+        {/* Enfants */}
+        <h2 className="font-display font-bold text-lg text-ink mb-3">Enfants du compte</h2>
+        <div className="flex flex-col gap-3 mb-8">
           {kids.map((kid, i) => {
             const isActive = kid.id === activeKid?.id
             return (
               <button key={kid.id} onClick={() => setActiveKid(kid)}
-                className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-left transition-all active:scale-95"
+                className="w-full flex items-center gap-4 text-left transition-all active:scale-95"
                 style={{
-                  background: isActive ? '#f5f3ff' : 'white',
-                  boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
-                  border: isActive ? '1.5px solid #c4b5fd' : '1.5px solid transparent',
+                  ...CARD,
+                  borderRadius: 28,
+                  padding: 14,
+                  border: isActive ? '1.5px solid #7c3aed' : CARD.border,
                 }}>
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0"
-                  style={{ background: ACCENT_COLORS[i % ACCENT_COLORS.length] }}>
-                  {AVATARS[i % AVATARS.length]}
-                </div>
+                <IconTile size={52}><span style={{ fontSize: 26 }}>{AVATARS[i % AVATARS.length]}</span></IconTile>
                 <div className="flex-1 min-w-0">
-                  <p className="font-display font-bold text-base truncate" style={{ color: isActive ? '#7c3aed' : '#1a1a2e' }}>{kid.name}</p>
-                  <p className="font-body text-xs text-muted mt-0.5">{kid.coin_balance || 0} {lang === 'ar' ? 'نقطة' : 'pts'}</p>
+                  <p className="font-display font-extrabold text-base truncate" style={{ color: '#1a1a2e' }}>{kid.name}</p>
+                  <div className="flex items-center gap-1.5 mt-0.5">
+                    <img src="/coin-flower.png" alt="" style={{ width: 16, height: 16, objectFit: 'contain' }} />
+                    <span className="font-display font-bold text-xs" style={{ color: '#f59e0b' }}>{kid.coin_balance || 0}</span>
+                  </div>
                 </div>
-                {isActive && <span className="font-bold text-lg flex-shrink-0" style={{ color: '#7c3aed' }}>✓</span>}
+                {isActive && (
+                  <div className="flex items-center justify-center flex-shrink-0"
+                    style={{ width: 28, height: 28, borderRadius: '50%', background: '#7c3aed' }}>
+                    <Svg size={16} color="white"><path d="M5 12l5 5L20 7" /></Svg>
+                  </div>
+                )}
               </button>
             )
           })}
 
           <button onClick={() => setShowAddKid(true)}
-            className="w-full py-4 rounded-2xl font-display font-bold text-base transition-all active:scale-95"
-            style={{ border: '2px dashed #c4b5fd', color: '#7c3aed', background: 'white' }}>
-            {lang === 'ar' ? '+ إضافة طفل' : '+ Add a kid'}
+            className="w-full flex items-center justify-center gap-2.5 rounded-full py-4 font-display font-bold text-base text-ink transition-all active:scale-95"
+            style={PILL}>
+            <Svg size={20}><path d="M12 5v14M5 12h14" /></Svg>
+            Ajouter un enfant
           </button>
         </div>
 
-
-
-        {/* Language */}
-        <p className="font-body font-bold text-xs text-muted uppercase tracking-widest mb-3">
-          {lang === 'ar' ? 'اللغة' : 'Language'}
+        {/* Crédit OpenMoji */}
+        <p className="font-body text-xs text-center px-2 mb-5" style={{ color: '#9ca3af' }}>
+          Tous les émojis sont conçus par{' '}
+          <a href="https://openmoji.org" target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 700 }}>OpenMoji</a>
+          {' '}– le projet open source d’émojis et d’icônes. Licence : CC BY-SA 4.0
         </p>
-        <div className="flex gap-3 mb-6">
-          {[{ code: 'en', label: '🇺🇸 English' }, { code: 'ar', label: '🇸🇦 عربي' }].map(({ code, label }) => (
-            <button key={code} onClick={() => handleLanguageChange(code)} disabled={langSaving}
-              className="flex-1 py-4 rounded-2xl font-display font-bold text-base transition-all active:scale-95"
-              style={{
-                background: lang === code ? '#7c3aed' : 'white',
-                color: lang === code ? 'white' : '#AFAFAF',
-                boxShadow: lang === code ? '0 4px 0 #5b21b6' : '0 2px 16px rgba(0,0,0,0.06)',
-              }}>
-              {label}
-            </button>
-          ))}
-        </div>
 
-        {/* OpenMoji credit */}
-        <div className="flex items-center justify-center mb-6 px-2">
-          <p className="font-body text-xs text-center" style={{ color: '#9ca3af' }}>
-            {lang === 'ar'
-              ? <>جميع الرموز التعبيرية مصممة بواسطة{' '}<a href="https://openmoji.org" target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 700 }}>OpenMoji</a>{' '}– مشروع الرموز مفتوح المصدر. الترخيص: CC BY-SA 4.0</>
-              : <>All emojis designed by{' '}<a href="https://openmoji.org" target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 700 }}>OpenMoji</a>{' '}– the open-source emoji and icon project. License: CC BY-SA 4.0</>
-            }
-          </p>
-        </div>
-
-        {/* Legal links */}
-        <div className="flex gap-4 justify-center mb-5">
-          <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="font-body text-xs text-muted underline">
-            {lang === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'}
+        {/* Liens légaux */}
+        <div className="flex gap-4 justify-center mb-6">
+          <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="font-body text-xs underline" style={{ color: '#9ca3af' }}>
+            Politique de confidentialité
           </a>
-          <a href="/terms.html" target="_blank" rel="noopener noreferrer" className="font-body text-xs text-muted underline">
-            {lang === 'ar' ? 'شروط الاستخدام' : 'Terms of Use'}
+          <a href="/terms.html" target="_blank" rel="noopener noreferrer" className="font-body text-xs underline" style={{ color: '#9ca3af' }}>
+            Conditions d’utilisation
           </a>
         </div>
 
-        {/* Refund */}
+        {/* Remboursement */}
         <a href="https://wa.me/14384102068" target="_blank" rel="noopener noreferrer"
-          className="w-full py-4 rounded-2xl font-display font-bold text-base text-center block transition-all active:scale-95 mb-3"
-          style={{ background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#16a34a', textDecoration: 'none' }}>
-          {lang === 'ar'
-            ? '💸 تريد استرداد الأموال؟ تواصل معنا'
-            : '💸 Want a refund? Contact us on WhatsApp'}
+          className="w-full flex items-center justify-center gap-2.5 rounded-full py-4 font-display font-bold text-base text-ink transition-all active:scale-95 mb-3"
+          style={{ ...PILL, textDecoration: 'none' }}>
+          <Svg size={20}><rect x="2" y="5" width="20" height="14" rx="3" /><path d="M2 10h20" /></Svg>
+          Demander un remboursement
         </a>
 
-        {/* Logout */}
-        <div onClick={() => setShowLogoutConfirm(true)}
-          className="w-full py-4 rounded-2xl font-display font-bold text-base text-center cursor-pointer transition-all active:scale-95"
-          style={{ background: '#fff5f5', boxShadow: '0 2px 16px rgba(239,68,68,0.08)', color: '#ef4444' }}>
-          {lang === 'ar' ? '🚪 تسجيل الخروج' : '🚪 Log out'}
-        </div>
+        {/* Déconnexion */}
+        <button onClick={() => setShowLogoutConfirm(true)}
+          className="w-full flex items-center justify-center gap-2.5 rounded-full py-4 font-display font-bold text-base text-ink transition-all active:scale-95"
+          style={PILL}>
+          <Svg size={20}><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></Svg>
+          Se déconnecter
+        </button>
 
-        {/* WhatsApp support */}
+        {/* Support WhatsApp */}
         <a href="https://wa.me/14384102068" target="_blank" rel="noopener noreferrer"
-          className="text-center block mt-3"
+          className="text-center block mt-4"
           style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, color: '#9ca3af', textDecoration: 'none' }}>
-          {lang === 'ar'
-            ? <>واجهت مشكلة؟ <span style={{ color: '#7c3aed', fontWeight: 700 }}>تواصل معنا على واتساب</span></>
-            : <>Encounter any issues? <span style={{ color: '#7c3aed', fontWeight: 700 }}>Contact us on WhatsApp</span></>
-          }
+          Un problème ? <span style={{ color: '#7c3aed', fontWeight: 700 }}>Contactez-nous sur WhatsApp</span>
         </a>
       </div>
 
-      {showAddKid && <AddKidModal lang={lang} onConfirm={handleAddKid} onClose={() => setShowAddKid(false)} />}
+      {showAddKid && <AddKidModal onConfirm={handleAddKid} onClose={() => setShowAddKid(false)} />}
 
       {showLogoutConfirm && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4">
-            <h2 className="font-display font-extrabold text-xl text-ink text-center">
-              {lang === 'ar' ? 'تسجيل الخروج؟' : 'Log out?'}
-            </h2>
-            <p className="font-body text-sm text-muted text-center">
-              {lang === 'ar' ? 'ستحتاج إلى اسم المستخدم وكلمة المرور لتسجيل الدخول مرة أخرى.' : "You'll need your username and password to log back in."}
+            <h2 className="font-display font-extrabold text-xl text-ink text-center">Se déconnecter ?</h2>
+            <p className="font-body text-sm text-center" style={{ color: '#9ca3af' }}>
+              Vous aurez besoin de votre nom d’utilisateur et de votre mot de passe pour vous reconnecter.
             </p>
-            <button onClick={handleLogout} className="w-full py-4 text-white font-display font-bold text-lg rounded-2xl" style={{ background: '#ef4444' }}>
-              {lang === 'ar' ? 'نعم، اخرج' : 'Yes, log out'}
+            <button onClick={handleLogout}
+              className="w-full flex items-center justify-center gap-2 py-4 text-white font-display font-bold text-base rounded-full transition-all active:scale-95"
+              style={{ background: '#1a1a2e' }}>
+              Oui, me déconnecter
             </button>
-            <button onClick={() => setShowLogoutConfirm(false)} className="w-full py-3 text-muted font-body font-bold text-sm text-center">
-              {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+            <button onClick={() => setShowLogoutConfirm(false)} className="w-full py-3 font-body font-bold text-sm text-center" style={{ color: '#9ca3af' }}>
+              Annuler
             </button>
           </div>
         </div>
@@ -220,7 +177,7 @@ export default function Profile({ onLogout, onLanguageChange }) {
   )
 }
 
-function AddKidModal({ lang, onConfirm, onClose }) {
+function AddKidModal({ onConfirm, onClose }) {
   const [name, setName] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -229,33 +186,49 @@ function AddKidModal({ lang, onConfirm, onClose }) {
     if (!name.trim()) return
     setSaving(true); setError('')
     try { await onConfirm(name.trim()) }
-    catch { setError(lang === 'ar' ? 'حدث خطأ ما.' : 'Something went wrong.'); setSaving(false) }
+    catch { setError('Une erreur est survenue.'); setSaving(false) }
   }
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
       <div className="w-full bg-white rounded-t-3xl px-5 pb-8 pt-4">
         <div className="flex justify-center mb-4"><div className="w-10 h-1 rounded-full bg-gray-200" /></div>
-        <h2 className="font-display font-extrabold text-2xl text-ink text-center mb-5">
-          {lang === 'ar' ? 'إضافة طفل' : 'Add a kid'}
-        </h2>
+        <h2 className="font-display font-extrabold text-2xl text-ink text-center mb-5">Ajouter un enfant</h2>
         <input type="text" value={name} onChange={e => setName(e.target.value)}
-          placeholder={lang === 'ar' ? 'اسم الطفل...' : "Kid's name..."}
+          placeholder="Prénom de l’enfant..."
           autoFocus
           className="w-full rounded-2xl px-4 py-4 font-display font-bold text-xl text-ink outline-none transition-colors mb-4"
-          style={{ border: '2px solid #e5e7eb', background: '#fafafa' }}
+          style={{ border: '1.5px solid #e5e7eb', background: 'white' }}
           onFocus={e => e.target.style.borderColor = '#7c3aed'}
           onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
-        {error && <p className="font-body text-sm text-red-500 font-bold text-center mb-2">{error}</p>}
+        {error && <p className="font-body text-sm font-bold text-center mb-2" style={{ color: '#6b7280' }}>{error}</p>}
         <button onClick={handleSubmit} disabled={!name.trim() || saving}
-          className="w-full disabled:opacity-40 text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95"
-          style={{ background: '#7c3aed', boxShadow: name.trim() ? '0 4px 0 #5b21b6' : 'none' }}>
-          {saving ? '...' : lang === 'ar' ? 'إضافة ←' : 'Add kid →'}
+          className="w-full disabled:opacity-40 text-white font-display font-bold text-lg rounded-full py-4 transition-all active:scale-95"
+          style={{ background: '#7c3aed', boxShadow: name.trim() ? '0 4px 16px rgba(124,58,237,0.3)' : 'none' }}>
+          {saving ? '...' : 'Ajouter'}
         </button>
-        <button onClick={onClose} className="w-full text-muted font-body font-bold text-sm py-3 text-center mt-1">
-          {lang === 'ar' ? 'إلغاء' : 'Cancel'}
+        <button onClick={onClose} className="w-full font-body font-bold text-sm py-3 text-center mt-1" style={{ color: '#9ca3af' }}>
+          Annuler
         </button>
       </div>
     </div>
+  )
+}
+
+/* ── petits composants ── */
+function IconTile({ size = 56, children }) {
+  return (
+    <div className="flex items-center justify-center flex-shrink-0"
+      style={{ width: size, height: size, borderRadius: Math.round(size * 0.32), background: '#f9fafb', border: '1.5px solid #eef0f3' }}>
+      {children}
+    </div>
+  )
+}
+
+function Svg({ size = 20, color = '#1a1a2e', children }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {children}
+    </svg>
   )
 }
