@@ -121,26 +121,24 @@ function TopStatsBar({ streak, coinBalance, lang }) {
   return (
     <>
       <div className="flex items-center justify-end gap-2 pt-12 pb-2 px-5">
-        {/* Streak pill */}
-        <button
-          onClick={() => setShowStreak(true)}
-          className="flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-all active:scale-95"
-          style={{ background: streak > 0 ? '#fff0f6' : '#f9fafb', border: '1.5px solid', borderColor: streak > 0 ? '#fecdd3' : '#e5e7eb' }}
-        >
-          <img src="/streak-fire.png" alt="streak" style={{ width: 18, height: 18, objectFit: 'contain', filter: streak === 0 ? 'grayscale(1) opacity(0.4)' : 'none' }} />
-          <span className="font-display font-extrabold text-sm" style={{ color: streak > 0 ? '#ff2d78' : '#9ca3af' }}>{streak}</span>
-          <span className="font-body text-xs text-muted">{lang === 'ar' ? 'أيام' : 'streak'}</span>
-        </button>
-
         {/* Coins pill */}
         <button
           onClick={() => setShowCoins(true)}
-          className="flex items-center gap-1.5 rounded-full px-3 py-1.5 transition-all active:scale-95"
-          style={{ background: '#fffbeb', border: '1.5px solid #fde68a' }}
+          className="flex items-center gap-2 rounded-full px-4 py-2 transition-all active:scale-95"
+          style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb' }}
         >
-          <img src="/coin-flower.png" alt="coins" style={{ width: 18, height: 18, objectFit: 'contain' }} />
-          <span className="font-display font-extrabold text-sm text-amber-500">{coinBalance ?? 0}</span>
-          <span className="font-body text-xs text-muted">{lang === 'ar' ? 'عملات' : 'coins'}</span>
+          <img src="/coin-flower.png" alt="coins" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+          <span className="font-display font-extrabold text-base text-amber-500">{coinBalance ?? 0}</span>
+        </button>
+
+        {/* Streak pill */}
+        <button
+          onClick={() => setShowStreak(true)}
+          className="flex items-center gap-2 rounded-full px-4 py-2 transition-all active:scale-95"
+          style={{ background: '#f9fafb', border: '1.5px solid #e5e7eb' }}
+        >
+          <img src="/streak-fire.png" alt="streak" style={{ width: 28, height: 28, objectFit: 'contain', filter: streak === 0 ? 'grayscale(1) opacity(0.4)' : 'none' }} />
+          <span className="font-display font-extrabold text-base" style={{ color: streak > 0 ? '#ff2d78' : '#9ca3af' }}>{streak}</span>
         </button>
       </div>
 
