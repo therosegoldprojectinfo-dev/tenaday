@@ -106,7 +106,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
 
   return (
     <div className="bg-white flex flex-col" style={{ height: '100dvh' }}>
-      <div className="w-full max-w-lg mx-auto px-5 flex flex-col flex-1">
+      <div className="w-full max-w-lg mx-auto px-5 flex flex-col flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(40px + env(safe-area-inset-bottom))' }}>
 
         {/* Back */}
         <button
@@ -135,7 +135,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
               <img
                 src={image.preview}
                 alt="Photo"
-                style={{ width: '100%', maxHeight: '52dvh', objectFit: 'contain' }}
+                style={{ width: '100%', maxHeight: '46dvh', objectFit: 'contain' }}
               />
             </div>
 
