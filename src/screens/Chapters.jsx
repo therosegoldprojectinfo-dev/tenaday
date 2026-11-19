@@ -198,7 +198,7 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
             <img
               src="/gifbro.gif"
               alt="Numio"
-              style={{ width: '100%', maxWidth: 360, height: 'auto' }}
+              style={{ width: '100%', maxWidth: 360, height: 'auto', mixBlendMode: 'multiply' }}
             />
           </div>
 
@@ -278,7 +278,7 @@ function ChapterCard({ chapter, accent, lang, onClick }) {
 function EmptyState({ lang, onAdd }) {
   return (
     <div className="flex flex-col items-center justify-center pt-10 gap-6 text-center px-4">
-      <img src="/gifbro.gif" alt="" style={{ width: 120, height: 'auto' }} />
+      <img src="/gifbro.gif" alt="" style={{ width: 120, height: 'auto', mixBlendMode: 'multiply' }} />
       <div>
         <p className="font-display font-extrabold text-2xl text-ink">{t(lang, 'chapters_empty_title')}</p>
         <p className="text-muted font-body text-base mt-2">{t(lang, 'chapters_empty_sub')}</p>
