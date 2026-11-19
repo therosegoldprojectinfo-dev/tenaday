@@ -40,14 +40,8 @@ export default function CurrentChapter({ chapter, onNew, onRevision, onSelectExa
           Retour
         </button>
 
-        {/* Emoji + subject name + exam count */}
+        {/* Subject name + exam count */}
         <div className="flex-shrink-0 flex items-center gap-4 mb-2">
-          <div
-            className="flex items-center justify-center rounded-2xl flex-shrink-0"
-            style={{ width: 64, height: 64, background: '#ede9fe' }}
-          >
-            <span style={{ fontSize: 36 }}>{chapter.emoji}</span>
-          </div>
           <div className="min-w-0">
             <h1 className="font-display font-extrabold text-2xl text-ink truncate">{chapter.name}</h1>
             <p className="font-body text-sm mt-0.5" style={{ color: '#9ca3af' }}>
