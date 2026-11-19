@@ -31,6 +31,17 @@ export async function deleteChapter(id) {
   if (error) throw error
 }
 
+export async function updateChapter(id, updates) {
+  const { data, error } = await supabase
+    .from('chapters')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
 // ── Exams ─────────────────────────────────────────────────────────
 
 export async function getExamsForChapter(chapterId) {
