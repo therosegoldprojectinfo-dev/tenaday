@@ -29,7 +29,7 @@ export default function PinGate({ onSuccess, onBack }) {
         onSuccess()
       } else {
         setShake(true)
-        setError(lang === 'ar' ? 'كلمة المرور غير صحيحة' : 'Wrong password')
+        setError(lang === 'ar' ? 'كلمة المرور غير صحيحة' : 'Mot de passe incorrect')
         setPassword('')
         setTimeout(() => setShake(false), 600)
       }
@@ -38,9 +38,9 @@ export default function PinGate({ onSuccess, onBack }) {
       if (isLocked) {
         setError(lang === 'ar'
           ? 'تم قفل الحساب مؤقتاً. انتظر 15 دقيقة أو تواصل معنا عبر واتساب.'
-          : 'Account temporarily locked. Wait 15 min or contact us on WhatsApp.')
+          : 'Compte temporairement bloqué. Attendez 15 min ou contactez-nous sur WhatsApp.')
       } else {
-        setError(lang === 'ar' ? 'حدث خطأ. حاول مرة أخرى.' : 'Something went wrong. Try again.')
+        setError(lang === 'ar' ? 'حدث خطأ. حاول مرة أخرى.' : 'Une erreur est survenue. Réessayez.')
       }
     } finally {
       setLoading(false)
@@ -63,10 +63,10 @@ export default function PinGate({ onSuccess, onBack }) {
 
       <div className="text-center">
         <h1 className="font-display font-extrabold text-3xl text-ink">
-          {lang === 'ar' ? 'منطقة الوالدين 🔒' : 'Parent Zone 🔒'}
+          {lang === 'ar' ? 'منطقة الوالدين 🔒' : 'Zone de Parents 🔒'}
         </h1>
         <p className="font-body text-base text-muted mt-1">
-          {lang === 'ar' ? 'أدخل كلمة المرور للمتابعة' : 'Enter your password to continue'}
+          {lang === 'ar' ? 'أدخل كلمة المرور للمتابعة' : 'Entrez votre code pour rentrer'}
         </p>
       </div>
 
@@ -79,10 +79,10 @@ export default function PinGate({ onSuccess, onBack }) {
           value={password}
           onChange={e => {
             setPassword(e.target.value)
-            if (!error.includes('locked') && !error.includes('قفل')) setError('')
+            if (!error.includes('bloqué') && !error.includes('قفل')) setError('')
           }}
           onKeyDown={e => e.key === 'Enter' && verify()}
-          placeholder={lang === 'ar' ? 'كلمة المرور' : 'Password'}
+          placeholder={lang === 'ar' ? 'كلمة المرور' : 'Mot de passe'}
           autoFocus
           className="w-full rounded-2xl px-4 py-4 font-display font-bold text-xl text-ink outline-none transition-all text-center"
           style={{
@@ -95,14 +95,14 @@ export default function PinGate({ onSuccess, onBack }) {
         {error && (
           <div className="text-center">
             <p className="font-body font-bold text-sm text-red-500">{error}</p>
-            {(error.includes('locked') || error.includes('قفل')) && (
+            {(error.includes('bloqué') || error.includes('قفل')) && (
               <a
                 href="https://wa.me/14384102068?text=Hi%2C%20I%20am%20locked%20out%20of%20my%20Numio%20Parent%20Zone."
                 target="_blank" rel="noopener noreferrer"
                 className="font-body font-bold text-sm underline mt-1 block"
                 style={{ color: '#7c3aed' }}
               >
-                {lang === 'ar' ? 'تواصل معنا عبر واتساب' : 'Contact us on WhatsApp'}
+                {lang === 'ar' ? 'تواصل معنا عبر واتساب' : 'Contactez-nous sur WhatsApp'}
               </a>
             )}
           </div>
@@ -112,12 +112,21 @@ export default function PinGate({ onSuccess, onBack }) {
       <button
         onClick={verify}
         disabled={!password || loading}
-        className="w-full max-w-xs disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:scale-95"
+        className="w-full max-w-xs disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:scale-95 flex items-center justify-center gap-3"
         style={{ background: '#7c3aed', boxShadow: password ? '0 4px 0 #5b21b6' : 'none' }}
       >
-        {loading
-          ? (lang === 'ar' ? 'جاري التحقق...' : 'Checking...')
-          : (lang === 'ar' ? 'دخول' : 'Enter')}
+        {loading ? (
+          lang === 'ar' ? 'جاري التحقق...' : 'Vérification...'
+        ) : (
+          <>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+              <polyline points="10 17 15 12 10 7" />
+              <line x1="15" y1="12" x2="3" y2="12" />
+            </svg>
+            {lang === 'ar' ? 'دخول' : 'Rentrer'}
+          </>
+        )}
       </button>
 
       <style>{`
