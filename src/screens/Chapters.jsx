@@ -14,38 +14,91 @@ const CARD_ACCENTS = [
   '#dcfce7', '#ffedd5', '#ccfbf1', '#fee2e2',
 ]
 
-function StreakPopupModal({ streak, lang, onClose }) {
-  const today = new Date()
+function CalendarMonth({ year, month, streakDaysSet, today }) {
+  const colHeaders = ['Di','Lu','Ma','Me','Je','Ve','Sa']
+  const firstDay   = new Date(year, month, 1).getDay()
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const monthName  = new Date(year, month, 1).toLocaleString('fr', { month: 'long' })
+  const isCurrentMonth = year === today.getFullYear() && month === today.getMonth()
+
+  const cells = []
+  for (let i = 0; i < firstDay; i++) cells.push(null)
+  for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+
+  return (
+    <div className="rounded-2xl mb-3" style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+      <div className="grid grid-cols-7 px-2 pt-3 pb-1">
+        {colHeaders.map((h, i) => (
+          <div key={i} className="text-center font-body font-bold text-xs" style={{ color: '#aaa' }}>{h}</div>
+        ))}
+      </div>
+      <div className="px-4 pb-1">
+        <span className="font-display font-bold text-sm text-ink capitalize">{monthName}</span>
+      </div>
+      <div className="grid grid-cols-7 gap-y-1 px-2 pb-3">
+        {cells.map((day, i) => {
+          if (!day) return <div key={i} />
+          const dateKey   = `${year}-${month}-${day}`
+          const isStreak  = streakDaysSet.has(dateKey)
+          const isToday   = isCurrentMonth && day === today.getDate()
+          return (
+            <div key={i} className="flex items-center justify-center" style={{ height: 42 }}>
+              {isStreak ? (
+                <div className="flex flex-col items-center">
+                  <img src="/streak-fire.png" alt="🔥" style={{ width: 28, height: 28, objectFit: 'contain' }} />
+                  {isToday && <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#ff2d78', marginTop: 1 }} />}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-0.5">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center font-display font-bold text-sm"
+                    style={{
+                      background: isToday ? 'rgba(255,45,120,0.08)' : 'transparent',
+                      color: isToday ? '#ff2d78' : '#bbb',
+                      border: isToday ? '1.5px solid #ff2d78' : 'none',
+                    }}>
+                    {day}
+                  </div>
+                  {isToday && <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#ff2d78' }} />}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function StreakPopupModal({ streak, lang, onClose, accountCreatedAt }) {
+  const today        = new Date()
   const currentYear  = today.getFullYear()
   const currentMonth = today.getMonth()
   const currentDay   = today.getDate()
 
-  // Build a grid of days for the current month
-  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay() // 0=Sun
-  const daysInMonth     = new Date(currentYear, currentMonth + 1, 0).getDate()
-
-  // Which days in this month have streak? 
-  // We know the streak count — mark the last `streak` days up to and including today
-  const streakDays = new Set()
+  // Build set of all streak days (key: "year-month-day")
+  const streakDaysSet = new Set()
   for (let i = 0; i < streak; i++) {
     const d = new Date(currentYear, currentMonth, currentDay - i)
-    if (d.getMonth() === currentMonth) streakDays.add(d.getDate())
+    streakDaysSet.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`)
   }
 
-  const monthName = today.toLocaleString(lang === 'ar' ? 'ar' : lang === 'fr' ? 'fr' : 'fr', { month: 'long' })
+  // Figure out earliest month to show (account creation or 3 months ago if no prop)
+  const earliest = accountCreatedAt ? new Date(accountCreatedAt) : new Date(currentYear, currentMonth - 2, 1)
+  const startYear  = earliest.getFullYear()
+  const startMonth = earliest.getMonth()
 
-  const colHeaders = lang === 'ar'
-    ? ['ح','إ','ث','ث','أ','خ','س']
-    : ['Di','Lu','Ma','Me','Je','Ve','Sa']
+  // Build list of months from start → current
+  const months = []
+  let y = startYear, m = startMonth
+  while (y < currentYear || (y === currentYear && m <= currentMonth)) {
+    months.push({ year: y, month: m })
+    m++
+    if (m > 11) { m = 0; y++ }
+  }
 
-  // Build calendar cells (pad start)
-  const cells = []
-  for (let i = 0; i < firstDayOfMonth; i++) cells.push(null)
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d)
-
-  const title    = lang === 'ar' ? `حافظ على سلسلتك لمدة ${streak} أيام` : `Garde ta série de ${streak} jour${streak > 1 ? 's' : ''}`
-  const subtitle = lang === 'ar' ? 'إبقِ سلسلتك مشتعلة!' : ''
-  const ctaLabel = lang === 'ar' ? `حافظ على سلسلتك لمدة ${streak} أيام 🎮` : `🎮 Garde ta série de ${streak} jour${streak > 1 ? 's' : ''}`
+  const ctaLabel = lang === 'ar'
+    ? `حافظ على سلسلتك لمدة ${streak} أيام 🎮`
+    : `🎮 Garde ta série de ${streak} jour${streak > 1 ? 's' : ''}`
 
   return (
     <div
@@ -54,96 +107,55 @@ function StreakPopupModal({ streak, lang, onClose }) {
       onClick={e => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
-        className="w-full md:max-w-sm rounded-t-3xl md:rounded-3xl flex flex-col px-5 pt-6 pb-8 relative"
-        style={{ background: '#F6F5F7' }}
+        className="w-full md:max-w-sm rounded-t-3xl md:rounded-3xl flex flex-col relative"
+        style={{ background: '#F6F5F7', maxHeight: '90dvh' }}
       >
         {/* Close */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center"
-          style={{ background: 'rgba(0,0,0,0.08)', color: '#333' }}
-        >✕</button>
+        <button onClick={onClose}
+          className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center z-10"
+          style={{ background: 'rgba(0,0,0,0.08)', color: '#333' }}>✕</button>
 
-        {/* Header */}
-        <div className="text-center mb-4 mt-2">
+        {/* Header — fixed inside modal */}
+        <div className="flex-shrink-0 text-center pt-6 pb-4 px-5">
           <p className="font-display font-bold text-ink text-lg leading-tight">Garde ta</p>
           <p className="font-display font-extrabold text-ink leading-tight" style={{ fontSize: 32 }}>
             Série de {streak} jour{streak > 1 ? 's' : ''}
           </p>
         </div>
 
-        {/* Streak pill */}
-        <div
-          className="flex items-center gap-3 rounded-2xl px-4 py-3 mb-4"
-          style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
-        >
-          <img src="/firebro.gif" alt="fire" style={{ width: 36, height: 36, objectFit: 'contain' }} />
-          <div>
-            <p className="font-display font-extrabold text-base text-ink">
-              {streak} question{streak > 1 ? 's' : ''}
-            </p>
-            <p className="font-body text-xs" style={{ color: '#888' }}>pour continuer ta série</p>
+        {/* Streak info card */}
+        <div className="flex-shrink-0 mx-5 mb-4">
+          <div className="flex items-center gap-3 rounded-2xl px-4 py-3"
+            style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+            <img src="/firebro.gif" alt="fire" style={{ width: 36, height: 36, objectFit: 'contain' }} />
+            <div>
+              <p className="font-display font-extrabold text-base text-ink">Compléter un Quiz</p>
+              <p className="font-body text-xs" style={{ color: '#888' }}>pour continuer ta série</p>
+            </div>
           </div>
         </div>
 
-        {/* Calendar */}
-        <div className="rounded-2xl overflow-hidden" style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-          {/* Col headers */}
-          <div className="grid grid-cols-7 px-2 pt-3 pb-1">
-            {colHeaders.map((h, i) => (
-              <div key={i} className="text-center font-body font-bold text-xs" style={{ color: '#aaa' }}>{h}</div>
-            ))}
-          </div>
-          {/* Month label */}
-          <div className="px-4 pb-1">
-            <span className="font-display font-bold text-sm text-ink capitalize">{monthName}</span>
-          </div>
-          {/* Day grid */}
-          <div className="grid grid-cols-7 gap-y-1 px-2 pb-3">
-            {cells.map((day, i) => {
-              if (!day) return <div key={i} />
-              const isStreak  = streakDays.has(day)
-              const isToday   = day === currentDay
-              return (
-                <div key={i} className="flex items-center justify-center" style={{ height: 42 }}>
-                  {isStreak ? (
-                    <div className="flex flex-col items-center gap-0" style={{ position: 'relative' }}>
-                      <img src="/streak-fire.png" alt="🔥" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-                      {isToday && (
-                        <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#ff2d78', marginTop: 1 }} />
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-0.5">
-                      <div
-                        className="w-9 h-9 rounded-full flex items-center justify-center font-display font-bold text-sm"
-                        style={{
-                          background: isToday ? 'rgba(255,45,120,0.08)' : 'transparent',
-                          color: isToday ? '#ff2d78' : '#bbb',
-                          border: isToday ? '1.5px solid #ff2d78' : 'none',
-                        }}
-                      >
-                        {day}
-                      </div>
-                      {isToday && (
-                        <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#ff2d78' }} />
-                      )}
-                    </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+        {/* Scrollable calendar area */}
+        <div className="flex-1 overflow-y-auto px-5 pb-2" style={{ minHeight: 0 }}>
+          {months.slice().reverse().map(({ year, month }) => (
+            <CalendarMonth
+              key={`${year}-${month}`}
+              year={year}
+              month={month}
+              streakDaysSet={streakDaysSet}
+              today={today}
+            />
+          ))}
         </div>
 
         {/* CTA */}
-        <button
-          onClick={onClose}
-          className="mt-5 w-full py-4 rounded-2xl font-display font-bold text-base text-white transition-all active:scale-95"
-          style={{ background: '#1a1a2e', boxShadow: '0 4px 0 #000' }}
-        >
-          {ctaLabel}
-        </button>
+        <div className="flex-shrink-0 px-5 py-5">
+          <button onClick={onClose}
+            className="w-full py-4 rounded-2xl font-display font-bold text-base text-white transition-all active:scale-95"
+            style={{ background: '#1a1a2e', boxShadow: '0 4px 0 #000' }}>
+            {ctaLabel}
+          </button>
+        </div>
       </div>
     </div>
   )
