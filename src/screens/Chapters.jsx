@@ -194,37 +194,29 @@ function CoinsPopupModal({ coinBalance, lang, onClose }) {
 }
 
 /* ── Small top-right streak + coins bar ── */
-function TopStatsBar({ streak, coinBalance, lang }) {
-  const [showStreak, setShowStreak] = useState(false)
-  const [showCoins,  setShowCoins]  = useState(false)
-
+function TopStatsBar({ streak, coinBalance, onOpenStreak, onOpenCoins }) {
   return (
-    <>
-      <div className="flex items-center justify-end gap-2 pt-3 pb-2 px-5">
-        {/* Coins pill */}
-        <button
-          onClick={() => setShowCoins(true)}
-          className="flex items-center gap-2 rounded-full transition-all active:scale-95"
-          style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb', padding: '10px 20px' }}
-        >
-          <img src="/coin-flower.png" alt="coins" style={{ width: 32, height: 32, objectFit: 'contain' }} />
-          <span className="font-display font-extrabold text-lg text-amber-500">{coinBalance ?? 0}</span>
-        </button>
+    <div className="flex items-center justify-end gap-2 pt-3 pb-2 px-5">
+      {/* Coins pill */}
+      <button
+        onClick={onOpenCoins}
+        className="flex items-center gap-2 rounded-full transition-all active:scale-95"
+        style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb', padding: '10px 20px' }}
+      >
+        <img src="/coin-flower.png" alt="coins" style={{ width: 32, height: 32, objectFit: 'contain' }} />
+        <span className="font-display font-extrabold text-lg text-amber-500">{coinBalance ?? 0}</span>
+      </button>
 
-        {/* Streak pill */}
-        <button
-          onClick={() => setShowStreak(true)}
-          className="flex items-center gap-2 rounded-full transition-all active:scale-95"
-          style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb', padding: '10px 20px' }}
-        >
-          <img src="/firebro.gif" alt="streak" style={{ width: 32, height: 32, objectFit: 'contain', filter: streak === 0 ? 'grayscale(1) opacity(0.4)' : 'none' }} />
-          <span className="font-display font-extrabold text-lg" style={{ color: streak > 0 ? '#ff2d78' : '#9ca3af' }}>{streak}</span>
-        </button>
-      </div>
-
-      {showStreak && <StreakPopupModal streak={streak} lang={lang} onClose={() => setShowStreak(false)} />}
-      {showCoins  && <CoinsPopupModal coinBalance={coinBalance} lang={lang} onClose={() => setShowCoins(false)} />}
-    </>
+      {/* Streak pill */}
+      <button
+        onClick={onOpenStreak}
+        className="flex items-center gap-2 rounded-full transition-all active:scale-95"
+        style={{ background: '#F5F5F5', border: '1.5px solid #e5e7eb', padding: '10px 20px' }}
+      >
+        <img src="/firebro.gif" alt="streak" style={{ width: 32, height: 32, objectFit: 'contain', filter: streak === 0 ? 'grayscale(1) opacity(0.4)' : 'none' }} />
+        <span className="font-display font-extrabold text-lg" style={{ color: streak > 0 ? '#ff2d78' : '#9ca3af' }}>{streak}</span>
+      </button>
+    </div>
   )
 }
 
@@ -233,7 +225,9 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
   const [chapters, setChapters]         = useState([])
   const [loading, setLoading]           = useState(true)
   const [showModal, setShowModal]       = useState(false)
-  const [emojiTarget, setEmojiTarget]   = useState(null)  // chapter to change emoji for
+  const [emojiTarget, setEmojiTarget]   = useState(null)
+  const [showStreak, setShowStreak]     = useState(false)
+  const [showCoins,  setShowCoins]      = useState(false)
 
   useEffect(() => {
     if (kidId) loadChapters()
@@ -300,7 +294,7 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
       }}>
-        <TopStatsBar streak={streak} coinBalance={activeKid?.coin_balance} lang={lang} />
+        <TopStatsBar streak={streak} coinBalance={activeKid?.coin_balance} onOpenStreak={() => setShowStreak(true)} onOpenCoins={() => setShowCoins(true)} />
       </div>
         <div className="max-w-2xl mx-auto">
 
@@ -356,6 +350,9 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
           )}
         </div>
       </div>
+
+      {showStreak && <StreakPopupModal streak={streak} lang={lang} onClose={() => setShowStreak(false)} />}
+      {showCoins  && <CoinsPopupModal coinBalance={activeKid?.coin_balance} lang={lang} onClose={() => setShowCoins(false)} />}
 
       {showModal && (
         <ChapterModal lang={lang} onConfirm={handleCreate} onClose={() => setShowModal(false)} />
