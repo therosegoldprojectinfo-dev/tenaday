@@ -1,7 +1,7 @@
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
 
-const ACCENTS = ['#ede9fe', '#fce7f3', '#dbeafe', '#dcfce7', '#ffedd5', '#fef9c3']
+const ACCENTS = ['#ede9fe', '#fce7f3', '#dbeafe', '#fef9c3', '#dcfce7', '#ffedd5']
 
 export default function Revision({ chapter, exams, onSelectExam, onBack }) {
   const lang = useLang()
@@ -25,48 +25,35 @@ export default function Revision({ chapter, exams, onSelectExam, onBack }) {
 
       <div className="flex-1 overflow-y-auto px-5 pb-10 flex flex-col gap-3">
         {exams.map((exam, i) => {
-          const isRevision = exam.is_revision === true
-          const versionLabel = isRevision
-            ? t(lang, 'revision_version', exam.revision_number ?? 2)
-            : t(lang, 'revision_original')
-
-          const accentColor = isRevision ? '#7c3aed' : '#6b7280'
-          const badgeBg     = isRevision ? '#ede9fe' : '#f3f4f6'
+          const n = exam.questions?.length ?? 0
+          const date = new Date(exam.created_at).toLocaleDateString('fr', { day: 'numeric', month: 'short' })
+          const version = exam.is_revision === true
+            ? ` · ${t(lang, 'revision_version', exam.revision_number ?? 2)}`
+            : ''
 
           return (
             <button
               key={exam.id}
               onClick={() => onSelectExam(exam)}
-              className="w-full text-left rounded-2xl px-4 py-4 transition-all active:scale-95"
-              style={{ background: 'white', boxShadow: '0 2px 12px rgba(0,0,0,0.07)' }}
+              className="w-full flex items-center gap-4 text-left bg-white active:scale-95 transition-all"
+              style={{
+                padding: 14,
+                borderRadius: 28,
+                border: '1.5px solid #eef0f3',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.05)',
+              }}
             >
-              <div className="flex items-center gap-4">
-                {/* Number circle */}
-                <div
-                  className="flex items-center justify-center rounded-xl font-display font-extrabold text-lg flex-shrink-0"
-                  style={{ width: 48, height: 48, background: ACCENTS[i % ACCENTS.length], color: '#7c3aed' }}
-                >
-                  {i + 1}
-                </div>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-display font-bold text-base text-ink truncate">{exam.topic}</p>
-                    {/* Version badge */}
-                    <span
-                      className="font-body font-bold text-xs px-2 py-0.5 rounded-full flex-shrink-0"
-                      style={{ background: badgeBg, color: accentColor }}
-                    >
-                      {versionLabel}
-                    </span>
-                  </div>
-                  <p className="font-body text-xs text-muted mt-0.5">
-                    {t(lang, 'current_questions', exam.questions?.length)} · {new Date(exam.created_at).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en', { month: 'short', day: 'numeric', year: 'numeric' })}
-                  </p>
-                </div>
-
-                <span className="text-muted text-xl flex-shrink-0">→</span>
+              <div
+                className="flex items-center justify-center flex-shrink-0"
+                style={{ width: 56, height: 56, borderRadius: 18, background: ACCENTS[i % ACCENTS.length], fontSize: 28 }}
+              >
+                📝
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-display font-extrabold text-base text-ink truncate">{exam.topic}</p>
+                <p className="font-body text-sm truncate" style={{ color: '#6b7280' }}>
+                  {n} question{n > 1 ? 's' : ''} · {date}{version}
+                </p>
               </div>
             </button>
           )
