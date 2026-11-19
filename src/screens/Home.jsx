@@ -130,46 +130,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
           <h1 className="font-display font-extrabold text-2xl text-ink">{chapter.name}</h1>
         </div>
 
-        {/* IDLE — hero camera UI */}
-        {status === 'idle' && (
-          <div className="flex-1 flex flex-col items-center justify-center gap-8 pb-10">
-            {/* Mascot */}
-            <div style={{ animation: 'float 3s ease-in-out infinite' }}>
-              <img src="/nav-profile.png" alt="" className="w-36 h-auto" />
-            </div>
-
-            {/* Text */}
-            <div className="text-center px-4">
-              <p className="font-display font-extrabold text-2xl text-ink leading-snug">
-                {lang === 'ar'
-                  ? 'أعطني صورة وسأحوّلها إلى اختبار ممتع!'
-                  : 'Give me a photo, I\'ll turn it into a fun quiz!'}
-              </p>
-            </div>
-
-            {/* Big camera circle button */}
-            <button
-              onClick={() => { setInputKey(k => k + 1); setTimeout(() => cameraInputRef.current?.click(), 10) }}
-              className="flex items-center justify-center transition-all active:scale-95"
-              style={{
-                width: 110,
-                height: 110,
-                borderRadius: '50%',
-                background: '#7c3aed',
-                boxShadow: '0 8px 32px rgba(124,58,237,0.35)',
-              }}
-            >
-              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                <circle cx="12" cy="13" r="4"/>
-              </svg>
-            </button>
-
-            <p className="font-body text-sm text-muted">
-              {lang === 'ar' ? 'اضغط للتقاط صورة أو اختيار من معرضك' : 'Tap to take a photo or choose from gallery'}
-            </p>
-          </div>
-        )}
+        {/* IDLE — temporarily removed: picker opens automatically on mount */}
 
         {/* REVIEW — images added, ready to generate */}
         {status === 'review' && (
