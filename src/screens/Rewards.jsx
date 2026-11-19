@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getRewards, getCoinBalance, claimReward, getClaims } from '../lib/economy'
+import { getRewards, getCoinBalance, claimReward } from '../lib/economy'
 import { useLang } from '../lib/LangContext'
 
 function Confetti() {
@@ -66,20 +66,18 @@ function CelebrationScreen({ rewardName, onParentZone, lang }) {
 export default function Rewards({ kidId, onNavigateToParentZone }) {
   const lang = useLang()
   const [rewards, setRewards]         = useState([])
-  const [claims, setClaims]           = useState([])
   const [balance, setBalance]         = useState(0)
   const [loading, setLoading]         = useState(true)
   const [claiming, setClaiming]       = useState(null)
   const [claimError, setClaimError]   = useState('')
-  const [showHistory, setShowHistory] = useState(false)
   const [celebration, setCelebration] = useState(null)
 
   useEffect(() => { load() }, [kidId])
 
   async function load() {
     try {
-      const [r, b, c] = await Promise.all([getRewards(), getCoinBalance(kidId), getClaims(kidId)])
-      setRewards(r); setBalance(b); setClaims(c)
+      const [r, b] = await Promise.all([getRewards(), getCoinBalance(kidId)])
+      setRewards(r); setBalance(b)
     } catch (e) { console.error(e) }
     finally { setLoading(false) }
   }
@@ -103,70 +101,13 @@ export default function Rewards({ kidId, onNavigateToParentZone }) {
     </div>
   )
 
-  /* ── History view (claims) ── */
-  if (showHistory) {
-    return (
-      <div className="bg-white flex flex-col" style={{ height: '100dvh', overflow: 'hidden' }}>
-        <div className="w-full max-w-lg mx-auto px-5 flex flex-col flex-1 overflow-y-auto pb-10">
-          <button
-            onClick={() => setShowHistory(false)}
-            className="flex-shrink-0 font-body font-bold text-sm mt-12 mb-5 flex items-center gap-1.5 active:opacity-60 self-start"
-            style={{ color: '#9ca3af' }}
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M11 3L5 9L11 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Retour
-          </button>
-          <h1 className="font-display font-bold text-lg text-ink mb-3">Historique</h1>
-
-          {claims.length === 0 ? (
-            <p className="font-body text-sm text-center py-10" style={{ color: '#9ca3af' }}>
-              Tu n’as encore rien acheté.
-            </p>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {claims.map(claim => {
-                const st = claim.status
-                return (
-                  <div key={claim.id} className="flex items-center gap-4 bg-white"
-                    style={{ padding: 14, borderRadius: 28, border: '1.5px solid #eef0f3', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-                    <div className="flex items-center justify-center flex-shrink-0"
-                      style={{ width: 56, height: 56, borderRadius: 18, fontSize: 26,
-                        background: st === 'approved' ? '#dcfce7' : st === 'rejected' ? '#fee2e2' : '#fef9c3' }}>
-                      {st === 'approved' ? '✅' : st === 'rejected' ? '❌' : '⏳'}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-display font-extrabold text-base text-ink truncate">{claim.rewards?.name}</p>
-                      <p className="font-body text-sm" style={{ color: '#6b7280' }}>
-                        {st === 'approved' ? 'Approuvée' : st === 'rejected' ? 'Refusée par un parent' : 'En attente d’un parent'}
-                      </p>
-                    </div>
-                    <p className="font-display font-bold text-sm flex-shrink-0" style={{ color: '#f59e0b' }}>{claim.rewards?.cost}</p>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
-
   /* ── Main view ── */
   return (
     <div className="bg-white flex flex-col" style={{ height: '100dvh', overflow: 'hidden' }}>
-      <div className="w-full max-w-lg mx-auto px-5 flex flex-col flex-1 overflow-y-auto pb-10 min-w-0">
+      <div className="w-full max-w-lg mx-auto px-5 flex flex-col flex-1 overflow-y-auto overflow-x-hidden pb-10 min-w-0">
 
         {/* Mes récompenses */}
-        <div className="flex-shrink-0 flex items-center justify-between mt-12 mb-3">
-          <h1 className="font-display font-bold text-lg text-ink">Mes récompenses</h1>
-          {claims.length > 0 && (
-            <button onClick={() => setShowHistory(true)} className="font-body text-base active:opacity-60" style={{ color: '#4b5563' }}>
-              Historique
-            </button>
-          )}
-        </div>
+        <h1 className="flex-shrink-0 font-display font-bold text-lg text-ink mt-12 mb-3">Mes récompenses</h1>
 
         {claimError && (
           <div className="rounded-2xl px-4 py-3 text-center mb-3" style={{ background: '#fff5f5' }}>
@@ -211,9 +152,20 @@ export default function Rewards({ kidId, onNavigateToParentZone }) {
             alt="Coffre"
             style={{ width: '100%', maxWidth: 240, height: 'auto' }}
           />
-          <p className="font-display font-extrabold text-xl text-ink mt-3">
-            Tu as <span style={{ color: '#f59e0b' }}>{balance}</span> pièce{balance > 1 ? 's' : ''}
-          </p>
+          {/* Curved "Tu as récolté / X pièces" title */}
+          <div className="w-full text-center mt-3" style={{ lineHeight: 1.1 }}>
+            <p className="font-display font-bold text-ink" style={{ fontSize: 18 }}>Tu as récolté</p>
+            <svg viewBox="0 0 300 60" width="100%" height="54" style={{ overflow: 'visible', marginTop: -4 }}>
+              <defs>
+                <path id="coinsCurve" d="M 10,45 Q 150,10 290,45" />
+              </defs>
+              <text fontFamily="inherit" fontWeight="800" fontSize="32" fill="#1a1a2e">
+                <textPath href="#coinsCurve" startOffset="50%" textAnchor="middle">
+                  <tspan fill="#f59e0b">{balance}</tspan> pièce{balance > 1 ? 's' : ''}
+                </textPath>
+              </text>
+            </svg>
+          </div>
         </div>
       </div>
 
