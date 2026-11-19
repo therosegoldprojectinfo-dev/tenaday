@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react'
 import { getRewards, createReward, deleteReward, getClaims, approveClaim, rejectClaim, isParentSessionError, getQuizResults } from '../lib/economy'
-import { useLang } from '../lib/LangContext'
 import { useKid } from '../lib/KidContext'
-import { t } from '../lib/i18n'
 import { supabase } from '../lib/supabaseClient'
 
 const PLANET_AVATARS = ['🪐', '🌍', '🌙', '⭐', '🌟', '☀️', '🌎', '🌏', '🌑', '💫']
 
 export default function ParentZone({ defaultTab = 'rewards' }) {
-  const lang = useLang()
   const { kids } = useKid()
   const [rewards, setRewards]         = useState([])
   const [claims, setClaims]           = useState([])
@@ -84,9 +81,9 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
   )
 
   const TABS = [
-    { id: 'rewards',  Icon: IconGift,  label: lang === 'ar' ? 'المكافآت' : 'Rewards' },
-    { id: 'claims',   Icon: IconClipboard, label: lang === 'ar' ? 'الطلبات' : 'Claims' },
-    { id: 'progress', Icon: IconChart, label: lang === 'ar' ? 'التقدم' : 'Progress' },
+    { id: 'rewards',  Icon: IconGift,  label: 'Récompenses' },
+    { id: 'claims',   Icon: IconClipboard, label: 'Demandes' },
+    { id: 'progress', Icon: IconChart, label: 'Progrès' },
   ]
 
   return (
@@ -95,8 +92,8 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
 
         {/* Header */}
         <div className="flex-shrink-0 pt-12 pb-5">
-          <h1 className="font-display font-extrabold text-2xl text-ink">{t(lang, 'parent_title')}</h1>
-          <p className="font-body text-sm mt-1" style={{ color: '#9ca3af' }}>{t(lang, 'parent_sub')}</p>
+          <h1 className="font-display font-extrabold text-2xl text-ink">Espace parents</h1>
+          <p className="font-body text-sm mt-1" style={{ color: '#9ca3af' }}>Gérez les récompenses et suivez les progrès</p>
         </div>
 
         {/* Kid stat cards */}
@@ -112,7 +109,7 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
                   <div>
                     <p className="font-display font-bold text-sm text-ink">{kid.name}</p>
                     <p className="font-body text-xs" style={{ color: '#9ca3af' }}>
-                      {avg !== null ? `${avg}% avg` : lang === 'ar' ? 'لا اختبارات' : 'No quizzes'}
+                      {avg !== null ? `${avg}% de moyenne` : 'Aucun quiz'}
                     </p>
                   </div>
                 </div>
@@ -153,7 +150,7 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
               {rewards.length === 0 && (
                 <div className="flex flex-col items-center justify-center pt-8 pb-2 gap-4 text-center">
                   <img src="/nav-gift.png" alt="" className="w-24 h-auto" style={{ animation: 'float 3s ease-in-out infinite' }} />
-                  <p className="font-body text-sm max-w-xs" style={{ color: '#9ca3af' }}>{lang === 'ar' ? 'لا توجد مكافآت بعد. أضف أول مكافأة!' : 'No rewards yet. Add your first one!'}</p>
+                  <p className="font-body text-sm max-w-xs" style={{ color: '#9ca3af' }}>Aucune récompense pour le moment. Ajoutez la première !</p>
                 </div>
               )}
               {rewards.map(reward => (
@@ -169,7 +166,7 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
                   <button onClick={() => setConfirmDeleteId(reward.id)}
                     className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-95"
                     style={{ background: 'white', border: '1.5px solid #e5e7eb' }}
-                    aria-label="Delete">
+                    aria-label="Supprimer">
                     <IconTrash size={18} />
                   </button>
                 </div>
@@ -178,7 +175,7 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
                 className="w-full flex items-center justify-center gap-2.5 rounded-full py-4 font-display font-bold text-base text-ink transition-all active:scale-95"
                 style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
                 <IconPlus size={20} />
-                {t(lang, 'parent_add_reward')}
+                Ajouter une récompense
               </button>
             </div>
           )}
@@ -189,7 +186,7 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
               {claims.length === 0 ? (
                 <div className="flex flex-col items-center justify-center pt-12 gap-4 text-center">
                   <IconTile size={72}><IconClipboard size={32} /></IconTile>
-                  <p className="font-display font-extrabold text-lg text-ink">{t(lang, 'parent_no_claims')}</p>
+                  <p className="font-display font-extrabold text-lg text-ink">Aucune demande pour le moment</p>
                 </div>
               ) : claims.map(claim => (
                 <div key={claim.id} className="flex flex-col gap-4" style={{ ...CARD, borderRadius: 28, padding: 16 }}>
@@ -201,9 +198,9 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
                       style={claim.status === 'pending'
                         ? { background: 'white', border: '1.5px solid #7c3aed', color: '#7c3aed' }
                         : { background: '#f3f4f6', border: '1.5px solid transparent', color: '#6b7280' }}>
-                      {claim.status === 'pending' ? (lang === 'ar' ? 'معلّق' : 'Pending')
-                        : claim.status === 'approved' ? (lang === 'ar' ? 'موافق' : 'Approved')
-                        : (lang === 'ar' ? 'مرفوض' : 'Rejected')}
+                      {claim.status === 'pending' ? 'En attente'
+                        : claim.status === 'approved' ? 'Approuvée'
+                        : 'Refusée'}
                     </span>
                   </div>
                   {/* Reward info */}
@@ -223,12 +220,12 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
                       <button onClick={() => handleApprove(claim.id)} disabled={approving === claim.id || rejecting === claim.id}
                         className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full text-white font-display font-bold text-sm transition-all active:scale-95 disabled:opacity-60"
                         style={{ background: '#7c3aed', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}>
-                        {approving === claim.id ? '...' : (<><IconCheck size={18} color="white" />{t(lang, 'parent_approve')}</>)}
+                        {approving === claim.id ? '...' : (<><IconCheck size={18} color="white" />Approuver</>)}
                       </button>
                       <button onClick={() => setConfirmRejectId(claim.id)} disabled={approving === claim.id || rejecting === claim.id}
                         className="flex-1 flex items-center justify-center gap-2 py-3 rounded-full font-display font-bold text-sm text-ink transition-all active:scale-95 disabled:opacity-60"
                         style={{ background: 'white', border: '1.5px solid #e5e7eb' }}>
-                        {rejecting === claim.id ? '...' : (<><IconX size={18} />{t(lang, 'parent_deny')}</>)}
+                        {rejecting === claim.id ? '...' : (<><IconX size={18} />Refuser</>)}
                       </button>
                     </div>
                   )}
@@ -243,7 +240,7 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
               {kids.length === 0 ? (
                 <div className="flex flex-col items-center justify-center pt-12 gap-4 text-center">
                   <IconTile size={72}><IconChart size={32} /></IconTile>
-                  <p className="font-display font-extrabold text-lg text-ink">{lang === 'ar' ? 'لا يوجد أطفال بعد' : 'No kids yet'}</p>
+                  <p className="font-display font-extrabold text-lg text-ink">Aucun enfant pour le moment</p>
                 </div>
               ) : kids.map((kid, i) => {
                 const results = quizResults[kid.id] || []
@@ -261,9 +258,9 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
                     {/* Stat cards */}
                     <div className="grid grid-cols-3 gap-2 mb-3">
                       {[
-                        { label: lang === 'ar' ? 'الاختبارات' : 'Quizzes', value: total },
-                        { label: lang === 'ar' ? 'المتوسط' : 'Avg Score', value: avg !== null ? `${avg}%` : '—' },
-                        { label: lang === 'ar' ? 'الرصيد' : 'Balance', value: kidBalances[kid.id] ?? '—' },
+                        { label: 'Quiz', value: total },
+                        { label: 'Moyenne', value: avg !== null ? `${avg}%` : '—' },
+                        { label: 'Solde', value: kidBalances[kid.id] ?? '—' },
                       ].map(({ label, value }) => (
                         <div key={label} className="text-center" style={{ ...CARD, borderRadius: 22, padding: '12px 8px' }}>
                           <p className="font-body text-xs mb-1" style={{ color: '#9ca3af' }}>{label}</p>
@@ -275,12 +272,12 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
                     {/* Quiz results list */}
                     {results.length === 0 ? (
                       <div className="text-center" style={{ ...CARD, borderRadius: 22, padding: '20px 16px', boxShadow: 'none' }}>
-                        <p className="font-body text-sm" style={{ color: '#9ca3af' }}>{lang === 'ar' ? 'سيظهر تقدم طفلك هنا بعد إكمال اختباراتهم.' : "Progress will appear here after quizzes are completed."}</p>
+                        <p className="font-body text-sm" style={{ color: '#9ca3af' }}>Les progrès apparaîtront ici une fois les quiz terminés.</p>
                       </div>
                     ) : (
                       <div className="flex flex-col gap-2">
                         {results.map(r => {
-                          const date = new Date(r.created_at).toLocaleDateString(lang === 'ar' ? 'ar-SA' : 'en', { month: 'short', day: 'numeric' })
+                          const date = new Date(r.created_at).toLocaleDateString('fr', { day: 'numeric', month: 'short' })
                           const pct = r.score_pct
                           return (
                             <div key={r.result_id} className="flex items-center gap-3" style={{ ...CARD, borderRadius: 22, padding: '12px 16px' }}>
@@ -307,20 +304,20 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
         </div>
       </div>
 
-      {showModal && <RewardModal lang={lang} onConfirm={handleCreate} onClose={() => setShowModal(false)} />}
+      {showModal && <RewardModal onConfirm={handleCreate} onClose={() => setShowModal(false)} />}
 
       {/* Confirm reject */}
       {confirmRejectId && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4">
-            <h2 className="font-display font-extrabold text-xl text-ink text-center">{lang === 'ar' ? 'رفض الطلب؟' : 'Reject this claim?'}</h2>
-            <p className="font-body text-sm text-center" style={{ color: '#9ca3af' }}>{lang === 'ar' ? 'سيُعاد رصيد العملات إلى الطفل.' : 'Points will be refunded to the child.'}</p>
+            <h2 className="font-display font-extrabold text-xl text-ink text-center">Refuser cette demande ?</h2>
+            <p className="font-body text-sm text-center" style={{ color: '#9ca3af' }}>Les pièces seront remboursées à l’enfant.</p>
             <button disabled={rejectBusy} onClick={async () => { setRejectBusy(true); await handleReject(confirmRejectId); setRejectBusy(false); setConfirmRejectId(null) }}
               className="w-full flex items-center justify-center gap-2 py-4 text-white font-display font-bold text-base rounded-full disabled:opacity-50 transition-all active:scale-95"
               style={{ background: '#1a1a2e' }}>
-              {rejectBusy ? '...' : (<><IconX size={18} color="white" />{lang === 'ar' ? 'نعم، ارفض' : 'Yes, reject'}</>)}
+              {rejectBusy ? '...' : (<><IconX size={18} color="white" />Oui, refuser</>)}
             </button>
-            <button onClick={() => setConfirmRejectId(null)} className="w-full py-3 font-body font-bold text-sm text-center" style={{ color: '#9ca3af' }}>{lang === 'ar' ? 'إلغاء' : 'Cancel'}</button>
+            <button onClick={() => setConfirmRejectId(null)} className="w-full py-3 font-body font-bold text-sm text-center" style={{ color: '#9ca3af' }}>Annuler</button>
           </div>
         </div>
       )}
@@ -329,14 +326,14 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
       {confirmDeleteId && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4">
-            <h2 className="font-display font-extrabold text-xl text-ink text-center">{lang === 'ar' ? 'حذف المكافأة؟' : 'Delete reward?'}</h2>
-            <p className="font-body text-sm text-center" style={{ color: '#9ca3af' }}>{lang === 'ar' ? 'لا يمكن التراجع عن هذا الإجراء.' : 'This cannot be undone.'}</p>
+            <h2 className="font-display font-extrabold text-xl text-ink text-center">Supprimer la récompense ?</h2>
+            <p className="font-body text-sm text-center" style={{ color: '#9ca3af' }}>Cette action est irréversible.</p>
             <button disabled={deleteBusy} onClick={async () => { setDeleteBusy(true); await confirmDelete(); setDeleteBusy(false) }}
               className="w-full flex items-center justify-center gap-2 py-4 text-white font-display font-bold text-base rounded-full disabled:opacity-50 transition-all active:scale-95"
               style={{ background: '#1a1a2e' }}>
-              {deleteBusy ? '...' : (<><IconTrash size={18} color="white" />{lang === 'ar' ? 'نعم، احذف' : 'Yes, delete'}</>)}
+              {deleteBusy ? '...' : (<><IconTrash size={18} color="white" />Oui, supprimer</>)}
             </button>
-            <button onClick={() => setConfirmDeleteId(null)} className="w-full py-3 font-body font-bold text-sm text-center" style={{ color: '#9ca3af' }}>{lang === 'ar' ? 'إلغاء' : 'Cancel'}</button>
+            <button onClick={() => setConfirmDeleteId(null)} className="w-full py-3 font-body font-bold text-sm text-center" style={{ color: '#9ca3af' }}>Annuler</button>
           </div>
         </div>
       )}
@@ -346,12 +343,12 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-6">
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col items-center gap-4 text-center">
             <IconTile size={72}><IconLock size={32} /></IconTile>
-            <h2 className="font-display font-extrabold text-xl text-ink">{lang === 'ar' ? 'انتهت جلسة الوالدين' : 'Parent session expired'}</h2>
-            <p className="font-body text-sm" style={{ color: '#9ca3af' }}>{lang === 'ar' ? 'يرجى التحقق مرة أخرى للمتابعة.' : 'Please verify again to continue.'}</p>
+            <h2 className="font-display font-extrabold text-xl text-ink">Session parent expirée</h2>
+            <p className="font-body text-sm" style={{ color: '#9ca3af' }}>Veuillez vérifier à nouveau pour continuer.</p>
             <button onClick={() => { setSessionExpired(false); window.location.reload() }}
               className="w-full py-4 text-white font-display font-bold text-base rounded-full transition-all active:scale-95"
               style={{ background: '#7c3aed', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}>
-              {lang === 'ar' ? 'تحقق مجدداً' : 'Verify again'}
+              Vérifier à nouveau
             </button>
           </div>
         </div>
@@ -362,18 +359,25 @@ export default function ParentZone({ defaultTab = 'rewards' }) {
   )
 }
 
-function RewardModal({ lang, onConfirm, onClose }) {
+function RewardModal({ onConfirm, onClose }) {
   const [name, setName]     = useState('')
   const [cost, setCost]     = useState(50)
   const [saving, setSaving] = useState(false)
   const [error, setError]   = useState('')
-  const PRESETS = t(lang, 'parent_presets')
+  const PRESETS = [
+    { label: 'Temps d’écran', cost: 50 },
+    { label: 'Dessert', cost: 30 },
+    { label: 'Soirée film', cost: 80 },
+    { label: 'Sortie au parc', cost: 100 },
+    { label: 'Choisir le dîner', cost: 40 },
+    { label: 'Nouveau jouet', cost: 150 },
+  ]
 
   async function handleSubmit() {
     if (!name.trim()) return
     setSaving(true); setError('')
     try { await onConfirm(name.trim(), cost) }
-    catch { setError(lang === 'ar' ? 'حدث خطأ ما.' : 'Something went wrong.'); setSaving(false) }
+    catch { setError('Une erreur est survenue.'); setSaving(false) }
   }
 
   return (
@@ -381,11 +385,11 @@ function RewardModal({ lang, onConfirm, onClose }) {
       <div className="w-full bg-white rounded-t-3xl flex flex-col" style={{ maxHeight: '85dvh' }}>
         <div className="flex-shrink-0 pt-3 pb-1 flex justify-center"><div className="w-10 h-1 rounded-full bg-gray-200" /></div>
         <div className="flex-1 overflow-y-auto px-5 pb-8 flex flex-col gap-5">
-          <h2 className="font-display font-extrabold text-2xl text-ink text-center pt-2">{t(lang, 'parent_modal_title')}</h2>
+          <h2 className="font-display font-extrabold text-2xl text-ink text-center pt-2">Nouvelle récompense</h2>
 
           {/* Presets */}
           <div className="flex flex-col gap-2">
-            <label className="font-body font-bold text-xs uppercase tracking-widest" style={{ color: '#9ca3af' }}>{t(lang, 'parent_modal_presets')}</label>
+            <label className="font-body font-bold text-xs uppercase tracking-widest" style={{ color: '#9ca3af' }}>Idées rapides</label>
             <div className="flex flex-wrap gap-2">
               {PRESETS.map(p => {
                 const sel = name === p.label
@@ -402,8 +406,8 @@ function RewardModal({ lang, onConfirm, onClose }) {
 
           {/* Name */}
           <div className="flex flex-col gap-2">
-            <label className="font-body font-bold text-xs uppercase tracking-widest" style={{ color: '#9ca3af' }}>{t(lang, 'parent_modal_name_label')}</label>
-            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder={t(lang, 'parent_modal_name_placeholder')}
+            <label className="font-body font-bold text-xs uppercase tracking-widest" style={{ color: '#9ca3af' }}>Nom de la récompense</label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder="Ex. : Soirée film"
               className="w-full rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none transition-colors"
               style={{ border: '1.5px solid #e5e7eb', background: 'white' }}
               onFocus={e => e.target.style.borderColor = '#7c3aed'}
@@ -412,7 +416,7 @@ function RewardModal({ lang, onConfirm, onClose }) {
 
           {/* Cost slider */}
           <div className="flex flex-col gap-2">
-            <label className="font-body font-bold text-xs uppercase tracking-widest" style={{ color: '#9ca3af' }}>{t(lang, 'parent_modal_cost_label')}</label>
+            <label className="font-body font-bold text-xs uppercase tracking-widest" style={{ color: '#9ca3af' }}>Coût (en pièces)</label>
             <div className="flex items-center gap-3">
               <input type="range" min={10} max={200} step={10} value={cost} onChange={e => setCost(Number(e.target.value))} className="flex-1" style={{ accentColor: '#7c3aed' }} />
               <div className="flex items-center gap-1.5 justify-end" style={{ width: 80 }}>
@@ -427,9 +431,9 @@ function RewardModal({ lang, onConfirm, onClose }) {
           <button onClick={handleSubmit} disabled={!name.trim() || saving}
             className="w-full disabled:opacity-40 text-white font-display font-bold text-lg rounded-full py-4 transition-all active:scale-95"
             style={{ background: '#7c3aed', boxShadow: '0 4px 16px rgba(124,58,237,0.3)' }}>
-            {saving ? t(lang, 'parent_modal_creating') : t(lang, 'parent_modal_cta')}
+            {saving ? 'Création...' : 'Créer la récompense'}
           </button>
-          <button onClick={onClose} className="w-full font-body font-bold text-sm py-2 text-center" style={{ color: '#9ca3af' }}>{t(lang, 'parent_modal_cancel')}</button>
+          <button onClick={onClose} className="w-full font-body font-bold text-sm py-2 text-center" style={{ color: '#9ca3af' }}>Annuler</button>
         </div>
       </div>
     </div>
