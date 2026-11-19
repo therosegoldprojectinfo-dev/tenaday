@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { generatePractice } from '../lib/generatePractice'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
@@ -48,6 +48,14 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
 
   const MAX_IMAGES = 5
   const MAX_SIZE_MB = 10
+
+  // Open the camera / gallery as soon as this screen shows, so the
+  // "Prendre une photo" tap goes straight to the picker.
+  // If the browser blocks it, the idle screen below stays as a fallback.
+  useEffect(() => {
+    const id = setTimeout(() => cameraInputRef.current?.click(), 50)
+    return () => clearTimeout(id)
+  }, [])
 
   async function handleGallerySelected(e) {
     const files = Array.from(e.target.files || [])
@@ -256,6 +264,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId }) {
         multiple
         className="hidden"
         onChange={handleGallerySelected}
+        onCancel={() => { if (images.length === 0) onBack() }}
       />
 
       <style>{`@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`}</style>
