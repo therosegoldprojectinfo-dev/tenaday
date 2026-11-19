@@ -205,7 +205,7 @@ function TopStatsBar({ streak, coinBalance, lang }) {
 
   return (
     <>
-      <div className="flex items-center justify-end gap-2 pt-12 pb-2 px-5">
+      <div className="flex items-center justify-end gap-2 pt-3 pb-2 px-5">
         {/* Coins pill */}
         <button
           onClick={() => setShowCoins(true)}
