@@ -355,7 +355,7 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
             </div>
           )}
         </div>
-      </div>  {/* end scroll wrapper */}
+      </div>
 
       {showModal && (
         <ChapterModal lang={lang} onConfirm={handleCreate} onClose={() => setShowModal(false)} />
@@ -368,7 +368,7 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
           onClose={() => setEmojiTarget(null)}
         />
       )}
-    </div>  {/* end outer flex */}
+    </div>
   )
 }
 
