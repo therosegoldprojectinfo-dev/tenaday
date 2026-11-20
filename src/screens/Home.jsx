@@ -64,11 +64,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
     const file = e.target.files?.[0]
     if (!file) return
     const problem = validateFile(file)
-    if (problem) {
-      setError(problem)
-      setStatus('error')
-      return
-    }
+    if (problem) { setError(problem); setStatus('error'); return }
     if (image?.preview) URL.revokeObjectURL(image.preview)
     setImage({ file, preview: URL.createObjectURL(file) })
     setStatus('review')
@@ -101,7 +97,6 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
     <div className="bg-white flex flex-col" style={{ height: '100dvh' }}>
       <div className="w-full max-w-lg mx-auto px-5 flex flex-col flex-1 overflow-y-auto" style={{ paddingBottom: 'calc(40px + env(safe-area-inset-bottom))' }}>
 
-        {/* Back */}
         <button
           onClick={onBack}
           className="flex-shrink-0 text-muted font-body font-bold text-sm mt-12 mb-2 flex items-center gap-1 active:opacity-60 self-start"
@@ -109,7 +104,6 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
           {t(lang, 'home_back')}
         </button>
 
-        {/* Chapter title */}
         <div className="flex-shrink-0 flex items-center gap-3 mb-6">
           <span style={{ fontSize: 32 }}>{chapter.emoji}</span>
           <h1 className="font-display font-extrabold text-2xl text-ink">{chapter.name}</h1>
@@ -122,11 +116,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
               className="w-full flex items-center justify-center overflow-hidden"
               style={{ borderRadius: 28, background: '#f9fafb', border: '1.5px solid #eef0f3', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
             >
-              <img
-                src={image.preview}
-                alt="Photo"
-                style={{ width: '100%', maxHeight: '46dvh', objectFit: 'contain' }}
-              />
+              <img src={image.preview} alt="Photo" style={{ width: '100%', maxHeight: '46dvh', objectFit: 'contain' }} />
             </div>
 
             <button
@@ -158,31 +148,21 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
         {/* LOADING */}
         {status === 'loading' && (
           <div className="flex-1 flex flex-col items-center justify-center gap-6 pb-10">
-            <p
-              className="font-display font-bold text-muted"
-              style={{ fontSize: '1rem', letterSpacing: '0.04em' }}
-            >
+            <p className="font-display font-bold text-muted" style={{ fontSize: '1rem', letterSpacing: '0.04em' }}>
               Quiz
             </p>
 
-            {/* Curved "Chargement" */}
-            <svg viewBox="0 0 400 120" width="340" height="110" style={{ overflow: 'visible' }}>
+            <svg viewBox="0 0 400 120" width="300" height="90" style={{ overflow: 'visible' }}>
               <defs>
                 <path id="curve" d="M 30,90 Q 200,30 370,90" />
               </defs>
-              <text
-                fontFamily="inherit"
-                fontWeight="800"
-                fontSize="62"
-                fill="#1a1a2e"
-              >
+              <text fontFamily="inherit" fontWeight="800" fontSize="46" fill="#1a1a2e">
                 <textPath href="#curve" startOffset="50%" textAnchor="middle">
                   Chargement
                 </textPath>
               </text>
             </svg>
 
-            {/* 3 bouncing dots */}
             <div className="flex items-center gap-3">
               {[0, 1, 2].map(i => (
                 <div
