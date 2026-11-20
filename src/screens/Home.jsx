@@ -157,7 +157,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
 
         {/* LOADING */}
         {status === 'loading' && (
-          <div className="flex-1 flex flex-col items-center justify-center gap-2 pb-10">
+          <div className="flex-1 flex flex-col items-center justify-center gap-6 pb-10">
             <p
               className="font-display font-bold text-muted"
               style={{ fontSize: '1rem', letterSpacing: '0.04em' }}
@@ -165,10 +165,10 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
               Quiz
             </p>
 
-            {/* Curved "Chargement" via SVG textPath */}
-            <svg viewBox="0 0 400 120" width="340" height="110" style={{ overflow: 'visible', marginBottom: 16 }}>
+            {/* Curved "Chargement" */}
+            <svg viewBox="0 0 400 120" width="340" height="110" style={{ overflow: 'visible' }}>
               <defs>
-                <path id="curve" d="M 30,90 Q 200,-20 370,90" />
+                <path id="curve" d="M 30,90 Q 200,30 370,90" />
               </defs>
               <text
                 fontFamily="inherit"
@@ -182,11 +182,21 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
               </text>
             </svg>
 
-            <img
-              src="/gifrunning.gif"
-              alt=""
-              style={{ width: '72%', maxWidth: 300, height: 'auto' }}
-            />
+            {/* 3 bouncing dots */}
+            <div className="flex items-center gap-3">
+              {[0, 1, 2].map(i => (
+                <div
+                  key={i}
+                  style={{
+                    width: 14,
+                    height: 14,
+                    borderRadius: '50%',
+                    background: '#7c3aed',
+                    animation: `bounce 1.2s ease-in-out ${i * 0.2}s infinite`,
+                  }}
+                />
+              ))}
+            </div>
           </div>
         )}
 
@@ -224,6 +234,13 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
         className="hidden"
         onChange={handleRetake}
       />
+
+      <style>{`
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); opacity: 0.4; }
+          50% { transform: translateY(-12px); opacity: 1; }
+        }
+      `}</style>
     </div>
   )
 }
