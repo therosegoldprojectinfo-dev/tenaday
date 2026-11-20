@@ -112,20 +112,13 @@ export default function Profile({ onLogout }) {
           </button>
         </div>
 
-        {/* Crédit OpenMoji */}
-        <p className="font-body text-xs text-center px-2 mb-5" style={{ color: '#9ca3af' }}>
-          Tous les émojis sont conçus par{' '}
-          <a href="https://openmoji.org" target="_blank" rel="noopener noreferrer" style={{ color: '#7c3aed', fontWeight: 700 }}>OpenMoji</a>
-          {' '}– le projet open source d’émojis et d’icônes. Licence : CC BY-SA 4.0
-        </p>
-
         {/* Liens légaux */}
         <div className="flex gap-4 justify-center mb-6">
           <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="font-body text-xs underline" style={{ color: '#9ca3af' }}>
             Politique de confidentialité
           </a>
           <a href="/terms.html" target="_blank" rel="noopener noreferrer" className="font-body text-xs underline" style={{ color: '#9ca3af' }}>
-            Conditions d’utilisation
+            Conditions d'utilisation
           </a>
         </div>
 
@@ -160,7 +153,7 @@ export default function Profile({ onLogout }) {
           <div className="bg-white rounded-3xl p-6 w-full max-w-sm flex flex-col gap-4">
             <h2 className="font-display font-extrabold text-xl text-ink text-center">Se déconnecter ?</h2>
             <p className="font-body text-sm text-center" style={{ color: '#9ca3af' }}>
-              Vous aurez besoin de votre nom d’utilisateur et de votre mot de passe pour vous reconnecter.
+              Vous aurez besoin de votre nom d'utilisateur et de votre mot de passe pour vous reconnecter.
             </p>
             <button onClick={handleLogout}
               className="w-full flex items-center justify-center gap-2 py-4 text-white font-display font-bold text-base rounded-full transition-all active:scale-95"
@@ -195,7 +188,7 @@ function AddKidModal({ onConfirm, onClose }) {
         <div className="flex justify-center mb-4"><div className="w-10 h-1 rounded-full bg-gray-200" /></div>
         <h2 className="font-display font-extrabold text-2xl text-ink text-center mb-5">Ajouter un enfant</h2>
         <input type="text" value={name} onChange={e => setName(e.target.value)}
-          placeholder="Prénom de l’enfant..."
+          placeholder="Prénom de l'enfant..."
           autoFocus
           className="w-full rounded-2xl px-4 py-4 font-display font-bold text-xl text-ink outline-none transition-colors mb-4"
           style={{ border: '1.5px solid #e5e7eb', background: 'white' }}
