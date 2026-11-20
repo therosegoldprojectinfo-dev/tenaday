@@ -89,7 +89,7 @@ export default function Rewards({ kidId, onNavigateToParentZone }) {
       const { newBalance } = await claimReward(reward.id, kidId)
       setBalance(newBalance); await load()
       setCelebration({ rewardName: reward.name })
-    } catch { setClaimError(lang === 'ar' ? 'فشل الاستبدال، حاول مرة أخرى' : 'Échec de l’achat, réessaie.') }
+    } catch { setClaimError(lang === 'ar' ? 'فشل الاستبدال، حاول مرة أخرى' : 'Échec de l\'achat, réessaie.') }
     finally { setClaiming(null) }
   }
 
@@ -106,43 +106,8 @@ export default function Rewards({ kidId, onNavigateToParentZone }) {
     <div className="bg-white flex flex-col" style={{ height: '100dvh', overflow: 'hidden' }}>
       <div className="w-full max-w-lg mx-auto px-5 flex flex-col flex-1 overflow-y-auto overflow-x-hidden pb-10 min-w-0">
 
-        {/* Mes récompenses */}
-        <h1 className="flex-shrink-0 font-display font-bold text-lg text-ink mt-12 mb-3">Mes récompenses</h1>
-
-        {claimError && (
-          <div className="rounded-2xl px-4 py-3 text-center mb-3" style={{ background: '#fff5f5' }}>
-            <p className="font-body text-sm text-red-500 font-bold">{claimError}</p>
-          </div>
-        )}
-
-        {rewards.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 text-center py-6">
-            <img src="/nav-gift.png" alt="" className="w-24 h-auto" />
-            <p className="font-display font-extrabold text-lg text-ink">Aucune récompense pour le moment</p>
-            <p className="font-body text-sm max-w-xs" style={{ color: '#9ca3af' }}>
-              Demande à un parent d’en ajouter dans l’espace parents !
-            </p>
-          </div>
-        ) : (
-          <div
-            className="no-scrollbar flex gap-3 overflow-x-auto pb-2 flex-shrink-0"
-            style={{ scrollSnapType: 'x mandatory', marginRight: -20, paddingRight: 20 }}
-          >
-            {rewards.map(reward => (
-              <RewardCard
-                key={reward.id}
-                reward={reward}
-                balance={balance}
-                single={rewards.length === 1}
-                claiming={claiming === reward.id}
-                onClaim={() => handleClaim(reward)}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Mes Pièces */}
-        <h2 className="flex-shrink-0 font-display font-bold text-lg text-ink mt-8 mb-3">Mes Pièces</h2>
+        {/* Mes Pièces — now on top */}
+        <h1 className="flex-shrink-0 font-display font-bold text-lg text-ink mt-12 mb-3">Mes Pièces</h1>
         <div
           className="flex-shrink-0 flex flex-col items-center bg-white"
           style={{ borderRadius: 28, border: '1.5px solid #eef0f3', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', padding: '24px 16px' }}
@@ -167,6 +132,42 @@ export default function Rewards({ kidId, onNavigateToParentZone }) {
             </svg>
           </div>
         </div>
+
+        {/* Mes récompenses — now below */}
+        <h2 className="flex-shrink-0 font-display font-bold text-lg text-ink mt-8 mb-3">Mes récompenses</h2>
+
+        {claimError && (
+          <div className="rounded-2xl px-4 py-3 text-center mb-3" style={{ background: '#fff5f5' }}>
+            <p className="font-body text-sm text-red-500 font-bold">{claimError}</p>
+          </div>
+        )}
+
+        {rewards.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 text-center py-6">
+            <img src="/nav-gift.png" alt="" className="w-24 h-auto" />
+            <p className="font-display font-extrabold text-lg text-ink">Aucune récompense pour le moment</p>
+            <p className="font-body text-sm max-w-xs" style={{ color: '#9ca3af' }}>
+              Demande à un parent d'en ajouter dans l'espace parents !
+            </p>
+          </div>
+        ) : (
+          <div
+            className="no-scrollbar flex gap-3 overflow-x-auto pb-2 flex-shrink-0"
+            style={{ scrollSnapType: 'x mandatory', marginRight: -20, paddingRight: 20 }}
+          >
+            {rewards.map(reward => (
+              <RewardCard
+                key={reward.id}
+                reward={reward}
+                balance={balance}
+                single={rewards.length === 1}
+                claiming={claiming === reward.id}
+                onClaim={() => handleClaim(reward)}
+              />
+            ))}
+          </div>
+        )}
+
       </div>
 
       <style>{`.no-scrollbar{scrollbar-width:none}.no-scrollbar::-webkit-scrollbar{display:none}`}</style>
