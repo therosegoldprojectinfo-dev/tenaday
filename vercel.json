@@ -1,14 +1,8 @@
 {
   "rewrites": [
-    { "source": "/privacy",     "destination": "/privacy.html"     },
-    { "source": "/terms",       "destination": "/terms.html"       },
-    { "source": "/testing",     "destination": "/testing.html"     },
-    { "source": "/Productpage", "destination": "/Productpage.html" },
-    { "source": "/learnmore",   "destination": "/learnmore.html"   },
-    { "source": "/numiopage",   "destination": "/numiopage.html"   },
-    { "source": "/checkout",    "destination": "/checkout.html"    },
-    { "source": "/registration","destination": "/registration.html"},
-    { "source": "/trynumio",    "destination": "/trynumio.html"    },
-    { "source": "/(.*)",        "destination": "/index.html"       }
+    { "source": "/privacy",  "destination": "/privacy.html"  },
+    { "source": "/terms",    "destination": "/terms.html"    },
+    { "source": "/checkout", "destination": "/checkout.html" },
+    { "source": "/(.*)",     "destination": "/index.html"    }
   ]
 }
