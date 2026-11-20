@@ -50,8 +50,6 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
     return null
   }
 
-  // The photo picked on the subject page arrives as initialFiles.
-  // Only ONE photo is allowed, so we keep the first file only.
   const startFile  = Array.isArray(initialFiles) ? initialFiles[0] : null
   const startError = startFile ? validateFile(startFile) : null
 
@@ -62,7 +60,6 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
   )
   const [inputKey, setInputKey] = useState(0)
 
-  // "Reprendre la photo" — replaces the current photo
   function handleRetake(e) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -90,10 +87,6 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
     setError(null)
     try {
       const compressed = [await compressImage(image.file)]
-      // generatePractice runs the full 4-phase pipeline server-side
-      // (lesson analysis → curriculum alignment → practice plan →
-      // questions) and already inserts the exam row — no separate
-      // saveExam() call needed anymore.
       const saved = await generatePractice(compressed, { kidId, chapterId: chapter.id })
       onExamReady(saved)
     } catch (err) {
@@ -122,12 +115,9 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
           <h1 className="font-display font-extrabold text-2xl text-ink">{chapter.name}</h1>
         </div>
 
-        {/* IDLE — temporarily removed: picker opens automatically on mount */}
-
-        {/* REVIEW — one photo, ready to generate */}
+        {/* REVIEW */}
         {status === 'review' && image && (
           <div className="flex-1 flex flex-col items-center gap-5 pb-10">
-            {/* Photo, big and centered */}
             <div
               className="w-full flex items-center justify-center overflow-hidden"
               style={{ borderRadius: 28, background: '#f9fafb', border: '1.5px solid #eef0f3', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}
@@ -139,7 +129,6 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
               />
             </div>
 
-            {/* Générer le quiz */}
             <button
               onClick={handleGenerate}
               className="w-full flex items-center justify-center gap-2.5 text-white font-display font-bold text-lg rounded-2xl py-5 transition-all active:scale-95"
@@ -152,7 +141,6 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
               Générer le quiz
             </button>
 
-            {/* Reprendre la photo */}
             <button
               onClick={() => { setInputKey(k => k + 1); setTimeout(() => cameraInputRef.current?.click(), 10) }}
               className="w-full flex items-center justify-center gap-2.5 font-display font-bold text-base text-ink rounded-2xl py-4 transition-all active:scale-95"
@@ -169,15 +157,30 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
 
         {/* LOADING */}
         {status === 'loading' && (
-          <div className="flex-1 flex flex-col items-center justify-center gap-6 pb-10">
-            <div style={{ animation: 'float 2s ease-in-out infinite' }}>
-              <img src="/nav-profile.png" alt="" className="w-28 h-auto" />
-            </div>
-            <div className="text-center">
-              <p className="font-display font-bold text-xl text-ink">{t(lang, 'home_generating')}</p>
-              <p className="text-muted text-sm mt-1">{t(lang, 'home_reading')}</p>
-            </div>
-            <div className="w-12 h-12 rounded-full border-4 border-gray-100 border-t-violet-500 animate-spin" />
+          <div className="flex-1 flex flex-col items-center justify-center gap-2 pb-10">
+            <p
+              className="font-display font-bold text-muted"
+              style={{ fontSize: '1rem', letterSpacing: '0.04em' }}
+            >
+              Quiz
+            </p>
+            <p
+              className="font-display font-extrabold text-ink"
+              style={{
+                fontSize: 'clamp(3rem, 13vw, 4.5rem)',
+                fontStyle: 'italic',
+                letterSpacing: '-0.03em',
+                lineHeight: 1,
+                marginBottom: 24,
+              }}
+            >
+              Chargement
+            </p>
+            <img
+              src="/gifrunning.gif"
+              alt=""
+              style={{ width: '72%', maxWidth: 300, height: 'auto' }}
+            />
           </div>
         )}
 
@@ -215,8 +218,6 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
         className="hidden"
         onChange={handleRetake}
       />
-
-      <style>{`@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`}</style>
     </div>
   )
 }
