@@ -14,24 +14,34 @@ export async function getChapters(kidId) {
     .order('created_at', { ascending: true })
   if (error) throw error
 
-  // 2. Fetch this kid's completions, with each exam's chapter_id
+  // 2. Fetch this kid's completed exam ids
   const { data: completions, error: compError } = await supabase
     .from('quiz_completions')
-    .select('exam_id, exams!inner(chapter_id)')
+    .select('exam_id')
     .eq('kid_id', kidId)
   if (compError) throw compError
 
-  // 3. Count distinct exams per chapter (matière)
-  const countMap = {}
-  const seenExams = new Set()
-  for (const row of completions ?? []) {
-    const chapterId = row.exams?.chapter_id
-    if (!chapterId || seenExams.has(row.exam_id)) continue
-    seenExams.add(row.exam_id)
-    countMap[chapterId] = (countMap[chapterId] ?? 0) + 1
+  const examIds = [...new Set((completions ?? []).map(r => r.exam_id))]
+
+  // 3. Look up the subject (chapter_id) of each completed exam
+  const chapterByExam = {}
+  if (examIds.length > 0) {
+    const { data: exams, error: examError } = await supabase
+      .from('exams')
+      .select('id, chapter_id')
+      .in('id', examIds)
+    if (examError) throw examError
+    for (const e of exams ?? []) chapterByExam[e.id] = e.chapter_id
   }
 
-  // 4. Merge quiz_count into each subject
+  // 4. Count distinct completed exams per subject
+  const countMap = {}
+  for (const examId of examIds) {
+    const chapterId = chapterByExam[examId]
+    if (chapterId) countMap[chapterId] = (countMap[chapterId] ?? 0) + 1
+  }
+
+  // 5. Merge quiz_count into each subject
   return chapters.map(ch => ({
     ...ch,
     quiz_count: countMap[ch.id] ?? 0,
