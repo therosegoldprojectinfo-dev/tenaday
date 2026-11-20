@@ -1,16 +1,6 @@
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
 
-function StreakBadge({ count }) {
-  if (!count) return null
-  return (
-    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-100">
-      <img src="/streak-mascot.png" alt="" className="w-4 h-4 object-contain" />
-      <span className="font-display font-bold text-xs text-purple-600">{count}</span>
-    </div>
-  )
-}
-
 const NAV_ICONS = {
   chapters:    '/nav-chapters.png',
   rewards:     '/nav-gift.png',
@@ -18,23 +8,30 @@ const NAV_ICONS = {
   profile:     '/nav-profile.png',
 }
 
-export default function Nav({ active, onChange, streak = 0 }) {
+const FR_LABELS = {
+  chapters:    'Chapitres',
+  rewards:     'Récompenses',
+  parent_zone: 'Zone Parents',
+  profile:     'Profil',
+}
+
+export default function Nav({ active, onChange }) {
   const lang = useLang()
   const TABS = [
-    { id: 'chapters',    label: t(lang, 'nav_chapters')    },
-    { id: 'rewards',     label: t(lang, 'nav_rewards')     },
-    { id: 'parent_zone', label: t(lang, 'nav_parent_zone') },
-    { id: 'profile',     label: lang === 'ar' ? 'الملف' : 'Profile' },
+    { id: 'chapters'    },
+    { id: 'rewards'     },
+    { id: 'parent_zone' },
+    { id: 'profile'     },
   ]
 
   return (
     <>
-      {/* Mobile bottom bar */}
+      {/* Mobile bottom bar — icons only */}
       <nav
         className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-100 flex"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
-        {TABS.map(({ id, label }) => {
+        {TABS.map(({ id }) => {
           const isActive = active === id
           return (
             <button
@@ -48,7 +45,7 @@ export default function Nav({ active, onChange, streak = 0 }) {
               >
                 <img
                   src={NAV_ICONS[id]}
-                  alt={label}
+                  alt={FR_LABELS[id]}
                   className="w-9 h-9 object-contain"
                 />
               </div>
@@ -57,23 +54,22 @@ export default function Nav({ active, onChange, streak = 0 }) {
         })}
       </nav>
 
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar — icons + French labels, no streak */}
       <aside className="hidden md:flex fixed top-0 bottom-0 bg-white border-e border-gray-100 flex-col z-40 overflow-hidden w-56"
         style={{ insetInlineStart: 0 }}>
 
         {/* Logo area */}
-        <div className="flex items-center justify-between px-4 pt-5 pb-2 mb-4">
+        <div className="flex items-center px-4 pt-5 pb-2 mb-4">
           <img
             src="/nav-logo.png"
             alt="Numio"
             style={{ height: 50, width: 'auto', objectFit: 'contain' }}
           />
-          <StreakBadge count={streak} />
         </div>
 
         {/* Nav items */}
         <div className="flex flex-col gap-1 px-3 flex-1">
-          {TABS.map(({ id, label }) => {
+          {TABS.map(({ id }) => {
             const isActive = active === id
             return (
               <button
@@ -90,24 +86,11 @@ export default function Nav({ active, onChange, streak = 0 }) {
                     className="w-full h-full object-contain"
                   />
                 </div>
-                {label}
+                {FR_LABELS[id]}
               </button>
             )
           })}
         </div>
-
-        {/* Streak widget */}
-        {streak > 0 && (
-          <div className="mt-auto px-2 pb-4">
-            <div className="flex items-center gap-3 bg-purple-50 rounded-2xl px-3 py-3">
-              <img src="/streak-mascot.png" alt="" className="w-10 h-10 object-contain" />
-              <div>
-                <p className="font-display font-bold text-lg text-purple-600">{t(lang, 'nav_streak_days', streak)}</p>
-                <p className="font-body text-xs text-muted">{t(lang, 'nav_current_streak')}</p>
-              </div>
-            </div>
-          </div>
-        )}
       </aside>
     </>
   )
