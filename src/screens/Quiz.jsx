@@ -1,7 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react'
 import { completeQuiz, updateStreak } from '../lib/economy'
 import { logQuestionAttempt } from '../lib/performance'
-import { getAssetPath } from '../lib/openmojiAssets'
 import { gradeAnswer } from '../lib/grading'
 import StreakPopup from './StreakPopup'
 import { useLang } from '../lib/LangContext'
@@ -302,19 +301,6 @@ function ItemsList({ items }) {
             lineHeight: 1.4,
           }}>{item}</span>
         </div>
-      ))}
-    </div>
-  )
-}
-
-function VisualCountRow({ asset, quantity }) {
-  const src = getAssetPath(asset)
-  return (
-    <div className="flex flex-wrap gap-2 justify-center rounded-2xl px-4 py-5 mb-4" style={{ background: '#fafafa', border: '2px solid #f3f4f6' }}>
-      {Array.from({ length: quantity }).map((_, i) => (
-        src
-          ? <img key={i} src={src} alt={asset} style={{ width: 40, height: 40 }} />
-          : <span key={i} style={{ fontSize: 36, lineHeight: 1 }}>❓</span>
       ))}
     </div>
   )
@@ -708,7 +694,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
             </div>
           )}
 
-          {/* NEW: short_answer = typed sentence, graded by keywords */}
+          {/* short_answer = typed sentence, graded by keywords */}
           {q.type === 'short_answer' && (
             <div className="flex flex-col gap-3">
               <textarea
@@ -742,7 +728,7 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
             </div>
           )}
 
-          {/* NEW: choice_reason = pick a choice, then type why */}
+          {/* choice_reason = pick a choice, then type why */}
           {q.type === 'choice_reason' && (
             <div className="flex flex-col gap-3">
               {q.options.map((option, optIdx) => (
@@ -777,17 +763,6 @@ export default function Quiz({ exam, onDone, onQuit, kidId, isTrial = false }) {
                   background: revealed ? (isCorrect ? '#f0fdf4' : isPartial ? '#fffbeb' : '#fff5f5') : '#fafafa',
                 }}
               />
-            </div>
-          )}
-
-          {q.type === 'visual_count' && (
-            <div className="flex flex-col gap-3">
-              <VisualCountRow asset={q.asset} quantity={q.quantity} />
-              <div className="grid grid-cols-2 gap-3">
-                {q.options.map((option, optIdx) => (
-                  <MCQCard key={`${optIdx}-${option}`} option={option} selected={selected} revealed={revealed} correct={q.correct_answer} onSelect={setSelected} big />
-                ))}
-              </div>
             </div>
           )}
 
