@@ -34,6 +34,15 @@ export default function QuizIntro({ exam, kidName = 'Champ', chapterId, kidId, o
   if (generating) {
     return (
       <div className="bg-white flex flex-col items-center justify-center px-6 text-center" style={{ height: '100dvh' }}>
+        {/* Back button */}
+        <button
+          onClick={onBack}
+          className="absolute top-12 flex items-center gap-1 text-muted font-body font-bold text-sm active:opacity-60"
+          style={{ insetInlineStart: 20 }}
+        >
+          {lang === 'ar' ? '→' : '←'} {lang === 'ar' ? 'رجوع' : 'Back'}
+        </button>
+
         <p className="font-display font-bold text-muted" style={{ fontSize: '1rem', letterSpacing: '0.04em' }}>
           Quiz
         </p>
@@ -83,7 +92,6 @@ export default function QuizIntro({ exam, kidName = 'Champ', chapterId, kidId, o
 
       <div className="w-full max-w-sm flex flex-col items-center gap-6">
 
-        {/* Title */}
         <div className="flex flex-col gap-2">
           <h1 className="font-display font-extrabold text-3xl text-ink leading-tight">
             {lang === 'ar'
@@ -93,14 +101,12 @@ export default function QuizIntro({ exam, kidName = 'Champ', chapterId, kidId, o
           <p className="font-display font-bold text-xl mt-1" style={{ color: '#7c3aed' }}>{exam.topic}</p>
         </div>
 
-        {/* Error message */}
         {error && (
           <div className="w-full rounded-2xl px-4 py-3 text-center" style={{ background: '#fef2f2' }}>
             <p className="font-body text-sm" style={{ color: '#dc2626' }}>{error}</p>
           </div>
         )}
 
-        {/* Débutez button */}
         <button
           onClick={onStart}
           className="w-full text-white font-display font-extrabold text-xl rounded-2xl py-5 transition-all active:scale-95 flex items-center justify-center gap-3"
@@ -112,7 +118,6 @@ export default function QuizIntro({ exam, kidName = 'Champ', chapterId, kidId, o
           Débutez
         </button>
 
-        {/* Régénérez button */}
         {canRegenerate && (
           <button
             onClick={handleNewQuestions}
