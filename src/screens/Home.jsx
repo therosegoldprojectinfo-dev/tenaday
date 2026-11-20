@@ -164,18 +164,24 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
             >
               Quiz
             </p>
-            <p
-              className="font-display font-extrabold text-ink"
-              style={{
-                fontSize: 'clamp(3rem, 13vw, 4.5rem)',
-                fontStyle: 'italic',
-                letterSpacing: '-0.03em',
-                lineHeight: 1,
-                marginBottom: 24,
-              }}
-            >
-              Chargement
-            </p>
+
+            {/* Curved "Chargement" via SVG textPath */}
+            <svg viewBox="0 0 400 120" width="340" height="110" style={{ overflow: 'visible', marginBottom: 16 }}>
+              <defs>
+                <path id="curve" d="M 30,90 Q 200,-20 370,90" />
+              </defs>
+              <text
+                fontFamily="inherit"
+                fontWeight="800"
+                fontSize="62"
+                fill="#1a1a2e"
+              >
+                <textPath href="#curve" startOffset="50%" textAnchor="middle">
+                  Chargement
+                </textPath>
+              </text>
+            </svg>
+
             <img
               src="/gifrunning.gif"
               alt=""
