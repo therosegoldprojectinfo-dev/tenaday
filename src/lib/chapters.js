@@ -2,17 +2,40 @@ import { supabase } from './supabaseClient'
 
 const EDGE_FUNCTION_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`
 
-// ── Chapters ──────────────────────────────────────────────────────
+// ── Chapters (matières) ───────────────────────────────────────────
 
 export async function getChapters(kidId) {
-  const { data, error } = await supabase
+  // 1. Fetch this kid's subjects
+  const { data: chapters, error } = await supabase
     .from('chapters')
     .select('*')
     .eq('kid_id', kidId)
     .or('is_activation.is.null,is_activation.eq.false')
     .order('created_at', { ascending: true })
   if (error) throw error
-  return data
+
+  // 2. Fetch this kid's completions, with each exam's chapter_id
+  const { data: completions, error: compError } = await supabase
+    .from('quiz_completions')
+    .select('exam_id, exams!inner(chapter_id)')
+    .eq('kid_id', kidId)
+  if (compError) throw compError
+
+  // 3. Count distinct exams per chapter (matière)
+  const countMap = {}
+  const seenExams = new Set()
+  for (const row of completions ?? []) {
+    const chapterId = row.exams?.chapter_id
+    if (!chapterId || seenExams.has(row.exam_id)) continue
+    seenExams.add(row.exam_id)
+    countMap[chapterId] = (countMap[chapterId] ?? 0) + 1
+  }
+
+  // 4. Merge quiz_count into each subject
+  return chapters.map(ch => ({
+    ...ch,
+    quiz_count: countMap[ch.id] ?? 0,
+  }))
 }
 
 export async function createChapter({ name, emoji, kidId }) {
@@ -40,6 +63,20 @@ export async function updateChapter(id, updates) {
     .single()
   if (error) throw error
   return data
+}
+
+// ── Quiz completions ──────────────────────────────────────────────
+
+// Call this when a kid finishes a quiz. Safe to call more than once
+// for the same exam: the duplicate is ignored.
+export async function markQuizCompleted({ examId, kidId }) {
+  const { error } = await supabase
+    .from('quiz_completions')
+    .upsert(
+      { exam_id: examId, kid_id: kidId },
+      { onConflict: 'exam_id,kid_id', ignoreDuplicates: true }
+    )
+  if (error) throw error
 }
 
 // ── Exams ─────────────────────────────────────────────────────────
