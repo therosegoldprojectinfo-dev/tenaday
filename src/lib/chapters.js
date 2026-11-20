@@ -5,37 +5,14 @@ const EDGE_FUNCTION_BASE = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1`
 // ── Chapters ──────────────────────────────────────────────────────
 
 export async function getChapters(kidId) {
-  // 1. Fetch chapters
-  const { data: chapters, error } = await supabase
+  const { data, error } = await supabase
     .from('chapters')
     .select('*')
     .eq('kid_id', kidId)
     .or('is_activation.is.null,is_activation.eq.false')
     .order('created_at', { ascending: true })
   if (error) throw error
-
-  // 2. Fetch quiz_count per chapter for this kid
-  //    quiz_completions → exams (to get chapter_id)
-  const { data: completions, error: compError } = await supabase
-    .from('quiz_completions')
-    .select('exam_id, exams!inner(chapter_id)')
-    .eq('kid_id', kidId)
-  if (compError) throw compError
-
-  // 3. Count completions per chapter_id
-  const countMap = {}
-  for (const row of completions ?? []) {
-    const chapterId = row.exams?.chapter_id
-    if (chapterId) {
-      countMap[chapterId] = (countMap[chapterId] ?? 0) + 1
-    }
-  }
-
-  // 4. Merge quiz_count into each chapter
-  return chapters.map(ch => ({
-    ...ch,
-    quiz_count: countMap[ch.id] ?? 0,
-  }))
+  return data
 }
 
 export async function createChapter({ name, emoji, kidId }) {
