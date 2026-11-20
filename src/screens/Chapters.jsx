@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { getChapters, createChapter, deleteChapter, updateChapter } from '../lib/chapters'
 import { useLang } from '../lib/LangContext'
-import { t } from '../lib/i18n'
 
 const EMOJI_OPTIONS = [
   '📐','📖','🔬','🌍','🎨','🎵','🏃','💻','🧮','📝',
@@ -9,92 +8,7 @@ const EMOJI_OPTIONS = [
   '🧪','🌊','🦁','🎯','🧩','🌸','⚽','🎸','🍎','🚀',
 ]
 
-function CalendarMonth({ year, month, streakDaysSet, today }) {
-  const colHeaders = ['Di','Lu','Ma','Me','Je','Ve','Sa']
-  const firstDay   = new Date(year, month, 1).getDay()
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
-  const monthName  = new Date(year, month, 1).toLocaleString('fr', { month: 'long' })
-  const isCurrentMonth = year === today.getFullYear() && month === today.getMonth()
-
-  const cells = []
-  for (let i = 0; i < firstDay; i++) cells.push(null)
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d)
-
-  return (
-    <div className="rounded-2xl mb-3" style={{ background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-      <div className="grid grid-cols-7 px-2 pt-3 pb-1">
-        {colHeaders.map((h, i) => (
-          <div key={i} className="text-center font-body font-bold text-xs" style={{ color: '#aaa' }}>{h}</div>
-        ))}
-      </div>
-      <div className="px-4 pb-1">
-        <span className="font-display font-bold text-sm text-ink capitalize">{monthName}</span>
-      </div>
-      <div className="grid grid-cols-7 gap-y-1 px-2 pb-3">
-        {cells.map((day, i) => {
-          if (!day) return <div key={i} />
-          const dateKey   = `${year}-${month}-${day}`
-          const isStreak  = streakDaysSet.has(dateKey)
-          const isToday   = isCurrentMonth && day === today.getDate()
-          return (
-            <div key={i} className="flex items-center justify-center" style={{ height: 42 }}>
-              {isStreak ? (
-                <div className="flex flex-col items-center">
-                  <img src="/streak-fire.png" alt="🔥" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-                  {isToday && <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#ff2d78', marginTop: 1 }} />}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-0.5">
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center font-display font-bold text-sm"
-                    style={{
-                      background: isToday ? 'rgba(255,45,120,0.08)' : 'transparent',
-                      color: isToday ? '#ff2d78' : '#bbb',
-                      border: isToday ? '1.5px solid #ff2d78' : 'none',
-                    }}>
-                    {day}
-                  </div>
-                  {isToday && <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#ff2d78' }} />}
-                </div>
-              )}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
-
-function StreakPopupModal({ streak, lang, onClose, accountCreatedAt }) {
-  const today        = new Date()
-  const currentYear  = today.getFullYear()
-  const currentMonth = today.getMonth()
-  const currentDay   = today.getDate()
-
-  // Build set of all streak days (key: "year-month-day")
-  const streakDaysSet = new Set()
-  for (let i = 0; i < streak; i++) {
-    const d = new Date(currentYear, currentMonth, currentDay - i)
-    streakDaysSet.add(`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`)
-  }
-
-  // Figure out earliest month to show (account creation or 3 months ago if no prop)
-  const earliest = accountCreatedAt ? new Date(accountCreatedAt) : new Date(currentYear, currentMonth - 2, 1)
-  const startYear  = earliest.getFullYear()
-  const startMonth = earliest.getMonth()
-
-  // Build list of months from start → current
-  const months = []
-  let y = startYear, m = startMonth
-  while (y < currentYear || (y === currentYear && m <= currentMonth)) {
-    months.push({ year: y, month: m })
-    m++
-    if (m > 11) { m = 0; y++ }
-  }
-
-  const ctaLabel = lang === 'ar'
-    ? `حافظ على سلسلتك لمدة ${streak} أيام 🎮`
-    : `🎮 Garde ta série de ${streak} jour${streak > 1 ? 's' : ''}`
-
+function StreakPopupModal({ streak, lang, onClose }) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-end md:items-center md:justify-center"
@@ -105,14 +19,11 @@ function StreakPopupModal({ streak, lang, onClose, accountCreatedAt }) {
         className="w-full md:max-w-sm rounded-t-3xl md:rounded-3xl flex flex-col relative"
         style={{ background: '#F6F5F7', maxHeight: '90dvh' }}
       >
-        {/* Close */}
         <button onClick={onClose}
           className="absolute top-4 left-4 w-9 h-9 rounded-full flex items-center justify-center z-10"
           style={{ background: 'rgba(0,0,0,0.08)', color: '#333' }}>✕</button>
 
-        {/* Header — centered gif + text + button */}
         <div className="flex-shrink-0 flex flex-col items-center text-center pt-10 pb-5 px-5 gap-3">
-          {/* Curved "Garde ta / Série de X jours" title */}
           <div className="w-full" style={{ lineHeight: 1.1 }}>
             <p className="font-display font-bold text-ink" style={{ fontSize: 18 }}>Garde ta</p>
             <svg viewBox="0 0 300 60" width="100%" height="54" style={{ overflow: 'visible', marginTop: -4 }}>
@@ -139,8 +50,6 @@ function StreakPopupModal({ streak, lang, onClose, accountCreatedAt }) {
             Débuter un Quiz !
           </button>
         </div>
-
-
       </div>
     </div>
   )
@@ -187,7 +96,6 @@ function CoinsPopupModal({ coinBalance, lang, onClose }) {
 function TopStatsBar({ streak, coinBalance, onOpenStreak, onOpenCoins }) {
   return (
     <div className="flex items-center justify-end gap-2 pt-3 pb-2 px-5">
-      {/* Coins pill */}
       <button
         onClick={onOpenCoins}
         className="flex items-center gap-2 rounded-full transition-all active:scale-95"
@@ -197,7 +105,6 @@ function TopStatsBar({ streak, coinBalance, onOpenStreak, onOpenCoins }) {
         <span className="font-display font-extrabold text-lg text-amber-500">{coinBalance ?? 0}</span>
       </button>
 
-      {/* Streak pill */}
       <button
         onClick={onOpenStreak}
         className="flex items-center gap-2 rounded-full transition-all active:scale-95"
@@ -210,14 +117,14 @@ function TopStatsBar({ streak, coinBalance, onOpenStreak, onOpenCoins }) {
   )
 }
 
-export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid, onLeaderboard }) {
+export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid }) {
   const lang = useLang()
-  const [chapters, setChapters]         = useState([])
-  const [loading, setLoading]           = useState(true)
-  const [showModal, setShowModal]       = useState(false)
-  const [emojiTarget, setEmojiTarget]   = useState(null)
-  const [showStreak, setShowStreak]     = useState(false)
-  const [showCoins,  setShowCoins]      = useState(false)
+  const [chapters, setChapters]       = useState([])
+  const [loading, setLoading]         = useState(true)
+  const [showModal, setShowModal]     = useState(false)
+  const [emojiTarget, setEmojiTarget] = useState(null)
+  const [showStreak, setShowStreak]   = useState(false)
+  const [showCoins,  setShowCoins]    = useState(false)
 
   useEffect(() => {
     if (kidId) loadChapters()
@@ -269,23 +176,28 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
   return (
     <div className="flex flex-col" style={{ height: '100dvh', background: '#ffffff' }}>
 
-      <div className="flex-1 overflow-y-auto px-5 pb-10" style={{ background: '#ffffff' }}>
+      <div className="flex-1 overflow-y-auto px-5 pb-24" style={{ background: '#ffffff' }}>
 
-      {/* Top stats bar — sticky with frosted glass */}
-      <div style={{
-        position: 'sticky',
-        top: 0,
-        zIndex: 30,
-        marginLeft: '-20px',
-        marginRight: '-20px',
-        paddingLeft: '20px',
-        paddingRight: '20px',
-        background: 'rgba(255,255,255,0.72)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-      }}>
-        <TopStatsBar streak={streak} coinBalance={activeKid?.coin_balance} onOpenStreak={() => setShowStreak(true)} onOpenCoins={() => setShowCoins(true)} />
-      </div>
+        <div style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 30,
+          marginLeft: '-20px',
+          marginRight: '-20px',
+          paddingLeft: '20px',
+          paddingRight: '20px',
+          background: 'rgba(255,255,255,0.72)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+        }}>
+          <TopStatsBar
+            streak={streak}
+            coinBalance={activeKid?.coin_balance}
+            onOpenStreak={() => setShowStreak(true)}
+            onOpenCoins={() => setShowCoins(true)}
+          />
+        </div>
+
         <div className="max-w-2xl mx-auto">
 
           {/* GIF mascot */}
@@ -297,7 +209,7 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
             />
           </div>
 
-          {/* Add subject row — separate + button and input bar */}
+          {/* Add subject row */}
           <div className="flex items-center gap-3 mb-6">
             <button
               onClick={() => setShowModal(true)}
@@ -323,7 +235,9 @@ export default function Chapters({ onSelectChapter, kidId, streak = 0, activeKid
           </div>
 
           {chapters.length === 0 ? (
-            <EmptyState lang={lang} onAdd={() => setShowModal(true)} />
+            <p className="font-body text-base text-center mt-10" style={{ color: '#9ca3af' }}>
+              Aucune Matière pour le moment.
+            </p>
           ) : (
             <div className="grid grid-cols-2 gap-4">
               {chapters.map((chapter, index) => (
@@ -373,14 +287,12 @@ function ChapterCard({ chapter, index, onClick, onDelete, onChangeEmoji }) {
       className="w-full rounded-3xl bg-white overflow-hidden"
       style={{ boxShadow: '0 4px 20px rgba(0,0,0,0.08)', position: 'relative' }}
     >
-      {/* Colored top with big emoji */}
       <div
         className="flex items-center justify-center"
         style={{ background: accent, height: 110, borderRadius: '24px 24px 0 0', position: 'relative' }}
       >
         <span style={{ fontSize: 58, lineHeight: 1 }}>{chapter.emoji}</span>
 
-        {/* Three-dot button */}
         <button
           onClick={e => { e.stopPropagation(); setMenuOpen(v => !v) }}
           className="flex items-center justify-center active:scale-95 transition-all"
@@ -398,10 +310,8 @@ function ChapterCard({ chapter, index, onClick, onDelete, onChangeEmoji }) {
           </svg>
         </button>
 
-        {/* Dropdown menu */}
         {menuOpen && (
           <>
-            {/* backdrop to close */}
             <div
               style={{ position: 'fixed', inset: 0, zIndex: 40 }}
               onClick={e => { e.stopPropagation(); setMenuOpen(false) }}
@@ -420,7 +330,7 @@ function ChapterCard({ chapter, index, onClick, onDelete, onChangeEmoji }) {
                 className="w-full text-left flex items-center gap-2 font-body font-bold text-sm text-ink transition-all active:scale-95"
                 style={{ padding: '12px 16px', borderBottom: '1px solid #f3f4f6' }}
               >
-                <span style={{ fontSize: 16 }}>🎨</span> Changer d'émojie
+                <span style={{ fontSize: 16 }}>🎨</span> Changer d'emoji
               </button>
               <button
                 onClick={() => { setMenuOpen(false); onDelete(chapter) }}
@@ -434,7 +344,6 @@ function ChapterCard({ chapter, index, onClick, onDelete, onChangeEmoji }) {
         )}
       </div>
 
-      {/* Bottom content */}
       <div className="px-4 pt-3 pb-4">
         <p className="font-display font-extrabold text-base text-ink truncate mb-0.5">{chapter.name}</p>
         <p className="font-body text-xs mb-3" style={{ color: '#9ca3af' }}>
@@ -463,7 +372,7 @@ function EmojiPickerModal({ chapter, onConfirm, onClose }) {
         </div>
         <div className="flex-1 overflow-y-auto px-5 pb-8 flex flex-col gap-5">
           <h2 className="font-display font-extrabold text-xl text-ink text-center pt-2">
-            Changer d'émojie
+            Changer d'emoji
           </h2>
           <div className="flex justify-center">
             <span style={{ fontSize: 52 }}>{selected}</span>
@@ -491,25 +400,6 @@ function EmojiPickerModal({ chapter, onConfirm, onClose }) {
   )
 }
 
-function EmptyState({ lang, onAdd }) {
-  return (
-    <div className="flex flex-col items-center justify-center pt-10 gap-6 text-center px-4">
-      <img src="/gifbro.gif" alt="" style={{ width: 120, height: 'auto', mixBlendMode: 'multiply' }} />
-      <div>
-        <p className="font-display font-extrabold text-2xl text-ink">{t(lang, 'chapters_empty_title')}</p>
-        <p className="text-muted font-body text-base mt-2">{t(lang, 'chapters_empty_sub')}</p>
-      </div>
-      <button
-        onClick={onAdd}
-        className="w-full max-w-xs text-white font-display font-bold text-lg rounded-2xl py-5 transition-all active:scale-95"
-        style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}
-      >
-        {t(lang, 'chapters_empty_cta')}
-      </button>
-    </div>
-  )
-}
-
 function ChapterModal({ lang, onConfirm, onClose }) {
   const [name, setName]     = useState('')
   const [emoji, setEmoji]   = useState('📐')
@@ -531,14 +421,14 @@ function ChapterModal({ lang, onConfirm, onClose }) {
         </div>
         <div className="flex-1 overflow-y-auto px-5 pb-8 flex flex-col gap-5">
           <h2 className="font-display font-extrabold text-2xl text-ink text-center pt-2">
-            {t(lang, 'chapters_modal_title')}
+            Nouvelle Matière
           </h2>
           <div className="flex flex-col gap-2">
             <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">
-              {t(lang, 'chapters_modal_name_label')}
+              Nom
             </label>
             <input type="text" value={name} onChange={e => setName(e.target.value)}
-              placeholder={t(lang, 'chapters_modal_name_placeholder')}
+              placeholder="Ex : Mathématiques"
               className="w-full rounded-2xl px-4 py-3 font-display font-bold text-lg text-ink outline-none transition-colors"
               style={{ border: '2px solid #e5e7eb', background: '#fafafa' }}
               onFocus={e => e.target.style.borderColor = '#7c3aed'}
@@ -546,7 +436,7 @@ function ChapterModal({ lang, onConfirm, onClose }) {
           </div>
           <div className="flex flex-col gap-2">
             <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">
-              {t(lang, 'chapters_modal_icon_label')}
+              Icône
             </label>
             <div className="grid grid-cols-6 md:grid-cols-8 gap-2">
               {EMOJI_OPTIONS.map(e => (
@@ -561,16 +451,16 @@ function ChapterModal({ lang, onConfirm, onClose }) {
           <div className="flex items-center gap-3 rounded-2xl px-4 py-3" style={{ background: '#f5f3ff' }}>
             <span style={{ fontSize: 28 }}>{emoji}</span>
             <span className="font-display font-bold text-lg text-ink">
-              {name || t(lang, 'chapters_modal_name_placeholder')}
+              {name || 'Nom de la matière'}
             </span>
           </div>
           <button onClick={handleSubmit} disabled={!name.trim() || saving}
             className="w-full disabled:opacity-40 text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95"
             style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}>
-            {saving ? t(lang, 'chapters_modal_creating') : t(lang, 'chapters_modal_cta')}
+            {saving ? 'Création...' : 'Créer la matière'}
           </button>
           <button onClick={onClose} className="w-full text-muted font-body font-bold text-sm py-2 text-center">
-            {t(lang, 'chapters_modal_cancel')}
+            Annuler
           </button>
         </div>
       </div>
