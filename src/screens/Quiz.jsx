@@ -3,6 +3,7 @@ import { completeQuiz, updateStreak } from '../lib/economy'
 import { logQuestionAttempt } from '../lib/performance'
 import { gradeAnswer } from '../lib/grading'
 import StreakPopup from './StreakPopup'
+import CoinPopup from './CoinPopup'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
 
@@ -112,37 +113,7 @@ function ResultsScreen({ questions, answers, topic, onDone, coinsEarned, isTrial
   else if (pct >= 60) { emoji = '😊'; headlineKey = 'quiz_results_good';    subKey = 'quiz_results_good_sub' }
   else                { emoji = '💪'; headlineKey = 'quiz_results_keep';    subKey = 'quiz_results_keep_sub' }
 
-  if (!isTrial && coinsEarned > 0) {
-    return (
-      <div style={{ height: '100dvh', background: '#1a1200', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '0 28px', gap: 0 }}>
-        <style>{`@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}} @keyframes coinpop{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}`}</style>
-        <div style={{ animation: 'float 2s ease-in-out infinite', marginBottom: 24 }}>
-          <img src="/coin-flower.png" alt="coins" style={{ width: 120, height: 120, objectFit: 'contain' }} />
-        </div>
-        <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 900, fontSize: 36, color: '#fbbf24', textAlign: 'center', lineHeight: 1.15, margin: 0, marginBottom: 10, letterSpacing: '-0.02em' }}>
-          {lang === 'ar' ? `رائع! ربحت ${coinsEarned} عملة` : `Wow! You earned ${coinsEarned} coins 🎉`}
-        </p>
-        <p style={{ fontFamily: "'Baloo 2', sans-serif", fontWeight: 600, fontSize: 18, color: 'rgba(251,191,36,0.55)', textAlign: 'center', margin: 0, marginBottom: 48 }}>
-          {correct}/{total} {lang === 'ar' ? 'إجابة صحيحة' : 'correct answers'}
-        </p>
-        <div style={{ width: '100%', maxWidth: 360, background: 'rgba(255,255,255,0.08)', borderRadius: 16, padding: '14px 20px', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
-          <span style={{ fontSize: 28 }}>🎯</span>
-          <div>
-            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(251,191,36,0.5)', margin: 0 }}>Your score</p>
-            <p style={{ fontFamily: "'Baloo 2', sans-serif", fontSize: 24, fontWeight: 800, color: '#fbbf24', margin: 0 }}>{correct}/{total}</p>
-          </div>
-        </div>
-        <button
-          onClick={onDone}
-          style={{ width: '100%', maxWidth: 360, background: '#fbbf24', border: 'none', borderRadius: 24, padding: '20px 0', fontFamily: "'Baloo 2', sans-serif", fontWeight: 900, fontSize: 22, color: '#1a1200', cursor: 'pointer', boxShadow: '0 5px 0 #b45309', letterSpacing: '-0.01em' }}
-          onMouseDown={e => e.currentTarget.style.transform = 'scale(0.97)'}
-          onMouseUp={e => e.currentTarget.style.transform = 'scale(1)'}
-        >
-          {lang === 'ar' ? 'رائع! 🎁' : 'Awesome! 🎁'}
-        </button>
-      </div>
-    )
-  }
+  if (!isTrial && coinsEarned > 0) return <CoinPopup coinsEarned={coinsEarned} onDone={onDone} />
 
   return (
     <div className="bg-white flex flex-col items-center px-6 py-10 gap-5" style={{ height: '100dvh', overflowY: 'auto' }}>
