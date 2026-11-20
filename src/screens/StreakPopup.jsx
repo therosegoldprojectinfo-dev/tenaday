@@ -1,58 +1,42 @@
-import { useLang } from '../lib/LangContext'
-import { t } from '../lib/i18n'
-
 export default function StreakPopup({ streakCount, onClose }) {
-  const lang = useLang()
-  const isFirst     = streakCount === 1
-  const isMilestone = [3, 5, 7, 10, 14, 21, 30].includes(streakCount)
-
-  let headline, sub
-  if (isFirst) {
-    headline = t(lang, 'streak_first_headline')
-    sub      = t(lang, 'streak_first_sub')
-  } else if (isMilestone) {
-    headline = t(lang, 'streak_milestone_headline', streakCount)
-    sub      = t(lang, 'streak_milestone_sub')
-  } else {
-    headline = t(lang, 'streak_default_headline', streakCount)
-    sub      = t(lang, 'streak_default_sub')
-  }
+  const label = streakCount === 1 ? 'jour de série' : 'jours de série'
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center px-6" style={{ height: '100dvh', background: '#1a0a14' }}>
-      <div className="w-full max-w-sm flex flex-col items-center gap-6 text-center">
+    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-6">
+      <div className="w-full max-w-sm flex flex-col items-center text-center gap-2">
 
-        {/* Fire mascot */}
-        <div style={{ animation: 'float 2s ease-in-out infinite' }}>
-          <img src="/streak-fire.png" alt="" className="w-48 h-auto" />
-        </div>
+        {/* Above the fire */}
+        <p className="font-display font-bold text-2xl text-ink">
+          Tu as <span style={{ color: '#ff2d78' }}>{streakCount}</span>
+        </p>
 
-        {/* Headline */}
-        <div>
-          <h2 className="font-display font-extrabold text-4xl text-white">{headline}</h2>
-          <p className="font-body text-base mt-2" style={{ color: 'rgba(255,255,255,0.5)' }}>{sub}</p>
-        </div>
+        {/* Fire only */}
+        <img
+          src="/streak-fire.png"
+          alt=""
+          style={{ width: 200, height: 200, objectFit: 'contain' }}
+        />
 
-        {/* Streak dots */}
-        <div className="flex items-center justify-center gap-2">
-          {Array.from({ length: Math.min(streakCount, 7) }).map((_, i) => (
-            <div key={i} className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white"
-              style={{ background: '#ff2d78' }}>
-              ✓
-            </div>
-          ))}
-          {streakCount > 7 && (
-            <span className="font-display font-extrabold text-2xl" style={{ color: '#ff2d78' }}>+{streakCount - 7}</span>
-          )}
-        </div>
+        {/* Curved text under the fire */}
+        <svg viewBox="0 0 300 70" width="100%" height="70" style={{ overflow: 'visible' }}>
+          <defs>
+            <path id="streak-curve" d="M 20,18 Q 150,68 280,18" />
+          </defs>
+          <text fill="#1a1a2e" fontWeight="800" fontSize="30" fontFamily="inherit">
+            <textPath href="#streak-curve" startOffset="50%" textAnchor="middle">
+              {label}
+            </textPath>
+          </text>
+        </svg>
 
-        <button onClick={onClose}
-          className="w-full font-display font-bold text-xl rounded-2xl py-5 transition-all active:scale-95 text-white"
-          style={{ background: '#ff2d78', boxShadow: '0 4px 0 #c4005a' }}>
-          {t(lang, 'streak_cta')}
+        <button
+          onClick={onClose}
+          className="w-full mt-6 py-4 rounded-full font-display font-bold text-base text-ink transition-all active:scale-95"
+          style={{ background: 'white', border: '1.5px solid #e5e7eb', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+        >
+          Continuer
         </button>
       </div>
-      <style>{`@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`}</style>
     </div>
   )
 }
