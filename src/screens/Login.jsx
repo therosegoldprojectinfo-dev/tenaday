@@ -1,43 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-const strings = {
-  en: {
-    title:       'Welcome back!',
-    sub:         'Log in to continue with your child.',
-    username:    'USERNAME',
-    password:    'PASSWORD',
-    username_ph: 'e.g. sarah_mom',
-    password_ph: 'Your password',
-    cta:         'Log in →',
-    loading:     'Logging in...',
-    forgot:      'Forgot password? Contact us on WhatsApp',
-    no_account:  "Don't have an account?",
-    try_free:    'Try for free →',
-    err_empty_u: 'Enter your username',
-    err_empty_p: 'Enter your password',
-    err_wrong:   'Wrong username or password',
-    err_generic: 'Something went wrong. Try again.',
-  },
-  ar: {
-    title:       'مرحباً بعودتك!',
-    sub:         'سجّل الدخول لمتابعة رحلة طفلك.',
-    username:    'اسم المستخدم',
-    password:    'كلمة المرور',
-    username_ph: 'مثال: sarah_mom',
-    password_ph: 'كلمة المرور',
-    cta:         'تسجيل الدخول ←',
-    loading:     'جارٍ تسجيل الدخول...',
-    forgot:      'نسيت كلمة المرور؟ تواصل معنا عبر واتساب',
-    no_account:  'ليس لديك حساب؟',
-    try_free:    'جرّب مجاناً ←',
-    err_empty_u: 'أدخل اسم المستخدم',
-    err_empty_p: 'أدخل كلمة المرور',
-    err_wrong:   'اسم المستخدم أو كلمة المرور غير صحيحة',
-    err_generic: 'حدث خطأ ما. حاول مرة أخرى.',
-  },
-}
-
 async function derivePassword(username, password) {
   const input = `numio:${username.trim().toLowerCase()}:${password}:v3`
   const encoded = new TextEncoder().encode(input)
@@ -45,118 +8,323 @@ async function derivePassword(username, password) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
-export default function Login({ lang = 'en', onSuccess, onTryFree, onLanguageChange }) {
-  const s = strings[lang] || strings.en
-  const dir = lang === 'ar' ? 'rtl' : 'ltr'
-
+export default function Login({ onSuccess }) {
+  const [tab, setTab] = useState('login') // 'login' | 'signup'
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [loading,  setLoading]  = useState(false)
-  const [error,    setError]    = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   async function handleLogin() {
-    if (!username.trim()) { setError(s.err_empty_u); return }
-    if (!password)        { setError(s.err_empty_p); return }
+    if (!username.trim()) { setError('Entrez votre nom d\'utilisateur'); return }
+    if (!password)        { setError('Entrez votre mot de passe'); return }
     setLoading(true); setError('')
     try {
       const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
       const derivedPw = await derivePassword(username.trim(), password)
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: derivedPw })
-      if (signInErr) { setError(s.err_wrong); return }
+      if (signInErr) { setError('Nom d\'utilisateur ou mot de passe incorrect'); return }
       await onSuccess(setError)
     } catch {
-      setError(s.err_generic)
+      setError('Une erreur s\'est produite. Réessayez.')
     } finally {
       setLoading(false)
     }
   }
 
+  const waLink = `https://wa.me/14384102068?text=${encodeURIComponent('Bonjour, j\'ai oublié mon mot de passe Numio. Mon nom d\'utilisateur est : ')}`
+
   return (
-    <div className="bg-white w-full flex flex-col" style={{ minHeight: '100dvh' }} dir={dir}>
-      <div className="w-full max-w-md mx-auto flex flex-col px-6" style={{ minHeight: '100dvh' }}>
+    <div style={styles.page}>
+      <div style={styles.container}>
 
-        {/* Language toggle */}
-        <div className="flex gap-2 justify-end pt-6 flex-shrink-0">
-          {['en', 'ar'].map(code => (
-            <button key={code} onClick={() => onLanguageChange?.(code)}
-              className="px-4 py-1.5 rounded-full font-body font-bold text-sm transition-all"
-              style={{ background: lang === code ? '#7c3aed' : '#f3f4f6', color: lang === code ? 'white' : '#AFAFAF' }}>
-              {code === 'en' ? 'EN' : 'عربي'}
-            </button>
-          ))}
+        {/* Logo */}
+        <div style={styles.logoWrap}>
+          <img src="/nav-logo.png" alt="Numio" style={styles.logo} />
         </div>
 
-        {/* Header */}
-        <div className="flex-shrink-0 pt-10 pb-8">
-          <img src="/nav-logo.png" alt="Numio" className="h-10 w-auto mb-8" />
-          <h1 className="font-display font-extrabold text-3xl text-ink mb-2">{s.title} 👋</h1>
-          <p className="font-body text-base text-muted">{s.sub}</p>
-        </div>
+        {/* Headline */}
+        <h1 style={styles.headline}>Commençons !</h1>
 
-        {/* Form */}
-        <div className="flex flex-col gap-4 flex-1">
-          <div className="flex flex-col gap-1.5">
-            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">{s.username}</label>
-            <input type="text" value={username}
-              onChange={e => { setUsername(e.target.value); setError('') }}
-              placeholder={s.username_ph} autoCapitalize="none" autoCorrect="off"
-              className="w-full rounded-2xl px-4 py-4 font-display font-bold text-lg text-ink outline-none transition-colors"
-              style={{ border: '2px solid #e5e7eb', background: '#fafafa' }}
-              onFocus={e => e.target.style.borderColor = '#7c3aed'}
-              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <label className="font-body font-bold text-xs text-muted uppercase tracking-widest">{s.password}</label>
-            <input type="password" value={password}
-              onChange={e => { setPassword(e.target.value); setError('') }}
-              placeholder={s.password_ph}
-              onKeyDown={e => e.key === 'Enter' && handleLogin()}
-              className="w-full rounded-2xl px-4 py-4 font-display font-bold text-lg text-ink outline-none transition-colors"
-              style={{ border: '2px solid #e5e7eb', background: '#fafafa' }}
-              onFocus={e => e.target.style.borderColor = '#7c3aed'}
-              onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
-          </div>
-
-          {error && <p className="font-body text-sm text-red-500 font-bold text-center">{error}</p>}
-
-          <button onClick={handleLogin} disabled={loading || !username.trim() || !password}
-            className="w-full disabled:opacity-40 text-white font-display font-bold text-xl rounded-2xl py-5 transition-all active:scale-95"
-            style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6' }}>
-            {loading ? s.loading : s.cta}
+        {/* Tab pill */}
+        <div style={styles.tabPill}>
+          <button
+            onClick={() => { setTab('login'); setError('') }}
+            style={{ ...styles.tabBtn, ...(tab === 'login' ? styles.tabBtnActive : styles.tabBtnInactive) }}
+          >
+            Connexion
           </button>
-
-          <a href={`https://wa.me/14384102068?text=${encodeURIComponent('Hi, I forgot my Numio password. My username is: ')}`}
-            target="_blank" rel="noopener noreferrer"
-            className="font-body font-bold text-sm text-center py-1"
-            style={{ color: '#7c3aed' }}>
-            {s.forgot}
-          </a>
-
-          <p className="font-body text-xs text-muted text-center">
-            <a href="/privacy.html" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: '#7c3aed' }}>
-              {lang === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'}
-            </a>
-            {' · '}
-            <a href="/terms.html" target="_blank" rel="noopener noreferrer" className="underline" style={{ color: '#7c3aed' }}>
-              {lang === 'ar' ? 'شروط الاستخدام' : 'Terms of Use'}
-            </a>
-          </p>
-
-          <div className="flex items-center gap-3 my-1">
-            <div className="flex-1 h-px bg-gray-100" />
-            <span className="font-body text-xs text-muted">{lang === 'ar' ? 'ليس لديك حساب؟' : "Don't have an account?"}</span>
-            <div className="flex-1 h-px bg-gray-100" />
-          </div>
-
-          <a href="https://buy.stripe.com/fZufZh2w12kDd6u6nv1ZS06"
-            className="w-full font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95 flex items-center justify-center"
-            style={{ background: '#f5f3ff', color: '#7c3aed', boxShadow: '0 2px 12px rgba(124,58,237,0.1)' }}>
-            {lang === 'ar' ? 'احصل على Numio ←' : 'Get Numio →'}
-          </a>
+          <button
+            onClick={() => { setTab('signup'); setError('') }}
+            style={{ ...styles.tabBtn, ...(tab === 'signup' ? styles.tabBtnActive : styles.tabBtnInactive) }}
+          >
+            Inscription
+          </button>
         </div>
-        <div className="pb-8" />
+
+        {/* ── LOGIN TAB ── */}
+        {tab === 'login' && (
+          <div style={styles.form}>
+            {/* Username */}
+            <div style={styles.fieldWrap}>
+              <label style={styles.label}>Nom d'utilisateur</label>
+              <input
+                type="text"
+                value={username}
+                onChange={e => { setUsername(e.target.value); setError('') }}
+                placeholder="ex. sarah_maman"
+                autoCapitalize="none"
+                autoCorrect="off"
+                style={styles.input}
+                onFocus={e => e.target.style.borderColor = '#4a6fa5'}
+                onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+              />
+            </div>
+
+            {/* Password */}
+            <div style={styles.fieldWrap}>
+              <label style={styles.label}>Mot de passe</label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => { setPassword(e.target.value); setError('') }}
+                placeholder="Votre mot de passe"
+                onKeyDown={e => e.key === 'Enter' && handleLogin()}
+                style={styles.input}
+                onFocus={e => e.target.style.borderColor = '#4a6fa5'}
+                onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+              />
+            </div>
+
+            {error && <p style={styles.error}>{error}</p>}
+
+            {/* CTA */}
+            <button
+              onClick={handleLogin}
+              disabled={loading || !username.trim() || !password}
+              style={{
+                ...styles.ctaBtn,
+                opacity: (loading || !username.trim() || !password) ? 0.45 : 1,
+              }}
+            >
+              {loading ? 'Connexion en cours…' : 'Entrer'}
+            </button>
+
+            {/* Forgot */}
+            <a
+              href={waLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={styles.forgot}
+            >
+              Mot de passe oublié ?
+            </a>
+
+            {/* Legal */}
+            <div style={styles.legal}>
+              <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={styles.legalLink}>
+                Politique de confidentialité
+              </a>
+              <span style={styles.dot}>·</span>
+              <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={styles.legalLink}>
+                Conditions d'utilisation
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* ── SIGNUP TAB ── */}
+        {tab === 'signup' && (
+          <div style={styles.form}>
+            <a
+              href="https://buy.stripe.com/fZufZh2w12kDd6u6nv1ZS06"
+              style={styles.getBtn}
+            >
+              <span style={styles.getBtnIcon}>🛒</span>
+              Obtenir Numio maintenant
+            </a>
+
+            {/* Legal */}
+            <div style={{ ...styles.legal, marginTop: 24 }}>
+              <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={styles.legalLink}>
+                Politique de confidentialité
+              </a>
+              <span style={styles.dot}>·</span>
+              <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={styles.legalLink}>
+                Conditions d'utilisation
+              </a>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   )
+}
+
+/* ── Styles ── */
+const styles = {
+  page: {
+    minHeight: '100dvh',
+    background: '#f8f9fb',
+    display: 'flex',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    fontFamily: "'Inter', system-ui, sans-serif",
+  },
+  container: {
+    width: '100%',
+    maxWidth: 420,
+    padding: '48px 28px 40px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  logoWrap: {
+    marginBottom: 20,
+  },
+  logo: {
+    height: 44,
+    width: 'auto',
+  },
+  headline: {
+    fontSize: 28,
+    fontWeight: 800,
+    color: '#1a202c',
+    margin: '0 0 28px',
+    textAlign: 'center',
+    letterSpacing: '-0.5px',
+  },
+  /* Tab pill — mirrors the Gizmo Sign up / Sign in pill */
+  tabPill: {
+    display: 'flex',
+    background: '#edf0f4',
+    borderRadius: 999,
+    padding: 4,
+    marginBottom: 36,
+    width: '100%',
+    maxWidth: 320,
+  },
+  tabBtn: {
+    flex: 1,
+    padding: '10px 0',
+    border: 'none',
+    borderRadius: 999,
+    fontSize: 15,
+    fontWeight: 700,
+    cursor: 'pointer',
+    transition: 'background 0.2s, color 0.2s, box-shadow 0.2s',
+    fontFamily: 'inherit',
+  },
+  tabBtnActive: {
+    background: '#ffffff',
+    color: '#1a202c',
+    boxShadow: '0 1px 6px rgba(0,0,0,0.12)',
+  },
+  tabBtnInactive: {
+    background: 'transparent',
+    color: '#8a94a6',
+  },
+
+  /* Form */
+  form: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 14,
+  },
+  fieldWrap: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 6,
+  },
+  label: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: '#4a5568',
+  },
+  input: {
+    width: '100%',
+    padding: '14px 16px',
+    borderRadius: 14,
+    border: '1.5px solid #e2e8f0',
+    background: '#ffffff',
+    fontSize: 16,
+    fontWeight: 500,
+    color: '#1a202c',
+    outline: 'none',
+    transition: 'border-color 0.2s',
+    boxSizing: 'border-box',
+    fontFamily: 'inherit',
+  },
+  error: {
+    fontSize: 13,
+    color: '#e53e3e',
+    fontWeight: 600,
+    textAlign: 'center',
+    margin: 0,
+  },
+  ctaBtn: {
+    width: '100%',
+    padding: '16px 0',
+    borderRadius: 14,
+    border: 'none',
+    background: '#4a6fa5',
+    color: '#ffffff',
+    fontSize: 17,
+    fontWeight: 700,
+    cursor: 'pointer',
+    transition: 'opacity 0.2s, transform 0.1s',
+    fontFamily: 'inherit',
+    marginTop: 4,
+    boxShadow: '0 3px 0 #2d4f80',
+  },
+  forgot: {
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: 600,
+    color: '#4a6fa5',
+    textDecoration: 'none',
+    marginTop: 2,
+  },
+  legal: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  legalLink: {
+    fontSize: 12,
+    color: '#8a94a6',
+    textDecoration: 'underline',
+    textDecorationColor: '#c8d0dd',
+  },
+  dot: {
+    color: '#c8d0dd',
+    fontSize: 12,
+  },
+
+  /* Signup tab */
+  getBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    width: '100%',
+    padding: '18px 0',
+    borderRadius: 14,
+    border: '1.5px solid #e2e8f0',
+    background: '#ffffff',
+    color: '#1a202c',
+    fontSize: 17,
+    fontWeight: 700,
+    textDecoration: 'none',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
+    marginTop: 8,
+    fontFamily: 'inherit',
+  },
+  getBtnIcon: {
+    fontSize: 20,
+  },
 }
