@@ -141,7 +141,7 @@ const BORDER = '1.5px solid #e2e8f0'
 const s = {
   page: {
     minHeight: '100dvh',
-    background: '#f4f5f7',
+    background: '#ffffff',
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'center',
