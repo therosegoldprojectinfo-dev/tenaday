@@ -9,65 +9,59 @@ async function derivePassword(username, password) {
 }
 
 export default function Login({ onSuccess }) {
-  const [tab, setTab] = useState('login') // 'login' | 'signup'
+  const [tab, setTab] = useState('login')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   async function handleLogin() {
-    if (!username.trim()) { setError('Entrez votre nom d\'utilisateur'); return }
+    if (!username.trim()) { setError("Entrez votre nom d'utilisateur"); return }
     if (!password)        { setError('Entrez votre mot de passe'); return }
     setLoading(true); setError('')
     try {
       const fakeEmail = `${username.trim().toLowerCase().replace(/\s+/g, '_')}@numio.app`
       const derivedPw = await derivePassword(username.trim(), password)
       const { error: signInErr } = await supabase.auth.signInWithPassword({ email: fakeEmail, password: derivedPw })
-      if (signInErr) { setError('Nom d\'utilisateur ou mot de passe incorrect'); return }
+      if (signInErr) { setError("Nom d'utilisateur ou mot de passe incorrect"); return }
       await onSuccess(setError)
     } catch {
-      setError('Une erreur s\'est produite. Réessayez.')
+      setError('Une erreur est survenue. Réessayez.')
     } finally {
       setLoading(false)
     }
   }
 
-  const waLink = `https://wa.me/14384102068?text=${encodeURIComponent('Bonjour, j\'ai oublié mon mot de passe Numio. Mon nom d\'utilisateur est : ')}`
+  const waLink = `https://wa.me/14384102068?text=${encodeURIComponent("Bonjour, j'ai oublié mon mot de passe Numio. Mon nom d'utilisateur est : ")}`
 
   return (
-    <div style={styles.page}>
-      <div style={styles.container}>
+    <div style={s.page}>
+      <div style={s.card}>
 
-        {/* Logo */}
-        <div style={styles.logoWrap}>
-          <img src="/nav-logo.png" alt="Numio" style={styles.logo} />
-        </div>
+        {/* Logo — bigger */}
+        <img src="/nav-logo.png" alt="Numio" style={s.logo} />
 
         {/* Headline */}
-        <h1 style={styles.headline}>Commençons !</h1>
+        <h1 style={s.headline}>Commençons !</h1>
 
         {/* Tab pill */}
-        <div style={styles.tabPill}>
-          <button
-            onClick={() => { setTab('login'); setError('') }}
-            style={{ ...styles.tabBtn, ...(tab === 'login' ? styles.tabBtnActive : styles.tabBtnInactive) }}
-          >
-            Connexion
-          </button>
-          <button
-            onClick={() => { setTab('signup'); setError('') }}
-            style={{ ...styles.tabBtn, ...(tab === 'signup' ? styles.tabBtnActive : styles.tabBtnInactive) }}
-          >
-            Inscription
-          </button>
+        <div style={s.pill}>
+          {['login', 'signup'].map(t => (
+            <button
+              key={t}
+              onClick={() => { setTab(t); setError('') }}
+              style={{ ...s.pillBtn, ...(tab === t ? s.pillBtnOn : s.pillBtnOff) }}
+            >
+              {t === 'login' ? 'Connexion' : 'Inscription'}
+            </button>
+          ))}
         </div>
 
-        {/* ── LOGIN TAB ── */}
+        {/* ── LOGIN ── */}
         {tab === 'login' && (
-          <div style={styles.form}>
-            {/* Username */}
-            <div style={styles.fieldWrap}>
-              <label style={styles.label}>Nom d'utilisateur</label>
+          <div style={s.form}>
+            <div style={s.field}>
+              <label style={s.label}>Nom d'utilisateur</label>
               <input
                 type="text"
                 value={username}
@@ -75,84 +69,63 @@ export default function Login({ onSuccess }) {
                 placeholder="ex. sarah_maman"
                 autoCapitalize="none"
                 autoCorrect="off"
-                style={styles.input}
-                onFocus={e => e.target.style.borderColor = '#4a6fa5'}
+                style={s.input}
+                onFocus={e => e.target.style.borderColor = '#1a202c'}
                 onBlur={e => e.target.style.borderColor = '#e2e8f0'}
               />
             </div>
 
-            {/* Password */}
-            <div style={styles.fieldWrap}>
-              <label style={styles.label}>Mot de passe</label>
+            <div style={s.field}>
+              <label style={s.label}>Mot de passe</label>
               <input
                 type="password"
                 value={password}
                 onChange={e => { setPassword(e.target.value); setError('') }}
                 placeholder="Votre mot de passe"
                 onKeyDown={e => e.key === 'Enter' && handleLogin()}
-                style={styles.input}
-                onFocus={e => e.target.style.borderColor = '#4a6fa5'}
+                style={s.input}
+                onFocus={e => e.target.style.borderColor = '#1a202c'}
                 onBlur={e => e.target.style.borderColor = '#e2e8f0'}
               />
             </div>
 
-            {error && <p style={styles.error}>{error}</p>}
+            {error && <p style={s.error}>{error}</p>}
 
-            {/* CTA */}
             <button
               onClick={handleLogin}
               disabled={loading || !username.trim() || !password}
-              style={{
-                ...styles.ctaBtn,
-                opacity: (loading || !username.trim() || !password) ? 0.45 : 1,
-              }}
+              style={{ ...s.ctaBtn, opacity: (loading || !username.trim() || !password) ? 0.4 : 1 }}
             >
               {loading ? 'Connexion en cours…' : 'Entrer'}
             </button>
 
-            {/* Forgot */}
-            <a
-              href={waLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={styles.forgot}
-            >
+            <a href={waLink} target="_blank" rel="noopener noreferrer" style={s.forgot}>
               Mot de passe oublié ?
             </a>
 
-            {/* Legal */}
-            <div style={styles.legal}>
-              <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={styles.legalLink}>
-                Politique de confidentialité
-              </a>
-              <span style={styles.dot}>·</span>
-              <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={styles.legalLink}>
-                Conditions d'utilisation
-              </a>
+            <div style={s.legal}>
+              <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={s.legalLink}>Politique de confidentialité</a>
+              <span style={s.dot}>·</span>
+              <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={s.legalLink}>Conditions d'utilisation</a>
             </div>
           </div>
         )}
 
-        {/* ── SIGNUP TAB ── */}
+        {/* ── SIGNUP ── */}
         {tab === 'signup' && (
-          <div style={styles.form}>
+          <div style={s.form}>
             <a
               href="https://buy.stripe.com/fZufZh2w12kDd6u6nv1ZS06"
-              style={styles.getBtn}
+              style={s.getBtn}
             >
-              <span style={styles.getBtnIcon}>🛒</span>
+              <span style={{ fontSize: 22 }}>🛒</span>
               Obtenir Numio maintenant
             </a>
 
-            {/* Legal */}
-            <div style={{ ...styles.legal, marginTop: 24 }}>
-              <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={styles.legalLink}>
-                Politique de confidentialité
-              </a>
-              <span style={styles.dot}>·</span>
-              <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={styles.legalLink}>
-                Conditions d'utilisation
-              </a>
+            <div style={{ ...s.legal, marginTop: 20 }}>
+              <a href="/privacy.html" target="_blank" rel="noopener noreferrer" style={s.legalLink}>Politique de confidentialité</a>
+              <span style={s.dot}>·</span>
+              <a href="/terms.html" target="_blank" rel="noopener noreferrer" style={s.legalLink}>Conditions d'utilisation</a>
             </div>
           </div>
         )}
@@ -162,66 +135,70 @@ export default function Login({ onSuccess }) {
   )
 }
 
-/* ── Styles ── */
-const styles = {
+const RADIUS = 999   // fully pill-shaped everywhere
+const BORDER = '1.5px solid #e2e8f0'
+
+const s = {
   page: {
     minHeight: '100dvh',
-    background: '#f8f9fb',
+    background: '#f4f5f7',
     display: 'flex',
     alignItems: 'flex-start',
     justifyContent: 'center',
     fontFamily: "'Inter', system-ui, sans-serif",
   },
-  container: {
+  card: {
     width: '100%',
-    maxWidth: 420,
-    padding: '48px 28px 40px',
+    maxWidth: 430,
+    padding: '52px 28px 48px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
   },
-  logoWrap: {
-    marginBottom: 20,
-  },
+
+  /* Logo — large */
   logo: {
-    height: 44,
+    height: 64,
     width: 'auto',
+    marginBottom: 24,
   },
+
   headline: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: 800,
     color: '#1a202c',
     margin: '0 0 28px',
     textAlign: 'center',
     letterSpacing: '-0.5px',
   },
-  /* Tab pill — mirrors the Gizmo Sign up / Sign in pill */
-  tabPill: {
+
+  /* Tab pill */
+  pill: {
     display: 'flex',
-    background: '#edf0f4',
-    borderRadius: 999,
+    background: '#e8eaed',
+    borderRadius: RADIUS,
     padding: 4,
-    marginBottom: 36,
+    marginBottom: 32,
     width: '100%',
-    maxWidth: 320,
+    maxWidth: 310,
   },
-  tabBtn: {
+  pillBtn: {
     flex: 1,
-    padding: '10px 0',
+    padding: '11px 0',
     border: 'none',
-    borderRadius: 999,
+    borderRadius: RADIUS,
     fontSize: 15,
     fontWeight: 700,
     cursor: 'pointer',
-    transition: 'background 0.2s, color 0.2s, box-shadow 0.2s',
+    transition: 'background 0.18s, color 0.18s, box-shadow 0.18s',
     fontFamily: 'inherit',
   },
-  tabBtnActive: {
+  pillBtnOn: {
     background: '#ffffff',
     color: '#1a202c',
-    boxShadow: '0 1px 6px rgba(0,0,0,0.12)',
+    boxShadow: '0 1px 8px rgba(0,0,0,0.13)',
   },
-  tabBtnInactive: {
+  pillBtnOff: {
     background: 'transparent',
     color: '#8a94a6',
   },
@@ -233,21 +210,22 @@ const styles = {
     flexDirection: 'column',
     gap: 14,
   },
-  fieldWrap: {
+  field: {
     display: 'flex',
     flexDirection: 'column',
-    gap: 6,
+    gap: 7,
   },
   label: {
     fontSize: 13,
     fontWeight: 600,
     color: '#4a5568',
+    paddingLeft: 4,
   },
   input: {
     width: '100%',
-    padding: '14px 16px',
-    borderRadius: 14,
-    border: '1.5px solid #e2e8f0',
+    padding: '15px 20px',
+    borderRadius: RADIUS,          // pill-shaped inputs
+    border: BORDER,
     background: '#ffffff',
     fontSize: 16,
     fontWeight: 500,
@@ -264,21 +242,23 @@ const styles = {
     textAlign: 'center',
     margin: 0,
   },
+
+  /* Primary CTA — pill, dark */
   ctaBtn: {
     width: '100%',
-    padding: '16px 0',
-    borderRadius: 14,
+    padding: '17px 0',
+    borderRadius: RADIUS,
     border: 'none',
-    background: '#4a6fa5',
+    background: '#1a202c',
     color: '#ffffff',
     fontSize: 17,
     fontWeight: 700,
     cursor: 'pointer',
-    transition: 'opacity 0.2s, transform 0.1s',
+    transition: 'opacity 0.2s',
     fontFamily: 'inherit',
-    marginTop: 4,
-    boxShadow: '0 3px 0 #2d4f80',
+    marginTop: 2,
   },
+
   forgot: {
     textAlign: 'center',
     fontSize: 14,
@@ -287,25 +267,26 @@ const styles = {
     textDecoration: 'none',
     marginTop: 2,
   },
+
   legal: {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 8,
-    marginTop: 4,
+    marginTop: 2,
   },
   legalLink: {
     fontSize: 12,
-    color: '#8a94a6',
+    color: '#9aa5b4',
     textDecoration: 'underline',
-    textDecorationColor: '#c8d0dd',
+    textDecorationColor: '#d1d9e0',
   },
   dot: {
-    color: '#c8d0dd',
+    color: '#d1d9e0',
     fontSize: 12,
   },
 
-  /* Signup tab */
+  /* Signup CTA — pill, outlined like reference image 2 */
   getBtn: {
     display: 'flex',
     alignItems: 'center',
@@ -313,18 +294,15 @@ const styles = {
     gap: 10,
     width: '100%',
     padding: '18px 0',
-    borderRadius: 14,
-    border: '1.5px solid #e2e8f0',
+    borderRadius: RADIUS,
+    border: BORDER,
     background: '#ffffff',
     color: '#1a202c',
     fontSize: 17,
     fontWeight: 700,
     textDecoration: 'none',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.07)',
-    marginTop: 8,
+    boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
     fontFamily: 'inherit',
-  },
-  getBtnIcon: {
-    fontSize: 20,
+    boxSizing: 'border-box',
   },
 }
