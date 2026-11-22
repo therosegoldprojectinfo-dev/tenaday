@@ -5,11 +5,21 @@ const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY')
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 
+const MODEL = 'claude-haiku-5-5'
+const PRICE_INPUT_PER_MTOK = 0.10
+const PRICE_OUTPUT_PER_MTOK = 0.50
+
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': 'https://numiomath.app',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
+
+const json = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+  })
 
 const SYSTEM_PROMPT = `You are an exam generator for kids aged 6 to 12 years old.
 
@@ -75,74 +85,35 @@ You MUST respond with ONLY a valid JSON object — no markdown, no backticks, no
 
 Generate exactly 15 questions total.`
 
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: CORS_HEADERS })
   if (req.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: CORS_HEADERS })
 
   try {
     // ── Auth ─────────────────────────────────────────────────────
-    const authHeader = req.headers.get('Authorization') || ''
-    const jwt = authHeader.replace('Bearer ', '')
-
+    const jwt = (req.headers.get('Authorization') || '').replace('Bearer ', '')
     const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
     const { data: { user }, error: authError } = await sb.auth.getUser(jwt)
-
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 401, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
-    }
+    if (authError || !user) return json({ error: 'Unauthorized' }, 401)
 
     // ── Parse body ───────────────────────────────────────────────
     const { exam_id, chapter_id, kid_id } = await req.json()
-
     if (!exam_id || !chapter_id || !kid_id) {
-      return new Response(
-        JSON.stringify({ error: 'exam_id, chapter_id, and kid_id are required' }),
-        { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
+      return json({ error: 'exam_id, chapter_id, and kid_id are required' }, 400)
     }
 
-    // ── Subscription check ───────────────────────────────────────
-    {
-      const { data: profile, error: profileErr } = await sb
-        .from('profiles')
-        .select('subscription_status')
-        .eq('id', user.id)
-        .single()
+    // ── Subscription check : règle unique ────────────────────────
+    const { data: hasAccess, error: accessErr } = await sb.rpc('has_active_access', { p_user_id: user.id })
+    if (accessErr || hasAccess !== true) return json({ error: 'SUBSCRIPTION_REQUIRED' }, 402)
 
-      if (profileErr || !profile || profile.subscription_status !== 'active') {
-        return new Response(
-          JSON.stringify({ error: 'SUBSCRIPTION_ACTIVATING' }),
-          { status: 402, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-        )
-      }
-    }
-
-    // ── Fetch the root exam (always use the original for page_text) ──
-    // Walk up to find the root: if this exam has a parent, fetch that instead
+    // ── Fetch the source exam ────────────────────────────────────
     const { data: sourceExam, error: examErr } = await sb
       .from('exams')
       .select('id, topic, questions, page_text, parent_exam_id, revision_number, user_id')
       .eq('id', exam_id)
       .single()
-
-    if (examErr || !sourceExam) {
-      return new Response(
-        JSON.stringify({ error: 'Exam not found' }),
-        { status: 404, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Security: make sure this exam belongs to this user
-    if (sourceExam.user_id !== user.id) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { status: 403, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
-    }
+    if (examErr || !sourceExam) return json({ error: 'Exam not found' }, 404)
+    if (sourceExam.user_id !== user.id) return json({ error: 'Unauthorized' }, 403)
 
     // Resolve the root exam to get page_text and collect all already-asked questions
     let rootExamId = sourceExam.parent_exam_id || sourceExam.id
@@ -150,7 +121,6 @@ serve(async (req) => {
     let topic = sourceExam.topic
 
     if (sourceExam.parent_exam_id) {
-      // This is already a revision — fetch the root
       const { data: rootExam } = await sb
         .from('exams')
         .select('id, topic, page_text')
@@ -163,14 +133,9 @@ serve(async (req) => {
       }
     }
 
-    if (!pageText) {
-      return new Response(
-        JSON.stringify({ error: 'NO_PAGE_TEXT' }),
-        { status: 422, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
-    }
+    if (!pageText) return json({ error: 'NO_PAGE_TEXT' }, 422)
 
-    // Fetch ALL exams in this chapter for this kid to collect already-asked questions
+    // All exams in this chapter for this kid, to avoid repeating questions
     const { data: allExams } = await sb
       .from('exams')
       .select('questions')
@@ -180,9 +145,7 @@ serve(async (req) => {
     const alreadyAsked: any[] = []
     if (allExams) {
       for (const e of allExams) {
-        if (Array.isArray(e.questions)) {
-          alreadyAsked.push(...e.questions)
-        }
+        if (Array.isArray(e.questions)) alreadyAsked.push(...e.questions)
       }
     }
 
@@ -194,28 +157,21 @@ serve(async (req) => {
         .select('id', { count: 'exact', head: true })
         .gte('created_at', `${today}T00:00:00Z`)
       if (countErr || authCount === null || authCount >= 500) {
-        return new Response(
-          JSON.stringify({ error: 'DAILY_LIMIT' }),
-          { status: 503, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-        )
+        return json({ error: 'DAILY_LIMIT' }, 503)
       }
 
       const { error: rateLimitErr } = await sb.rpc('increment_daily_quiz_count', { p_user_id: user.id })
       if (rateLimitErr) {
         const isRateLimit = rateLimitErr.message?.includes('Daily limit') || rateLimitErr.code === 'P0001'
-        return new Response(
-          JSON.stringify({ error: isRateLimit ? 'RATE_LIMIT' : 'Service error. Please try again.' }),
-          { status: isRateLimit ? 429 : 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-        )
+        return json({ error: isRateLimit ? 'RATE_LIMIT' : 'Service error. Please try again.' }, isRateLimit ? 429 : 500)
       }
     }
 
-    // ── Determine revision number ─────────────────────────────────
+    // ── Revision number ──────────────────────────────────────────
     const { count: revisionCount } = await sb
       .from('exams')
       .select('id', { count: 'exact', head: true })
       .eq('parent_exam_id', rootExamId)
-
     const newRevisionNumber = (revisionCount || 0) + 2 // +2 because original is v1
 
     // ── Call Claude ──────────────────────────────────────────────
@@ -237,7 +193,7 @@ Generate 15 new questions about this content, focusing on angles and details not
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: MODEL,
         max_tokens: 6000,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: userMessage }],
@@ -245,12 +201,8 @@ Generate 15 new questions about this content, focusing on angles and details not
     })
 
     if (!claudeResponse.ok) {
-      const err = await claudeResponse.text()
-      console.error('Claude API error:', err)
-      return new Response(
-        JSON.stringify({ error: 'Quiz generation failed' }),
-        { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
+      console.error('Claude API error:', await claudeResponse.text())
+      return json({ error: 'Quiz generation failed' }, 500)
     }
 
     const claudeData = await claudeResponse.json()
@@ -265,47 +217,31 @@ Generate 15 new questions about this content, focusing on angles and details not
         .replace(/\n?```\s*$/i, '')
         .trim()
       newExamData = JSON.parse(clean)
-
-      if (!newExamData || !Array.isArray(newExamData.questions) || newExamData.questions.length === 0) {
-        return new Response(
-          JSON.stringify({ error: 'Quiz generation failed' }),
-          { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-        )
-      }
-      for (const q of newExamData.questions) {
-        if (!q.type || !q.question || !q.correct_answer) {
-          return new Response(
-            JSON.stringify({ error: 'Quiz generation failed' }),
-            { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-          )
-        }
-        if (q.type === 'mcq' && (!Array.isArray(q.options) || q.options.length < 2)) {
-          return new Response(
-            JSON.stringify({ error: 'Quiz generation failed' }),
-            { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-          )
-        }
-      }
     } catch {
       console.error('Failed to parse Claude JSON:', rawText)
-      return new Response(
-        JSON.stringify({ error: 'Quiz generation failed' }),
-        { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
+      return json({ error: 'Quiz generation failed' }, 500)
+    }
+
+    if (!newExamData || !Array.isArray(newExamData.questions) || newExamData.questions.length === 0) {
+      return json({ error: 'Quiz generation failed' }, 500)
+    }
+    for (const q of newExamData.questions) {
+      if (!q.type || !q.question || !q.correct_answer) return json({ error: 'Quiz generation failed' }, 500)
+      if (q.type === 'mcq' && (!Array.isArray(q.options) || q.options.length < 2)) {
+        return json({ error: 'Quiz generation failed' }, 500)
+      }
     }
 
     // ── Save new exam row ────────────────────────────────────────
-    const revisionTopic = `${topic} (v${newRevisionNumber})`
-
     const { data: savedExam, error: saveErr } = await sb
       .from('exams')
       .insert({
         user_id:         user.id,
         chapter_id:      chapter_id,
         kid_id:          kid_id,
-        topic:           revisionTopic,
+        topic:           `${topic} (v${newRevisionNumber})`,
         questions:       newExamData.questions,
-        page_text:       pageText, // carry over so future revisions can also use it
+        page_text:       pageText,
         is_revision:     true,
         revision_number: newRevisionNumber,
         parent_exam_id:  rootExamId,
@@ -315,18 +251,14 @@ Generate 15 new questions about this content, focusing on angles and details not
 
     if (saveErr || !savedExam) {
       console.error('Failed to save revision exam:', saveErr)
-      return new Response(
-        JSON.stringify({ error: 'Failed to save revision exam' }),
-        { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-      )
+      return json({ error: 'Failed to save revision exam' }, 500)
     }
 
     // ── Usage tracking ───────────────────────────────────────────
     try {
       const costUsd =
-        ((usage.input_tokens || 0) * 3 / 1_000_000) +
-        ((usage.output_tokens || 0) * 15 / 1_000_000)
-
+        ((usage.input_tokens || 0) * PRICE_INPUT_PER_MTOK / 1_000_000) +
+        ((usage.output_tokens || 0) * PRICE_OUTPUT_PER_MTOK / 1_000_000)
       await sb.from('usage_logs').insert({
         user_id:       user.id,
         image_count:   0,
@@ -338,16 +270,10 @@ Generate 15 new questions about this content, focusing on angles and details not
       console.error('Usage tracking failed (non-fatal):', trackErr)
     }
 
-    return new Response(
-      JSON.stringify(savedExam),
-      { status: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-    )
+    return json(savedExam)
 
   } catch (err) {
     console.error('Edge Function error:', err)
-    return new Response(
-      JSON.stringify({ error: 'Service error. Please try again.' }),
-      { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
-    )
+    return json({ error: 'Service error. Please try again.' }, 500)
   }
 })
