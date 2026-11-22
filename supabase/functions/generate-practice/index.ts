@@ -359,19 +359,9 @@ serve(async (req) => {
       }
     }
 
-    // ---------- subscription check — allows paid (active) AND free trial (trial, within 7 days) ----------
-    const { data: profileRow, error: profileErr } = await sb
-      .from('profiles')
-      .select('subscription_status, trial_started_at')
-      .eq('id', user.id)
-      .single()
-    if (profileErr || !profileRow) return jsonResponse({ error: 'SUBSCRIPTION_ACTIVATING' }, 402)
-    const isActive = profileRow.subscription_status === 'active'
-    const isTrial =
-      profileRow.subscription_status === 'trial' &&
-      !!profileRow.trial_started_at &&
-      Date.now() - new Date(profileRow.trial_started_at).getTime() < 7 * 24 * 60 * 60 * 1000
-    if (!isActive && !isTrial) return jsonResponse({ error: 'SUBSCRIPTION_ACTIVATING' }, 402)
+    // ---------- subscription check : règle unique (abonnement payé en cours, ou accès à vie) ----------
+    const { data: hasAccess, error: accessErr } = await sb.rpc('has_active_access', { p_user_id: user.id })
+    if (accessErr || hasAccess !== true) return jsonResponse({ error: 'SUBSCRIPTION_REQUIRED' }, 402)
 
     // ---------- kid + rate limit ----------
     const { data: kid, error: kidErr } = await sb.from('kid_profiles').select('id, grade').eq('id', kid_id).eq('user_id', user.id).single()
