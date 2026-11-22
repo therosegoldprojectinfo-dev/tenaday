@@ -3,6 +3,8 @@ import { generatePractice } from '../lib/generatePractice'
 import { useLang } from '../lib/LangContext'
 import { t } from '../lib/i18n'
 
+const SUBSCRIBE_URL = 'https://buy.stripe.com/3cI28r7Qlgbt8Qe4fn1ZS07'
+
 async function compressImage(file, maxWidthPx = 1600, quality = 0.82) {
   return new Promise((resolve) => {
     const img = new Image()
@@ -29,7 +31,12 @@ function getErrorMessage(err, lang) {
   if (err?.message === 'DAILY_LIMIT' || err?.message?.includes('temporarily unavailable')) {
     return lang === 'ar' ? 'وصلنا للحد اليومي. عد غداً 🌙' : 'Daily limit reached. Come back tomorrow 🌙'
   }
-  if (err?.message === 'SUBSCRIPTION_ACTIVATING' || err?.message === 'SUBSCRIPTION_REQUIRED') {
+  if (err?.message === 'SUBSCRIPTION_REQUIRED') {
+    return lang === 'ar'
+      ? 'انتهى اشتراكك. جدده للمتابعة.'
+      : 'Your subscription has ended. Renew it to keep generating quizzes.'
+  }
+  if (err?.message === 'SUBSCRIPTION_ACTIVATING') {
     return lang === 'ar'
       ? '⏳ جاري تفعيل اشتراكك، انتظر لحظة ثم حاول مجدداً.'
       : '⏳ Your subscription is activating. Wait a moment and try again.'
@@ -91,7 +98,11 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
     }
   }
 
-  const isRateLimit = error?.message === 'RATE_LIMIT' || error?.message === 'DAILY_LIMIT' || error?.message?.includes('temporarily unavailable')
+  const isRateLimit =
+    error?.message === 'RATE_LIMIT' ||
+    error?.message === 'DAILY_LIMIT' ||
+    error?.message?.includes('temporarily unavailable')
+  const isSubscriptionEnded = error?.message === 'SUBSCRIPTION_REQUIRED'
 
   return (
     <div className="bg-white flex flex-col" style={{ height: '100dvh' }}>
@@ -183,12 +194,27 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
         {/* ERROR */}
         {status === 'error' && (
           <div className="flex-1 flex flex-col items-center justify-center gap-6 pb-10 px-4">
-            <span style={{ fontSize: 64 }}>😅</span>
+            <span style={{ fontSize: 64 }}>{isSubscriptionEnded ? '🔒' : '😅'}</span>
             <div className="text-center">
-              <p className="font-display font-bold text-xl text-ink">{t(lang, 'home_error_title')}</p>
+              <p className="font-display font-bold text-xl text-ink">
+                {isSubscriptionEnded
+                  ? (lang === 'ar' ? 'الاشتراك منتهٍ' : 'Subscription ended')
+                  : t(lang, 'home_error_title')}
+              </p>
               <p className="text-sm text-muted mt-2">{getErrorMessage(error, lang)}</p>
             </div>
-            {!isRateLimit && (
+
+            {isSubscriptionEnded && (
+              <a
+                href={SUBSCRIBE_URL}
+                className="w-full text-center text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95"
+                style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6', display: 'block', textDecoration: 'none' }}
+              >
+                {lang === 'ar' ? 'جدّد الاشتراك' : 'Renew — $15/month'}
+              </a>
+            )}
+
+            {!isRateLimit && !isSubscriptionEnded && (
               <button
                 onClick={handleReset}
                 className="w-full text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95"
@@ -197,7 +223,8 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
                 {t(lang, 'home_try_again')}
               </button>
             )}
-            {isRateLimit && (
+
+            {(isRateLimit || isSubscriptionEnded) && (
               <button onClick={handleReset} className="w-full bg-gray-100 text-muted font-display font-bold text-base rounded-2xl py-4">
                 {lang === 'ar' ? 'رجوع' : 'Go back'}
               </button>
