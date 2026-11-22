@@ -134,13 +134,18 @@ serve(async (req) => {
         break
       }
 
-      // Changement ou annulation : on suit le statut Stripe
+      // Changement ou annulation : on suit le statut Stripe.
+      // Annulation : l'accès s'arrête immédiatement (date de fin = maintenant).
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted': {
-        const status = event.type === 'customer.subscription.deleted' ? 'canceled' : mapStatus(obj.status)
+        const isDeleted = event.type === 'customer.subscription.deleted'
+        const status    = isDeleted ? 'canceled' : mapStatus(obj.status)
+        const periodEnd = isDeleted
+          ? new Date().toISOString()
+          : toIso(obj.current_period_end)
         const { error } = await sb.rpc('update_subscription_by_customer', {
           p_customer_id: obj.customer, p_subscription_id: obj.id,
-          p_status: status, p_period_end: toIso(obj.current_period_end),
+          p_status: status, p_period_end: periodEnd,
         })
         if (error) throw error
         break
