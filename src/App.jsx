@@ -4,7 +4,6 @@ import Login from './screens/Login'
 import { getStreak } from './lib/economy'
 import { getKids, createKid } from './lib/kids'
 import Nav from './components/Nav'
-import TrialEndingBanner from './components/TrialEndingBanner'
 import Chapters from './screens/Chapters'
 import CurrentChapter from './screens/CurrentChapter'
 import Home from './screens/Home'
@@ -58,7 +57,7 @@ export default function App() {
   }, [lang])
 
   const [onboarded, setOnboarded]     = useState(null)
-  const { isInactive, checked, isTrial, trialDaysLeft } = useSubscription(onboarded === true)
+  const { isInactive, checked } = useSubscription(onboarded === true)
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [tab, setTab]                 = useState('chapters')
   const [pinUnlocked, setPinUnlocked] = useState(false)
@@ -321,11 +320,6 @@ export default function App() {
           )}
 
           </main>
-
-          {/* Trial ending warning — shows once on the last day */}
-          {isTrial && trialDaysLeft === 1 && (
-            <TrialEndingBanner trialDaysLeft={trialDaysLeft} />
-          )}
 
         </div>
       </KidContext.Provider>
