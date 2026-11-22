@@ -16,12 +16,12 @@ serve(async (req) => {
 
   try {
     const params = new URLSearchParams({
-      'line_items[0][price]':    'price_1UWNZ3F3Ob4o24uqJspIzP2S',
+      'line_items[0][price]':    'price_1UefCAF3Ob4o24uqoqvAMw1D',
       'line_items[0][quantity]': '1',
-      'mode':                    'payment',
+      'mode':                    'subscription',
       'ui_mode':                 'embedded',
       'return_url':              'https://numiomath.app/success?session_id={CHECKOUT_SESSION_ID}',
-      'metadata[product]':       'numio_lifetime',
+      'metadata[product]':       'numio_monthly',
     })
 
     const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
@@ -44,7 +44,6 @@ serve(async (req) => {
       JSON.stringify({ clientSecret: session.client_secret }),
       { status: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
     )
-
   } catch (err) {
     console.error('Edge Function error:', err)
     return new Response(
