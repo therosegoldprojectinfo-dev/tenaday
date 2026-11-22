@@ -36,11 +36,6 @@ function getErrorMessage(err, lang) {
       ? 'انتهى اشتراكك. جدده للمتابعة.'
       : 'Your subscription has ended. Renew it to keep generating quizzes.'
   }
-  if (err?.message === 'SUBSCRIPTION_ACTIVATING') {
-    return lang === 'ar'
-      ? '⏳ جاري تفعيل اشتراكك، انتظر لحظة ثم حاول مجدداً.'
-      : '⏳ Your subscription is activating. Wait a moment and try again.'
-  }
   if (err?.message) return err.message
   return lang === 'ar' ? 'حدث خطأ ما. يرجى المحاولة مرة أخرى.' : 'Something went wrong. Please try again.'
 }
@@ -210,7 +205,7 @@ export default function Home({ chapter, onExamReady, onBack, kidId, initialFiles
                 className="w-full text-center text-white font-display font-bold text-lg rounded-2xl py-4 transition-all active:scale-95"
                 style={{ background: '#7c3aed', boxShadow: '0 4px 0 #5b21b6', display: 'block', textDecoration: 'none' }}
               >
-                {lang === 'ar' ? 'جدّد الاشتراك' : 'Renew — $15/month'}
+                {lang === 'ar' ? 'جدّد الاشتراك' : 'Renew — $14.98/month'}
               </a>
             )}
 
