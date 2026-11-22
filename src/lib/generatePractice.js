@@ -29,7 +29,7 @@ async function callGeneratePractice(body) {
     const err = await response.json().catch(() => ({ error: 'Unknown error' }))
     if (response.status === 429) throw new Error('RATE_LIMIT')
     if (response.status === 503) throw new Error('DAILY_LIMIT')
-    if (response.status === 402) throw new Error('SUBSCRIPTION_ACTIVATING')
+    if (response.status === 402) throw new Error('SUBSCRIPTION_REQUIRED')
     throw new Error(err.error || 'Failed to generate practice')
   }
 
