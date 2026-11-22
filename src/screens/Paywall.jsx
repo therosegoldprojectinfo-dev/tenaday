@@ -40,11 +40,11 @@ export default function Paywall() {
 
       <h2 style={S.h2}>Your subscription has ended</h2>
       <p style={S.p}>
-        Subscribe to Numio for $15/month to keep generating quizzes
+        Subscribe to Numio for $14.98/month to keep generating quizzes
         and tracking your child's progress.
       </p>
 
-      <a href={LANDING} style={S.cta}>Subscribe — $15/month →</a>
+      <a href={LANDING} style={S.cta}>Subscribe — $14.98/month →</a>
 
       <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" style={S.wa}>
         💬 Contact support
