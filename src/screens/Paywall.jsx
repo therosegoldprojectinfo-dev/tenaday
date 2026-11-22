@@ -38,16 +38,16 @@ export default function Paywall() {
     <div style={S.wrap}>
       <img src="/nav-profile.png" alt="Numio" style={S.mascot} />
 
-      <h2 style={S.h2}>Your subscription has ended</h2>
+      <h2 style={S.h2}>Ton abonnement est terminé</h2>
       <p style={S.p}>
-        Subscribe to Numio for $14.98/month to keep generating quizzes
-        and tracking your child's progress.
+        Abonne-toi à Numio pour 14,98 $/mois afin de continuer à générer des quiz
+        et à suivre les progrès de ton enfant.
       </p>
 
-      <a href={LANDING} style={S.cta}>Subscribe — $14.98/month →</a>
+      <a href={LANDING} style={S.cta}>S'abonner — 14,98 $/mois →</a>
 
       <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" style={S.wa}>
-        💬 Contact support
+        💬 Contacter le support
       </a>
 
       <style>{`@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}`}</style>
