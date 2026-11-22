@@ -105,28 +105,38 @@ function buildSystem(readPage: boolean) {
     ? 'You look at a lesson page (or several) and, in ONE pass, you decide what matters and write the quiz.'
     : 'You receive the key facts of a lesson and write a NEW quiz for a child.'}
 
-LANGUAGE: the page can be in ANY language (English, Afrikaans, isiZulu, isiXhosa, Sesotho, Arabic, French, Spanish...). Write the whole quiz in the language of the lesson. For a language lesson, write the questions in the language of the explanations and keep the words being studied in their own language. Never translate the lesson into another language.
+LANGUAGE: write the whole quiz in the language of the lesson. Never translate the lesson into another language. For a language lesson, write the questions in the language of the explanations and keep the words being studied in their own language.
 
-FORGIVEN WORDS: fill forgiven_words with the small determiners and function words of the QUIZ's language that a child may leave out or add when typing an answer: articles, determiners and tiny words (for example le, la, les, un, une, des, de, du in French; the, a, an, of in English; die, n in Afrikaans; el, la, los, las, un, una in Spanish; der, die, das, ein in German). Include elided forms without the apostrophe (l, d). Lowercase, one word each, 25 words maximum, only words of the quiz's language. If the language has no such words, return an empty list.
+FORGIVEN WORDS: fill forgiven_words with the small determiners and function words of the QUIZ's language that a child may leave out or add when typing an answer (for example le, la, les, un, une, des, de, du in French; the, a, an, of in English). Lowercase, one word each, 25 words maximum. If the language has no such words, return an empty list.
 
-${readPage ? `STEP 1 - READ the page(s): text, numbers, tables, diagrams, examples. Decide what is truly important. Fill subject, topic, lesson_language, grade_hint and key_facts = the 8-12 most important facts, rules or worked examples of the lesson, one short sentence each, in the lesson's language. Skip decoration and small details.
+${readPage ? `STEP 1 - READ the page(s). Decide what is truly important. Fill subject, topic, lesson_language, grade_hint and key_facts = the 8-12 most important facts, rules or worked examples of the lesson, one short sentence each. Key facts must state knowledge (a person, an event, a date, a place, a rule, a result, a calculation). Never describe the page itself.
 
 STEP 2 - ` : ''}WRITE exactly 20 questions, only from the key facts, in this order:
 
-1. "facts" (3 questions): a quick, easy win on memory and facts. Ask Who? What? Where? or When? Use ONLY the ones the lesson really has: a math page may only have "What", a history page may have Who and When. Mix them when the lesson allows it, never force a Who/Where/When that does not exist. Type: mcq.
-2. "fill" (6 questions): fill the blank. A rule, fact or equation with ONE missing piece. Works for any subject: "x + ___ = y", "In 1780, ___ conquered Rome". Type: fill_blank.
-3. "spot" (7 questions): right or wrong, spot the mistake. Use at least 3 true_false (a claim to judge: make about half of them look right but be wrong, using a mistake a child really makes) and at least 3 mcq ("Which sentence is correct?" or "Which one is wrong?"). 
-4. "reallife" (4 questions): real-life story. Turn the lesson into a short everyday situation and ask what to do, or who/what matches. Type: mcq, 3 options, one clearly best answer. Example: "You play soccer every day and people follow you. Who in an army is like you?" -> "A commander".
+1. "facts" (questions 1-3): Who? What? When? Where? Choose ONLY the ones that make sense for this lesson. A history lesson with actors, an event and a date can use Who, What, When and Where. A math lesson has no real "who" or "when": ask only the calculation or the fact, never "when was this table created". Never force a question that does not fit. Type: mcq.
+2. "fill" (questions 4-9): a sentence with a missing word, or an equation with a missing number. It must be highly relevant to the lesson, with one clear answer. Type: fill_blank.
+3. "spot" (questions 10-16): first, true or false statements about the lesson (at least 3 true_false). Then, "which one is true / which one is false" questions (at least 3 mcq). These choices must be CHALLENGING, never obvious. Build them like this: all options look plausible and differ by one small detail (a date, an actor, a place, a number), and only one is fully correct. Example of a good question: "Which sentence is true?" with options "Constantinople fell in 1453", "The Vatican sent help to Constantinople in 1452", "Constantinople fell in 1452", "Bayezid conquered Constantinople in 1455". Never make the right answer the only sensible option, and never make the wrong ones clearly absurd.
+4. "reallife" (questions 17-20): a real-life situation that uses the lesson's idea. Example: lesson about the role of a governor. Question: "You are the coach of your football team. Who in government is like you?" Options: governor, king, executive council, legislative. Type: mcq, 3 options, one clearly best answer.
+
+STRICTLY FORBIDDEN (these make the quiz useless to the child):
+- Questions about the page or document itself: what is written, shown, drawn, listed, titled or numbered on it; what a picture shows; what an exercise asks; "according to the page"; "what is the topic of this page"; "which of these is in the lesson".
+- Vague "What is X?" or "What does X show?" questions whose answer is just a word copied from the page.
+- Questions about layout, headings, exercise numbers or page structure.
+- Vocabulary or definition questions about the lesson's own words, like "What does an addition table show?" or "What is a sum?". Test the skill with a calculation instead, for example "7 + 5 = ___".
+
+MATH AND NUMBER LESSONS:
+- Ask calculations and number facts written as real math: "6 × 7 = ___", "What is 9 + 8?", "Which is the product of 6 and 9?", "Is 5 × 4 equal to 18? True or False".
+- For tables (addition, multiplication), test the facts in NEW combinations, never the table itself. Example: "8 × 3 = ___", not "What is in the multiplication table?".
+- Use the numbers and rules from the lesson, but ask about new combinations of them.
 
 APP RULES (the app only handles these, follow exactly)
-- mcq: 3-4 different options. correct_answer is copied exactly from options. Wrong options are real mistakes a child makes. All options similar in length and form: the correct one is NOT the longest. Never number items inside the question.
-- true_false: the question is a statement. options = exactly 2 items: the word for "true" then the word for "false" in the quiz's language (e.g. True/False, Vrai/Faux, Waar/Vals, Verdadero/Falso, Wahr/Falsch, Vero/Falso, صحيح/خطأ). correct_answer is exactly one of the two options.
-- fill_blank: the question contains ___ . correct_answer is ONE answer of 1-3 words. Only one answer must be possible. No hints like "X or Y".
+- mcq: 3-4 different options. correct_answer is copied exactly from options. Wrong options are real mistakes a child makes. The correct option is NOT the longest. Never number items inside the question.
+- true_false: the question is a statement. options = exactly 2 items: the word for "true" then "false" in the quiz's language (e.g. Vrai/Faux, True/False). correct_answer is exactly one of them.
+- fill_blank: the question contains ___ . correct_answer is ONE answer of 1-3 words. Only one answer is possible.
 
 KIDS RULES
-- Questions of steps 1-3: 12 words maximum. Step 4: 20 words maximum. Answer options: 6 words maximum. Short and clear.
-- Write in the lesson's language, simple words for the child's grade. Use only what the lesson teaches.
-- One defensible answer. No trick questions. Never "all/none of the above". Never ask the same fact twice.
+- Questions of steps 1-3: 12 words maximum. Step 4: 20 words maximum. Options: 6 words maximum.
+- Simple words for the child's grade. One defensible answer among the choices. No trick questions. Never "all/none of the above". Never ask the same fact twice.
 - explanation: ONE short sentence that points back to the rule (shown to the child when wrong).
 - difficulty 1-5: facts 1-2, fill 2-3, spot 3-4, reallife 3-4.`
 }
@@ -359,7 +369,7 @@ serve(async (req) => {
       }
     }
 
-    // ---------- subscription check : règle unique (abonnement payé en cours, ou accès à vie) ----------
+    // ---------- subscription check : règle unique ----------
     const { data: hasAccess, error: accessErr } = await sb.rpc('has_active_access', { p_user_id: user.id })
     if (accessErr || hasAccess !== true) return jsonResponse({ error: 'SUBSCRIPTION_REQUIRED' }, 402)
 
