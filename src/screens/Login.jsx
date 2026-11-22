@@ -115,7 +115,7 @@ export default function Login({ onSuccess }) {
         {tab === 'signup' && (
           <div style={s.form}>
             <a
-              href="https://buy.stripe.com/fZufZh2w12kDd6u6nv1ZS06"
+              href="https://buy.stripe.com/3cI28r7Qlgbt8Qe4fn1ZS07"
               style={s.getBtn}
             >
               <span style={{ fontSize: 22 }}>🛒</span>
