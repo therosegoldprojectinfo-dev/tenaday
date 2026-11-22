@@ -1,8 +1,5 @@
-import { useEffect, useState } from 'react'
-import { supabase } from '../lib/supabaseClient'
-
 const WHATSAPP = 'https://wa.me/14384102068'
-const LANDING  = 'https://buy.stripe.com/fZufZh2w12kDd6u6nv1ZS06'
+const LANDING  = 'https://buy.stripe.com/3cI28r7Qlgbt8Qe4fn1ZS07'
 
 const S = {
   wrap: {
@@ -11,13 +8,6 @@ const S = {
     padding: '32px 24px', background: '#fff', textAlign: 'center',
   },
   mascot: { width: 90, marginBottom: 24, animation: 'float 3s ease-in-out infinite' },
-  badge: {
-    display: 'inline-flex', alignItems: 'center', gap: 6,
-    background: '#fef3c7', border: '2px solid #fde68a',
-    borderRadius: 100, padding: '6px 16px', marginBottom: 16,
-    fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700,
-    fontSize: 13, color: '#92400e',
-  },
   h2: {
     fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 800,
     fontSize: 26, color: '#1a1a2e', marginBottom: 10,
@@ -44,51 +34,17 @@ const S = {
 }
 
 export default function Paywall() {
-  const [wasTrial, setWasTrial] = useState(false)
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
-      supabase
-        .from('profiles')
-        .select('trial_started_at, stripe_customer_id')
-        .eq('id', user.id)
-        .single()
-        .then(({ data }) => {
-          if (data?.trial_started_at && !data?.stripe_customer_id) setWasTrial(true)
-        })
-        .catch(() => {})
-    })
-  }, [])
-
   return (
     <div style={S.wrap}>
       <img src="/nav-profile.png" alt="Numio" style={S.mascot} />
 
-      {wasTrial
-        ? (
-          <>
-            <div style={S.badge}>🎉 Your free trial has ended</div>
-            <h2 style={S.h2}>Hope you enjoyed Numio!</h2>
-            <p style={S.p}>
-              Your 7-day free trial is over. Get full access to keep generating
-              quizzes and tracking your child's progress.
-            </p>
-          </>
-        ) : (
-          <>
-            <h2 style={S.h2}>Your subscription has ended</h2>
-            <p style={S.p}>
-              Renew your Numio subscription to continue generating quizzes
-              and tracking your child's progress.
-            </p>
-          </>
-        )
-      }
+      <h2 style={S.h2}>Your subscription has ended</h2>
+      <p style={S.p}>
+        Subscribe to Numio for $15/month to keep generating quizzes
+        and tracking your child's progress.
+      </p>
 
-      <a href={LANDING} style={S.cta}>
-        {wasTrial ? 'Get full access →' : 'Renew Numio →'}
-      </a>
+      <a href={LANDING} style={S.cta}>Subscribe — $15/month →</a>
 
       <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" style={S.wa}>
         💬 Contact support
